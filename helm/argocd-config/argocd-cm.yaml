@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-cm
+    app.kubernetes.io/part-of: argocd
+data:
+  # Enable admin account
+  admin.enabled: "true"
+  
+  # Enable API keys for admin
+  admin.apiKey.enabled: "true"
+  
+  # Enable ArgoCD API
+  api.enabled: "true"
+  
+  # Enable RBAC
+  rbac.enabled: "true"
+  
+  # Allow anonymous access to health endpoints
+  admin.enableHealthCheck: "true"
+  
+  # Enable application status updates
+  application.instanceLabelKey: "app.kubernetes.io/instance"
+  
+  # Enable application health checks
+  application.statusAggregator.enabled: "true"
+  
+  # Enable application sync windows
+  application.syncWindows.enabled: "true"

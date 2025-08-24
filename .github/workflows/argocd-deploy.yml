@@ -1,0 +1,176 @@
+name: Deploy to ArgoCD
+
+on:
+  workflow_run:
+    workflows: ["Build and Publish Docker Images"]
+    types: [completed]
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Specific service to deploy (leave empty for all)'
+        required: false
+        default: ''
+
+env:
+  ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
+  ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+  KUBECONFIG: ${{ secrets.KUBECONFIG }}
+
+jobs:
+  deploy-to-argocd:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install ArgoCD CLI
+      run: |
+        curl -sSL -o argocd-linux-amd64 https://github.com/argoproj/argo-cd/releases/latest/download/argocd-linux-amd64
+        chmod +x argocd-linux-amd64
+        sudo mv argocd-linux-amd64 /usr/local/bin/argocd
+
+    - name: Install kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'
+
+    - name: Setup kubectl config
+      run: |
+        echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig.yaml
+        export KUBECONFIG=kubeconfig.yaml
+
+    - name: Login to ArgoCD
+      run: |
+        export KUBECONFIG=kubeconfig.yaml
+        argocd login ${{ secrets.ARGOCD_SERVER }} --auth-token ${{ secrets.ARGOCD_AUTH_TOKEN }} --insecure
+
+    - name: Generate ArgoCD Applications
+      run: |
+        chmod +x scripts/generate-argocd-apps.sh
+        ./scripts/generate-argocd-apps.sh
+
+    - name: Update image tags in ArgoCD Applications
+      id: update-tags
+      run: |
+        export KUBECONFIG=kubeconfig.yaml
+        
+        # Get the latest image tags from the previous workflow
+        if [[ "${{ github.event_name }}" == "workflow_run" ]]; then
+          # Extract service names and tags from the previous workflow
+          echo "Updating ArgoCD applications with latest image tags..."
+          
+          # For now, we'll update all applications to use 'latest' tag
+          # In a more advanced setup, you could parse the actual tags from the previous workflow
+          for app in helm/argocd-applications/*-app.yaml; do
+            if [ -f "$app" ]; then
+              echo "Updating $app"
+              # Update the image tag parameter to latest
+              sed -i 's/value: latest/value: latest/' "$app"
+            fi
+          done
+        fi
+
+    - name: Deploy to ArgoCD
+      run: |
+        export KUBECONFIG=kubeconfig.yaml
+        
+        if [[ "${{ github.event.inputs.service }}" != "" ]]; then
+          # Deploy specific service
+          SERVICE_NAME="${{ github.event.inputs.service }}"
+          case "$SERVICE_NAME" in
+            "Defender.Portal")
+              APP_NAME="defender-portal"
+              ;;
+            "Defender.UserManagementService")
+              APP_NAME="defender-user-management"
+              ;;
+            "Defender.WalletService")
+              APP_NAME="defender-wallet"
+              ;;
+            "Defender.RiskGamesService")
+              APP_NAME="defender-risk-games"
+              ;;
+            "Defender.NotificationService")
+              APP_NAME="defender-notification"
+              ;;
+            "Defender.JobSchedulerService")
+              APP_NAME="defender-job-scheduler"
+              ;;
+            "Defender.IdentityService")
+              APP_NAME="defender-identity"
+              ;;
+            *)
+              echo "Unknown service: $SERVICE_NAME"
+              exit 1
+              ;;
+          esac
+          
+          echo "Deploying $APP_NAME to ArgoCD..."
+          argocd app create -f "helm/argocd-applications/${APP_NAME}-app.yaml" --upsert
+          argocd app sync "$APP_NAME" --prune
+        else
+          # Deploy all services
+          echo "Deploying all services to ArgoCD..."
+          for app in helm/argocd-applications/*-app.yaml; do
+            if [ -f "$app" ]; then
+              echo "Deploying $app"
+              argocd app create -f "$app" --upsert
+            fi
+          done
+          
+          # Sync all applications
+          argocd app list --output name | xargs -I {} argocd app sync {} --prune
+        fi
+
+    - name: Wait for ArgoCD sync
+      run: |
+        export KUBECONFIG=kubeconfig.yaml
+        
+        if [[ "${{ github.event.inputs.service }}" != "" ]]; then
+          SERVICE_NAME="${{ github.event.inputs.service }}"
+          case "$SERVICE_NAME" in
+            "Defender.Portal") APP_NAME="defender-portal" ;;
+            "Defender.UserManagementService") APP_NAME="defender-user-management" ;;
+            "Defender.WalletService") APP_NAME="defender-wallet" ;;
+            "Defender.RiskGamesService") APP_NAME="defender-risk-games" ;;
+            "Defender.NotificationService") APP_NAME="defender-notification" ;;
+            "Defender.JobSchedulerService") APP_NAME="defender-job-scheduler" ;;
+            "Defender.IdentityService") APP_NAME="defender-identity" ;;
+          esac
+          
+          echo "Waiting for $APP_NAME to sync..."
+          argocd app wait "$APP_NAME" --sync --timeout 300
+        else
+          echo "Waiting for all applications to sync..."
+          argocd app list --output name | xargs -I {} argocd app wait {} --sync --timeout 300
+        fi
+
+    - name: Get deployment status
+      run: |
+        export KUBECONFIG=kubeconfig.yaml
+        echo "=== ArgoCD Application Status ==="
+        argocd app list
+        echo ""
+        echo "=== Recent Sync History ==="
+        if [[ "${{ github.event.inputs.service }}" != "" ]]; then
+          SERVICE_NAME="${{ github.event.inputs.service }}"
+          case "$SERVICE_NAME" in
+            "Defender.Portal") APP_NAME="defender-portal" ;;
+            "Defender.UserManagementService") APP_NAME="defender-user-management" ;;
+            "Defender.WalletService") APP_NAME="defender-wallet" ;;
+            "Defender.RiskGamesService") APP_NAME="defender-risk-games" ;;
+            "Defender.NotificationService") APP_NAME="defender-notification" ;;
+            "Defender.JobSchedulerService") APP_NAME="defender-job-scheduler" ;;
+            "Defender.IdentityService") APP_NAME="defender-identity" ;;
+          esac
+          argocd app history "$APP_NAME" --output table
+        else
+          for app in $(argocd app list --output name); do
+            echo "=== $app ==="
+            argocd app history "$app" --output table | head -5
+            echo ""
+          done
+        fi

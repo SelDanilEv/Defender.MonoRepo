@@ -1,0 +1,80 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: default-project
+    app.kubernetes.io/part-of: argocd
+spec:
+  description: Default project for all repositories
+  sourceRepos:
+    - 'https://github.com/SelDanilEv/Defender.Localnfra.git'
+  destinations:
+    - namespace: defender
+      server: https://kubernetes.default.svc
+    - namespace: defender-staging
+      server: https://kubernetes.default.svc
+    - namespace: '*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: ''
+      kind: ConfigMap
+    - group: ''
+      kind: Secret
+    - group: ''
+      kind: Service
+    - group: ''
+      kind: ServiceAccount
+    - group: ''
+      kind: PersistentVolumeClaim
+    - group: apps
+      kind: Deployment
+    - group: apps
+      kind: StatefulSet
+    - group: networking.k8s.io
+      kind: Ingress
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: staging-project
+    app.kubernetes.io/part-of: argocd
+spec:
+  description: Staging environment for pre-production testing
+  sourceRepos:
+    - 'https://github.com/SelDanilEv/Defender.MonoRepo.git'
+  destinations:
+    - namespace: defender-staging
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: ''
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: ''
+      kind: ConfigMap
+    - group: ''
+      kind: Secret
+    - group: ''
+      kind: Service
+    - group: ''
+      kind: ServiceAccount
+    - group: ''
+      kind: PersistentVolumeClaim
+    - group: apps
+      kind: Deployment
+    - group: apps
+      kind: StatefulSet
+    - group: networking.k8s.io
+      kind: Ingress
+    - group: autoscaling
+      kind: HorizontalPodAutoscaler

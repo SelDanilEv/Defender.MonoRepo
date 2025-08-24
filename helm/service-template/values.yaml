@@ -1,0 +1,19 @@
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  requests:
+    cpu: "125m"
+    memory: "256Mi"
+  limits:
+    cpu: "250m"
+    memory: "512Mi"
+
+configMapData:
+  ASPNETCORE_ENVIRONMENT: "DockerDev"
+
+secretName: basic-secret
+
