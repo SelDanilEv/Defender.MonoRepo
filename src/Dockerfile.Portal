@@ -24,20 +24,12 @@ COPY Defender.Common/src/Defender.Common ./Defender.Common/src/Defender.Common
 COPY Defender.DistributedCache/src/Defender.DistributedCache ./Defender.DistributedCache/src/Defender.DistributedCache
 COPY Defender.Kafka/src/Defender.Kafka ./Defender.Kafka/src/Defender.Kafka
 
-RUN echo "Restoring project..." && \
-    dotnet restore "service/src/WebUI/WebUI.csproj"
+RUN dotnet restore "service/src/WebUI/WebUI.csproj"
 
 COPY $SERVICE_DIR/src ./service/src
 
-RUN echo "After copying service source:" && \
-    echo "Service directory contents:" && ls -la ./service/src/ && \
-    echo "WebUI directory contents:" && ls -la ./service/src/WebUI/
-
 WORKDIR /app-src/service/src/WebUI
-RUN echo "Current directory: $(pwd)" && \
-    echo "Directory contents:" && ls -la && \
-    echo "Building project..." && \
-    dotnet build "WebUI.csproj" -c Release -o /app/build
+RUN dotnet build "WebUI.csproj" -c Release -o /app/build
 
 FROM build AS publish
 WORKDIR /app-src/service/src/WebUI
