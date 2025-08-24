@@ -48,11 +48,6 @@ jobs:
           - name: 'Defender.GeneralTestingService'
             dockerfile: 'Dockerfile.Service'
             project_type: 'WebApi'
-        exclude:
-          # Exclude services that don't need Docker images
-          - name: 'Defender.Common'
-          - name: 'Defender.DistributedCache'
-          - name: 'Defender.Kafka'
 
     steps:
     - name: Checkout code
