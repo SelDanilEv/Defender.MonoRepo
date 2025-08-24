@@ -24,30 +24,34 @@ jobs:
     strategy:
       matrix:
         service:
-          - name: 'Defender.Portal'
+          - name: 'defender.portal'
             dockerfile: 'Dockerfile.Portal'
             project_type: 'WebUI'
-          - name: 'Defender.UserManagementService'
+            service_dir: 'Defender.Portal'
+          - name: 'defender.user-management'
             dockerfile: 'Dockerfile.Service'
             project_type: 'WebApi'
-          - name: 'Defender.WalletService'
+            service_dir: 'Defender.UserManagementService'
+          - name: 'defender.wallet'
             dockerfile: 'Dockerfile.Service'
             project_type: 'WebApi'
-          - name: 'Defender.RiskGamesService'
+            service_dir: 'Defender.WalletService'
+          - name: 'defender.risk-games'
             dockerfile: 'Dockerfile.Service'
             project_type: 'WebApi'
-          - name: 'Defender.NotificationService'
+            service_dir: 'Defender.RiskGamesService'
+          - name: 'defender.notification'
             dockerfile: 'Dockerfile.Service'
             project_type: 'WebApi'
-          - name: 'Defender.JobSchedulerService'
+            service_dir: 'Defender.NotificationService'
+          - name: 'defender.job-scheduler'
             dockerfile: 'Dockerfile.Service'
             project_type: 'WebApi'
-          - name: 'Defender.IdentityService'
+            service_dir: 'Defender.JobSchedulerService'
+          - name: 'defender.identity'
             dockerfile: 'Dockerfile.Service'
             project_type: 'WebApi'
-          - name: 'Defender.GeneralTestingService'
-            dockerfile: 'Dockerfile.Service'
-            project_type: 'WebApi'
+            service_dir: 'Defender.IdentityService'
 
     steps:
     - name: Checkout code
@@ -97,7 +101,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         build-args: |
           DOTNET_VERSION=${{ env.DOTNET_VERSION }}
-          SERVICE_DIR=${{ matrix.service.name }}
+          SERVICE_DIR=${{ matrix.service.service_dir }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
@@ -141,9 +145,19 @@ jobs:
         if [[ "$SERVICE_NAME" == "Defender.Portal" ]]; then
           echo "dockerfile=Dockerfile.Portal" >> $GITHUB_OUTPUT
           echo "project_type=WebUI" >> $GITHUB_OUTPUT
+          echo "clean_name=defender.portal" >> $GITHUB_OUTPUT
         else
           echo "dockerfile=Dockerfile.Service" >> $GITHUB_OUTPUT
           echo "project_type=WebApi" >> $GITHUB_OUTPUT
+          case "$SERVICE_NAME" in
+            "Defender.UserManagementService") echo "clean_name=defender.user-management" ;;
+            "Defender.WalletService") echo "clean_name=defender.wallet" ;;
+            "Defender.RiskGamesService") echo "clean_name=defender.risk-games" ;;
+            "Defender.NotificationService") echo "clean_name=defender.notification" ;;
+            "Defender.JobSchedulerService") echo "clean_name=defender.job-scheduler" ;;
+            "Defender.IdentityService") echo "clean_name=defender.identity" ;;
+            *) echo "clean_name=$SERVICE_NAME" ;;
+          esac
         fi
         echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
 
@@ -151,7 +165,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v5
       with:
-        images: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.service-config.outputs.service_name }}
+        images: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.service-config.outputs.clean_name }}
         tags: |
           type=raw,value=latest
           type=raw,value=${{ github.sha }}
@@ -174,5 +188,5 @@ jobs:
 
     - name: Output image info
       run: |
-        echo "Built image: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.service-config.outputs.service_name }}"
+        echo "Built image: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.service-config.outputs.clean_name }}"
         echo "Tags: ${{ steps.meta.outputs.tags }}"
