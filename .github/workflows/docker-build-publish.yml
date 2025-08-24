@@ -64,6 +64,14 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Get build info
+      id: build-info
+      run: |
+        echo "build_date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+        echo "build_time=$(date +'%H%M%S')" >> $GITHUB_OUTPUT
+        echo "build_number=${{ github.run_number }}" >> $GITHUB_OUTPUT
+        echo "short_sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
     - name: Extract metadata
       id: meta
       uses: docker/metadata-action@v5
@@ -76,6 +84,8 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=sha,prefix={{branch}}-
           type=raw,value=latest,enable={{is_default_branch}}
+          type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_number }}
+          type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_time }}-${{ steps.build-info.outputs.short_sha }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
@@ -116,6 +126,14 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+    - name: Get build info
+      id: build-info
+      run: |
+        echo "build_date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+        echo "build_time=$(date +'%H%M%S')" >> $GITHUB_OUTPUT
+        echo "build_number=${{ github.run_number }}" >> $GITHUB_OUTPUT
+        echo "short_sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+
     - name: Determine service configuration
       id: service-config
       run: |
@@ -137,6 +155,8 @@ jobs:
         tags: |
           type=raw,value=latest
           type=raw,value=${{ github.sha }}
+          type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_number }}
+          type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_time }}-${{ steps.build-info.outputs.short_sha }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
