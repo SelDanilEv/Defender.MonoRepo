@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.IdentityService.Application</RootNamespace>
+        <AssemblyName>Defender.IdentityService.Application</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Defender.Utils" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <PackageReference Include="Google.Apis.Core" />
+        <PackageReference Include="MediatR" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+
+</Project>

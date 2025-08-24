@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>Defender.Common</PackageId>
+		<Version>1.6.3</Version>
+		<Authors>Defender</Authors>
+		<Company>DefenderSD</Company>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RootNamespace>Defender.Common</RootNamespace>
+		<AssemblyName>Defender.Common</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" />
+		<PackageReference Include="FluentValidation" />
+		<PackageReference Include="MediatR" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+		<PackageReference Include="MongoDB.Driver" />
+		<PackageReference Include="Newtonsoft.Json" />
+	</ItemGroup>
+
+</Project>

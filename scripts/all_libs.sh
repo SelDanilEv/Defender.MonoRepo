@@ -1,0 +1,1 @@
+all_libs=('Defender.Common' 'Defender.DistributedCache' 'Defender.Kafka')

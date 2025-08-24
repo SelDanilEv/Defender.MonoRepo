@@ -1,0 +1,35 @@
+# Build results
+**/bin/
+**/obj/
+**/debug/
+**/release/
+# Config files
+*.user
+**/*.env
+
+# Dev tools & IDE
+.vscode/
+.vs/
+.idea/
+*.swp
+*.swo
+*._*
+
+# Dependencies
+**/node_modules/
+**/packages/
+**/bower_components/
+
+# Test results
+**/TestResults/
+coverage/
+
+# Misc
+.git
+.gitignore
+.DS_Store
+*.log
+
+# App settings
+# **/appsettings*.json
+# **/appsettings.json

@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.GeneralTestingService.Application</RootNamespace>
+        <AssemblyName>Defender.GeneralTestingService.Application</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <PackageReference Include="Google.Apis.Core" />
+        <PackageReference Include="MediatR"  />
+        <PackageReference Include="Serilog"  />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Common\Behaviours\" />
+    </ItemGroup>
+
+</Project>

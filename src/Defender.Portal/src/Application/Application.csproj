@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.Portal.Application</RootNamespace>
+        <AssemblyName>Defender.Portal.Application</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <PackageReference Include="Serilog" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Defender.DistributedCache\src\Defender.DistributedCache\Defender.DistributedCache.csproj" />
+        <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Common\Behaviours\" />
+      <Folder Include="Modules\Account\Queries\" />
+      <Folder Include="Modules\Admin\Banking\Queries\" />
+      <Folder Include="Modules\Authorization\Queries\" />
+    </ItemGroup>
+
+</Project>

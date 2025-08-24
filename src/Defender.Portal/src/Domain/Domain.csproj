@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.Portal.Domain</RootNamespace>
+        <AssemblyName>Defender.Portal.Domain</AssemblyName>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />
+    </ItemGroup>
+
+</Project>

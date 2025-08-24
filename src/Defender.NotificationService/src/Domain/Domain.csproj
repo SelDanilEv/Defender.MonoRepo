@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.NotificationService.Domain</RootNamespace>
+        <AssemblyName>Defender.NotificationService.Domain</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MediatR" />
+    </ItemGroup>
+
+     <ItemGroup>
+         <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" /> 
+    </ItemGroup> 
+
+</Project>

@@ -1,0 +1,163 @@
+name: Build and Publish Docker Images
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Specific service to build (leave empty for all)'
+        required: false
+        default: ''
+
+env:
+  DOCKER_REGISTRY: docker.io
+  DOTNET_VERSION: 8.0
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        service:
+          - name: 'Defender.Portal'
+            dockerfile: 'Dockerfile.Portal'
+            project_type: 'WebUI'
+          - name: 'Defender.UserManagementService'
+            dockerfile: 'Dockerfile.Service'
+            project_type: 'WebApi'
+          - name: 'Defender.WalletService'
+            dockerfile: 'Dockerfile.Service'
+            project_type: 'WebApi'
+          - name: 'Defender.RiskGamesService'
+            dockerfile: 'Dockerfile.Service'
+            project_type: 'WebApi'
+          - name: 'Defender.NotificationService'
+            dockerfile: 'Dockerfile.Service'
+            project_type: 'WebApi'
+          - name: 'Defender.JobSchedulerService'
+            dockerfile: 'Dockerfile.Service'
+            project_type: 'WebApi'
+          - name: 'Defender.IdentityService'
+            dockerfile: 'Dockerfile.Service'
+            project_type: 'WebApi'
+          - name: 'Defender.GeneralTestingService'
+            dockerfile: 'Dockerfile.Service'
+            project_type: 'WebApi'
+        exclude:
+          # Exclude services that don't need Docker images
+          - name: 'Defender.Common'
+          - name: 'Defender.DistributedCache'
+          - name: 'Defender.Kafka'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service.name }}
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha,prefix={{branch}}-
+          type=raw,value=latest,enable={{is_default_branch}}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./src
+        file: ./src/${{ matrix.service.dockerfile }}
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          DOTNET_VERSION=${{ env.DOTNET_VERSION }}
+          SERVICE_DIR=${{ matrix.service.name }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Output image info
+      run: |
+        echo "Built image: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service.name }}"
+        echo "Tags: ${{ steps.meta.outputs.tags }}"
+
+  # Additional job for building specific service when workflow_dispatch is used
+  build-specific-service:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != ''
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+    - name: Determine service configuration
+      id: service-config
+      run: |
+        SERVICE_NAME="${{ github.event.inputs.service }}"
+        if [[ "$SERVICE_NAME" == "Defender.Portal" ]]; then
+          echo "dockerfile=Dockerfile.Portal" >> $GITHUB_OUTPUT
+          echo "project_type=WebUI" >> $GITHUB_OUTPUT
+        else
+          echo "dockerfile=Dockerfile.Service" >> $GITHUB_OUTPUT
+          echo "project_type=WebApi" >> $GITHUB_OUTPUT
+        fi
+        echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+
+    - name: Extract metadata
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.service-config.outputs.service_name }}
+        tags: |
+          type=raw,value=latest
+          type=raw,value=${{ github.sha }}
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: ./src
+        file: ./src/${{ steps.service-config.outputs.dockerfile }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        build-args: |
+          DOTNET_VERSION=${{ env.DOTNET_VERSION }}
+          SERVICE_DIR=${{ steps.service-config.outputs.service_name }}
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+    - name: Output image info
+      run: |
+        echo "Built image: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.service-config.outputs.service_name }}"
+        echo "Tags: ${{ steps.meta.outputs.tags }}"

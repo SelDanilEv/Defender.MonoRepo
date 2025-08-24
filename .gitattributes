@@ -1,2 +1,5 @@
-# Auto detect text files and perform LF normalization
 * text=auto
+*.sh text eol=lf
+
+# https://github.com/github-linguist/linguist/blob/main/docs/overrides.md#generated-code
+**/packages.lock.json linguist-generated

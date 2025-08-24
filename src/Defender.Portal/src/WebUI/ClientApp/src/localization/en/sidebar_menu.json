@@ -1,0 +1,23 @@
+{ 
+  "header_home": "Home",
+  "page_home": "Home page",
+
+  "header_banking": "Banking",
+  "page_banking": "Banking",
+
+  "header_admin": "Admin",
+  "page_users": "Users",
+
+  "header_super_admin": "Super Admin",
+  "page_configuration": "Configuration",
+
+  "header_games": "Games",
+  "page_lottery": "Lottery",
+
+  "header_budget_tracker" : "Budget tracker",
+  "page_budget_tracker_positions" : "Positions",
+  "page_budget_tracker_reviews" : "Reviews",
+  "page_budget_tracker_diagram" : "Diagram",
+
+  "_" : "_"
+}

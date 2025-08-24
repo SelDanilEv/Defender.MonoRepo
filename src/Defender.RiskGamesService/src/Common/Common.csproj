@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.RiskGamesService.Common</RootNamespace>
+        <AssemblyName>Defender.RiskGamesService.Common</AssemblyName>
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Defender.Kafka\src\Defender.Kafka\Defender.Kafka.csproj" />
+    </ItemGroup>
+
+</Project>

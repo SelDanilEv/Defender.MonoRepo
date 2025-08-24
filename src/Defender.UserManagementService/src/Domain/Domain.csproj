@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.UserManagementService.Domain</RootNamespace>
+        <AssemblyName>Defender.UserManagementService.Domain</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />
+    </ItemGroup>
+
+</Project>

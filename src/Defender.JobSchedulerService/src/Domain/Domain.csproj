@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.JobSchedulerService.Domain</RootNamespace>
+        <AssemblyName>Defender.JobSchedulerService.Domain</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MediatR" />
+    </ItemGroup>
+
+     <ItemGroup>
+        <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />
+        <ProjectReference Include="..\..\..\Defender.Kafka\src\Defender.Kafka\Defender.Kafka.csproj" />
+    </ItemGroup> 
+
+</Project>

@@ -1,0 +1,40 @@
+{ 
+  "positions_table_title": "Positions",
+  "positions_dialog_title": "Position",	
+  "positions_table_name_column": "Name",
+  "positions_table_tags_column": "Tags",
+  "positions_table_currency_column": "Currency",
+  "positions_dialog_priority_label" : "Priority",
+  "positions_dialog_tags_label": "Add tags",
+
+  "reviews_table_title": "Reviews",
+  "reviews_table_date_column": "Date",
+  "reviews_table_positions_count_column": "Positions",
+  "reviews_table_total_column": "Total",
+
+  "reviews_dialog_add_position_button": "Add position",
+  "reviews_dialog_title": "Review",
+  "review_dialog_position_amount_label": "Amount",
+  "reviews_dialog_not_valid_rates_label": "Rates are valid for: ",
+  "reviews_dialog_rates_to_label": "Rates to: ",
+  "reviews_dialog_advanced_mode_label": "Advanced mode",
+
+  "diagram_config_start_date_label": "Start date",
+  "diagram_config_end_date_label": "End date",
+  "diagram_config_last_months_label": "Last months",
+  "diagram_config_default_main_currency_label": "ALL",
+
+  "main_diagram_trend_legend": "trend",
+
+  "groups_table_title": "Groups",
+  "groups_dialog_title": "Group",	
+  "groups_table_name_column": "Name",
+  "groups_table_tags_column": "Tags",
+  "groups_table_color_column": "Color",
+  "groups_table_trend_line_column": "Trend line",
+  "groups_dialog_tags_label": "Add tags",
+  "groups_dialog_color_label": "Color: ",
+  "groups_dialog_trend_line_label": "Trend line: ",
+
+  "_" : "_"
+}

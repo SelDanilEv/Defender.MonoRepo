@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<PackageId>Defender.DistributedCache</PackageId>
+		<Version>0.1.8</Version>
+		<Authors>Defender</Authors>
+		<Company>DefenderSD</Company>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<RootNamespace>Defender.DistributedCache</RootNamespace>
+		<AssemblyName>Defender.DistributedCache</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Dapper" />
+		<PackageReference Include="Microsoft.Extensions.Options" />
+		<PackageReference Include="Npgsql" />
+	</ItemGroup>
+
+</Project>

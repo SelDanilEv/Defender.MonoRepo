@@ -1,0 +1,23 @@
+{ 
+  "header_home": "Домой",
+  "page_home": "Главная",
+
+  "header_banking": "Банк",
+  "page_banking": "Банк",
+
+  "header_admin": "Админ",
+  "page_users": "Пользователи",
+
+  "header_super_admin": "Суперадмин",
+  "page_configuration": "Конфигурация",
+
+  "header_games": "Игры",
+  "page_lottery": "Лотерея",
+
+  "header_budget_tracker" : "Контроль бюджета",
+  "page_budget_tracker_positions" : "Позиции",
+  "page_budget_tracker_reviews" : "Обзоры",
+  "page_budget_tracker_diagram" : "Диаграмма",
+
+  "_" : "_"
+}

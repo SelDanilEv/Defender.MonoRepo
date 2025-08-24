@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.WalletService.Common</RootNamespace>
+        <AssemblyName>Defender.WalletService.Common</AssemblyName>
+
+    </PropertyGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Defender.Kafka\src\Defender.Kafka\Defender.Kafka.csproj" />
+        <ProjectReference Include="..\..\..\Defender.DistributedCache\src\Defender.DistributedCache\Defender.DistributedCache.csproj" />
+    </ItemGroup>
+
+</Project>

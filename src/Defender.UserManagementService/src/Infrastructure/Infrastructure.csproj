@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.UserManagementService.Infrastructure</RootNamespace>
+        <AssemblyName>Defender.UserManagementService.Infrastructure</AssemblyName>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Application\Application.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MongoDB.Driver" />
+    </ItemGroup>
+
+</Project>

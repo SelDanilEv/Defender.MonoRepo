@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+	<PropertyGroup>
+		<RootNamespace>Defender.DistributedCacheTestWebApi</RootNamespace>
+		<AssemblyName>Defender.DistributedCacheTestWebApi</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Swashbuckle.AspNetCore" />
+		<PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Defender.DistributedCache\Defender.DistributedCache.csproj" />
+	</ItemGroup>
+</Project>
