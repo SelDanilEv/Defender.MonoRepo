@@ -5,6 +5,10 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: defender-portal
+    app.kubernetes.io/part-of: defender
+    app.kubernetes.io/instance: defender-portal
 spec:
   project: default
   source:

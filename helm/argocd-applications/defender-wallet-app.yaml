@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-user-management
+  name: defender-wallet
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-user-management
+    app.kubernetes.io/name: defender-wallet
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-user-management
+    app.kubernetes.io/instance: defender-wallet
 spec:
   project: default
   source:
@@ -17,7 +17,7 @@ spec:
     path: helm/service-template
     helm:
       valueFiles:
-        - values-user-management.yaml
+        - values-wallet.yaml
       parameters:
         - name: image.tag
           value: latest
