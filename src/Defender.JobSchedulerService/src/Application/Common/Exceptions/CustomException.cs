@@ -8,5 +8,6 @@ public class CustomException : ServiceException
     public CustomException()
         : base(ErrorCodeHelper.GetErrorCode(ErrorCode.UnhandledError))
     {
+        
     }
 }
