@@ -6,6 +6,9 @@
 # Secrets
 /secrets
 
+# Chilly
+/chilly
+
 # User-specific files
 *.rsuser
 *.suo
