@@ -9,9 +9,20 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: "Specific service to build (leave empty for all)"
+        description: "Specific service to build (or ALL for all services)"
         required: false
-        default: ""
+        default: "ALL"
+        type: choice
+        options:
+          - "ALL"
+          - "Defender.BudgetTracker"
+          - "Defender.IdentityService"
+          - "Defender.JobSchedulerService"
+          - "Defender.NotificationService"
+          - "Defender.Portal"
+          - "Defender.RiskGamesService"
+          - "Defender.UserManagementService"
+          - "Defender.WalletService"
       force_build:
         description: "Force build even if no changes in src folder"
         required: false
@@ -190,7 +201,7 @@ jobs:
   # Additional job for building specific service when workflow_dispatch is used
   build-specific-service:
     needs: check-changes
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != '' && needs.check-changes.outputs.src-changed == 'true'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != '' && github.event.inputs.service != 'ALL' && needs.check-changes.outputs.src-changed == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -234,6 +245,7 @@ jobs:
               "Defender.NotificationService") echo "clean_name=defender.notification" ;;
               "Defender.JobSchedulerService") echo "clean_name=defender.job-scheduler" ;;
               "Defender.IdentityService") echo "clean_name=defender.identity" ;;
+              "Defender.BudgetTracker") echo "clean_name=defender.budget-tracker" ;;
               *) echo "clean_name=$SERVICE_NAME" ;;
             esac
           fi

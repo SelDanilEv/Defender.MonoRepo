@@ -1,5 +1,5 @@
 image:
-  repository: defendersd/dev-budget-tracker-service
+  repository: defendersd/budget-tracker
   tag: latest
   pullPolicy: Always
 

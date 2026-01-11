@@ -1,5 +1,5 @@
 image:
-  repository: defendersd/dev-job-scheduler-service
+  repository: defendersd/job-scheduler
   tag: latest
   pullPolicy: Always
 
