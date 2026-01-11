@@ -12,11 +12,6 @@ on:
         description: 'Docker image tag (e.g., v1.2.7 or sha-acde123)'
         required: true
         type: string
-      branch:
-        description: 'Git branch to update'
-        required: true
-        default: 'main'
-        type: string
 
 jobs:
   promote:
@@ -29,7 +24,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.branch }}
           fetch-depth: 0
           token: ${{ github.token }}
       
@@ -41,7 +35,7 @@ jobs:
       - name: Promote image tag
         run: |
           chmod +x scripts/promote-image-tag.sh
-          ./scripts/promote-image-tag.sh "${{ inputs.service }}" "${{ inputs.image_tag }}" "${{ inputs.branch }}"
+          ./scripts/promote-image-tag.sh "${{ inputs.service }}" "${{ inputs.image_tag }}"
       
       - name: Check for changes
         id: check-changes
@@ -55,9 +49,10 @@ jobs:
       - name: Commit and push changes
         if: steps.check-changes.outputs.has_changes == 'true'
         run: |
+          BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
           git add helm/service-template/values-*.yaml
-          git commit -m "chore(deploy): promote ${{ inputs.service }} to ${{ inputs.image_tag }} on ${{ inputs.branch }}"
-          git push origin ${{ inputs.branch }}
+          git commit -m "chore(deploy): promote ${{ inputs.service }} to ${{ inputs.image_tag }} on $BRANCH_NAME"
+          git push origin $BRANCH_NAME
       
       - name: No changes detected
         if: steps.check-changes.outputs.has_changes == 'false'
