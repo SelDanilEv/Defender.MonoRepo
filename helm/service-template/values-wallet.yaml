@@ -1,5 +1,5 @@
 image:
-  repository: defendersd/wallet
+  repository: defendersd/defender.wallet
   tag: latest
   pullPolicy: Always
 

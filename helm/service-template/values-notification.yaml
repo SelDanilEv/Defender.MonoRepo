@@ -1,5 +1,5 @@
 image:
-  repository: defendersd/notification
+  repository: defendersd/defender.notification
   tag: latest
   pullPolicy: Always
 

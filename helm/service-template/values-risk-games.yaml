@@ -1,5 +1,5 @@
 image:
-  repository: defendersd/risk-games
+  repository: defendersd/defender.risk-games
   tag: latest
   pullPolicy: Always
 

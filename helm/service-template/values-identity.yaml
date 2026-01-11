@@ -1,5 +1,5 @@
 image:
-  repository: defendersd/identity
+  repository: defendersd/defender.identity
   tag: latest
   pullPolicy: Always
 
