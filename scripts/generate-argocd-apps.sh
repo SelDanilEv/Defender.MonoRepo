@@ -43,9 +43,6 @@ spec:
     helm:
       valueFiles:
         - ${values_file}
-      parameters:
-        - name: image.tag
-          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: ${K8S_NAMESPACE}
