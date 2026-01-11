@@ -13,14 +13,11 @@ spec:
   project: default
   source:
     repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
-    targetRevision: HEAD
+    targetRevision: main
     path: helm/service-template
     helm:
       valueFiles:
         - values-portal.yaml
-      parameters:
-        - name: image.tag
-          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: defender
