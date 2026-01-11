@@ -136,6 +136,10 @@ jobs:
             dockerfile: "Dockerfile.Service"
             project_type: "WebApi"
             service_dir: "Defender.IdentityService"
+          - name: "defender.budget-tracker"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.BudgetTracker"
 
     steps:
       - name: Checkout code

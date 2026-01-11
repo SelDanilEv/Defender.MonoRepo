@@ -1,14 +1,25 @@
 #!/bin/bash
 
-. $(dirname "$0")/all_systems.sh
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "Service options for GitHub Actions workflows:"
+. "$SCRIPT_DIR/all_systems.sh"
+
+echo "=== Service Options for GitHub Actions Workflows ==="
 echo ""
-echo "        options:"
-./scripts/generate-service-options.sh
-echo ""
-echo "Copy the output above to replace the 'options:' section in:"
+echo "Copy this to replace the 'options:' section in:"
 echo "  - .github/workflows/docker-build-publish.yml"
 echo "  - .github/workflows/promote-image-tag.yml"
+echo ""
+echo "        options:"
+"$SCRIPT_DIR/generate-service-options.sh"
+echo ""
+echo ""
+echo "=== Service Matrix for docker-build-publish.yml ==="
+echo ""
+echo "Copy this to replace the matrix 'service:' section in:"
+echo "  - .github/workflows/docker-build-publish.yml"
+echo ""
+echo "        service:"
+"$SCRIPT_DIR/generate-service-matrix.sh"
 echo ""
 echo "Or run: ./scripts/validate-workflow-services.sh to check if workflows are in sync"
