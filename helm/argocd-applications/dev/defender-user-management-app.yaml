@@ -1,23 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-wallet
+  name: defender-user-management-app
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-wallet
+    app.kubernetes.io/name: defender-user-management-app
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-wallet
+    app.kubernetes.io/instance: defender-user-management-app
 spec:
-  project: default
+  project: auto-deploy-dev
   source:
     repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
     targetRevision: main
     path: helm/service-template
     helm:
       valueFiles:
-        - values-wallet.yaml
+        - values-user-management.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: defender

@@ -1,23 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-job-scheduler
+  name: defender-identity-app
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-job-scheduler
+    app.kubernetes.io/name: defender-identity-app
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-job-scheduler
+    app.kubernetes.io/instance: defender-identity-app
 spec:
-  project: default
+  project: auto-deploy-dev
   source:
     repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
     targetRevision: main
     path: helm/service-template
     helm:
       valueFiles:
-        - values-job-scheduler.yaml
+        - values-identity.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: defender

@@ -1,23 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-portal
+  name: defender-risk-games-app
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-portal
+    app.kubernetes.io/name: defender-risk-games-app
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-portal
+    app.kubernetes.io/instance: defender-risk-games-app
 spec:
-  project: default
+  project: auto-deploy-dev
   source:
     repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
     targetRevision: main
     path: helm/service-template
     helm:
       valueFiles:
-        - values-portal.yaml
+        - values-risk-games.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: defender

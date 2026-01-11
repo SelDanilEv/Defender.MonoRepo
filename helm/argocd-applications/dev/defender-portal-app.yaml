@@ -1,23 +1,23 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-user-management
+  name: defender-portal-app
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-user-management
+    app.kubernetes.io/name: defender-portal-app
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-user-management
+    app.kubernetes.io/instance: defender-portal-app
 spec:
-  project: default
+  project: auto-deploy-dev
   source:
     repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
     targetRevision: main
     path: helm/service-template
     helm:
       valueFiles:
-        - values-user-management.yaml
+        - values-portal.yaml
   destination:
     server: https://kubernetes.default.svc
     namespace: defender
