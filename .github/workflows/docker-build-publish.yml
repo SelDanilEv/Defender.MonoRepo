@@ -18,7 +18,57 @@ env:
   DOTNET_VERSION: 8.0
 
 jobs:
+  check-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      src-changed: ${{ steps.filter.outputs.src-changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Check for changes in src folder
+        id: filter
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "src-changed=true" >> $GITHUB_OUTPUT
+            echo "Manual workflow dispatch, building all services"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "src-changed=true" >> $GITHUB_OUTPUT
+            echo "Tag push detected, building all services"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.sha }}"
+            
+            if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -q "^src/"; then
+              echo "src-changed=true" >> $GITHUB_OUTPUT
+              echo "Changes detected in src folder"
+            else
+              echo "src-changed=false" >> $GITHUB_OUTPUT
+              echo "No changes in src folder"
+            fi
+          else
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.sha }}"
+            
+            if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]; then
+              echo "src-changed=true" >> $GITHUB_OUTPUT
+              echo "No base commit found, assuming changes"
+            else
+              if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -q "^src/"; then
+                echo "src-changed=true" >> $GITHUB_OUTPUT
+                echo "Changes detected in src folder"
+              else
+                echo "src-changed=false" >> $GITHUB_OUTPUT
+                echo "No changes in src folder"
+              fi
+            fi
+          fi
+
   build-and-publish:
+    needs: check-changes
+    if: needs.check-changes.outputs.src-changed == 'true'
     runs-on: ubuntu-latest
     
     strategy:
@@ -112,7 +162,8 @@ jobs:
 
   # Additional job for building specific service when workflow_dispatch is used
   build-specific-service:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != ''
+    needs: check-changes
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != '' && needs.check-changes.outputs.src-changed == 'true'
     runs-on: ubuntu-latest
     
     steps:
