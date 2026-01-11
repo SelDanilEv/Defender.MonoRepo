@@ -1,8 +1,7 @@
 image:
   repository: defendersd/defender.risk-games
-  tag: latest
+  tag: 20260111-36
   pullPolicy: Always
-
 ingress:
   enabled: true
   ingressClassName: traefik
@@ -11,4 +10,3 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-
