@@ -12,6 +12,11 @@ on:
         description: 'Specific service to build (leave empty for all)'
         required: false
         default: ''
+      force_build:
+        description: 'Force build even if no changes in src folder'
+        required: false
+        default: false
+        type: boolean
 
 env:
   DOCKER_REGISTRY: docker.io
@@ -32,8 +37,26 @@ jobs:
         id: filter
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "src-changed=true" >> $GITHUB_OUTPUT
-            echo "Manual workflow dispatch, building all services"
+            if [ "${{ github.event.inputs.force_build }}" == "true" ]; then
+              echo "src-changed=true" >> $GITHUB_OUTPUT
+              echo "Force build enabled, skipping src folder check"
+            else
+              BASE_SHA="${{ github.event.before }}"
+              HEAD_SHA="${{ github.sha }}"
+              
+              if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" == "0000000000000000000000000000000000000000" ]; then
+                echo "src-changed=true" >> $GITHUB_OUTPUT
+                echo "No base commit found, assuming changes"
+              else
+                if git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -q "^src/"; then
+                  echo "src-changed=true" >> $GITHUB_OUTPUT
+                  echo "Changes detected in src folder"
+                else
+                  echo "src-changed=false" >> $GITHUB_OUTPUT
+                  echo "No changes in src folder"
+                fi
+              fi
+            fi
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "src-changed=true" >> $GITHUB_OUTPUT
             echo "Tag push detected, building all services"
