@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: defender-job-scheduler-app
-  namespace: defender
+  namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
