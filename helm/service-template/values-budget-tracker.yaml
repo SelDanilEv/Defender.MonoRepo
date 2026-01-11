@@ -11,5 +11,3 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
-
-replicaCount: 3

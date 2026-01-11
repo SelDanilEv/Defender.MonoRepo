@@ -1,3 +1,5 @@
+replicaCount: 3
+
 service:
   type: ClusterIP
   port: 80
@@ -14,3 +16,4 @@ configMapData:
   ASPNETCORE_ENVIRONMENT: "DockerDev"
 
 secretName: basic-secret
+
