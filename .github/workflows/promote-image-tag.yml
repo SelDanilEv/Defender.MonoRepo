@@ -4,39 +4,56 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service name (or ALL for all services)'
+        description: "Service name (or ALL for all services)"
         required: false
-        default: 'ALL'
-        type: string
+        default: "ALL"
+        type: choice
+        options:
+          - "ALL"
+          - "Defender.BudgetTracker"
+          - "Defender.IdentityService"
+          - "Defender.JobSchedulerService"
+          - "Defender.NotificationService"
+          - "Defender.Portal"
+          - "Defender.RiskGamesService"
+          - "Defender.UserManagementService"
+          - "Defender.WalletService"
       image_tag:
-        description: 'Docker image tag (e.g., v1.2.7 or sha-acde123)'
+        description: "Docker image tag (e.g., v1.2.7 or sha-acde123)"
         required: true
         type: string
 
 jobs:
   promote:
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ github.token }}
-      
+
       - name: Configure Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-      
+
+      - name: Convert service name
+        id: convert-service
+        run: |
+          chmod +x scripts/map-service-name.sh
+          SHORT_NAME=$(./scripts/map-service-name.sh "${{ inputs.service }}")
+          echo "short_name=$SHORT_NAME" >> $GITHUB_OUTPUT
+
       - name: Promote image tag
         run: |
           chmod +x scripts/promote-image-tag.sh
-          ./scripts/promote-image-tag.sh "${{ inputs.service }}" "${{ inputs.image_tag }}"
-      
+          ./scripts/promote-image-tag.sh "${{ steps.convert-service.outputs.short_name }}" "${{ inputs.image_tag }}"
+
       - name: Check for changes
         id: check-changes
         run: |
@@ -45,7 +62,7 @@ jobs:
           else
             echo "has_changes=false" >> $GITHUB_OUTPUT
           fi
-      
+
       - name: Commit and push changes
         if: steps.check-changes.outputs.has_changes == 'true'
         run: |
@@ -53,7 +70,7 @@ jobs:
           git add helm/service-template/values-*.yaml
           git commit -m "chore(deploy): promote ${{ inputs.service }} to ${{ inputs.image_tag }} on $BRANCH_NAME"
           git push origin $BRANCH_NAME
-      
+
       - name: No changes detected
         if: steps.check-changes.outputs.has_changes == 'false'
         run: |
