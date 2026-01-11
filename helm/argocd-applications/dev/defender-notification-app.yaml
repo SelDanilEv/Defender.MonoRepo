@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-notification-app
+  name: notification
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-notification-app
+    app.kubernetes.io/name: notification
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-notification-app
+    app.kubernetes.io/instance: notification
 spec:
   project: auto-deploy-dev
   source:

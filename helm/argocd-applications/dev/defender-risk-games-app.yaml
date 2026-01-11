@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-risk-games-app
+  name: risk-games
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-risk-games-app
+    app.kubernetes.io/name: risk-games
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-risk-games-app
+    app.kubernetes.io/instance: risk-games
 spec:
   project: auto-deploy-dev
   source:

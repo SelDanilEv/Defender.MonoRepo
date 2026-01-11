@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-user-management-app
+  name: user-management
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-user-management-app
+    app.kubernetes.io/name: user-management
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-user-management-app
+    app.kubernetes.io/instance: user-management
 spec:
   project: auto-deploy-dev
   source:

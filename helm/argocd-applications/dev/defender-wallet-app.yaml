@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: defender-wallet-app
+  name: wallet
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: defender-wallet-app
+    app.kubernetes.io/name: wallet
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: defender-wallet-app
+    app.kubernetes.io/instance: wallet
 spec:
   project: auto-deploy-dev
   source:
