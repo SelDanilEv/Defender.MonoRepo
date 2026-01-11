@@ -164,6 +164,10 @@ jobs:
           type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_number }}
           type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_time }}-${{ steps.build-info.outputs.short_sha }}
 
+    - name: Print image tag
+      run: |
+        echo "Image tags: ${{ steps.meta.outputs.tags }}"
+
     - name: Build and push Docker image
       uses: docker/build-push-action@v5
       with:
@@ -245,6 +249,10 @@ jobs:
           type=raw,value=${{ github.sha }}
           type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_number }}
           type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_time }}-${{ steps.build-info.outputs.short_sha }}
+
+    - name: Print image tag
+      run: |
+        echo "Image tags: ${{ steps.meta.outputs.tags }}"
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v5

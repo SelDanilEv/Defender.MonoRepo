@@ -4,7 +4,6 @@ set -e
 
 SERVICE="${1:-}"
 IMAGE_TAG="${2:-}"
-BRANCH="${3:-}"
 VALUES_DIR="helm/service-template"
 
 if [ -z "$SERVICE" ]; then
@@ -14,11 +13,6 @@ fi
 
 if [ -z "$IMAGE_TAG" ]; then
     echo "Error: image_tag parameter is required"
-    exit 1
-fi
-
-if [ -z "$BRANCH" ]; then
-    echo "Error: branch parameter is required"
     exit 1
 fi
 
