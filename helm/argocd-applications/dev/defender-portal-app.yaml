@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: defender-portal-app
-  namespace: argocd
+  namespace: defender
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
