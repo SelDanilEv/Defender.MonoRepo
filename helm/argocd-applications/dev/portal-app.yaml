@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: job-scheduler
+  name: portal
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: job-scheduler
+    app.kubernetes.io/name: portal
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: job-scheduler
+    app.kubernetes.io/instance: portal
 spec:
   project: auto-deploy-dev
   source:
@@ -17,7 +17,10 @@ spec:
     path: helm/service-template
     helm:
       valueFiles:
-        - values-job-scheduler.yaml
+        - values-portal.yaml
+      parameters:
+        - name: image.tag
+          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: defender

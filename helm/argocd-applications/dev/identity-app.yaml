@@ -18,6 +18,9 @@ spec:
     helm:
       valueFiles:
         - values-identity.yaml
+      parameters:
+        - name: image.tag
+          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: defender

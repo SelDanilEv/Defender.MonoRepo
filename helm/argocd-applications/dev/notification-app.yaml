@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: portal
+  name: notification
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: portal
+    app.kubernetes.io/name: notification
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: portal
+    app.kubernetes.io/instance: notification
 spec:
   project: auto-deploy-dev
   source:
@@ -17,7 +17,10 @@ spec:
     path: helm/service-template
     helm:
       valueFiles:
-        - values-portal.yaml
+        - values-notification.yaml
+      parameters:
+        - name: image.tag
+          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: defender

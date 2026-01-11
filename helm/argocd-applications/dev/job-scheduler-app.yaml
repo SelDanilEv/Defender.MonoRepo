@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: notification
+  name: job-scheduler
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: notification
+    app.kubernetes.io/name: job-scheduler
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: notification
+    app.kubernetes.io/instance: job-scheduler
 spec:
   project: auto-deploy-dev
   source:
@@ -17,7 +17,10 @@ spec:
     path: helm/service-template
     helm:
       valueFiles:
-        - values-notification.yaml
+        - values-job-scheduler.yaml
+      parameters:
+        - name: image.tag
+          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: defender

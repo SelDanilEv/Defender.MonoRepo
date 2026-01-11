@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: wallet
+  name: risk-games
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
-    app.kubernetes.io/name: wallet
+    app.kubernetes.io/name: risk-games
     app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: wallet
+    app.kubernetes.io/instance: risk-games
 spec:
   project: auto-deploy-dev
   source:
@@ -17,7 +17,10 @@ spec:
     path: helm/service-template
     helm:
       valueFiles:
-        - values-wallet.yaml
+        - values-risk-games.yaml
+      parameters:
+        - name: image.tag
+          value: latest
   destination:
     server: https://kubernetes.default.svc
     namespace: defender
