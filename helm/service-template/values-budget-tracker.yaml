@@ -1,8 +1,7 @@
 image:
   repository: defendersd/defender.budget-tracker
-  tag: latest
+  tag: 20260111-36
   pullPolicy: Always
-
 ingress:
   enabled: true
   ingressClassName: traefik
