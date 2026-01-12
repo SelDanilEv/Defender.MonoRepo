@@ -5,10 +5,10 @@ autoscaling:
   maxReplicas: 2
   targetCPUUtilizationPercentage: 90
 
-
 service:
   type: ClusterIP
   port: 80
+  targetPort: 8080
 
 resources:
   requests:
@@ -22,4 +22,3 @@ configMapData:
   ASPNETCORE_ENVIRONMENT: "DockerDev"
 
 secretName: basic-secret
-
