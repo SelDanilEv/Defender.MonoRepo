@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import QueryStatsIcon from "@mui/icons-material/QueryStats";
+import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import BookmarksIcon from "@mui/icons-material/Bookmarks";
 
 const HomePage = (props: any) => {
@@ -151,7 +151,7 @@ const HomePage = (props: any) => {
           <Card sx={{ height: 120 }}>
             <CardActionArea
               component="a"
-              href="https://binary-option.coded-by-danil.dev/"
+              href="https://games.coded-by-danil.dev/"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ height: "100%" }}
@@ -180,9 +180,9 @@ const HomePage = (props: any) => {
                     component="div"
                     align="center"
                   >
-                    {u.t("home:quick_menu_binary_option")}
+                    {u.t("home:quick_menu_web_games")}
                   </Typography>
-                  <QueryStatsIcon sx={{ ml: 2 }} />
+                  <SportsEsportsIcon sx={{ ml: 2 }} />
                 </Box>
               </CardContent>
             </CardActionArea>
