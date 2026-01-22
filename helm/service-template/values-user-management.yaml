@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.user-management
-  tag: 20260122-44
+  tag: 20260122-45
   pullPolicy: Always
 ingress:
   enabled: true
