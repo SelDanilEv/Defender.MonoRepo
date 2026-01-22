@@ -193,7 +193,7 @@ const HomePage = (props: any) => {
           <Card sx={{ height: 120 }}>
             <CardActionArea
               component="a"
-              href="https://smart-note.coded-by-danil.dev/"
+              href="https://chat.coded-by-danil.dev/"
               target="_blank"
               rel="noopener noreferrer"
               sx={{ height: "100%" }}
