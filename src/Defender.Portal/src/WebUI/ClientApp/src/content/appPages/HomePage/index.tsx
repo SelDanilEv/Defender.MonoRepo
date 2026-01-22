@@ -15,7 +15,7 @@ import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
-import BookmarksIcon from "@mui/icons-material/Bookmarks";
+import HeadsetMicIcon from "@mui/icons-material/HeadsetMic";
 
 const HomePage = (props: any) => {
   const u = useUtils();
@@ -224,7 +224,7 @@ const HomePage = (props: any) => {
                   >
                     {u.t("home:quick_menu_smart_note")}
                   </Typography>
-                  <BookmarksIcon sx={{ ml: 2 }} />
+                  <HeadsetMicIcon sx={{ ml: 2 }} />
                 </Box>
               </CardContent>
             </CardActionArea>
