@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -17,7 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using ClaimTypes = Defender.Common.Consts.ClaimTypes;
 
 namespace WebApi;
@@ -125,18 +125,11 @@ public static class ConfigureServices
             );
 
             options.AddSecurityRequirement(
-                new OpenApiSecurityRequirement
+                document => new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer",
-                            },
-                        },
-                        []
+                        new OpenApiSecuritySchemeReference("Bearer", document, null),
+                        new System.Collections.Generic.List<string>()
                     },
                 }
             );

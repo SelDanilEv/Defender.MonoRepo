@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Defender.JobSchedulerService.Application.Common.Interfaces.Repositories;
 using Defender.JobSchedulerService.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -12,7 +12,7 @@ public static class ConfigureServices
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(_ => { }, Assembly.GetExecutingAssembly());
 
         RegisterRepositories(services);
 

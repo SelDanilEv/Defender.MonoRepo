@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Defender.Common.Clients.Portal;
 using Defender.GeneralTestingService.Application.Clients.Portal;
 using Defender.GeneralTestingService.Application.Common.Interfaces.Repositories;
@@ -17,7 +17,7 @@ public static class ConfigureServices
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(_ => { }, Assembly.GetExecutingAssembly());
 
         services
             .RegisterRepositories()

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Defender.Common.Clients.BudgetTracker;
 using Defender.Common.Clients.Identity;
 using Defender.Common.Clients.RiskGames;
@@ -23,7 +23,7 @@ public static class ConfigureServices
     public static IServiceCollection AddInfrastructureServices(
         this IServiceCollection services)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(_ => { }, Assembly.GetExecutingAssembly());
 
         services
             .RegisterRepositories()

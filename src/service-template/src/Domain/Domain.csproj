@@ -1,7 +1,6 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
         <RootNamespace>Defender.ServiceTemplate.Domain</RootNamespace>
         <AssemblyName>Defender.ServiceTemplate.Domain</AssemblyName>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -9,8 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Defender.Common" Version="1.6.3" />
-      <PackageReference Include="MediatR" Version="12.4.1" />
+      <PackageReference Include="Defender.Common" />
+      <PackageReference Include="MediatR" />
     </ItemGroup>
 
      <!--<ItemGroup>

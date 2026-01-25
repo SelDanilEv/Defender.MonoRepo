@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Defender.Common.Configuration.Options;
 using Defender.WalletService.Application.Common.Interfaces.Repositories;
 using Defender.WalletService.Infrastructure.Repositories;
@@ -14,7 +14,7 @@ public static class ConfigureServices
         this IServiceCollection services,
         IHostEnvironment environment)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(_ => { }, Assembly.GetExecutingAssembly());
 
         var mongoDbOptions = services
             .BuildServiceProvider()

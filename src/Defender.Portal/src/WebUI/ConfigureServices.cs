@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json.Serialization;
 using Defender.Common.Enums;
 using Defender.Common.Errors;
@@ -12,7 +12,7 @@ using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using ClaimTypes = Defender.Common.Consts.ClaimTypes;
 using ProblemDetailsOptions = Hellang.Middleware.ProblemDetails.ProblemDetailsOptions;
 
@@ -117,18 +117,11 @@ public static class ConfigureServices
             );
 
             options.AddSecurityRequirement(
-                new OpenApiSecurityRequirement
+                document => new OpenApiSecurityRequirement
                 {
                     {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer",
-                            },
-                        },
-                        new string[] { }
+                        new OpenApiSecuritySchemeReference("Bearer", document, null),
+                        new System.Collections.Generic.List<string>()
                     },
                 }
             );

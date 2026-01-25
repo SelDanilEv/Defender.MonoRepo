@@ -9,6 +9,7 @@
         <PackageReference Include="FluentValidation.AspNetCore" />
         <PackageReference Include="Hellang.Middleware.ProblemDetails" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+        <PackageReference Include="Microsoft.OpenApi" />
         <PackageReference Include="Serilog.AspNetCore" />
         <PackageReference Include="Swashbuckle.AspNetCore.Swagger" />
         <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" />

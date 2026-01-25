@@ -56,17 +56,17 @@ Each service follows a consistent layered architecture:
 
 #### Backend Technologies
 
-- **.NET 8.0**: Primary framework for all backend services
+- **.NET 10.0**: Primary framework for all backend services
 - **ASP.NET Core**: Web framework for REST APIs
-- **MediatR 12.4.1**: CQRS pattern implementation
-- **AutoMapper 13.0.1**: Object-to-object mapping
-- **FluentValidation 11.11.0**: Input validation
-- **MongoDB.Driver 3.0.0**: NoSQL database for document storage
-- **PostgreSQL (Npgsql 9.0.3)**: Relational database for distributed cache
-- **Confluent.Kafka 2.6.1**: Message broker for event-driven communication
+- **MediatR 14.0.0**: CQRS pattern implementation
+- **AutoMapper 16.0.0**: Object-to-object mapping
+- **FluentValidation 12.1.1**: Input validation
+- **MongoDB.Driver 3.6.0**: NoSQL database for document storage
+- **PostgreSQL (Npgsql 10.0.1)**: Relational database for distributed cache
+- **Confluent.Kafka 2.13.0**: Message broker for event-driven communication
 - **JWT Bearer Authentication**: Token-based authentication
-- **Serilog 4.2.0**: Structured logging
-- **Swashbuckle/Swagger**: API documentation
+- **Serilog 4.3.0**: Structured logging
+- **Swashbuckle/Swagger 10.1.0**: API documentation
 
 #### Frontend Technologies
 
@@ -150,7 +150,7 @@ Defender.ServiceName/
 
 #### Prerequisites
 
-- **.NET 8.0 SDK**
+- **.NET 10.0 SDK**
 - **Docker Desktop** (for local development)
 - **Node.js 16+** (for Portal frontend)
 - **MongoDB** (local or Docker)

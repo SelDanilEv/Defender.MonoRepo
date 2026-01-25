@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <RootNamespace>Defender.Portal.WebUI</RootNamespace>
@@ -15,6 +15,7 @@
         <PackageReference Include="FluentValidation.AspNetCore" />
         <PackageReference Include="Hellang.Middleware.ProblemDetails" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+        <PackageReference Include="Microsoft.OpenApi" />
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" >
           <TreatAsUsed>true</TreatAsUsed>
         </PackageReference>

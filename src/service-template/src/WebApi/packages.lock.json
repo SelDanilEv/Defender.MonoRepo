@@ -27,12 +27,6 @@
           "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
         }
       },
-      "Microsoft.OpenApi": {
-        "type": "Direct",
-        "requested": "[3.3.1, )",
-        "resolved": "3.3.1",
-        "contentHash": "8Xo42prPRLeQpcSv9sjajQQ0o+gL7rZ4HMUsNNI47iqK+bxDrIwLOGlN9fLAlTpJk0iyXRNR51zupMt5IdhU/w=="
-      },
       "Roslynator.Analyzers": {
         "type": "Direct",
         "requested": "[4.15.0, )",
@@ -82,11 +76,6 @@
         "type": "Transitive",
         "resolved": "1.6.1",
         "contentHash": "4H/f2uYJOZ+YObZjpY9ABrKZI+JNw3uizp6oMzTXwDw6F+2qIPhpRl/1t68O/6e98+vqNiYGu+lswmwdYUy3gg=="
-      },
-      "librdkafka.redist": {
-        "type": "Transitive",
-        "resolved": "2.13.0",
-        "contentHash": "PCtGYOJvqDo+dqxRsBidc6OJGGSCIqmh0wIWgTQljuzaxeAM8uAheNwZ/6o60hueObJj1vPczNLLeoLEu1+Q3g=="
       },
       "MediatR.Contracts": {
         "type": "Transitive",
@@ -222,61 +211,27 @@
         "resolved": "0.7.3",
         "contentHash": "U9Ix4l4cl58Kzz1rJzj5hoVTjmbx1qGMwzAcbv1j/d3NzrFaESIurQyg+ow4mivCgkE3S413y+U9k4WdnEIkRA=="
       },
-      "defender.common": {
+      "Defender.ServiceTemplate.Application": {
         "type": "Project",
         "dependencies": {
-          "AutoMapper": "[16.0.0, )",
-          "FluentValidation": "[12.1.1, )",
-          "MediatR": "[14.0.0, )",
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.2, )",
-          "MongoDB.Driver": "[3.6.0, )",
-          "Newtonsoft.Json": "[13.0.4, )"
-        }
-      },
-      "defender.distributedcache": {
-        "type": "Project",
-        "dependencies": {
-          "Dapper": "[2.1.66, )",
-          "Npgsql": "[10.0.1, )"
-        }
-      },
-      "defender.kafka": {
-        "type": "Project",
-        "dependencies": {
-          "Confluent.Kafka": "[2.13.0, )",
-          "Newtonsoft.Json": "[13.0.4, )"
-        }
-      },
-      "Defender.WalletService.Application": {
-        "type": "Project",
-        "dependencies": {
-          "Defender.WalletService.Common": "[1.0.0, )",
-          "Defender.WalletService.Domain": "[1.0.0, )",
+          "Defender.ServiceTemplate.Domain": "[1.0.0, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
-          "Google.Apis.Core": "[1.73.0, )",
           "MediatR": "[14.0.0, )",
           "Serilog": "[4.3.0, )",
           "System.IdentityModel.Tokens.Jwt": "[8.15.0, )"
         }
       },
-      "Defender.WalletService.Common": {
-        "type": "Project",
-        "dependencies": {
-          "Defender.DistributedCache": "[0.1.8, )",
-          "Defender.Kafka": "[8.0.6, )"
-        }
-      },
-      "Defender.WalletService.Domain": {
+      "Defender.ServiceTemplate.Domain": {
         "type": "Project",
         "dependencies": {
           "Defender.Common": "[1.6.3, )",
           "MediatR": "[14.0.0, )"
         }
       },
-      "Defender.WalletService.Infrastructure": {
+      "Defender.ServiceTemplate.Infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Defender.WalletService.Application": "[1.0.0, )",
+          "Defender.ServiceTemplate.Application": "[1.0.0, )",
           "MongoDB.Driver": "[3.6.0, )",
           "System.IdentityModel.Tokens.Jwt": "[8.15.0, )"
         }
@@ -284,26 +239,22 @@
       "AutoMapper": {
         "type": "CentralTransitive",
         "requested": "[16.0.0, )",
-        "resolved": "16.0.0",
-        "contentHash": "JIhkKjEsUcIPPbCR7cGQlH3a2ySLW2Tof6CXcJb5WbaoUkniREpJOlC2ROkaM/nck2b5JjptLIUdHvbItGvLGQ==",
-        "dependencies": {
-          "Microsoft.IdentityModel.JsonWebTokens": "8.14.0"
-        }
+        "resolved": "13.0.1",
+        "contentHash": "/Fx1SbJ16qS7dU4i604Sle+U9VLX+WSNVJggk6MupKVkYvvBm4XqYaeFuf67diHefHKHs50uQIS2YEDFhPCakQ=="
       },
-      "Confluent.Kafka": {
+      "Defender.Common": {
         "type": "CentralTransitive",
-        "requested": "[2.13.0, )",
-        "resolved": "2.13.0",
-        "contentHash": "QoQ0UT/XQXMjGYd337ungOq5XYITGh+S8Hjkj2tEiMsWrn1w0DvyXZgfFQyBPzlBWICBMiaBfnedIuSvss4oLQ==",
+        "requested": "[1.6.3, )",
+        "resolved": "1.6.3",
+        "contentHash": "hf0YIaFBSnO9OCJ6LMroVYVW8A4IMTOVNNvf0dF284rQyrP5r7uLFUyMTbzZubGwQjaAE0592W1VT2oCl4OSvg==",
         "dependencies": {
-          "librdkafka.redist": "2.13.0"
+          "AutoMapper": "13.0.1",
+          "FluentValidation": "11.11.0",
+          "MediatR": "12.4.1",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.11",
+          "MongoDB.Driver": "3.0.0",
+          "Newtonsoft.Json": "13.0.3"
         }
-      },
-      "Dapper": {
-        "type": "CentralTransitive",
-        "requested": "[2.1.66, )",
-        "resolved": "2.1.66",
-        "contentHash": "/q77jUgDOS+bzkmk3Vy9SiWMaetTw+NOoPAV0xPBsGVAyljd5S6P+4RUW7R3ZUGGr9lDRyPKgAMj2UAOwvqZYw=="
       },
       "FluentValidation": {
         "type": "CentralTransitive",
@@ -320,15 +271,6 @@
           "FluentValidation": "12.1.1"
         }
       },
-      "Google.Apis.Core": {
-        "type": "CentralTransitive",
-        "requested": "[1.73.0, )",
-        "resolved": "1.73.0",
-        "contentHash": "vSc7CY4KCP7HE4QTElDx/ExnGLbg9kXb89MS6cdvI+0D4sxvTYb16vGtXmF2jSDMV3iDmykSXdIUPTz8TDS6gg==",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.4"
-        }
-      },
       "MediatR": {
         "type": "CentralTransitive",
         "requested": "[14.0.0, )",
@@ -338,6 +280,12 @@
           "MediatR.Contracts": "[2.0.1, 3.0.0)",
           "Microsoft.IdentityModel.JsonWebTokens": "8.14.0"
         }
+      },
+      "Microsoft.OpenApi": {
+        "type": "CentralTransitive",
+        "requested": "[3.3.1, )",
+        "resolved": "2.3.0",
+        "contentHash": "5RZpjyt0JMmoc/aEgY9c1vE5pusdDGvkPl9qKIy9KFbRiIXD+w7gBJxX+unSjzzOcfgRoYxnO4okZyqDAL2WEw=="
       },
       "MongoDB.Driver": {
         "type": "CentralTransitive",
@@ -355,14 +303,8 @@
       "Newtonsoft.Json": {
         "type": "CentralTransitive",
         "requested": "[13.0.4, )",
-        "resolved": "13.0.4",
-        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
-      },
-      "Npgsql": {
-        "type": "CentralTransitive",
-        "requested": "[10.0.1, )",
-        "resolved": "10.0.1",
-        "contentHash": "XyUcxEfqlFomhNTG/ZdGlec+uSOQArKz0Mzz8jYKP/Jj9GM2YabU5CVZtp0yiC4f9hRp+tRZTnHMatJeJ3rwgw=="
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "Serilog": {
         "type": "CentralTransitive",

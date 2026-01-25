@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Defender.Common.Enums;
 using Defender.Common.Helpers;
 using Defender.DistributedCache.Configuration.Options;
@@ -24,7 +24,7 @@ public static class ConfigureServices
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(_ => { }, Assembly.GetExecutingAssembly());
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
 

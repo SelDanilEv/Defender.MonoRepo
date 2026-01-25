@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Defender.Common.Clients.Wallet;
 using Defender.RiskGamesService.Application.Common.Interfaces.Repositories.Lottery;
 using Defender.RiskGamesService.Application.Common.Interfaces.Repositories.Transactions;
@@ -21,7 +21,7 @@ public static class ConfigureServices
         IConfiguration configuration,
         IHostEnvironment environment)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(_ => { }, Assembly.GetExecutingAssembly());
 
         services
             .RegisterRepositories()

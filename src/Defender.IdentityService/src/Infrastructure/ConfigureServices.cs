@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Defender.Common.Clients.Notification;
 using Defender.Common.Clients.UserManagement;
 using Defender.IdentityService.Application.Common.Interfaces.Clients;
@@ -19,7 +19,7 @@ public static class ConfigureServices
 {
     public static IServiceCollection AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
+        services.AddAutoMapper(_ => { }, Assembly.GetExecutingAssembly());
 
         services
             .RegisterRepositories()
