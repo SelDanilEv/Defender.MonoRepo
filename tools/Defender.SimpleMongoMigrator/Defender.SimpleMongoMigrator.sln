@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34309.116
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Defender.SimpleMongoMigrator", "src\Defender.SimpleMongoMigrator\Defender.SimpleMongoMigrator.csproj", "{E7E027DD-887B-492E-8128-4DE3C16EE092}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EFB67AC3-9397-438C-8E51-57E4B06AA34D} = {EFB67AC3-9397-438C-8E51-57E4B06AA34D}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManualMigrator", "ManualMigrator\ManualMigrator.csproj", "{88B1CE04-50A4-4169-BC9A-6C95E796EB86}"
+	ProjectSection(ProjectDependencies) = postProject
+		{EFB67AC3-9397-438C-8E51-57E4B06AA34D} = {EFB67AC3-9397-438C-8E51-57E4B06AA34D}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MigratorLib", "MigratorLib\MigratorLib.csproj", "{EFB67AC3-9397-438C-8E51-57E4B06AA34D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E7E027DD-887B-492E-8128-4DE3C16EE092}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7E027DD-887B-492E-8128-4DE3C16EE092}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7E027DD-887B-492E-8128-4DE3C16EE092}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7E027DD-887B-492E-8128-4DE3C16EE092}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88B1CE04-50A4-4169-BC9A-6C95E796EB86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88B1CE04-50A4-4169-BC9A-6C95E796EB86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88B1CE04-50A4-4169-BC9A-6C95E796EB86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88B1CE04-50A4-4169-BC9A-6C95E796EB86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFB67AC3-9397-438C-8E51-57E4B06AA34D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFB67AC3-9397-438C-8E51-57E4B06AA34D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFB67AC3-9397-438C-8E51-57E4B06AA34D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFB67AC3-9397-438C-8E51-57E4B06AA34D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7ACC4638-7537-4972-A6C5-E5A071F70476}
+	EndGlobalSection
+EndGlobal
