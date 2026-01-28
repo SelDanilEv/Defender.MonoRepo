@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting;
 
 namespace Defender.Kafka.Service;
 
@@ -10,8 +10,8 @@ internal class KafkaEnvPrefixer(
     {
         var env = hostEnvironment.EnvironmentName switch
         {
-            "Production" or "DockerProd" => "prod",
-            "Development" or "DockerDev" => "dev",
+            "Production" or "DockerProd" or "Prod" => "prod",
+            "Development" or "DockerDev" or "Dev" => "dev",
             "Local" or "DockerLocal" => "local",
             _ => "local",
         };

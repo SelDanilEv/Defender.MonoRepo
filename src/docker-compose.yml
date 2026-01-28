@@ -2,8 +2,39 @@ networks:
   external-network:
     external: true
 
+x-service-base: &service-base
+  build:
+    context: .
+    dockerfile: Dockerfile.Service
+  networks:
+    - external-network
+
+x-service-local: &service-local
+  profiles:
+    - local
+  environment:
+    - ASPNETCORE_ENVIRONMENT=Local
+  env_file:
+    - ../secrets/secrets.local.list
+
+x-service-dev: &service-dev
+  profiles:
+    - dev
+  environment:
+    - ASPNETCORE_ENVIRONMENT=Dev
+  env_file:
+    - ../secrets/secrets.dev.list
+
+x-portal-base: &portal-base
+  build:
+    context: .
+    dockerfile: Dockerfile.Portal
+  networks:
+    - external-network
+
 services:
   local-identity-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -12,15 +43,22 @@ services:
     image: local-identity-service
     container_name: LocalIdentityService
     ports:
-      - "47050:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47050:8080"
+
+  dev-identity-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.IdentityService
+    image: local-identity-service
+    container_name: LocalIdentityService
+    ports:
+      - "47050:8080"
 
   local-user-management-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -29,15 +67,22 @@ services:
     image: local-user-management-service
     container_name: LocalUserManagementService
     ports:
-      - "47051:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47051:8080"
+
+  dev-user-management-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.UserManagementService
+    image: local-user-management-service
+    container_name: LocalUserManagementService
+    ports:
+      - "47051:8080"
 
   local-notification-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -46,15 +91,22 @@ services:
     image: local-notification-service
     container_name: LocalNotificationService
     ports:
-      - "47052:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47052:8080"
+
+  dev-notification-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.NotificationService
+    image: local-notification-service
+    container_name: LocalNotificationService
+    ports:
+      - "47052:8080"
 
   local-portal:
+    <<: [*portal-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Portal
@@ -63,15 +115,22 @@ services:
     image: local-portal
     container_name: LocalPortal
     ports:
-      - "47053:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47053:8080"
+
+  dev-portal:
+    <<: [*portal-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Portal
+      args:
+        SERVICE_DIR: Defender.Portal
+    image: local-portal
+    container_name: LocalPortal
+    ports:
+      - "47053:8080"
 
   # local-secret-management-service:
+  #   <<: [*service-base, *service-local]
   #   build:
   #     context: .
   #     dockerfile: Dockerfile.Service
@@ -81,14 +140,21 @@ services:
   #   container_name: LocalSecretManagementService
   #   ports:
   #     - "47056:80"
-  #   environment:
-  #     - ASPNETCORE_ENVIRONMENT=DockerLocal
-  #   env_file:
-  #     - ../secrets/secrets.local.list
-  #   networks:
-  #     - external-network
+  #
+  # dev-secret-management-service:
+  #   <<: [*service-base, *service-dev]
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.Service
+  #     args:
+  #       SERVICE_DIR: Defender.SecretManagementService
+  #   image: local-secret-management-service
+  #   container_name: LocalSecretManagementService
+  #   ports:
+  #     - "47056:80"
 
   local-job-scheduler-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -97,15 +163,22 @@ services:
     image: local-job-scheduler-service
     container_name: LocalJobSchedulerService
     ports:
-      - "47057:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47057:8080"
+
+  dev-job-scheduler-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.JobSchedulerService
+    image: local-job-scheduler-service
+    container_name: LocalJobSchedulerService
+    ports:
+      - "47057:8080"
 
   local-wallet-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -114,15 +187,22 @@ services:
     image: local-wallet-service
     container_name: LocalWalletService
     ports:
-      - "47058:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47058:8080"
+
+  dev-wallet-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.WalletService
+    image: local-wallet-service
+    container_name: LocalWalletService
+    ports:
+      - "47058:8080"
 
   local-general-testing-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -131,15 +211,22 @@ services:
     image: local-general-testing-service
     container_name: LocalGeneralTestingService
     ports:
-      - "47059:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47059:8080"
+
+  dev-general-testing-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.GeneralTestingService
+    image: local-general-testing-service
+    container_name: LocalGeneralTestingService
+    ports:
+      - "47059:8080"
 
   local-risk-games-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -148,15 +235,22 @@ services:
     image: local-risk-games-service
     container_name: LocalRiskGamesService
     ports:
-      - "47060:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47060:8080"
+
+  dev-risk-games-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.RiskGamesService
+    image: local-risk-games-service
+    container_name: LocalRiskGamesService
+    ports:
+      - "47060:8080"
 
   local-budget-tracker-service:
+    <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
@@ -165,13 +259,19 @@ services:
     image: local-budget-tracker-service
     container_name: LocalBudgetTrackerService
     ports:
-      - "47061:80"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=DockerLocal
-    env_file:
-      - ../secrets/secrets.local.list
-    networks:
-      - external-network
+      - "47061:8080"
+
+  dev-budget-tracker-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.BudgetTracker
+    image: local-budget-tracker-service
+    container_name: LocalBudgetTrackerService
+    ports:
+      - "47061:8080"
 
   mongo_local:
     container_name: "mongo_local"
@@ -191,7 +291,7 @@ services:
       - "mongo_local_config:/data/configdb"
 
   local-postgres-service:
-    image: postgres:latest
+    image: postgres:16
     container_name: local-postgres-service
     environment:
       - POSTGRES_USER=postgres

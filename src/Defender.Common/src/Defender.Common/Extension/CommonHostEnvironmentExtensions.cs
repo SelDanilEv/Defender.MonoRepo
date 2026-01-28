@@ -1,4 +1,4 @@
-﻿using Defender.Common.Enums;
+using Defender.Common.Enums;
 using Microsoft.Extensions.Hosting;
 
 namespace Defender.Common.Extension;
@@ -8,6 +8,7 @@ public static class CommonHostEnvironmentExtensions
     public static bool IsLocalOrDevelopment(this IHostEnvironment hostEnvironment)
     {
         return hostEnvironment.IsEnvironment("Development")
+            || hostEnvironment.IsEnvironment("Dev")
             || hostEnvironment.IsEnvironment("Local")
             || hostEnvironment.IsEnvironment("DockerLocal")
             || hostEnvironment.IsEnvironment("DockerDev");
@@ -17,8 +18,8 @@ public static class CommonHostEnvironmentExtensions
     {
         return hostEnvironment.EnvironmentName switch
         {
-            "Production" or "DockerProd" => AppEnvironment.prod,
-            "Development" or "DockerDev" => AppEnvironment.dev,
+            "Production" or "DockerProd" or "Prod" => AppEnvironment.prod,
+            "Development" or "DockerDev" or "Dev" => AppEnvironment.dev,
             "Local" or "DockerLocal" => AppEnvironment.local,
             _ => AppEnvironment.local,
         };
