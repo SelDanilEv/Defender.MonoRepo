@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.notification
-  tag: 20260128-48
+  tag: 20260128-49
   pullPolicy: Always
 ingress:
   enabled: true
