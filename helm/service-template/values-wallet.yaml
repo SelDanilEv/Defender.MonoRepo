@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.wallet
-  tag: 20260125-47
+  tag: 20260128-48
   pullPolicy: Always
 ingress:
   enabled: true
