@@ -15,11 +15,18 @@ export const mapToDataset = (
 
     history.allowedCurrencies.forEach((currency) => {
       groups.forEach((group) => {
-        const records = record.positions.filter(
-          (r) =>
-            r.currency === currency &&
-            group.tags.every((t) => r.tags.includes(t))
+        const datasetKey = buildDatasetItemId(currency, group.id);
+        const recordsByName = record.positions.filter(
+          (r) => r.currency === currency && r.name === datasetKey
         );
+        const records =
+          recordsByName.length > 0
+            ? recordsByName
+            : record.positions.filter(
+                (r) =>
+                  r.currency === currency &&
+                  group.tags.every((t) => r.tags.includes(t))
+              );
 
         if (!records.length) {
           return;
