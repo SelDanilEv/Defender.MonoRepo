@@ -1,0 +1,55 @@
+networks:
+  external-network:
+    external: true
+
+services:
+  secret-management-local:
+    profiles: ["local"]
+    build:
+      context: ../..
+      dockerfile: tools/Defender.SecretManagementService/src/Dockerfile
+    image: local-secret-management-service
+    container_name: LocalSecretManagementService
+    ports:
+      - "47056:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Local
+      - PORT=80
+    env_file:
+      - ./secrets/secrets.local.list
+    networks:
+      - external-network
+
+  secret-management-dev:
+    profiles: ["dev"]
+    build:
+      context: ../..
+      dockerfile: tools/Defender.SecretManagementService/src/Dockerfile
+    image: dev-secret-management-service
+    container_name: DevSecretManagementService
+    ports:
+      - "47056:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Dev
+      - PORT=80
+    env_file:
+      - ./secrets/secrets.dev.list
+    networks:
+      - external-network
+
+  secret-management-prod:
+    profiles: ["prod"]
+    build:
+      context: ../..
+      dockerfile: tools/Defender.SecretManagementService/src/Dockerfile
+    image: prod-secret-management-service
+    container_name: ProdSecretManagementService
+    ports:
+      - "47056:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - PORT=80
+    env_file:
+      - ./secrets/secrets.prod.list
+    networks:
+      - external-network

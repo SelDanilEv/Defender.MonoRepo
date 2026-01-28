@@ -1,0 +1,1 @@
+It's a simple mongo migrator console app that helps me to sync mongo database on different clusters (local + cloud)
