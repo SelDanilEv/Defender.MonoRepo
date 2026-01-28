@@ -28,10 +28,13 @@ public class MongoMigrator(IConfiguration configuration)
         Env targetCollections,
         Env resultCollection)
     {
-        if(_sourceClient is null || _destinationClient is null) 
+        SetupClients(source, destination, targetCollections, resultCollection);
+
+        if (_sourceClient is null || _destinationClient is null)
             throw new InvalidOperationException("Mongo clients are not initialized. Call SetupClients first.");
 
-        SetupClients(source, destination, targetCollections, resultCollection);
+        if (source == destination && targetCollections == resultCollection)
+            throw new InvalidOperationException("Source and destination environments must be different to avoid data loss.");
 
         using var cursor = await _sourceClient.ListDatabaseNamesAsync();
 

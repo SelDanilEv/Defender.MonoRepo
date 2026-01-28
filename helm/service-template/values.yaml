@@ -19,6 +19,6 @@ resources:
     memory: "512Mi"
 
 configMapData:
-  ASPNETCORE_ENVIRONMENT: "DockerDev"
+  ASPNETCORE_ENVIRONMENT: "Prod"
 
 secretName: basic-secret
