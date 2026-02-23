@@ -9,6 +9,7 @@ import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import AllInboxIcon from "@mui/icons-material/AllInbox";
 import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import GradingIcon from "@mui/icons-material/Grading";
+import RestaurantIcon from "@mui/icons-material/Restaurant";
 
 import MenuItem from "./MenuItem";
 import useUtils from "src/appUtils";
@@ -277,6 +278,27 @@ const RoleBasedMenu = (props: any) => {
                   to="/games/lottery"
                   icon={<LocalActivityIcon style={{ fontSize: "1.5em" }} />}
                   text={u.t("sidebar_menu:page_lottery")}
+                />
+              </List>
+            </SubMenuWrapper>
+          </List>
+        );
+        result.push(
+          <List
+            key={"food_adviser"}
+            component="div"
+            subheader={
+              <ListSubheader component="div" disableSticky>
+                {u.t("sidebar_menu:header_food_adviser")}
+              </ListSubheader>
+            }
+          >
+            <SubMenuWrapper>
+              <List component="div">
+                <MenuItem
+                  to="/food-adviser"
+                  icon={<RestaurantIcon style={{ fontSize: "1.5em" }} />}
+                  text={u.t("sidebar_menu:page_food_adviser")}
                 />
               </List>
             </SubMenuWrapper>

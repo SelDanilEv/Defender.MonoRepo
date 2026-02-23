@@ -26,6 +26,7 @@ Ports:
 - 47059 - Local General Testing Service
 - 47060 - Local Risk Games Service
 - 47061 - Local Budget Tracker Service
+- 47062 - Local Personal Food Adviser
 
 2. Dev
 
@@ -41,3 +42,4 @@ Ports:
 - 49059 - Dev General Testing Service
 - 49060 - Dev Risk Games Service
 - 49061 - Dev Budget Tracker Service
+- 49062 - Dev Personal Food Adviser

@@ -69,6 +69,21 @@ const BudgetTrackerReviewsPage = Loader(
   lazy(() => import("src/content/appPages/BudgetTracker/Review"))
 );
 
+// Food Adviser
+
+const FoodAdviserHomePage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdviser"))
+);
+const FoodAdviserSessionNewPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdviser/SessionNew"))
+);
+const FoodAdviserSessionReviewPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdviser/SessionReview"))
+);
+const FoodAdviserSessionRecommendationsPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdviser/SessionRecommendations"))
+);
+
 // Home
 
 const HomePage = Loader(lazy(() => import("src/content/appPages/HomePage")));
@@ -281,6 +296,32 @@ const routes: RouteObject[] = [
       {
         path: "update",
         element: <AccountInfo />,
+      },
+      {
+        path: "*",
+        element: <Status404 />,
+      },
+    ],
+  },
+  {
+    path: "food-adviser",
+    element: <SidebarLayout />,
+    children: [
+      {
+        path: "",
+        element: <FoodAdviserHomePage />,
+      },
+      {
+        path: "session/new",
+        element: <FoodAdviserSessionNewPage />,
+      },
+      {
+        path: "session/:sessionId/review",
+        element: <FoodAdviserSessionReviewPage />,
+      },
+      {
+        path: "session/:sessionId/recommendations",
+        element: <FoodAdviserSessionRecommendationsPage />,
       },
       {
         path: "*",

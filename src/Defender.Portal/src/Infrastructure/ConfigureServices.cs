@@ -9,6 +9,7 @@ using Defender.Portal.Application.Common.Interfaces.Wrappers;
 using Defender.Portal.Application.Configuration.Options;
 using Defender.Portal.Infrastructure.Clients.BudgetTracker;
 using Defender.Portal.Infrastructure.Clients.Identity;
+using Defender.Portal.Infrastructure.Clients.PersonalFoodAdviser;
 using Defender.Portal.Infrastructure.Clients.RiskGames;
 using Defender.Portal.Infrastructure.Clients.UserManagement;
 using Defender.Portal.Infrastructure.Clients.Wallet;
@@ -40,6 +41,7 @@ public static class ConfigureServices
         services.AddTransient<IWalletWrapper, WalletWrapper>();
         services.AddTransient<IRiskGamesWrapper, RiskGamesWrapper>();
         services.AddTransient<IBudgetTrackerWrapper, BudgetTrackerWrapper>();
+        services.AddTransient<IPersonalFoodAdviserWrapper, PersonalFoodAdviserWrapper>();
 
         //services.AddHostedService<KeepAliveHostedService>();
 
@@ -85,6 +87,11 @@ public static class ConfigureServices
             {
                 client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<BudgetTrackerOptions>>().Value.Url);
             });
+
+        services.AddHttpClient<IPersonalFoodAdviserClient, PersonalFoodAdviserClient>((serviceProvider, client) =>
+        {
+            client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<PersonalFoodAdviserOptions>>().Value.Url.TrimEnd('/') + "/");
+        });
 
         return services;
     }

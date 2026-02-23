@@ -61,6 +61,18 @@ const APIEndpoints = {
     getGroups: "groups",
     group: "group",
   },
+  foodAdviser: {
+    getPreferences: "preferences",
+    updatePreferences: "preferences",
+    createSession: "session",
+    getSession: "session",
+    uploadImages: "session",
+    confirmMenu: "session",
+    requestParsing: "session",
+    requestRecommendations: "session",
+    getRecommendations: "session",
+    submitRating: "rating",
+  },
 };
 
 const APIUrls = () => {

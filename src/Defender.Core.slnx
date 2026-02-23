@@ -49,6 +49,12 @@
     <Project Path="Defender.WalletService/src/Infrastructure/Infrastructure.csproj" />
     <Project Path="Defender.WalletService/src/WebApi/WebApi.csproj" />
   </Folder>
+  <Folder Name="/Defender.PersonalFoodAdviser/">
+    <Project Path="Defender.PersonalFoodAdviser/src/Application/Application.csproj" />
+    <Project Path="Defender.PersonalFoodAdviser/src/Domain/Domain.csproj" />
+    <Project Path="Defender.PersonalFoodAdviser/src/Infrastructure/Infrastructure.csproj" />
+    <Project Path="Defender.PersonalFoodAdviser/src/WebApi/WebApi.csproj" />
+  </Folder>
   <Folder Name="/Libraries/" />
   <Folder Name="/Libraries/Defender.Common/">
     <Project Path="Defender.Common/src/Defender.Common/Defender.Common.csproj" />

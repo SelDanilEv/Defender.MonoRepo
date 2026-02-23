@@ -6,7 +6,8 @@
 # Secrets
 /secrets
 /secrets.prod
-/tools/Defender.SecretManagementService/secrets/secrets.prod.list
+/tools/Defender.SecretManagementService/secrets/*.list
+!/tools/Defender.SecretManagementService/secrets/*.template.list
 
 # Chilly
 /chilly

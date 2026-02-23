@@ -8,12 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Defender.Common" />
       <PackageReference Include="MediatR" />
     </ItemGroup>
 
-     <!--<ItemGroup>
-         <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />   
-    </ItemGroup>--> 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Defender.Common\src\Defender.Common\Defender.Common.csproj" />
+    </ItemGroup> 
 
 </Project>

@@ -1,1 +1,1 @@
-all_systems=('Defender.BudgetTracker' 'Defender.IdentityService' 'Defender.JobSchedulerService' 'Defender.NotificationService' 'Defender.Portal' 'Defender.RiskGamesService' 'Defender.UserManagementService' 'Defender.WalletService')
+all_systems=('Defender.BudgetTracker' 'Defender.IdentityService' 'Defender.JobSchedulerService' 'Defender.NotificationService' 'Defender.PersonalFoodAdviser' 'Defender.Portal' 'Defender.RiskGamesService' 'Defender.UserManagementService' 'Defender.WalletService')

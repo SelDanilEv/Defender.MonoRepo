@@ -1,4 +1,4 @@
-﻿using Defender.Portal.Application.Configuration.Options;
+using Defender.Portal.Application.Configuration.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,6 +13,7 @@ public static class ServiceOptionsExtensions
         services.Configure<WalletOptions>(configuration.GetSection(nameof(WalletOptions)));
         services.Configure<RiskGamesOptions>(configuration.GetSection(nameof(RiskGamesOptions)));
         services.Configure<BudgetTrackerOptions>(configuration.GetSection(nameof(BudgetTrackerOptions)));
+        services.Configure<PersonalFoodAdviserOptions>(configuration.GetSection(nameof(PersonalFoodAdviserOptions)));
 
         return services;
     }

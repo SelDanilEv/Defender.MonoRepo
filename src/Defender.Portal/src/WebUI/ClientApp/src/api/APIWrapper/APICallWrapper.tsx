@@ -35,6 +35,8 @@ const APICallWrapper = async ({
 
     switch (response.status) {
       case 200:
+      case 201:
+      case 202:
         onSuccess(response);
 
         if (showSuccess || successMessage) {

@@ -2,7 +2,6 @@
   <ItemGroup>
     <PackageVersion Include="AutoMapper" Version="16.0.0" />
     <PackageVersion Include="Confluent.Kafka" Version="2.13.0" />
-    <PackageVersion Include="Defender.Common" Version="1.6.3" />
     <PackageVersion Include="Defender.Utils" Version="1.0.9" />
     <PackageVersion Include="Dapper" Version="2.1.66" />
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
@@ -16,6 +15,8 @@
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.2" />
     <PackageVersion Include="Microsoft.AspNetCore.SpaProxy" Version="10.0.2" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />

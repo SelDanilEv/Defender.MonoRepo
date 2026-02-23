@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: personal-food-adviser
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: personal-food-adviser
+    app.kubernetes.io/part-of: defender
+    app.kubernetes.io/instance: personal-food-adviser
+spec:
+  project: auto-deploy-dev
+  source:
+    repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
+    targetRevision: main
+    path: helm/service-template
+    helm:
+      valueFiles:
+        - values-personal-food-adviser.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: defender
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

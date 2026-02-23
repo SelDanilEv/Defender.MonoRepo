@@ -1,4 +1,4 @@
-{ 
+{
   "header_home": "Home",
   "page_home": "Home page",
 
@@ -14,10 +14,13 @@
   "header_games": "Games",
   "page_lottery": "Lottery",
 
-  "header_budget_tracker" : "Budget tracker",
-  "page_budget_tracker_positions" : "Positions",
-  "page_budget_tracker_reviews" : "Reviews",
-  "page_budget_tracker_diagram" : "Diagram",
+  "header_budget_tracker": "Budget tracker",
+  "page_budget_tracker_positions": "Positions",
+  "page_budget_tracker_reviews": "Reviews",
+  "page_budget_tracker_diagram": "Diagram",
 
-  "_" : "_"
+  "header_food_adviser": "Food Adviser",
+  "page_food_adviser": "Food Adviser",
+
+  "_": "_"
 }
