@@ -4,6 +4,7 @@ using Defender.PersonalFoodAdviser.Application.Kafka;
 using Defender.PersonalFoodAdviser.Application.Services;
 using Defender.PersonalFoodAdviser.Domain.Entities;
 using Defender.PersonalFoodAdviser.Domain.Enums;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Defender.PersonalFoodAdviser.Tests;
@@ -13,9 +14,10 @@ public class MenuSessionServiceTests
     private readonly Mock<IMenuSessionRepository> _repository = new();
     private readonly Mock<IDefaultKafkaProducer<MenuParsingRequestedEvent>> _parsingProducer = new();
     private readonly Mock<IDefaultKafkaProducer<RecommendationsRequestedEvent>> _recommendationsProducer = new();
+    private readonly Mock<ILogger<MenuSessionService>> _logger = new();
 
     private MenuSessionService CreateSut()
-        => new(_repository.Object, _parsingProducer.Object, _recommendationsProducer.Object);
+        => new(_repository.Object, _parsingProducer.Object, _recommendationsProducer.Object, _logger.Object);
 
     [Fact]
     public async Task GetByIdAsync_WhenSessionBelongsToDifferentUser_ReturnsNull()

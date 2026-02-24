@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -17,7 +17,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "src\WebApi\WebApi
 		{34C0FACD-F3D9-400C-8945-554DD6B0819A} = {34C0FACD-F3D9-400C-8945-554DD6B0819A}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Defender.PersonalFoodAdviser.Tests", "src\Defender.PersonalFoodAdviser.Tests\Defender.PersonalFoodAdviser.Tests.csproj", "{E8A1B2C3-D4E5-4F67-8901-234567890ABC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Defender.PersonalFoodAdviser.Tests", "src\\Tests\\Defender.PersonalFoodAdviser.Tests.csproj", "{E8A1B2C3-D4E5-4F67-8901-234567890ABC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Defender.Common", "..\Defender.Common\src\Defender.Common\Defender.Common.csproj", "{B350C690-BB45-45FD-B489-3F4CB2644D85}"
 EndProject
@@ -74,3 +74,4 @@ Global
 		SolutionGuid = {3CB609D9-5D54-4C11-A371-DAAC8B74E430}
 	EndGlobalSection
 EndGlobal
+

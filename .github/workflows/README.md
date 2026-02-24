@@ -7,6 +7,7 @@ This GitHub Action workflow automatically builds and publishes Docker images for
 - **Matrix Build**: Builds all services in parallel for faster execution
 - **Smart Tagging**: Automatically creates appropriate tags based on git events
 - **Manual Trigger**: Can build specific services on demand
+- **NuGet Egress Preflight**: Verifies outbound HTTPS to NuGet before `dotnet test`
 - **Caching**: Uses GitHub Actions cache for faster builds
 - **Security**: Only pushes images on main/develop branches and tags (not on PRs)
 
@@ -111,6 +112,7 @@ The workflow uses the `./src` directory as the build context, which contains:
 1. **Authentication failed**: Check your Docker Hub credentials in repository secrets
 2. **Build context error**: Ensure all required files are in the `./src` directory
 3. **Service not found**: Verify the service name matches exactly (case-sensitive)
+4. **NuGet restore fails (NU1301)**: Allow outbound HTTPS to `*.nuget.org` on port `443`
 
 ### Debug Mode
 

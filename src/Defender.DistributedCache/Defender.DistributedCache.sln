@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defender.DistributedCacheTe
 		{AEF3DE65-9B04-4046-B54C-82D9EC86E3FE} = {AEF3DE65-9B04-4046-B54C-82D9EC86E3FE}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defender.DistributedCache.Tests", "src\Defender.DistributedCache.Tests\Defender.DistributedCache.Tests.csproj", "{996EC1BD-125B-4003-A279-6977E686C257}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defender.DistributedCache.Tests", "src\\Tests\\Defender.DistributedCache.Tests.csproj", "{996EC1BD-125B-4003-A279-6977E686C257}"
 	ProjectSection(ProjectDependencies) = postProject
 		{AEF3DE65-9B04-4046-B54C-82D9EC86E3FE} = {AEF3DE65-9B04-4046-B54C-82D9EC86E3FE}
 	EndProjectSection
@@ -47,3 +47,4 @@ Global
 		SolutionGuid = {46727B6A-9DCB-408D-8C96-43DAF8070792}
 	EndGlobalSection
 EndGlobal
+

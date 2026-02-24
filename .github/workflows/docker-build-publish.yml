@@ -33,6 +33,7 @@ on:
 env:
   DOCKER_REGISTRY: docker.io
   DOTNET_VERSION: 8.0
+  TEST_DOTNET_VERSION: 10.0.x
 
 jobs:
   check-changes:
@@ -152,6 +153,51 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up .NET SDK for tests
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.TEST_DOTNET_VERSION }}
+
+      - name: Validate NuGet egress
+        shell: bash
+        run: |
+          chmod +x scripts/check-nuget-egress.sh
+          ./scripts/check-nuget-egress.sh
+
+      - name: Run unit tests (non-blocking)
+        id: run-tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          SERVICE_DIR="${{ matrix.service.service_dir }}"
+          echo "Searching for test projects under src/${SERVICE_DIR}"
+          TEST_PROJECTS=$(find "src/${SERVICE_DIR}" -type f \( -name "*Tests*.csproj" -o -name "*.Tests.csproj" \))
+
+          if [ -z "$TEST_PROJECTS" ]; then
+            echo "No test projects found for ${SERVICE_DIR}; skipping tests."
+            exit 0
+          fi
+
+          mkdir -p TestResults
+          for project in $TEST_PROJECTS; do
+            echo "Running tests for ${project}"
+            dotnet test "$project" \
+              --configuration Release \
+              --collect:"XPlat Code Coverage" \
+              --results-directory TestResults \
+              --logger "trx;LogFileName=$(basename "$project").trx"
+          done
+
+      - name: Test step summary
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.run-tests.outcome }}" != "success" ]; then
+            echo "Unit tests failed for ${{ matrix.service.service_dir }}; continuing to Docker build as requested."
+          else
+            echo "Unit tests passed for ${{ matrix.service.service_dir }}."
+          fi
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -219,6 +265,17 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up .NET SDK for tests
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.TEST_DOTNET_VERSION }}
+
+      - name: Validate NuGet egress
+        shell: bash
+        run: |
+          chmod +x scripts/check-nuget-egress.sh
+          ./scripts/check-nuget-egress.sh
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -259,6 +316,40 @@ jobs:
             esac
           fi
           echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Run unit tests (non-blocking)
+        id: run-tests
+        continue-on-error: true
+        shell: bash
+        run: |
+          SERVICE_DIR="${{ steps.service-config.outputs.service_name }}"
+          echo "Searching for test projects under src/${SERVICE_DIR}"
+          TEST_PROJECTS=$(find "src/${SERVICE_DIR}" -type f \( -name "*Tests*.csproj" -o -name "*.Tests.csproj" \))
+
+          if [ -z "$TEST_PROJECTS" ]; then
+            echo "No test projects found for ${SERVICE_DIR}; skipping tests."
+            exit 0
+          fi
+
+          mkdir -p TestResults
+          for project in $TEST_PROJECTS; do
+            echo "Running tests for ${project}"
+            dotnet test "$project" \
+              --configuration Release \
+              --collect:"XPlat Code Coverage" \
+              --results-directory TestResults \
+              --logger "trx;LogFileName=$(basename "$project").trx"
+          done
+
+      - name: Test step summary
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.run-tests.outcome }}" != "success" ]; then
+            echo "Unit tests failed for ${{ steps.service-config.outputs.service_name }}; continuing to Docker build as requested."
+          else
+            echo "Unit tests passed for ${{ steps.service-config.outputs.service_name }}."
+          fi
 
       - name: Extract metadata
         id: meta

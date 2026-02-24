@@ -18,6 +18,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Using Include="Moq" />
 		<Using Include="Xunit" />
 	</ItemGroup>
 

@@ -447,3 +447,7 @@ __mismatch__/
 
 # Ignore XRM Toolbox DBs
 *.xrmsuo2
+
+# Local .NET CLI and NuGet caches
+.dotnet/
+.nuget/
