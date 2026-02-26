@@ -5,17 +5,26 @@
 
 SOLUTION_NAME="Defender.Core"
 SOLUTION_DIR="$(pwd)"
-SOLUTION="$SOLUTION_DIR/$SOLUTION_NAME.slnx"
+SRC_DIR="$SOLUTION_DIR/src"
+SOLUTION="$SRC_DIR/$SOLUTION_NAME.sln"
 shopt -s nullglob
 
-rm -f "$SOLUTION"
-dotnet new sln -n "$SOLUTION_NAME"
+rm -f "$SOLUTION" "$SOLUTION_DIR/$SOLUTION_NAME.sln" "$SOLUTION_DIR/$SOLUTION_NAME.slnx" "$SRC_DIR/$SOLUTION_NAME.slnx"
+mkdir -p "$SRC_DIR"
+dotnet new sln -n "$SOLUTION_NAME" --format sln -o "$SRC_DIR"
+
+solution_folder_name() {
+    echo "${1##*/}"
+}
 
 add_projects_from() {
     local folders=("$@")
     for folder in "${folders[@]}"; do
-        for proj in "$folder"/src/*/*.csproj; do
-            dotnet sln "$SOLUTION" add "$proj" --solution-folder "$folder"
+        local path="$SRC_DIR/$folder"
+        local folder_name
+        folder_name=$(solution_folder_name "$folder")
+        for proj in "$path"/src/*/*.csproj; do
+            dotnet sln "$SOLUTION" add "$proj" --solution-folder "$folder_name"
         done
     done
 }
@@ -23,9 +32,12 @@ add_projects_from() {
 add_libraries() {
     local folders=("$@")
     for folder in "${folders[@]}"; do
-        for proj in "$folder"/src/*/*.csproj; do
+        local path="$SRC_DIR/$folder"
+        local folder_name
+        folder_name=$(solution_folder_name "$folder")
+        for proj in "$path"/src/*/*.csproj; do
             dotnet sln "$SOLUTION" remove "$proj" > /dev/null 2>&1 || true
-            dotnet sln "$SOLUTION" add "$proj" --solution-folder "Libraries/$folder"
+            dotnet sln "$SOLUTION" add "$proj" --solution-folder "Libraries/$folder_name"
         done
     done
 }

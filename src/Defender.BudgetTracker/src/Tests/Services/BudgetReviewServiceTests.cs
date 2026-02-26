@@ -122,4 +122,58 @@ public class BudgetReviewServiceTests
         Assert.Equal(publishDate, result.Date);
         _budgetReviewRepository.Verify(x => x.UpsertBudgetReviewAsync(It.IsAny<BudgetReview>()), Times.Once);
     }
+
+    [Fact]
+    public async Task PublishBudgetReviewAsync_WhenIdProvidedAndSameDate_UpdatesExistingReview()
+    {
+        var userId = Guid.NewGuid();
+        var reviewId = Guid.NewGuid();
+        var publishDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var publishRequest = new PublishBudgetReviewRequest
+        {
+            Id = reviewId,
+            Date = publishDate,
+            ReviewedPositions = [new PositionToPublish { Name = "Item1", Currency = Currency.USD, Amount = 50 }]
+        };
+        var existingReview = new BudgetReview { Id = reviewId, UserId = userId, Date = publishDate };
+        var reviewedPositions = new List<ReviewedPosition> { ReviewedPosition.FromPosition(new BasePosition { Name = "Item1", Currency = Currency.USD }, 50) };
+
+        _currentAccountAccessor.Setup(x => x.GetAccountId()).Returns(userId);
+        _budgetReviewRepository.Setup(x => x.GetBudgetReviewAsync(reviewId)).ReturnsAsync(existingReview);
+        _mapper.Setup(x => x.Map<List<ReviewedPosition>>(publishRequest.ReviewedPositions)).Returns(reviewedPositions);
+        _budgetReviewRepository.Setup(x => x.UpsertBudgetReviewAsync(existingReview)).ReturnsAsync(existingReview);
+
+        var result = await CreateSut().PublishBudgetReviewAsync(publishRequest);
+
+        Assert.Same(existingReview, result);
+        _budgetReviewRepository.Verify(x => x.UpsertBudgetReviewAsync(existingReview), Times.Once);
+        _ratesModelService.Verify(x => x.GetRatesModelAsync(It.IsAny<DateOnly>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task PublishBudgetReviewAsync_WhenReviewByDateExists_DeletesOldAndCreatesNew()
+    {
+        var userId = Guid.NewGuid();
+        var publishDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var publishRequest = new PublishBudgetReviewRequest
+        {
+            Date = publishDate,
+            ReviewedPositions = [new PositionToPublish { Name = "Item1", Currency = Currency.USD, Amount = 100 }]
+        };
+        var existingByDate = new BudgetReview { Id = Guid.NewGuid(), UserId = userId, Date = publishDate, RatesModel = new RatesModel() };
+        var reviewedPositions = new List<ReviewedPosition> { ReviewedPosition.FromPosition(new BasePosition { Name = "Item1", Currency = Currency.USD }, 100) };
+        var savedReview = new BudgetReview { Id = Guid.NewGuid(), UserId = userId, Date = publishDate };
+
+        _currentAccountAccessor.Setup(x => x.GetAccountId()).Returns(userId);
+        _budgetReviewRepository.Setup(x => x.GetBudgetReviewAsync(userId, publishDate)).ReturnsAsync(existingByDate);
+        _budgetReviewRepository.Setup(x => x.DeleteBudgetReviewAsync(existingByDate.Id)).Returns(Task.CompletedTask);
+        _mapper.Setup(x => x.Map<List<ReviewedPosition>>(publishRequest.ReviewedPositions)).Returns(reviewedPositions);
+        _budgetReviewRepository.Setup(x => x.UpsertBudgetReviewAsync(It.IsAny<BudgetReview>())).ReturnsAsync(savedReview);
+
+        var result = await CreateSut().PublishBudgetReviewAsync(publishRequest);
+
+        Assert.Equal(userId, result.UserId);
+        _budgetReviewRepository.Verify(x => x.DeleteBudgetReviewAsync(existingByDate.Id), Times.Once);
+        _budgetReviewRepository.Verify(x => x.UpsertBudgetReviewAsync(It.IsAny<BudgetReview>()), Times.Once);
+    }
 }

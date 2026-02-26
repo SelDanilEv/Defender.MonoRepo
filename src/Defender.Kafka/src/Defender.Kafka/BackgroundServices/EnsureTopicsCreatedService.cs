@@ -21,13 +21,25 @@ public abstract class EnsureTopicsCreatedService : BackgroundService
         IOptions<KafkaOptions> kafkaOptions,
         IKafkaEnvPrefixer kafkaEnvPrefixer,
         ILogger<EnsureTopicsCreatedService> logger)
+        : this(
+            new AdminClientBuilder(new AdminClientConfig
+            {
+                BootstrapServers = kafkaOptions.Value.BootstrapServers
+            }).Build(),
+            kafkaEnvPrefixer,
+            logger)
+    {
+    }
+
+    protected EnsureTopicsCreatedService(
+        IAdminClient adminClient,
+        IKafkaEnvPrefixer kafkaEnvPrefixer,
+        ILogger<EnsureTopicsCreatedService> logger)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
-        var adminConfig = new AdminClientConfig { BootstrapServers = kafkaOptions.Value.BootstrapServers };
-        _adminClient = new AdminClientBuilder(adminConfig).Build();
+        _adminClient = adminClient ?? throw new ArgumentNullException(nameof(adminClient));
         
-        KafkaEnvPrefixer = kafkaEnvPrefixer;
+        KafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)

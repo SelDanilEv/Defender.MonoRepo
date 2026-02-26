@@ -12,6 +12,7 @@ public class DefaultKafkaConsumer<TValue> : IDefaultKafkaConsumer<TValue>
     private readonly IDeserializer<TValue> _valueSerializer;
     private readonly ILogger<DefaultKafkaConsumer<TValue>> _logger;
     private readonly IKafkaEnvPrefixer _kafkaEnvPrefixer;
+    private readonly Func<ConsumerConfig, IDeserializer<TValue>, Action<Error>, IConsumer<Ignore, TValue>> _consumerFactory;
 
     public DefaultKafkaConsumer(
         IOptions<KafkaOptions> kafkaOptions,
@@ -28,6 +29,30 @@ public class DefaultKafkaConsumer<TValue> : IDefaultKafkaConsumer<TValue>
         _kafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
         _kafkaOptions = kafkaOptions.Value ?? throw new ArgumentNullException(nameof(kafkaOptions));
         _valueSerializer = valueSerializer ?? throw new ArgumentNullException(nameof(valueSerializer));
+        _consumerFactory = (config, deserializer, onError) =>
+            new ConsumerBuilder<Ignore, TValue>(config)
+                .SetValueDeserializer(deserializer)
+                .SetErrorHandler((_, error) => onError(error))
+                .Build();
+    }
+
+    internal DefaultKafkaConsumer(
+        IOptions<KafkaOptions> kafkaOptions,
+        ILogger<DefaultKafkaConsumer<TValue>> logger,
+        IKafkaEnvPrefixer kafkaEnvPrefixer,
+        IDeserializer<TValue> valueSerializer,
+        Func<ConsumerConfig, IDeserializer<TValue>, Action<Error>, IConsumer<Ignore, TValue>> consumerFactory)
+    {
+        if (string.IsNullOrWhiteSpace(kafkaOptions?.Value?.BootstrapServers))
+        {
+            throw new ArgumentException("BootstrapServers must be provided in KafkaOptions.", nameof(kafkaOptions));
+        }
+
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _kafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
+        _kafkaOptions = kafkaOptions.Value ?? throw new ArgumentNullException(nameof(kafkaOptions));
+        _valueSerializer = valueSerializer ?? throw new ArgumentNullException(nameof(valueSerializer));
+        _consumerFactory = consumerFactory ?? throw new ArgumentNullException(nameof(consumerFactory));
     }
 
     public async Task StartConsuming(
@@ -44,10 +69,7 @@ public class DefaultKafkaConsumer<TValue> : IDefaultKafkaConsumer<TValue>
             EnableAutoCommit = true
         };
         
-        using var consumer = new ConsumerBuilder<Ignore, TValue>(config)
-            .SetValueDeserializer(_valueSerializer)
-            .SetErrorHandler((_, error) => OnError(error))
-            .Build();
+        using var consumer = _consumerFactory(config, _valueSerializer, OnError);
         
         topic = _kafkaEnvPrefixer.AddEnvPrefix(topic);
 

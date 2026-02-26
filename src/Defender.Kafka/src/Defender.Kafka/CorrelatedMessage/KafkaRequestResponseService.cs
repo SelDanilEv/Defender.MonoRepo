@@ -6,10 +6,36 @@ using Defender.Kafka.Service;
 
 namespace Defender.Kafka.CorrelatedMessage;
 
-public class KafkaRequestResponseService(
-    IKafkaEnvPrefixer kafkaEnvPrefixer,
-    IOptions<KafkaOptions> kafkaOptions) : IKafkaRequestResponseService
+public class KafkaRequestResponseService : IKafkaRequestResponseService
 {
+    private readonly IKafkaEnvPrefixer _kafkaEnvPrefixer;
+    private readonly IOptions<KafkaOptions> _kafkaOptions;
+    private readonly Func<ProducerConfig, IProducer<string, string>> _producerFactory;
+    private readonly Func<ConsumerConfig, IConsumer<string, string>> _consumerFactory;
+
+    public KafkaRequestResponseService(
+        IKafkaEnvPrefixer kafkaEnvPrefixer,
+        IOptions<KafkaOptions> kafkaOptions)
+        : this(
+            kafkaEnvPrefixer,
+            kafkaOptions,
+            config => new ProducerBuilder<string, string>(config).Build(),
+            config => new ConsumerBuilder<string, string>(config).Build())
+    {
+    }
+
+    internal KafkaRequestResponseService(
+        IKafkaEnvPrefixer kafkaEnvPrefixer,
+        IOptions<KafkaOptions> kafkaOptions,
+        Func<ProducerConfig, IProducer<string, string>> producerFactory,
+        Func<ConsumerConfig, IConsumer<string, string>> consumerFactory)
+    {
+        _kafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
+        _kafkaOptions = kafkaOptions ?? throw new ArgumentNullException(nameof(kafkaOptions));
+        _producerFactory = producerFactory ?? throw new ArgumentNullException(nameof(producerFactory));
+        _consumerFactory = consumerFactory ?? throw new ArgumentNullException(nameof(consumerFactory));
+    }
+
     public async Task<TResponse> SendAsync<TRequest, TResponse>(
         string requestTopic,
         string responseTopic,
@@ -20,21 +46,19 @@ public class KafkaRequestResponseService(
     {
         var producerConfig = new ProducerConfig
         {
-            BootstrapServers = kafkaOptions.Value.BootstrapServers
+            BootstrapServers = _kafkaOptions.Value.BootstrapServers
         };
 
         var consumerConfig = new ConsumerConfig
         {
-            BootstrapServers = kafkaOptions.Value.BootstrapServers,
-            GroupId = kafkaEnvPrefixer.AddEnvPrefix(groupId),
+            BootstrapServers = _kafkaOptions.Value.BootstrapServers,
+            GroupId = _kafkaEnvPrefixer.AddEnvPrefix(groupId),
             AutoOffsetReset = AutoOffsetReset.Latest,
             EnableAutoCommit = false
         };
 
-        using var producer = new ProducerBuilder<string, string>
-            (producerConfig).Build();
-        using var consumer = new ConsumerBuilder<string, string>
-            (consumerConfig).Build();
+        using var producer = _producerFactory(producerConfig);
+        using var consumer = _consumerFactory(consumerConfig);
 
         var message = new Message<string, string>
         {

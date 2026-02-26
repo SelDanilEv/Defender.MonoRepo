@@ -23,6 +23,11 @@ public class DefaultKafkaProducer<TValue> : IDefaultKafkaProducer<TValue>, IDisp
             throw new ArgumentNullException(nameof(kafkaOptions), "Kafka bootstrap servers cannot be null.");
         }
 
+        if (valueSerializer == null)
+        {
+            throw new ArgumentNullException(nameof(valueSerializer));
+        }
+
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _kafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
 
@@ -37,6 +42,16 @@ public class DefaultKafkaProducer<TValue> : IDefaultKafkaProducer<TValue>, IDisp
             .SetValueSerializer(valueSerializer)
             .SetErrorHandler((_, error) => OnError(error))
             .Build();
+    }
+
+    internal DefaultKafkaProducer(
+        IProducer<Null, TValue> producer,
+        ILogger<DefaultKafkaProducer<TValue>> logger,
+        IKafkaEnvPrefixer kafkaEnvPrefixer)
+    {
+        _producer = producer ?? throw new ArgumentNullException(nameof(producer));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _kafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
     }
 
     public async Task ProduceAsync(

@@ -1,11 +1,12 @@
 [CmdletBinding()]
 param(
-    [string[]]$Services,
     [ValidateSet('Debug', 'Release')]
     [string]$Configuration = 'Debug',
     [string]$OutputRoot = 'artifacts/coverage',
     [switch]$SkipTestRun,
-    [switch]$OpenReport
+    [switch]$OpenReport,
+    [switch]$ContinueOnFailure,
+    [switch]$FailFast
 )
 
 Set-StrictMode -Version Latest
@@ -15,6 +16,31 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $outputRootPath = Join-Path $repoRoot $OutputRoot
 $rawRoot = Join-Path $outputRootPath 'raw'
 $dashboardRoot = Join-Path $outputRootPath 'dashboard'
+$scriptsDir = $PSScriptRoot
+$shouldContinueOnFailure = $true
+
+function Get-DefenderServiceNames {
+    $allSystemsPath = Join-Path $scriptsDir 'all_systems.sh'
+    $allLibsPath = Join-Path $scriptsDir 'all_libs.sh'
+    $names = [System.Collections.Generic.List[string]]::new()
+    foreach ($path in @($allSystemsPath, $allLibsPath)) {
+        if (-not (Test-Path $path)) { continue }
+        $content = Get-Content $path -Raw
+        $matches = [regex]::Matches($content, "'(Defender\.[^']+)'")
+        foreach ($m in $matches) { $names.Add($m.Groups[1].Value) }
+    }
+    if ($names.Count -eq 0) {
+        $srcPath = Join-Path $repoRoot 'src'
+        Get-ChildItem -Path $srcPath -Directory | Where-Object { $_.Name -like 'Defender.*' } | Sort-Object Name | ForEach-Object { $names.Add($_.Name) }
+    }
+    $names
+}
+if ($FailFast) {
+    $shouldContinueOnFailure = $false
+}
+elseif ($PSBoundParameters.ContainsKey('ContinueOnFailure')) {
+    $shouldContinueOnFailure = $ContinueOnFailure.IsPresent
+}
 
 $hasLocalDotnetCoverage = $false
 $hasLocalReportGenerator = $false
@@ -34,28 +60,31 @@ if (-not $SkipTestRun) {
         Remove-Item -Path $rawRoot -Recurse -Force
     }
 
-    $serviceDirs = @(Get-ChildItem -Path (Join-Path $repoRoot 'src') -Directory |
-        Where-Object { $_.Name -like 'Defender.*' })
+    $failedProjects = [System.Collections.Generic.List[string]]::new()
+    $servicesWithoutTests = [System.Collections.Generic.List[string]]::new()
+    $projectsWithoutCoverage = [System.Collections.Generic.List[string]]::new()
 
-    if ($Services -and $Services.Count -gt 0) {
-        $selected = @{}
-        foreach ($name in $Services) {
-            $selected[$name.ToLowerInvariant()] = $true
+    $serviceNames = Get-DefenderServiceNames
+    $srcPath = Join-Path $repoRoot 'src'
+    $serviceDirs = @($serviceNames | ForEach-Object {
+        $name = $_
+        $dir = Join-Path $srcPath $name
+        if (Test-Path $dir -PathType Container) {
+            [System.IO.DirectoryInfo]::new($dir)
         }
-
-        $serviceDirs = @($serviceDirs |
-            Where-Object { $selected.ContainsKey($_.Name.ToLowerInvariant()) })
-
-        if ($serviceDirs.Count -eq 0) {
-            throw "No matching services found for: $($Services -join ', ')"
+        else {
+            Write-Warning "Skipping $name : folder not found at $dir"
+            $null
         }
-    }
+    } | Where-Object { $_ })
+    Write-Host "Processing $($serviceDirs.Count) services/libraries for coverage (from all_systems + all_libs)."
 
     foreach ($serviceDir in $serviceDirs) {
         $testProjects = @(Get-ChildItem -Path $serviceDir.FullName -Recurse -Filter *.Tests.csproj -File |
             Where-Object { $_.FullName -notmatch '\\(obj|bin)\\' })
         if ($testProjects.Count -eq 0) {
             Write-Warning "Skipping $($serviceDir.Name): no *.Tests.csproj found"
+            $servicesWithoutTests.Add($serviceDir.Name)
             continue
         }
         $serviceRaw = Join-Path $rawRoot $serviceDir.Name
@@ -84,9 +113,33 @@ if (-not $SkipTestRun) {
             }
 
             if ($LASTEXITCODE -ne 0) {
-                throw "dotnet test failed for $($serviceDir.Name) :: $projectName"
+                $projectRef = "$($serviceDir.Name) :: $projectName"
+                $failedProjects.Add($projectRef)
+                if ($shouldContinueOnFailure) {
+                    Write-Warning "Tests failed for $projectRef, continuing..."
+                }
+                else {
+                    throw "dotnet test failed for $projectRef"
+                }
+            }
+            elseif (-not (Test-Path $coverageFile)) {
+                $projectRef = "$($serviceDir.Name) :: $projectName"
+                $projectsWithoutCoverage.Add($projectRef)
+                Write-Warning "No coverage file generated for $projectRef"
             }
         }
+    }
+
+    if ($servicesWithoutTests.Count -gt 0) {
+        Write-Warning "Services without test projects ($($servicesWithoutTests.Count)): $($servicesWithoutTests -join ', ')"
+    }
+
+    if ($failedProjects.Count -gt 0) {
+        Write-Warning "Test projects failed ($($failedProjects.Count)): $($failedProjects -join '; ')"
+    }
+
+    if ($projectsWithoutCoverage.Count -gt 0) {
+        Write-Warning "Test projects without generated coverage ($($projectsWithoutCoverage.Count)): $($projectsWithoutCoverage -join '; ')"
     }
 }
 

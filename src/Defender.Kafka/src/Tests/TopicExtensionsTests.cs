@@ -28,4 +28,13 @@ public class TopicExtensionsTests
         var exception = Assert.Throws<ArgumentException>(act);
         Assert.Contains("Unknown topic", exception.Message);
     }
+
+    [Fact]
+    public void GetName_WhenUnknownEnumValueProvided_ThrowsArgumentException()
+    {
+        Action act = () => _ = ((Topic)999).GetName();
+
+        var exception = Assert.Throws<ArgumentException>(act);
+        Assert.Contains("Unknown topic", exception.Message);
+    }
 }
