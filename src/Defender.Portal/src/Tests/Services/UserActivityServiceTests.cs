@@ -5,7 +5,7 @@ using Defender.Portal.Application.Services.Accounts;
 using Defender.Portal.Domain.Entities;
 using Defender.Portal.Domain.Enums;
 
-namespace Defender.Portal.Tests.Services.Accounts;
+namespace Defender.Portal.Tests.Services;
 
 public class UserActivityServiceTests
 {

@@ -7,7 +7,7 @@ using Defender.WalletService.Domain.Entities.Wallets;
 using Defender.WalletService.Domain.Enums;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Defender.WalletService.Tests.Mappings;
+namespace Defender.WalletService.Tests.Infrastructure.Mappings;
 
 public class MappingProfileTests
 {

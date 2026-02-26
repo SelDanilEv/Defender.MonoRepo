@@ -8,7 +8,7 @@ using Defender.RiskGamesService.Domain.Enums;
 
 using SharedTransactionType = Defender.Common.DB.SharedStorage.Enums.TransactionType;
 
-namespace Defender.RiskGamesService.Tests.Services.Transaction;
+namespace Defender.RiskGamesService.Tests.Services;
 
 public class TransactionManagementServiceTests
 {

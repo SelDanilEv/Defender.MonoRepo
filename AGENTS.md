@@ -30,6 +30,16 @@
 - Primary test stack is xUnit with Moq.
 - Name tests with `Method_WhenCondition_ExpectedResult`.
 - Add or update tests for behavior changes in Application/Infrastructure layers before opening a PR.
+- **Unit test layout**: For each `Defender.<Service>`, keep tests under `src/Defender.<Service>/src/Tests/` with this layout:
+  - `Services/` — application service tests
+  - `Handlers/` — MediatR command/query handler tests
+  - `Validators/` — FluentValidation validator tests
+  - `Models/` — request/DTO mapping tests
+  - `Domain/` — entity and helper tests
+  - `Infrastructure/Clients/` — external API wrapper tests
+  - `Infrastructure/Mappings/` — AutoMapper profile tests
+  - `Controllers/` — WebApi controller tests
+  Use `.cursor/skills/generate-unit-tests/SKILL.md` for full patterns and coverage goals.
 
 ## Commit & Pull Request Guidelines
 - Use imperative commit subjects (`Add...`, `Update...`, `Fix...`); Conventional Commit prefixes are used for chores/deploy (example: `chore(deploy): ...`).

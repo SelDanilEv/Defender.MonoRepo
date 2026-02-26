@@ -7,7 +7,7 @@ using Defender.PersonalFoodAdviser.Domain.Enums;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Defender.PersonalFoodAdviser.Tests;
+namespace Defender.PersonalFoodAdviser.Tests.Services;
 
 public class MenuSessionServiceTests
 {

@@ -5,7 +5,7 @@ using Defender.UserManagementService.Application.Mappings;
 using Defender.UserManagementService.Domain.Entities;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Defender.UserManagementService.Tests.Mappings;
+namespace Defender.UserManagementService.Tests.Infrastructure.Mappings;
 
 public class MappingProfileTests
 {

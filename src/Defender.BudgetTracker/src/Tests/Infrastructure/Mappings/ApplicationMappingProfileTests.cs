@@ -7,7 +7,7 @@ using Defender.BudgetTracker.Domain.Entities.Reviews;
 using Defender.BudgetTracker.Domain.Enums;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Defender.BudgetTracker.Tests.Mappings;
+namespace Defender.BudgetTracker.Tests.Infrastructure.Mappings;
 
 public class ApplicationMappingProfileTests
 {

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 
-namespace Defender.PersonalFoodAdviser.Tests;
+namespace Defender.PersonalFoodAdviser.Tests.Infrastructure.Clients;
 
 public class HuggingFaceDishExtractionTests
 {
