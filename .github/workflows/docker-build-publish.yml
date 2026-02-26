@@ -102,12 +102,13 @@ jobs:
             fi
           fi
 
-  build-and-publish:
+  test-services:
     needs: check-changes
-    if: needs.check-changes.outputs.src-changed == 'true'
+    if: needs.check-changes.outputs.src-changed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.service == '' || github.event.inputs.service == 'ALL')
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         service:
           - name: "defender.portal"
@@ -164,9 +165,8 @@ jobs:
           chmod +x scripts/check-nuget-egress.sh
           ./scripts/check-nuget-egress.sh
 
-      - name: Run unit tests (non-blocking)
+      - name: Run unit tests
         id: run-tests
-        continue-on-error: true
         shell: bash
         run: |
           SERVICE_DIR="${{ matrix.service.service_dir }}"
@@ -193,10 +193,61 @@ jobs:
         shell: bash
         run: |
           if [ "${{ steps.run-tests.outcome }}" != "success" ]; then
-            echo "Unit tests failed for ${{ matrix.service.service_dir }}; continuing to Docker build as requested."
+            echo "Unit tests failed for ${{ matrix.service.service_dir }}."
           else
             echo "Unit tests passed for ${{ matrix.service.service_dir }}."
           fi
+
+  build-and-publish:
+    needs: check-changes
+    if: needs.check-changes.outputs.src-changed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.service == '' || github.event.inputs.service == 'ALL')
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        service:
+          - name: "defender.portal"
+            dockerfile: "Dockerfile.Portal"
+            project_type: "WebUI"
+            service_dir: "Defender.Portal"
+          - name: "defender.user-management"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.UserManagementService"
+          - name: "defender.wallet"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.WalletService"
+          - name: "defender.risk-games"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.RiskGamesService"
+          - name: "defender.notification"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.NotificationService"
+          - name: "defender.personal-food-adviser"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.PersonalFoodAdviser"
+          - name: "defender.job-scheduler"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.JobSchedulerService"
+          - name: "defender.identity"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.IdentityService"
+          - name: "defender.budget-tracker"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.BudgetTracker"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -253,8 +304,7 @@ jobs:
           echo "Built image: ${{ env.DOCKER_REGISTRY }}/${{ secrets.DOCKERHUB_USERNAME }}/${{ matrix.service.name }}"
           echo "Tags: ${{ steps.meta.outputs.tags }}"
 
-  # Additional job for building specific service when workflow_dispatch is used
-  build-specific-service:
+  test-specific-service:
     needs: check-changes
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != '' && github.event.inputs.service != 'ALL' && needs.check-changes.outputs.src-changed == 'true'
     runs-on: ubuntu-latest
@@ -275,6 +325,57 @@ jobs:
         run: |
           chmod +x scripts/check-nuget-egress.sh
           ./scripts/check-nuget-egress.sh
+
+      - name: Determine service configuration
+        id: service-config
+        run: |
+          SERVICE_NAME="${{ github.event.inputs.service }}"
+          echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Run unit tests
+        id: run-tests
+        shell: bash
+        run: |
+          SERVICE_DIR="${{ steps.service-config.outputs.service_name }}"
+          echo "Searching for test projects under src/${SERVICE_DIR}"
+          TEST_PROJECTS=$(find "src/${SERVICE_DIR}" -type f \( -name "*Tests*.csproj" -o -name "*.Tests.csproj" \))
+
+          if [ -z "$TEST_PROJECTS" ]; then
+            echo "No test projects found for ${SERVICE_DIR}; skipping tests."
+            exit 0
+          fi
+
+          mkdir -p TestResults
+          for project in $TEST_PROJECTS; do
+            echo "Running tests for ${project}"
+            dotnet test "$project" \
+              --configuration Release \
+              --collect:"XPlat Code Coverage" \
+              --results-directory TestResults \
+              --logger "trx;LogFileName=$(basename "$project").trx"
+          done
+
+      - name: Test step summary
+        if: always()
+        shell: bash
+        run: |
+          if [ "${{ steps.run-tests.outcome }}" != "success" ]; then
+            echo "Unit tests failed for ${{ steps.service-config.outputs.service_name }}."
+          else
+            echo "Unit tests passed for ${{ steps.service-config.outputs.service_name }}."
+          fi
+
+  # Additional job for building specific service when workflow_dispatch is used
+  build-specific-service:
+    needs: check-changes
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != '' && github.event.inputs.service != 'ALL' && needs.check-changes.outputs.src-changed == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -316,40 +417,6 @@ jobs:
             esac
           fi
           echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
-
-      - name: Run unit tests (non-blocking)
-        id: run-tests
-        continue-on-error: true
-        shell: bash
-        run: |
-          SERVICE_DIR="${{ steps.service-config.outputs.service_name }}"
-          echo "Searching for test projects under src/${SERVICE_DIR}"
-          TEST_PROJECTS=$(find "src/${SERVICE_DIR}" -type f \( -name "*Tests*.csproj" -o -name "*.Tests.csproj" \))
-
-          if [ -z "$TEST_PROJECTS" ]; then
-            echo "No test projects found for ${SERVICE_DIR}; skipping tests."
-            exit 0
-          fi
-
-          mkdir -p TestResults
-          for project in $TEST_PROJECTS; do
-            echo "Running tests for ${project}"
-            dotnet test "$project" \
-              --configuration Release \
-              --collect:"XPlat Code Coverage" \
-              --results-directory TestResults \
-              --logger "trx;LogFileName=$(basename "$project").trx"
-          done
-
-      - name: Test step summary
-        if: always()
-        shell: bash
-        run: |
-          if [ "${{ steps.run-tests.outcome }}" != "success" ]; then
-            echo "Unit tests failed for ${{ steps.service-config.outputs.service_name }}; continuing to Docker build as requested."
-          else
-            echo "Unit tests passed for ${{ steps.service-config.outputs.service_name }}."
-          fi
 
       - name: Extract metadata
         id: meta
