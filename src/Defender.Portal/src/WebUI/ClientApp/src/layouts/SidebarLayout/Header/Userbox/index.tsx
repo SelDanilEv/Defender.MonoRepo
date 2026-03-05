@@ -33,14 +33,14 @@ const UserBoxButton = styled(Button)(
 const MenuUserBox = styled(Box)(
   ({ theme }) => `
         background: ${theme.colors.alpha.black[5]};
-        padding: ${theme.spacing(2)};
+        padding: ${theme.spacing(1, 1.25)};
 `
 );
 
 const UserBoxText = styled(Box)(
   ({ theme }) => `
         text-align: left;
-        padding-left: ${theme.spacing(1)};
+        padding-left: ${theme.spacing(0.75)};
 `
 );
 
@@ -49,12 +49,14 @@ const UserBoxLabel = styled(Typography)(
         font-weight: ${theme.typography.fontWeightBold};
         color: ${theme.palette.secondary.main};
         display: block;
+        line-height: 1.2;
 `
 );
 
 const UserBoxDescription = styled(Typography)(
   ({ theme }) => `
-        color: ${lighten(theme.palette.secondary.main, 0.5)}
+        color: ${lighten(theme.palette.secondary.main, 0.5)};
+        line-height: 1.2;
 `
 );
 
@@ -117,34 +119,48 @@ const HeaderUserbox = (props: any) => {
           vertical: "top",
           horizontal: "right",
         }}
+        PaperProps={{
+          sx: {
+            minWidth: 194,
+          },
+        }}
       >
-        <MenuUserBox sx={{ minWidth: 210 }} display="flex">
-          <Avatar variant="rounded" alt={user?.Nickname} src={user?.Avatar} />
+        <MenuUserBox sx={{ minWidth: 194 }} display="flex">
+          <Avatar
+            variant="rounded"
+            alt={user?.Nickname}
+            src={user?.Avatar}
+            sx={{ width: 28, height: 28, fontSize: "0.85rem" }}
+          />
           <UserBoxText>
-            <UserBoxLabel variant="body1">{user?.Nickname}</UserBoxLabel>
-            <UserBoxDescription variant="body2">
+            <UserBoxLabel variant="body2">{user?.Nickname}</UserBoxLabel>
+            <UserBoxDescription variant="caption">
               {roleToDisplay}
             </UserBoxDescription>
           </UserBoxText>
         </MenuUserBox>
         <Divider sx={{ mb: 0 }} />
-        <List sx={{ p: 1 }} component="nav">
+        <List sx={{ p: 0.5 }} component="nav">
           <ListItemButton
             to="/account/update"
             component={NavLink}
             onClick={handleClose}
+            sx={{ px: 1, py: 0.5, minHeight: 34, borderRadius: 1 }}
           >
-            <AccountBoxTwoToneIcon fontSize="medium" />
+            <AccountBoxTwoToneIcon fontSize="small" />
             <ListItemText
-              primaryTypographyProps={{ ml: "10px", fontSize: "1.3em" }}
+              primaryTypographyProps={{ ml: "8px", fontSize: "0.95rem", lineHeight: 1.2 }}
               primary={u.t("sidebar_header__menu_profile")}
             />
           </ListItemButton>
-          <Divider />
-          <ListItemButton onClick={() => Logout()}>
-            <LockOpenTwoToneIcon fontSize="medium" />
+          <Divider sx={{ my: 0.25 }} />
+          <ListItemButton
+            onClick={() => Logout()}
+            sx={{ px: 1, py: 0.5, minHeight: 34, borderRadius: 1 }}
+          >
+            <LockOpenTwoToneIcon fontSize="small" />
             <ListItemText
-              primaryTypographyProps={{ ml: "10px", fontSize: "1.3em" }}
+              primaryTypographyProps={{ ml: "8px", fontSize: "0.95rem", lineHeight: 1.2 }}
               primary={u.t("sidebar_header__menu_logout")}
             />
           </ListItemButton>

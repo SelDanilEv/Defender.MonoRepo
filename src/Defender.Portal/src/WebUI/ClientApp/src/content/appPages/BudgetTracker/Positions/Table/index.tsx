@@ -13,7 +13,6 @@ import {
   Typography,
   useTheme,
   CardHeader,
-  Chip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import CachedIcon from "@mui/icons-material/Cached";
@@ -31,6 +30,7 @@ import { DialogMode, OpenDialog } from "src/models/shared/DialogMode";
 import LockedIconButton from "src/components/LockedComponents/LockedIconButtons/LockedIconButton";
 import { BudgetTrackerAvailableCurrencies } from "src/models/shared/Currency";
 import DefaultTableConsts from "src/consts/DefaultTableConsts";
+import TagChip from "src/components/TagChip";
 
 import PositionDialogBody from "./PositionDialogBody";
 
@@ -84,7 +84,7 @@ const PositionsTable = (props: PositionsTableProps) => {
     return (
       <>
         {tags.map((tag, index) => (
-          <Chip sx={{ mx: 0.5, my: 0.2 }} key={index} label={tag} />
+          <TagChip sx={{ mx: 0.5, my: 0.2 }} key={index} label={tag} size="small" />
         ))}
       </>
     );
@@ -231,18 +231,23 @@ const PositionsTable = (props: PositionsTableProps) => {
         </Table>
       </TableContainer>
       <Box
-        p={2}
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "right",
+          justifyContent: "flex-end",
+          flexWrap: "wrap",
+          gap: 0.5,
+          px: 1.5,
+          pt: 0.5,
+          pb: 0.75,
         }}
       >
         <Typography
           variant="body2"
           sx={{
             textAlign: "center",
-            fontSize: u.isMobile ? "0.6em" : "1em",
+            fontSize: u.isMobile ? "0.68rem" : "0.8rem",
+            lineHeight: 1.2,
           }}
         >
           {u.t("table_rows_per_page_label")}

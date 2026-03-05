@@ -86,7 +86,7 @@ const SidebarLayout: FC<SidebarLayoutProps> = (props: any) => {
           <Box
             display="block"
             p={1}
-            sx={{ fontSize: u.isMobile ? "0.9em" : "1.1em" }}
+            sx={{ fontSize: u.isMobile ? "0.9em" : "0.98em" }}
           >
             <Outlet />
           </Box>

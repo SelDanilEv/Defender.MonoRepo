@@ -33,17 +33,19 @@ const LogoInnerStyled = styled(Box)(
 `
 );
 
-const LogoInner = ({ height, width, children }) => {
+const LogoInner = ({ height, width, children, sx }) => {
   return (
-    <LogoInnerStyled height={height} width={width}>
+    <LogoInnerStyled height={height} width={width} sx={sx}>
       {children}
     </LogoInnerStyled>
   );
 };
 
 const Logo = (props: any) => {
+  const { compact = false } = props;
+
   return (
-    <LogoWrapper>
+    <LogoWrapper sx={{ margin: compact ? 0 : undefined }}>
       <Badge
         sx={{
           ".MuiBadge-badge": {
@@ -57,7 +59,11 @@ const Logo = (props: any) => {
         color="success"
         badgeContent={config.VERSION_OF_APP}
       >
-        <LogoInner height={props.height} width={props.width}>
+        <LogoInner
+          height={props.height}
+          width={props.width}
+          sx={{ marginBottom: compact ? 0 : undefined }}
+        >
           <img src="/static/images/logo/Logo.png" alt="Logo" />
         </LogoInner>
       </Badge>

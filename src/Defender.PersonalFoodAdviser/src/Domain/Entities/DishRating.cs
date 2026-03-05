@@ -20,4 +20,5 @@ public class DishRating : IBaseModel
     public Guid? SessionId { get; set; }
 
     public DateTime CreatedAtUtc { get; set; }
+    public DateTime? UpdatedAtUtc { get; set; }
 }

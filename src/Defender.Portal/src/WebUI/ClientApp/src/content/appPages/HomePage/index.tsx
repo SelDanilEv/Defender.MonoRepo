@@ -16,6 +16,46 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import HeadsetMicIcon from "@mui/icons-material/HeadsetMic";
+import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+
+const quickLinks = [
+  {
+    key: "cloud",
+    labelKey: "home:quick_menu_cloud",
+    href: "https://cloud.coded-by-danil.dev/",
+    icon: CloudUploadIcon,
+  },
+  {
+    key: "diagram",
+    labelKey: "home:quick_menu_diagram",
+    to: "/budget-tracker/diagram",
+    icon: StackedLineChartIcon,
+  },
+  {
+    key: "food_adviser",
+    labelKey: "home:quick_menu_food_adviser",
+    to: "/food-adviser",
+    icon: RestaurantMenuIcon,
+  },
+  {
+    key: "lottery",
+    labelKey: "home:quick_menu_lottery",
+    to: "/games/lottery",
+    icon: LocalActivityIcon,
+  },
+  {
+    key: "web_games",
+    labelKey: "home:quick_menu_web_games",
+    href: "https://games.coded-by-danil.dev/",
+    icon: SportsEsportsIcon,
+  },
+  {
+    key: "smart_note",
+    labelKey: "home:quick_menu_smart_note",
+    href: "https://chat.coded-by-danil.dev/",
+    icon: HeadsetMicIcon,
+  },
+];
 
 const HomePage = (props: any) => {
   const u = useUtils();
@@ -27,209 +67,48 @@ const HomePage = (props: any) => {
           <WalletAccountsInfo></WalletAccountsInfo>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ height: 120 }}>
-            <CardActionArea
-              component="a"
-              href="https://cloud.coded-by-danil.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{ height: "100%" }}
-            >
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                >
-                  <Typography
-                    gutterBottom
-                    variant="h3"
-                    component="div"
-                    align="center"
-                  >
-                    {u.t("home:quick_menu_cloud")}
-                  </Typography>
-                  <CloudUploadIcon sx={{ ml: 2 }} />
-                </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
+        {quickLinks.map((item) => {
+          const Icon = item.icon;
 
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ height: 120 }}>
-            <CardActionArea
-              component={Link}
-              to="/budget-tracker/diagram"
-              sx={{ height: "100%" }}
-            >
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
+          return (
+            <Grid item xs={12} sm={6} md={2} key={item.key}>
+              <Card sx={{ height: { xs: 84, sm: 92 } }}>
+                <CardActionArea
+                  component={item.to ? Link : "a"}
+                  {...(item.to
+                    ? { to: item.to }
+                    : {
+                        href: item.href,
+                        target: "_blank",
+                        rel: "noopener noreferrer",
+                      })}
+                  sx={{ height: "100%" }}
                 >
-                  <Typography
-                    gutterBottom
-                    variant="h3"
-                    component="div"
-                    align="center"
+                  <CardContent
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: 1,
+                      height: "100%",
+                      px: 1.5,
+                    }}
                   >
-                    {u.t("home:quick_menu_diagram")}
-                  </Typography>
-                  <StackedLineChartIcon sx={{ ml: 2 }} />
-                </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ height: 120 }}>
-            <CardActionArea
-              component={Link}
-              to="/games/lottery"
-              sx={{ height: "100%" }}
-            >
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Typography
-                    gutterBottom
-                    variant="h3"
-                    component="div"
-                    align="center"
-                  >
-                    {u.t("home:quick_menu_lottery")}
-                  </Typography>
-                  <LocalActivityIcon sx={{ ml: 2 }} />
-                </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ height: 120 }}>
-            <CardActionArea
-              component="a"
-              href="https://games.coded-by-danil.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{ height: "100%" }}
-            >
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                >
-                  <Typography
-                    gutterBottom
-                    variant="h3"
-                    component="div"
-                    align="center"
-                  >
-                    {u.t("home:quick_menu_web_games")}
-                  </Typography>
-                  <SportsEsportsIcon sx={{ ml: 2 }} />
-                </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
-
-        <Grid item xs={12} sm={4}>
-          <Card sx={{ height: 120 }}>
-            <CardActionArea
-              component="a"
-              href="https://chat.coded-by-danil.dev/"
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{ height: "100%" }}
-            >
-              <CardContent
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "100%",
-                  }}
-                >
-                  <Typography
-                    gutterBottom
-                    variant="h3"
-                    component="div"
-                    align="center"
-                  >
-                    {u.t("home:quick_menu_smart_note")}
-                  </Typography>
-                  <HeadsetMicIcon sx={{ ml: 2 }} />
-                </Box>
-              </CardContent>
-            </CardActionArea>
-          </Card>
-        </Grid>
+                    <Typography
+                      variant="h5"
+                      component="div"
+                      align="center"
+                      sx={{ lineHeight: 1.2 }}
+                    >
+                      {u.t(item.labelKey)}
+                    </Typography>
+                    <Icon sx={{ fontSize: 22, flexShrink: 0 }} />
+                  </CardContent>
+                </CardActionArea>
+              </Card>
+            </Grid>
+          );
+        })}
       </Grid>
     </>
   );

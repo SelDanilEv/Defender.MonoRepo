@@ -34,6 +34,20 @@ public class MenuSessionController(
         return CreatedAtAction(nameof(Get), new { sessionId = session.Id }, session);
     }
 
+    [HttpGet]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(IReadOnlyList<MenuSession>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IReadOnlyList<MenuSession>>> GetAll(CancellationToken cancellationToken)
+    {
+        var userId = currentAccountAccessor.GetAccountId();
+        logger.LogInformation("Get all menu sessions requested by user {UserId}", userId);
+        var sessions = await menuSessionService.GetByUserIdAsync(userId, cancellationToken);
+        logger.LogInformation("Returning {Count} menu sessions for user {UserId}", sessions.Count, userId);
+        return Ok(sessions);
+    }
+
     [HttpGet("{sessionId:guid}")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(MenuSession), StatusCodes.Status200OK)]
@@ -52,6 +66,27 @@ public class MenuSessionController(
         }
         logger.LogInformation("Menu session loaded: session {SessionId}, status {Status}", sessionId, session.Status);
         return Ok(session);
+    }
+
+    [HttpDelete("{sessionId:guid}")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> Delete(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var userId = currentAccountAccessor.GetAccountId();
+        logger.LogInformation("Delete menu session requested: session {SessionId}, user {UserId}", sessionId, userId);
+        var deleted = await menuSessionService.DeleteAsync(sessionId, userId, cancellationToken);
+        if (!deleted)
+        {
+            logger.LogWarning("Delete menu session failed: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
+            return NotFound();
+        }
+
+        logger.LogInformation("Delete menu session completed: session {SessionId}, user {UserId}", sessionId, userId);
+        return NoContent();
     }
 
     [HttpPost("{sessionId:guid}/upload")]
@@ -225,14 +260,20 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Get recommendations requested: session {SessionId}, user {UserId}", sessionId, userId);
-        var items = await menuSessionService.GetRecommendationsAsync(sessionId, userId, cancellationToken);
-        if (items == null || items.Count == 0)
+        var session = await menuSessionService.GetByIdAsync(sessionId, userId, cancellationToken);
+        if (session == null)
+        {
+            logger.LogWarning("Get recommendations failed: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
+            return NotFound();
+        }
+
+        if (session.RankedItems.Count == 0)
         {
             logger.LogInformation("No recommendations available: session {SessionId}, user {UserId}", sessionId, userId);
             return NoContent();
         }
-        logger.LogInformation("Recommendations returned: session {SessionId}, user {UserId}, count {Count}", sessionId, userId, items.Count);
-        return Ok(items);
+        logger.LogInformation("Recommendations returned: session {SessionId}, user {UserId}, count {Count}", sessionId, userId, session.RankedItems.Count);
+        return Ok(session.RankedItems);
     }
 
     private static bool IsImageFile(string? contentType)

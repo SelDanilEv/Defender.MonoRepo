@@ -166,7 +166,7 @@ const PositionDialogBody = (props: PositionDialogBodyProps) => {
 
           <Grid item xs={12} sm={12}>
             <LockedChipList
-              sx={{ minWidth: "100px", width: "30%" }}
+              fullWidth
               label={u.t("budgetTracker:positions_dialog_tags_label")}
               variant="standard"
               initialChips={inputModel.tags}

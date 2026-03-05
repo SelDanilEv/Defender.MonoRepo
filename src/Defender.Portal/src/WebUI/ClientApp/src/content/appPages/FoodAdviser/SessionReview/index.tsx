@@ -62,34 +62,40 @@ const FoodAdviserSessionReviewPage = () => {
     setNewItemText("");
   };
 
-  const handleConfirm = () => {
-    if (!sessionId) return;
+  const handleConfirm = async () => {
+    if (!sessionId || confirming) return;
     setConfirming(true);
-    foodAdviserApi
-      .confirmMenu(sessionId, cleanedItems, trySomethingNew, u)
-      .then(() => foodAdviserApi.requestRecommendations(sessionId, u))
-      .then(() => {
-        setConfirming(false);
-        navigate(`/food-adviser/session/${sessionId}/recommendations`);
-      })
-      .catch(() => setConfirming(false));
+    try {
+      await foodAdviserApi.confirmMenu(sessionId, cleanedItems, trySomethingNew, u);
+      setConfirming(false);
+      navigate(`/food-adviser/session/${sessionId}/recommendations`);
+      void foodAdviserApi.requestRecommendations(sessionId, u).catch(() => {});
+    } catch {
+      setConfirming(false);
+    }
   };
 
   if (!session) return null;
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 1 }}>
-        {u.t("foodAdviser:review_title")}
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        {items.length === 0
-          ? u.t("foodAdviser:review_no_items_detected")
-          : u.t("foodAdviser:review_edit_hint")}
-      </Typography>
+    <Box sx={{ pt: 1 }}>
+      <Box sx={{ mb: 2.5, textAlign: "center" }}>
+        <Typography variant="h4" sx={{ mb: 1 }}>
+          {u.t("foodAdviser:review_title")}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{ maxWidth: 560, mx: "auto" }}
+        >
+          {items.length === 0
+            ? u.t("foodAdviser:review_no_items_detected")
+            : u.t("foodAdviser:review_edit_hint")}
+        </Typography>
+      </Box>
       {cleanedItems.length !== items.length && (
         <Alert severity="info" sx={{ mb: 2 }}>
-          Duplicate or empty entries will be removed before confirmation.
+          {u.t("foodAdviser:review_duplicate_entries_warning")}
         </Alert>
       )}
       <Grid container spacing={2}>
@@ -109,7 +115,7 @@ const FoodAdviserSessionReviewPage = () => {
                     size="small"
                     color="error"
                     onClick={() => handleRemove(index)}
-                    aria-label="Remove"
+                    aria-label={u.t("foodAdviser:review_remove_item")}
                   >
                     <DeleteOutlineIcon fontSize="small" />
                   </IconButton>

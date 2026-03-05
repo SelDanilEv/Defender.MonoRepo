@@ -189,7 +189,7 @@ const GroupDialogBody = (props: GroupDialogBodyProps) => {
           <Grid item xs={12} sm={12}>
             <LockedChipList
               disabled={dialogMode === DialogMode.Delete}
-              sx={{ minWidth: "100px", width: "30%" }}
+              fullWidth
               label={u.t("budgetTracker:groups_dialog_tags_label")}
               variant="standard"
               initialChips={inputModel.tags}

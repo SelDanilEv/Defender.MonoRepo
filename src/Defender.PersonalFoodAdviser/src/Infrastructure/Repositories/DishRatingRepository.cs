@@ -4,6 +4,7 @@ using Defender.Common.DB.Repositories;
 using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Repositories;
 using Defender.PersonalFoodAdviser.Domain.Entities;
 using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace Defender.PersonalFoodAdviser.Infrastructure.Repositories;
 
@@ -22,10 +23,32 @@ public class DishRatingRepository : BaseMongoRepository<DishRating>, IDishRating
         return await AddItemAsync(rating);
     }
 
+    public async Task<DishRating> UpdateAsync(DishRating rating, CancellationToken cancellationToken = default)
+    {
+        rating.UpdatedAtUtc = DateTime.UtcNow;
+        return await ReplaceItemAsync(rating);
+    }
+
     public async Task<IReadOnlyList<DishRating>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         var request = FindModelRequest<DishRating>.Init(x => x.UserId, userId);
         var items = await GetItemsAsync(request);
-        return (IReadOnlyList<DishRating>)items;
+        return items
+            .GroupBy(item => NormalizeDishName(item.DishName), StringComparer.OrdinalIgnoreCase)
+            .Select(group => group
+                .OrderByDescending(item => item.UpdatedAtUtc ?? item.CreatedAtUtc)
+                .First())
+            .OrderByDescending(item => item.UpdatedAtUtc ?? item.CreatedAtUtc)
+            .ToList();
     }
+
+    public async Task DeleteBySessionIdAsync(Guid sessionId, CancellationToken cancellationToken = default)
+    {
+        await _mongoCollection.DeleteManyAsync(
+            Builders<DishRating>.Filter.Eq(rating => rating.SessionId, sessionId),
+            cancellationToken);
+    }
+
+    private static string NormalizeDishName(string? dishName)
+        => dishName?.Trim() ?? string.Empty;
 }

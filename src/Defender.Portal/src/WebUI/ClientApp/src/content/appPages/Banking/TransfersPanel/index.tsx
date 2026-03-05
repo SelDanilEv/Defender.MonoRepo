@@ -93,12 +93,12 @@ const TransfersPanel = (props: any) => {
             <TextField
               name="walletNumber"
               label={u.t("banking_page__transfer_wallet_number_label")}
-              InputProps={{ style: { fontSize: "1.5em" } }}
               value={
                 transferRequest.walletNumber ? transferRequest.walletNumber : ""
               }
               onChange={UpdateRequest}
               variant="outlined"
+              size="small"
               fullWidth
             />
           </Grid>
@@ -107,10 +107,10 @@ const TransfersPanel = (props: any) => {
               name="amount"
               label={u.t("banking_page__transfer_amount_label")}
               sx={{ padding: 0 }}
-              InputProps={{ style: { fontSize: "1.5em" } }}
               value={!transferRequest.amount ? "" : transferRequest.amount}
               onChange={UpdateRequest}
               variant="outlined"
+              size="small"
               fullWidth
             />
           </Grid>
@@ -119,7 +119,7 @@ const TransfersPanel = (props: any) => {
               name="currency"
               value={transferRequest.currency}
               onChange={UpdateRequest}
-              sx={{ height: "100%" }}
+              size="small"
               fullWidth
             >
               {availableCurrencies?.length > 0
@@ -137,7 +137,7 @@ const TransfersPanel = (props: any) => {
               onClick={() => setShowTransferDialog(true)}
               variant="outlined"
               fullWidth
-              sx={{ height: { xs: "55px", sm: "100%" } }}
+              sx={{ minHeight: 38 }}
             >
               {u.t("banking_page__transfer_button_transfer")}
             </LockedButton>

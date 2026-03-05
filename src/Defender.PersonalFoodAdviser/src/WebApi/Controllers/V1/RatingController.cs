@@ -15,6 +15,20 @@ public class RatingController(
     Defender.Common.Interfaces.ICurrentAccountAccessor currentAccountAccessor,
     ILogger<RatingController> logger) : ControllerBase
 {
+    [HttpGet]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(IReadOnlyList<Defender.PersonalFoodAdviser.Domain.Entities.DishRating>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IReadOnlyList<Defender.PersonalFoodAdviser.Domain.Entities.DishRating>>> Get(CancellationToken cancellationToken)
+    {
+        var userId = currentAccountAccessor.GetAccountId();
+        logger.LogInformation("Get ratings requested for user {UserId}", userId);
+        var ratings = await ratingService.GetRatingsAsync(userId, cancellationToken);
+        logger.LogInformation("Returning {Count} ratings for user {UserId}", ratings.Count, userId);
+        return Ok(ratings);
+    }
+
     [HttpPost]
     [Auth(Roles.User)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]

@@ -1,4 +1,5 @@
 using Defender.Common.Configuration.Options;
+using Defender.Common.DB.Model;
 using Defender.Common.DB.Repositories;
 using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Repositories;
 using Defender.PersonalFoodAdviser.Domain.Entities;
@@ -26,9 +27,23 @@ public class MenuSessionRepository : BaseMongoRepository<MenuSession>, IMenuSess
         return await GetItemAsync(sessionId);
     }
 
+    public async Task<IReadOnlyList<MenuSession>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var request = FindModelRequest<MenuSession>.Init(x => x.UserId, userId);
+        var items = await GetItemsAsync(request);
+        return items
+            .OrderByDescending(session => session.UpdatedAtUtc ?? session.CreatedAtUtc)
+            .ToList();
+    }
+
     public async Task<MenuSession> UpdateAsync(MenuSession session, CancellationToken cancellationToken = default)
     {
         session.UpdatedAtUtc = DateTime.UtcNow;
         return await ReplaceItemAsync(session);
+    }
+
+    public Task DeleteAsync(Guid sessionId, CancellationToken cancellationToken = default)
+    {
+        return RemoveItemAsync(sessionId);
     }
 }

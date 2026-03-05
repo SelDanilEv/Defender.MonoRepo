@@ -6,7 +6,6 @@ import {
   Card,
   CardHeader,
   CardActionArea,
-  CardContent,
 } from "@mui/material";
 import { connect } from "react-redux";
 
@@ -109,12 +108,12 @@ const WalletAccountsInfo = (props: any) => {
     if (wallet.walletNumber) {
       for (const account of wallet.currencyAccounts) {
         result.push(
-          <Grid item xs={12} sm={6} md={4} key={account.currency}>
+          <Grid item xs={12} sm={6} md={2} key={account.currency}>
             <CardCc>
               <Box display="flex" alignItems="center">
                 <CardLogo>{account.currency}</CardLogo>
-                <Box marginLeft={"auto"} marginRight={"2em"}>
-                  <Typography variant="h3" fontWeight="normal">
+                <Box marginLeft={"auto"} marginRight={{ xs: "1em", sm: "1.25em" }}>
+                  <Typography variant="h5" fontWeight="normal" sx={{ whiteSpace: "nowrap" }}>
                     {account.balance / 100 +
                       CurrencySymbolsMap[account.currency]}
                   </Typography>
@@ -127,15 +126,33 @@ const WalletAccountsInfo = (props: any) => {
 
       if (result.length < BankingSupportedCurrencies.length)
         result.push(
-          <Grid item xs={12} sm={6} md={4} key={-1}>
+          <Grid item xs={12} sm={6} md={2} key={-1}>
             <CardAddAction>
-              <CardActionArea sx={{ px: 1 }} onClick={createNewAccount}>
-                <CardContent>
+              <CardActionArea
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  minHeight: "inherit",
+                  px: 1,
+                  py: 0,
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 0.75,
+                  textAlign: "center",
+                }}
+                onClick={createNewAccount}
+              >
+                <Box display="flex" alignItems="center" justifyContent="center">
                   <AvatarAddWrapper>
-                    <AddTwoToneIcon fontSize="large" />
+                    <AddTwoToneIcon sx={{ fontSize: 18 }} />
                   </AvatarAddWrapper>
-                </CardContent>
-                <Typography style={{ fontSize: "1.5em" }}>
+                </Box>
+                <Typography
+                  align="center"
+                  sx={{ fontSize: "0.82rem", lineHeight: 1.05 }}
+                >
                   {u.t("banking_page__wallet_button_create_account")}
                 </Typography>
               </CardActionArea>
@@ -184,7 +201,7 @@ const WalletAccountsInfo = (props: any) => {
       <Card>
         <CardHeader
           titleTypographyProps={{
-            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+            style: { fontSize: u.isMobile ? "1.15rem" : "1.35rem" },
           }}
           title={
             u.t("banking_page__wallet_title") +
@@ -228,7 +245,7 @@ const WalletAccountsInfo = (props: any) => {
           }
         />
         <Divider />
-        <Grid container spacing={1}>
+        <Grid container spacing={0.5}>
           {displayAccounts()}
         </Grid>
       </Card>

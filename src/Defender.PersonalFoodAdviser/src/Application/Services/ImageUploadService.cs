@@ -1,6 +1,8 @@
 using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Repositories;
 using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Services;
+using Defender.PersonalFoodAdviser.Application.Common.Helpers;
 using Defender.PersonalFoodAdviser.Domain.Entities;
+using Defender.PersonalFoodAdviser.Domain.Enums;
 using Microsoft.Extensions.Logging;
 
 namespace Defender.PersonalFoodAdviser.Application.Services;
@@ -24,7 +26,8 @@ public class ImageUploadService(
             {
                 SessionId = sessionId,
                 Data = bytes,
-                ContentType = contentType
+                ContentType = contentType,
+                ImageHash = ImageHashHelper.ComputeSha256(bytes)
             };
             blob = await imageBlobRepository.SaveAsync(blob, cancellationToken);
             refs.Add(blob.Id.ToString());
@@ -35,9 +38,14 @@ public class ImageUploadService(
         if (session != null)
         {
             var previousCount = session.ImageRefs.Count;
-            session.ImageRefs.AddRange(refs);
+            session.ImageRefs = MergeImageRefs(session.ImageRefs, refs);
+            ResetDerivedStateForImages(session);
             await menuSessionRepository.UpdateAsync(session, cancellationToken);
-            logger.LogInformation("Updated session image refs after upload: session {SessionId}, oldCount {OldCount}, newCount {NewCount}", sessionId, previousCount, session.ImageRefs.Count);
+            logger.LogInformation(
+                "Updated session image refs after upload: session {SessionId}, oldCount {OldCount}, newCount {NewCount}; cleared parsed, confirmed, and ranked items",
+                sessionId,
+                previousCount,
+                session.ImageRefs.Count);
         }
         else
         {
@@ -46,5 +54,33 @@ public class ImageUploadService(
 
         logger.LogInformation("Image upload completed for session {SessionId}: uploadedRefsCount {RefsCount}", sessionId, refs.Count);
         return refs;
+    }
+
+    private static List<string> MergeImageRefs(IReadOnlyList<string> existingRefs, IReadOnlyList<string> newRefs)
+    {
+        var merged = new List<string>(existingRefs.Count + newRefs.Count);
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var imageRef in existingRefs.Concat(newRefs))
+        {
+            var value = imageRef?.Trim();
+            if (string.IsNullOrWhiteSpace(value) || !seen.Add(value))
+                continue;
+
+            merged.Add(value);
+        }
+
+        return merged;
+    }
+
+    private static void ResetDerivedStateForImages(MenuSession session)
+    {
+        session.ParsedItems = [];
+        session.ConfirmedItems = [];
+        session.RankedItems = [];
+        session.TrySomethingNew = false;
+        session.RecommendationWarningCode = null;
+        session.RecommendationWarningMessage = null;
+        session.Status = MenuSessionStatus.Uploaded;
     }
 }

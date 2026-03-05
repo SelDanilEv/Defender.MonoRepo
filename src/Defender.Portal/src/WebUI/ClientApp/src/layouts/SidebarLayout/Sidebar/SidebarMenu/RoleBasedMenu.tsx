@@ -21,11 +21,11 @@ const SubMenuWrapper = styled(Box)(
     .MuiList-root {
 
       .MuiListItem-root {
-        padding: 1px 0;
+        padding: 0;
 
         .MuiBadge-root {
           position: absolute;
-          right: ${theme.spacing(3.2)};
+          right: ${theme.spacing(2.5)};
 
           .MuiBadge-standard {
             background: ${theme.colors.primary.main};
@@ -42,7 +42,8 @@ const SubMenuWrapper = styled(Box)(
           background-color: transparent;
           width: 100%;
           justify-content: flex-start;
-          padding: ${theme.spacing(1.2, 3)};
+          min-height: 34px;
+          padding: ${theme.spacing(0.7, 2)};
 
           .MuiButton-startIcon,
           .MuiButton-endIcon {
@@ -56,15 +57,15 @@ const SubMenuWrapper = styled(Box)(
 
           .MuiButton-startIcon {
             color: ${theme.colors.alpha.trueWhite[30]};
-            font-size: ${theme.typography.pxToRem(20)};
-            margin-right: ${theme.spacing(1)};
+            font-size: ${theme.typography.pxToRem(16)};
+            margin-right: ${theme.spacing(0.75)};
           }
           
           .MuiButton-endIcon {
             color: ${theme.colors.alpha.trueWhite[50]};
             margin-left: auto;
             opacity: .8;
-            font-size: ${theme.typography.pxToRem(20)};
+            font-size: ${theme.typography.pxToRem(16)};
           }
 
           &.active,
@@ -84,7 +85,7 @@ const SubMenuWrapper = styled(Box)(
 
           .MuiBadge-root {
             position: absolute;
-            right: ${theme.spacing(7)};
+            right: ${theme.spacing(5.5)};
           }
         }
 
@@ -92,17 +93,18 @@ const SubMenuWrapper = styled(Box)(
           width: 100%;
 
           .MuiList-root {
-            padding: ${theme.spacing(1, 0)};
+            padding: ${theme.spacing(0.5, 0)};
           }
 
           .MuiListItem-root {
-            padding: 1px 0;
+            padding: 0;
 
             .MuiButton-root {
-              padding: ${theme.spacing(0.8, 3)};
+              min-height: 30px;
+              padding: ${theme.spacing(0.5, 2)};
 
               .MuiBadge-root {
-                right: ${theme.spacing(3.2)};
+                right: ${theme.spacing(2.5)};
               }
 
               &:before {
@@ -118,7 +120,7 @@ const SubMenuWrapper = styled(Box)(
                 transform: scale(0);
                 transform-origin: center;
                 border-radius: 20px;
-                margin-right: ${theme.spacing(1.8)};
+                margin-right: ${theme.spacing(1.2)};
               }
 
               &.active,
@@ -203,7 +205,7 @@ const RoleBasedMenu = (props: any) => {
               <List component="div">
                 <MenuItem
                   to="/home"
-                  icon={<HomeIcon style={{ fontSize: "1.5em" }} />}
+                  icon={<HomeIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_home")}
                 />
               </List>
@@ -224,17 +226,17 @@ const RoleBasedMenu = (props: any) => {
               <List component="div">
                 <MenuItem
                   to="/budget-tracker/positions"
-                  icon={<AllInboxIcon style={{ fontSize: "1.5em" }} />}
+                  icon={<AllInboxIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_budget_tracker_positions")}
                 />
                 <MenuItem
                   to="/budget-tracker/reviews"
-                  icon={<GradingIcon style={{ fontSize: "1.5em" }} />}
+                  icon={<GradingIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_budget_tracker_reviews")}
                 />
                 <MenuItem
                   to="/budget-tracker/diagram"
-                  icon={<StackedLineChartIcon style={{ fontSize: "1.5em" }} />}
+                  icon={<StackedLineChartIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_budget_tracker_diagram")}
                 />
               </List>
@@ -255,7 +257,7 @@ const RoleBasedMenu = (props: any) => {
               <List component="div">
                 <MenuItem
                   to="/banking"
-                  icon={<AccountBalanceIcon style={{ fontSize: "1.5em" }} />}
+                  icon={<AccountBalanceIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_banking")}
                 />
               </List>
@@ -276,7 +278,7 @@ const RoleBasedMenu = (props: any) => {
               <List component="div">
                 <MenuItem
                   to="/games/lottery"
-                  icon={<LocalActivityIcon style={{ fontSize: "1.5em" }} />}
+                  icon={<LocalActivityIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_lottery")}
                 />
               </List>
@@ -297,7 +299,7 @@ const RoleBasedMenu = (props: any) => {
               <List component="div">
                 <MenuItem
                   to="/food-adviser"
-                  icon={<RestaurantIcon style={{ fontSize: "1.5em" }} />}
+                  icon={<RestaurantIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_food_adviser")}
                 />
               </List>

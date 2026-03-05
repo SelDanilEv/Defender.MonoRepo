@@ -17,6 +17,20 @@ export interface MenuSessionDto {
   confirmedItems: string[];
   rankedItems: string[];
   trySomethingNew: boolean;
+  recommendationWarningCode: string | null;
+  recommendationWarningMessage: string | null;
+  createdAtUtc: string;
+  updatedAtUtc: string | null;
+}
+
+export interface DishRatingDto {
+  id: string;
+  userId: string;
+  dishName: string;
+  rating: number;
+  sessionId: string | null;
+  createdAtUtc: string;
+  updatedAtUtc: string | null;
 }
 
 const parseJsonSafe = async <T>(response: Response): Promise<T | null> => {
@@ -103,6 +117,21 @@ export const foodAdviserApi = {
       });
     }),
 
+  getSessions: (utils: any): Promise<MenuSessionDto[]> =>
+    new Promise((resolve) => {
+      APICallWrapper({
+        url: apiUrls.foodAdviser.getSessions,
+        options: { method: "GET" },
+        utils,
+        onSuccess: async (response) => {
+          const data = await parseJsonSafe<MenuSessionDto[]>(response);
+          resolve(Array.isArray(data) ? data : []);
+        },
+        onFailure: async () => resolve([]),
+        showError: false,
+      });
+    }),
+
   getSession: (sessionId: string, utils: any): Promise<MenuSessionDto | null> =>
     new Promise((resolve) => {
       APICallWrapper({
@@ -114,6 +143,34 @@ export const foodAdviserApi = {
           resolve(data);
         },
         onFailure: async () => resolve(null),
+        showError: false,
+      });
+    }),
+
+  deleteSession: (sessionId: string, utils: any): Promise<void> =>
+    new Promise((resolve, reject) => {
+      APICallWrapper({
+        url: `${apiUrls.foodAdviser.deleteSession}/${sessionId}`,
+        options: { method: "DELETE" },
+        utils,
+        onSuccess: async () => resolve(),
+        onFailure: async () => reject(),
+        showSuccess: true,
+        showError: true,
+      });
+    }),
+
+  getRatings: (utils: any): Promise<DishRatingDto[]> =>
+    new Promise((resolve) => {
+      APICallWrapper({
+        url: apiUrls.foodAdviser.getRatings,
+        options: { method: "GET" },
+        utils,
+        onSuccess: async (response) => {
+          const data = await parseJsonSafe<DishRatingDto[]>(response);
+          resolve(Array.isArray(data) ? data : []);
+        },
+        onFailure: async () => resolve([]),
         showError: false,
       });
     }),

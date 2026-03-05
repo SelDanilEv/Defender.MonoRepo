@@ -10,4 +10,8 @@ public class PortalMenuSessionDto
     public List<string> ConfirmedItems { get; set; } = [];
     public List<string> RankedItems { get; set; } = [];
     public bool TrySomethingNew { get; set; }
+    public string? RecommendationWarningCode { get; set; }
+    public string? RecommendationWarningMessage { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public DateTime? UpdatedAtUtc { get; set; }
 }

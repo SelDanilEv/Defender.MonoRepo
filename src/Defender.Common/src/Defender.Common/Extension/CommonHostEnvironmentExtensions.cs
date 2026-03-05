@@ -7,20 +7,18 @@ public static class CommonHostEnvironmentExtensions
 {
     public static bool IsLocalOrDevelopment(this IHostEnvironment hostEnvironment)
     {
-        return hostEnvironment.IsEnvironment("Development")
-            || hostEnvironment.IsEnvironment("Dev")
-            || hostEnvironment.IsEnvironment("Local")
-            || hostEnvironment.IsEnvironment("DockerLocal")
-            || hostEnvironment.IsEnvironment("DockerDev");
+        return hostEnvironment.IsEnvironment("Dev")
+            || hostEnvironment.IsEnvironment("Debug")
+            || hostEnvironment.IsEnvironment("Local");
     }
 
     public static AppEnvironment GetAppEnvironment(this IHostEnvironment hostEnvironment)
     {
         return hostEnvironment.EnvironmentName switch
         {
-            "Production" or "DockerProd" or "Prod" => AppEnvironment.prod,
-            "Development" or "DockerDev" or "Dev" => AppEnvironment.dev,
-            "Local" or "DockerLocal" => AppEnvironment.local,
+            "Prod" => AppEnvironment.prod,
+            "Dev" => AppEnvironment.dev,
+            "Debug" or "Local" => AppEnvironment.local,
             _ => AppEnvironment.local,
         };
     }

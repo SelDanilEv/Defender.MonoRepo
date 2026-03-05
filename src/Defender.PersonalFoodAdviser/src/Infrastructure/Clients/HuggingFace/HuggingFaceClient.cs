@@ -1,9 +1,9 @@
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Text.RegularExpressions;
 using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Services;
-using Defender.PersonalFoodAdviser.Application.Configuration.Options;
+using Defender.PersonalFoodAdviser.Application.Helpers.LocalSecretHelper;
+using Defender.PersonalFoodAdviser.Infrastructure.Configuration.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -12,74 +12,41 @@ namespace Defender.PersonalFoodAdviser.Infrastructure.Clients.HuggingFace;
 public class HuggingFaceClient(
     HttpClient httpClient,
     IOptions<HuggingFaceOptions> options,
-    ILogger<HuggingFaceClient> logger) : IHuggingFaceClient
+    IOptions<MenuIntelligenceOptions> menuIntelligenceOptions,
+    ILogger<HuggingFaceClient> logger) : IMenuIntelligenceClient
 {
-    public async Task<IReadOnlyList<string>> ExtractDishNamesFromImagesAsync(IReadOnlyList<byte[]> imageBytes, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<string>> ExtractDishNamesFromImagesAsync(
+        IReadOnlyList<byte[]> imageBytes,
+        CancellationToken cancellationToken = default)
     {
-        var allDishes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var opts = options.Value;
+        var apiKey = await ResolveApiKeyAsync();
 
         logger.LogInformation(
             "ExtractDishNamesFromImages: image count={Count}, ApiKey configured={HasKey}, VisionModel={Model}",
-            imageBytes.Count, !string.IsNullOrEmpty(opts.ApiKey), opts.VisionModel ?? "(null)");
+            imageBytes.Count,
+            !string.IsNullOrEmpty(apiKey),
+            opts.VisionModel ?? "(null)");
 
-        if (string.IsNullOrEmpty(opts.ApiKey))
+        if (string.IsNullOrEmpty(apiKey))
         {
             logger.LogWarning("HuggingFace ApiKey not configured; menu extraction requires a valid API key. Configure HuggingFaceOptions:ApiKey.");
             return [];
         }
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", opts.ApiKey);
+
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
         var visionUrl = $"{opts.BaseUrl.TrimEnd('/')}/models/{opts.VisionModel}";
-        var prompt = string.IsNullOrWhiteSpace(opts.VisionPrompt)
-            ? "List all dish and menu item names visible in this restaurant menu. Return only the names, one per line, no prices or numbers."
-            : opts.VisionPrompt.Trim();
+        var prompt = MenuIntelligenceClientHelper.ResolveVisionPrompt(menuIntelligenceOptions.Value.VisionPrompt);
+        var allDishes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         for (var i = 0; i < imageBytes.Count; i++)
-        {
-            var bytes = imageBytes[i];
-            try
-            {
-                var json = await CallVisionApiAsync(visionUrl, bytes, prompt, opts.VisionMaxNewTokens, cancellationToken);
-                var texts = ParseGeneratedTextFromResponse(json);
-                if (texts.Count == 0 && !string.IsNullOrWhiteSpace(json))
-                    logger.LogWarning(
-                        "ExtractDishNamesFromImages: image index={Index}, API returned {JsonLength} chars but no generated_text/summary_text found. Json preview: {Preview}",
-                        i, json.Length, json.Length > 300 ? json[..300] + "..." : json);
-                logger.LogInformation(
-                    "ExtractDishNamesFromImages: image index={Index}, response produced {TextCount} text segment(s), total raw length={RawLength}",
-                    i, texts.Count, texts.Sum(t => t?.Length ?? 0));
-
-                var imageDishCount = 0;
-                foreach (var text in texts)
-                {
-                    var dishes = ParseDishNamesFromText(text).ToList();
-                    if (!string.IsNullOrWhiteSpace(text) && dishes.Count == 0)
-                        logger.LogWarning(
-                            "ExtractDishNamesFromImages: image index={Index} had non-empty model output but ParseDishNamesFromText returned 0 dishes. Raw preview (first 500 chars): {Preview}",
-                            i, text.Length > 500 ? text[..500] + "..." : text);
-                    foreach (var d in dishes)
-                    {
-                        if (!string.IsNullOrWhiteSpace(d))
-                        {
-                            allDishes.Add(d.Trim());
-                            imageDishCount++;
-                        }
-                    }
-                }
-                logger.LogInformation(
-                    "ExtractDishNamesFromImages: image index={Index} yielded {DishCount} dish names from this image (cumulative: {Total})",
-                    i, imageDishCount, allDishes.Count);
-            }
-            catch (Exception ex)
-            {
-                logger.LogWarning(ex, "ExtractDishNamesFromImages: failed to process image index={Index} (size={Size} bytes); continuing with remaining images", i, bytes.Length);
-            }
-        }
+            await TryProcessVisionImageAsync(i, imageBytes[i], visionUrl, prompt, opts.VisionMaxNewTokens, allDishes, cancellationToken);
 
         var result = allDishes.ToList();
         logger.LogInformation(
             "ExtractDishNamesFromImages: finished. Total unique dishes={Count}. Dishes: [{Dishes}]",
-            result.Count, string.Join(", ", result));
+            result.Count,
+            string.Join(", ", result));
         return result;
     }
 
@@ -93,13 +60,21 @@ public class HuggingFaceClient(
         CancellationToken cancellationToken = default)
     {
         var opts = options.Value;
-        if (string.IsNullOrEmpty(opts.ApiKey))
+        var apiKey = await ResolveApiKeyAsync();
+        if (string.IsNullOrEmpty(apiKey))
         {
             logger.LogWarning("HuggingFace ApiKey not configured; returning placeholder recommendations");
-            return confirmedDishes.Take(topN).ToList();
+            return MenuIntelligenceClientHelper.NormalizeRankedDishes(confirmedDishes, confirmedDishes, topN);
         }
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", opts.ApiKey);
-        var prompt = BuildRecommendationPrompt(confirmedDishes, likes, dislikes, ratingHistory, trySomethingNew, topN);
+
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", apiKey);
+        var prompt = MenuIntelligenceClientHelper.BuildRecommendationPrompt(
+            confirmedDishes,
+            likes,
+            dislikes,
+            ratingHistory,
+            trySomethingNew,
+            topN);
         var textUrl = $"{opts.BaseUrl.TrimEnd('/')}/models/{opts.TextModel}";
         var body = JsonSerializer.Serialize(new { inputs = prompt });
         using var content = new StringContent(body, Encoding.UTF8, "application/json");
@@ -107,47 +82,113 @@ public class HuggingFaceClient(
         response.EnsureSuccessStatusCode();
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         var texts = ParseGeneratedTextFromResponse(json);
-        var ranked = new List<string>();
+        var ranked = MenuIntelligenceClientHelper.ExtractRankedDishesFromTexts(texts);
+        return MenuIntelligenceClientHelper.NormalizeRankedDishes(ranked, confirmedDishes, topN);
+    }
+
+    private async Task<string> ResolveApiKeyAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(options.Value.ApiKey))
+            return options.Value.ApiKey;
+
+        try
+        {
+            return await LocalSecretsHelper.GetSecretAsync(LocalSecret.HuggingFaceApiKey);
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "HuggingFace API key secret lookup failed");
+            return string.Empty;
+        }
+    }
+
+    private async Task TryProcessVisionImageAsync(
+        int index,
+        byte[] imageBytes,
+        string visionUrl,
+        string prompt,
+        int maxNewTokens,
+        ISet<string> allDishes,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var json = await CallVisionApiAsync(visionUrl, imageBytes, prompt, maxNewTokens, cancellationToken);
+            var texts = ParseGeneratedTextFromResponse(json);
+
+            LogEmptyVisionResponse(index, json, texts);
+            LogVisionResponseSummary(index, texts);
+
+            var imageDishCount = AddParsedDishes(index, texts, allDishes);
+            logger.LogInformation(
+                "ExtractDishNamesFromImages: image index={Index} yielded {DishCount} dish names from this image (cumulative: {Total})",
+                index,
+                imageDishCount,
+                allDishes.Count);
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(ex, "ExtractDishNamesFromImages: failed to process image index={Index} (size={Size} bytes); continuing with remaining images", index, imageBytes.Length);
+        }
+    }
+
+    private void LogEmptyVisionResponse(int index, string json, IReadOnlyCollection<string> texts)
+    {
+        if (texts.Count > 0 || string.IsNullOrWhiteSpace(json))
+            return;
+
+        logger.LogWarning(
+            "ExtractDishNamesFromImages: image index={Index}, API returned {JsonLength} chars but no generated_text/summary_text found. Json preview: {Preview}",
+            index,
+            json.Length,
+            json.Length > 300 ? json[..300] + "..." : json);
+    }
+
+    private void LogVisionResponseSummary(int index, IReadOnlyCollection<string> texts)
+    {
+        logger.LogInformation(
+            "ExtractDishNamesFromImages: image index={Index}, response produced {TextCount} text segment(s), total raw length={RawLength}",
+            index,
+            texts.Count,
+            texts.Sum(t => t?.Length ?? 0));
+    }
+
+    private int AddParsedDishes(int index, IEnumerable<string> texts, ISet<string> allDishes)
+    {
+        var imageDishCount = 0;
+
         foreach (var text in texts)
         {
-            var lines = text.Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
-            foreach (var line in lines)
+            var dishes = MenuIntelligenceClientHelper.ParseDishNamesFromText(text).ToList();
+            LogUnparsedVisionText(index, text, dishes.Count);
+
+            foreach (var dish in dishes.Where(static dish => !string.IsNullOrWhiteSpace(dish)))
             {
-                var dish = line.Trim();
-                if (string.IsNullOrEmpty(dish) || dish.StartsWith('#')) continue;
-                var numPrefix = Regex.Match(dish, @"^\d+[\.\)]\s*").Value;
-                if (!string.IsNullOrEmpty(numPrefix))
-                    dish = dish.Substring(numPrefix.Length).Trim();
-                if (!string.IsNullOrEmpty(dish))
-                    ranked.Add(dish);
+                allDishes.Add(dish.Trim());
+                imageDishCount++;
             }
         }
-        return ranked.Take(topN).ToList();
+
+        return imageDishCount;
     }
 
-    private static string BuildRecommendationPrompt(
-        IReadOnlyList<string> confirmedDishes,
-        IReadOnlyList<string> likes,
-        IReadOnlyList<string> dislikes,
-        IReadOnlyList<(string DishName, int Rating)> ratingHistory,
-        bool trySomethingNew,
-        int topN)
+    private void LogUnparsedVisionText(int index, string text, int dishCount)
     {
-        var sb = new StringBuilder();
-        sb.Append("Menu dishes: ").AppendLine(string.Join(", ", confirmedDishes));
-        if (likes.Count > 0) sb.Append("Likes: ").AppendLine(string.Join(", ", likes));
-        if (dislikes.Count > 0) sb.Append("Dislikes: ").AppendLine(string.Join(", ", dislikes));
-        if (ratingHistory.Count > 0)
-        {
-            sb.Append("Previous ratings: ");
-            sb.AppendLine(string.Join(", ", ratingHistory.Select(r => $"{r.DishName}({r.Rating})")));
-        }
-        sb.Append("Try something new: ").AppendLine(trySomethingNew ? "yes" : "no");
-        sb.Append($"Return exactly {topN} dish names from the menu, one per line, ranked by how much the user will enjoy them. Only dish names, no numbers or extra text.");
-        return sb.ToString();
+        if (string.IsNullOrWhiteSpace(text) || dishCount > 0)
+            return;
+
+        logger.LogWarning(
+            "ExtractDishNamesFromImages: image index={Index} had non-empty model output but ParseDishNamesFromText returned 0 dishes. Raw preview (first 500 chars): {Preview}",
+            index,
+            text.Length > 500 ? text[..500] + "..." : text);
     }
 
-    private async Task<string> CallVisionApiAsync(string visionUrl, byte[] imageBytes, string prompt, int maxNewTokens, CancellationToken cancellationToken)
+    private async Task<string> CallVisionApiAsync(
+        string visionUrl,
+        byte[] imageBytes,
+        string prompt,
+        int maxNewTokens,
+        CancellationToken cancellationToken)
     {
         var payload = new
         {
@@ -156,12 +197,14 @@ public class HuggingFaceClient(
             parameters = new { max_new_tokens = maxNewTokens },
             options = new { wait_for_model = true }
         };
+
         using var jsonContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
         var response = await httpClient.PostAsync(visionUrl, jsonContent, cancellationToken);
         if (response.IsSuccessStatusCode)
             return await response.Content.ReadAsStringAsync(cancellationToken);
-        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
-            response.StatusCode == System.Net.HttpStatusCode.UnsupportedMediaType)
+
+        if (response.StatusCode == System.Net.HttpStatusCode.BadRequest
+            || response.StatusCode == System.Net.HttpStatusCode.UnsupportedMediaType)
         {
             var urlWithParams = $"{visionUrl}?max_new_tokens={maxNewTokens}";
             using var binaryContent = new ByteArrayContent(imageBytes);
@@ -170,6 +213,7 @@ public class HuggingFaceClient(
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync(cancellationToken);
         }
+
         response.EnsureSuccessStatusCode();
         return string.Empty;
     }
@@ -177,52 +221,30 @@ public class HuggingFaceClient(
     private static List<string> ParseGeneratedTextFromResponse(string json)
     {
         var result = new List<string>();
+
         try
         {
             using var doc = JsonDocument.Parse(json);
             if (doc.RootElement.ValueKind == JsonValueKind.Array)
             {
-                foreach (var el in doc.RootElement.EnumerateArray())
+                foreach (var element in doc.RootElement.EnumerateArray())
                 {
-                    if (el.TryGetProperty("generated_text", out var gt))
-                        result.Add(gt.GetString() ?? "");
-                    else if (el.TryGetProperty("summary_text", out var st))
-                        result.Add(st.GetString() ?? "");
+                    if (element.TryGetProperty("generated_text", out var generatedText))
+                        result.Add(generatedText.GetString() ?? string.Empty);
+                    else if (element.TryGetProperty("summary_text", out var summaryText))
+                        result.Add(summaryText.GetString() ?? string.Empty);
                 }
             }
-            else if (doc.RootElement.TryGetProperty("generated_text", out var gt))
-                result.Add(gt.GetString() ?? "");
+            else if (doc.RootElement.TryGetProperty("generated_text", out var generatedText))
+            {
+                result.Add(generatedText.GetString() ?? string.Empty);
+            }
         }
         catch
         {
             result.Add(json);
         }
-        return result;
-    }
 
-    private static IEnumerable<string> ParseDishNamesFromText(string text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) yield break;
-        var normalized = text
-            .Replace("|", "\n", StringComparison.Ordinal)
-            .Replace("•", "\n", StringComparison.Ordinal)
-            .Replace(" - ", "\n", StringComparison.Ordinal)
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace("\r", "\n", StringComparison.Ordinal);
-        var raw = normalized.Split(['\n', ',', ';'], StringSplitOptions.RemoveEmptyEntries);
-        foreach (var segment in raw)
-        {
-            var dish = segment.Trim();
-            if (string.IsNullOrWhiteSpace(dish)) continue;
-            dish = Regex.Replace(dish, @"^\d+[\.\)]\s*", "");
-            dish = Regex.Replace(dish, @"\s*\d+[\.\)]\s*$", "");
-            dish = Regex.Replace(dish, @"\s*\d+[\.,]\d{2}\s*$", "");
-            dish = Regex.Replace(dish, @"\s*\d+\s*$", "");
-            dish = Regex.Replace(dish, @"^\s*[-–—]\s*", "");
-            dish = Regex.Replace(dish, @"\s+", " ").Trim();
-            if (dish.Length < 2) continue;
-            if (Regex.IsMatch(dish, @"^\d+$")) continue;
-            yield return dish;
-        }
+        return result;
     }
 }

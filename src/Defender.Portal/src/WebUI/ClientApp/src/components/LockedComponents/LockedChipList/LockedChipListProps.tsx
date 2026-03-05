@@ -1,8 +1,8 @@
-import { SelectProps } from "@mui/material";
+import { TextFieldProps } from "@mui/material";
 
-type LockedChipListProps = Omit<SelectProps, "onChange"> & {
-  isLoading;
-  dispatch;
+type LockedChipListProps = Omit<TextFieldProps, "onChange" | "value"> & {
+  isLoading?: boolean;
+  dispatch?: unknown;
   initialChips?: string[];
   onChange?: (chips: string[]) => void;
 };

@@ -69,6 +69,14 @@ public class PersonalFoodAdviserClient(
         return (await response.Content.ReadFromJsonAsync<PortalMenuSessionDto>(JsonOptions, cancellationToken))!;
     }
 
+    public async Task<IReadOnlyList<PortalMenuSessionDto>> GetSessionsAsync(CancellationToken cancellationToken = default)
+    {
+        await SetAuthHeaderAsync();
+        var response = await httpClient.GetAsync($"{BaseUrl}/api/V1/MenuSession", cancellationToken);
+        await EnsureSuccessOrThrowAsync(response, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<List<PortalMenuSessionDto>>(JsonOptions, cancellationToken) ?? [];
+    }
+
     public async Task<PortalMenuSessionDto?> GetSessionAsync(Guid sessionId, CancellationToken cancellationToken = default)
     {
         await SetAuthHeaderAsync();
@@ -76,6 +84,15 @@ public class PersonalFoodAdviserClient(
         if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
         await EnsureSuccessOrThrowAsync(response, cancellationToken);
         return await response.Content.ReadFromJsonAsync<PortalMenuSessionDto>(JsonOptions, cancellationToken);
+    }
+
+    public async Task<bool> DeleteSessionAsync(Guid sessionId, CancellationToken cancellationToken = default)
+    {
+        await SetAuthHeaderAsync();
+        var response = await httpClient.DeleteAsync($"{BaseUrl}/api/V1/MenuSession/{sessionId}", cancellationToken);
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return false;
+        await EnsureSuccessOrThrowAsync(response, cancellationToken);
+        return true;
     }
 
     public async Task<IReadOnlyList<string>> UploadSessionImagesAsync(Guid sessionId, Stream[] fileStreams, string[] contentTypes, CancellationToken cancellationToken = default)
@@ -128,6 +145,14 @@ public class PersonalFoodAdviserClient(
         if (response.StatusCode == System.Net.HttpStatusCode.NoContent) return null;
         await EnsureSuccessOrThrowAsync(response, cancellationToken);
         return await response.Content.ReadFromJsonAsync<List<string>>(JsonOptions, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<PortalDishRatingDto>> GetRatingsAsync(CancellationToken cancellationToken = default)
+    {
+        await SetAuthHeaderAsync();
+        var response = await httpClient.GetAsync($"{BaseUrl}/api/V1/Rating", cancellationToken);
+        await EnsureSuccessOrThrowAsync(response, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<List<PortalDishRatingDto>>(JsonOptions, cancellationToken) ?? [];
     }
 
     public async Task SubmitRatingAsync(string dishName, int rating, Guid? sessionId, CancellationToken cancellationToken = default)

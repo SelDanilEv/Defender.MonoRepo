@@ -182,7 +182,7 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
             <Grid item xs={10} sm={10}>
               <LockedChipList
                 disabled={dialogMode === DialogMode.Delete}
-                sx={{ minWidth: "100px", width: "25%" }}
+                fullWidth
                 label={u.t("budgetTracker:positions_dialog_tags_label")}
                 variant="standard"
                 initialChips={position.tags}

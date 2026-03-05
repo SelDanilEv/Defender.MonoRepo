@@ -46,6 +46,28 @@ public class CommonHelpersTests
         Assert.True(hostEnvironment.IsLocalOrDevelopment());
     }
 
+    [Fact]
+    public void GetAppEnvironment_WhenDebugEnvironmentProvided_ReturnsLocal()
+    {
+        var hostEnvironment = new FakeHostEnvironment("Debug");
+
+        var result = hostEnvironment.GetAppEnvironment();
+
+        Assert.Equal(AppEnvironment.local, result);
+        Assert.True(hostEnvironment.IsLocalOrDevelopment());
+    }
+
+    [Fact]
+    public void GetAppEnvironment_WhenProdEnvironmentProvided_ReturnsProd()
+    {
+        var hostEnvironment = new FakeHostEnvironment("Prod");
+
+        var result = hostEnvironment.GetAppEnvironment();
+
+        Assert.Equal(AppEnvironment.prod, result);
+        Assert.False(hostEnvironment.IsLocalOrDevelopment());
+    }
+
     private sealed class FakeHostEnvironment(string environmentName) : IHostEnvironment
     {
         public string EnvironmentName { get; set; } = environmentName;

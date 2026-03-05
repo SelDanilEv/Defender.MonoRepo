@@ -83,6 +83,9 @@ const FoodAdviserSessionReviewPage = Loader(
 const FoodAdviserSessionRecommendationsPage = Loader(
   lazy(() => import("src/content/appPages/FoodAdviser/SessionRecommendations"))
 );
+const FoodAdviserSessionsPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdviser/Sessions"))
+);
 
 // Home
 
@@ -322,6 +325,10 @@ const routes: RouteObject[] = [
       {
         path: "session/:sessionId/recommendations",
         element: <FoodAdviserSessionRecommendationsPage />,
+      },
+      {
+        path: "sessions",
+        element: <FoodAdviserSessionsPage />,
       },
       {
         path: "*",

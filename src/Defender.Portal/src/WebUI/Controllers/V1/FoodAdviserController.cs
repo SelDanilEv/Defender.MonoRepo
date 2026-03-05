@@ -48,6 +48,16 @@ public class FoodAdviserController(
         return CreatedAtAction(nameof(GetSession), new { sessionId = result.Id }, result);
     }
 
+    [HttpGet("sessions")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(IReadOnlyList<PortalMenuSessionDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetSessions(CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetSessionsQuery(), cancellationToken);
+        return Ok(result);
+    }
+
     [HttpGet("session/{sessionId:guid}")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(PortalMenuSessionDto), StatusCodes.Status200OK)]
@@ -58,6 +68,18 @@ public class FoodAdviserController(
         var result = await mediator.Send(new GetSessionQuery(sessionId), cancellationToken);
         if (result == null) return NotFound();
         return Ok(result);
+    }
+
+    [HttpDelete("session/{sessionId:guid}")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> DeleteSession(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var deleted = await mediator.Send(new DeleteSessionCommand(sessionId), cancellationToken);
+        if (!deleted) return NotFound();
+        return NoContent();
     }
 
     [HttpPost("session/{sessionId:guid}/upload")]
@@ -135,6 +157,16 @@ public class FoodAdviserController(
     {
         var result = await mediator.Send(new GetRecommendationsQuery(sessionId), cancellationToken);
         if (result == null || result.Count == 0) return NoContent();
+        return Ok(result);
+    }
+
+    [HttpGet("ratings")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(IReadOnlyList<PortalDishRatingDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> GetRatings(CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetRatingsQuery(), cancellationToken);
         return Ok(result);
     }
 

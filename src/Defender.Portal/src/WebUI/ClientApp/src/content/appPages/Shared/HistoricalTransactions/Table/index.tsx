@@ -210,18 +210,23 @@ const HistoricalTransactionsTable = (
         </Table>
       </TableContainer>
       <Box
-        p={2}
         sx={{
           display: "flex",
           alignItems: "center",
-          justifyContent: "right",
+          justifyContent: "flex-end",
+          flexWrap: "wrap",
+          gap: 0.5,
+          px: 1.5,
+          pt: 0.5,
+          pb: 0.75,
         }}
       >
         <Typography
           variant="body2"
           sx={{
             textAlign: "center",
-            fontSize: u.isMobile ? "0.6em" : "1em",
+            fontSize: u.isMobile ? "0.68rem" : "0.8rem",
+            lineHeight: 1.2,
           }}
         >
           {u.t("table_rows_per_page_label")}

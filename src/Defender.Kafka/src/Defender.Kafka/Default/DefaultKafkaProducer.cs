@@ -1,4 +1,4 @@
-﻿using Confluent.Kafka;
+using Confluent.Kafka;
 using Defender.Kafka.Configuration.Options;
 using Defender.Kafka.Service;
 using Microsoft.Extensions.Logging;
@@ -8,6 +8,8 @@ namespace Defender.Kafka.Default;
 
 public class DefaultKafkaProducer<TValue> : IDefaultKafkaProducer<TValue>, IDisposable
 {
+    private const int FlushTimeoutSeconds = 10;
+
     private readonly IProducer<Null, TValue> _producer;
     private readonly ILogger<DefaultKafkaProducer<TValue>> _logger;
     private readonly IKafkaEnvPrefixer _kafkaEnvPrefixer;
@@ -23,13 +25,12 @@ public class DefaultKafkaProducer<TValue> : IDefaultKafkaProducer<TValue>, IDisp
             throw new ArgumentNullException(nameof(kafkaOptions), "Kafka bootstrap servers cannot be null.");
         }
 
-        if (valueSerializer == null)
-        {
-            throw new ArgumentNullException(nameof(valueSerializer));
-        }
+        ArgumentNullException.ThrowIfNull(valueSerializer);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(kafkaEnvPrefixer);
 
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _kafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
+        _logger = logger;
+        _kafkaEnvPrefixer = kafkaEnvPrefixer;
 
         var config = new ProducerConfig
         {
@@ -49,9 +50,12 @@ public class DefaultKafkaProducer<TValue> : IDefaultKafkaProducer<TValue>, IDisp
         ILogger<DefaultKafkaProducer<TValue>> logger,
         IKafkaEnvPrefixer kafkaEnvPrefixer)
     {
-        _producer = producer ?? throw new ArgumentNullException(nameof(producer));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _kafkaEnvPrefixer = kafkaEnvPrefixer ?? throw new ArgumentNullException(nameof(kafkaEnvPrefixer));
+        ArgumentNullException.ThrowIfNull(producer);
+        ArgumentNullException.ThrowIfNull(logger);
+        ArgumentNullException.ThrowIfNull(kafkaEnvPrefixer);
+        _producer = producer;
+        _logger = logger;
+        _kafkaEnvPrefixer = kafkaEnvPrefixer;
     }
 
     public async Task ProduceAsync(
@@ -77,7 +81,7 @@ public class DefaultKafkaProducer<TValue> : IDefaultKafkaProducer<TValue>, IDisp
         }
     }
 
-    public void Flush() => _producer.Flush(TimeSpan.FromSeconds(10));
+    public void Flush() => _producer.Flush(TimeSpan.FromSeconds(FlushTimeoutSeconds));
 
     private void OnError(Error error)
     {

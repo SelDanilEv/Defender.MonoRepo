@@ -221,10 +221,10 @@ export const NebulaFighterTheme = createTheme({
   },
   general: {
     reactFrameworkColor: "#00D8FF",
-    borderRadiusSm: "6px",
-    borderRadius: "10px",
-    borderRadiusLg: "12px",
-    borderRadiusXl: "16px",
+    borderRadiusSm: "4px",
+    borderRadius: "8px",
+    borderRadiusLg: "10px",
+    borderRadiusXl: "12px",
   },
   sidebar: {
     background: colors.layout.sidebar.background,
@@ -238,15 +238,15 @@ export const NebulaFighterTheme = createTheme({
     menuItemIconColorActive: colors.layout.sidebar.menuItemIconColorActive,
     menuItemHeadingColor: colors.layout.sidebar.menuItemHeadingColor,
     boxShadow: "1px 0 0 #272C48",
-    width: "290px",
+    width: "236px",
   },
   header: {
-    height: "80px",
+    height: "68px",
     background: themeColors.primaryAlt,
     boxShadow: "0px 1px 0px #272C48",
     textColor: colors.secondary.main,
   },
-  spacing: 9,
+  spacing: 8,
   palette: {
     common: {
       black: colors.alpha.black[100],
@@ -337,9 +337,10 @@ export const NebulaFighterTheme = createTheme({
       styleOverrides: {
         root: {
           textTransform: "none",
-          marginLeft: 8,
-          marginRight: 8,
+          marginLeft: 6,
+          marginRight: 6,
           fontWeight: "bold",
+          fontSize: 12,
         },
       },
     },
@@ -429,7 +430,15 @@ export const NebulaFighterTheme = createTheme({
       },
     },
     MuiSelect: {
+      defaultProps: {
+        size: "small",
+      },
       styleOverrides: {
+        select: {
+          minHeight: "auto",
+          display: "flex",
+          alignItems: "center",
+        },
         iconOutlined: {
           color: colors.alpha.black[50],
         },
@@ -441,6 +450,8 @@ export const NebulaFighterTheme = createTheme({
     MuiOutlinedInput: {
       styleOverrides: {
         root: {
+          minHeight: 38,
+
           "& .MuiInputAdornment-positionEnd.MuiInputAdornment-outlined": {
             paddingRight: 6,
           },
@@ -457,8 +468,8 @@ export const NebulaFighterTheme = createTheme({
       styleOverrides: {
         colorPrimary: {
           fontWeight: "bold",
-          lineHeight: "40px",
-          fontSize: 13,
+          lineHeight: "34px",
+          fontSize: 12,
           background: colors.alpha.black[5],
           color: colors.alpha.black[70],
         },
@@ -467,11 +478,22 @@ export const NebulaFighterTheme = createTheme({
     MuiCardHeader: {
       styleOverrides: {
         action: {
-          marginTop: -5,
-          marginBottom: -5,
+          marginTop: -3,
+          marginBottom: -3,
         },
         title: {
-          fontSize: 15,
+          fontSize: 14,
+        },
+      },
+    },
+    MuiCardContent: {
+      styleOverrides: {
+        root: {
+          padding: 14,
+
+          "&:last-child": {
+            paddingBottom: 14,
+          },
         },
       },
     },
@@ -483,7 +505,19 @@ export const NebulaFighterTheme = createTheme({
       },
     },
     MuiChip: {
+      defaultProps: {
+        size: "small",
+      },
       styleOverrides: {
+        root: {
+          height: 26,
+          fontSize: 12,
+          borderRadius: 6,
+        },
+        label: {
+          paddingLeft: 8,
+          paddingRight: 8,
+        },
         colorSecondary: {
           background: colors.alpha.black[5],
           color: colors.alpha.black[100],
@@ -518,7 +552,7 @@ export const NebulaFighterTheme = createTheme({
     MuiAvatar: {
       styleOverrides: {
         root: {
-          fontSize: 14,
+          fontSize: 13,
           fontWeight: "bold",
         },
         colorDefault: {
@@ -534,7 +568,7 @@ export const NebulaFighterTheme = createTheme({
         },
         avatar: {
           background: colors.alpha.black[10],
-          fontSize: 13,
+          fontSize: 12,
           color: colors.alpha.black[70],
           fontWeight: "bold",
 
@@ -555,7 +589,7 @@ export const NebulaFighterTheme = createTheme({
     MuiPaginationItem: {
       styleOverrides: {
         page: {
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: "bold",
           transition: "all .2s",
         },
@@ -575,13 +609,16 @@ export const NebulaFighterTheme = createTheme({
     MuiButton: {
       defaultProps: {
         disableRipple: true,
+        size: "small",
       },
       styleOverrides: {
         root: {
           fontWeight: "bold",
+          fontSize: 13,
           textTransform: "none",
-          paddingLeft: 16,
-          paddingRight: 16,
+          minHeight: 30,
+          paddingLeft: 12,
+          paddingRight: 12,
 
           ".MuiSvgIcon-root": {
             transition: "all .2s",
@@ -604,23 +641,23 @@ export const NebulaFighterTheme = createTheme({
           },
         },
         sizeSmall: {
-          padding: "6px 16px",
+          padding: "4px 12px",
           lineHeight: 1.5,
         },
         sizeMedium: {
-          padding: "8px 20px",
+          padding: "6px 14px",
         },
         sizeLarge: {
-          padding: "11px 24px",
+          padding: "9px 18px",
         },
         textSizeSmall: {
-          padding: "7px 12px",
+          padding: "4px 8px",
         },
         textSizeMedium: {
-          padding: "9px 16px",
+          padding: "6px 10px",
         },
         textSizeLarge: {
-          padding: "12px 16px",
+          padding: "8px 12px",
         },
       },
     },
@@ -652,17 +689,20 @@ export const NebulaFighterTheme = createTheme({
       },
     },
     MuiIconButton: {
+      defaultProps: {
+        size: "small",
+      },
       styleOverrides: {
         root: {
           borderRadius: 8,
-          padding: 8,
+          padding: 6,
 
           "& .MuiTouchRipple-root": {
             borderRadius: 8,
           },
         },
         sizeSmall: {
-          padding: 4,
+          padding: 3,
         },
       },
     },
@@ -748,7 +788,7 @@ export const NebulaFighterTheme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 6,
-          height: 6,
+          height: 5,
         },
       },
     },
@@ -793,7 +833,7 @@ export const NebulaFighterTheme = createTheme({
           },
         },
         padding: {
-          padding: "12px",
+          padding: "8px",
 
           "& .MuiListItem-button": {
             borderRadius: 6,
@@ -805,13 +845,13 @@ export const NebulaFighterTheme = createTheme({
     MuiTabs: {
       styleOverrides: {
         root: {
-          height: 38,
-          minHeight: 38,
+          height: 34,
+          minHeight: 34,
           overflow: "visible",
         },
         indicator: {
-          height: 38,
-          minHeight: 38,
+          height: 34,
+          minHeight: 34,
           borderRadius: 6,
           border: "1px solid " + colors.primary.dark,
           boxShadow: "0px 2px 10px " + colors.primary.light,
@@ -825,16 +865,16 @@ export const NebulaFighterTheme = createTheme({
       styleOverrides: {
         root: {
           padding: 0,
-          height: 38,
-          minHeight: 38,
+          height: 34,
+          minHeight: 34,
           borderRadius: 6,
           transition: "color .2s",
           textTransform: "capitalize",
 
           "&.MuiButtonBase-root": {
             minWidth: "auto",
-            paddingLeft: 20,
-            paddingRight: 20,
+            paddingLeft: 14,
+            paddingRight: 14,
             marginRight: 4,
           },
           "&.Mui-selected, &.Mui-selected:hover": {
@@ -850,13 +890,13 @@ export const NebulaFighterTheme = createTheme({
     MuiMenu: {
       styleOverrides: {
         paper: {
-          padding: 12,
+          padding: 8,
         },
         list: {
-          padding: 12,
+          padding: 8,
 
           "& .MuiMenuItem-root.MuiButtonBase-root": {
-            fontSize: 14,
+            fontSize: 13,
             marginTop: 1,
             marginBottom: 1,
             transition: "all .2s",
@@ -905,6 +945,9 @@ export const NebulaFighterTheme = createTheme({
       },
     },
     MuiAutocomplete: {
+      defaultProps: {
+        size: "small",
+      },
       styleOverrides: {
         tag: {
           margin: 1,
@@ -934,13 +977,46 @@ export const NebulaFighterTheme = createTheme({
       },
     },
     MuiTablePagination: {
+      defaultProps: {
+        SelectProps: {
+          size: "small",
+        },
+      },
       styleOverrides: {
-        toolbar: {
-          "& .MuiIconButton-root": {
-            padding: 8,
+        root: {
+          overflow: "visible",
+          "& .MuiInputBase-root": {
+            fontSize: 12,
+            marginRight: 4,
+          },
+          "& .MuiTablePagination-actions": {
+            marginLeft: 4,
+          },
+          "& .MuiTablePagination-actions .MuiIconButton-root": {
+            padding: 3,
           },
         },
+        toolbar: {
+          minHeight: 32,
+          paddingLeft: "0 !important",
+          paddingRight: "0 !important",
+          paddingTop: "0 !important",
+          paddingBottom: "0 !important",
+        },
+        selectLabel: {
+          fontSize: 12,
+          lineHeight: 1.2,
+          margin: 0,
+        },
+        displayedRows: {
+          fontSize: 12,
+          lineHeight: 1.2,
+          margin: 0,
+        },
         select: {
+          paddingTop: 2,
+          paddingBottom: 2,
+          minHeight: 0,
           "&:focus": {
             backgroundColor: "transparent",
           },
@@ -973,11 +1049,11 @@ export const NebulaFighterTheme = createTheme({
       styleOverrides: {
         root: {
           borderBottomColor: colors.alpha.black[10],
-          fontSize: 14,
+          fontSize: 13,
         },
         head: {
           textTransform: "uppercase",
-          fontSize: 13,
+          fontSize: 12,
           fontWeight: "bold",
           color: colors.alpha.black[70],
         },
@@ -987,7 +1063,7 @@ export const NebulaFighterTheme = createTheme({
       styleOverrides: {
         message: {
           lineHeight: 1.5,
-          fontSize: 14,
+          fontSize: 13,
         },
         standardInfo: {
           color: colors.info.main,
@@ -1001,23 +1077,55 @@ export const NebulaFighterTheme = createTheme({
       styleOverrides: {
         tooltip: {
           backgroundColor: alpha(colors.alpha.black["100"], 0.95),
-          padding: "8px 16px",
-          fontSize: 13,
+          padding: "6px 12px",
+          fontSize: 12,
         },
         arrow: {
           color: alpha(colors.alpha.black["100"], 0.95),
         },
       },
     },
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          fontSize: 13,
+        },
+        input: {
+          paddingTop: 10,
+          paddingBottom: 10,
+        },
+        inputSizeSmall: {
+          paddingTop: 8,
+          paddingBottom: 8,
+        },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        size: "small",
+      },
+    },
+    MuiFormControl: {
+      defaultProps: {
+        size: "small",
+      },
+    },
+    MuiFormControlLabel: {
+      styleOverrides: {
+        label: {
+          fontSize: 13,
+        },
+      },
+    },
     MuiSwitch: {
       styleOverrides: {
         root: {
-          height: 33,
+          height: 30,
           overflow: "visible",
 
           "& .MuiButtonBase-root": {
             position: "absolute",
-            padding: 6,
+            padding: 5,
             transition:
               "left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
           },
@@ -1098,61 +1206,62 @@ export const NebulaFighterTheme = createTheme({
     },
   },
   shape: {
-    borderRadius: 10,
+    borderRadius: 8,
   },
   typography: {
     fontFamily:
       '"Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
     h1: {
       fontWeight: 700,
-      fontSize: 35,
+      fontSize: 32,
     },
     h2: {
       fontWeight: 700,
-      fontSize: 30,
+      fontSize: 27,
     },
     h3: {
       fontWeight: 700,
-      fontSize: 25,
+      fontSize: 22,
       lineHeight: 1.4,
       color: colors.alpha.black[100],
     },
     h4: {
       fontWeight: 700,
-      fontSize: 16,
+      fontSize: 15,
     },
     h5: {
       fontWeight: 700,
-      fontSize: 14,
+      fontSize: 13,
     },
     h6: {
-      fontSize: 15,
+      fontSize: 14,
     },
     body1: {
-      fontSize: 14,
+      fontSize: 13,
     },
     body2: {
-      fontSize: 14,
+      fontSize: 13,
     },
     button: {
       fontWeight: 600,
+      fontSize: 13,
     },
     caption: {
-      fontSize: 13,
+      fontSize: 12,
       textTransform: "uppercase",
       color: colors.alpha.black[50],
     },
     subtitle1: {
-      fontSize: 14,
+      fontSize: 13,
       color: colors.alpha.black[70],
     },
     subtitle2: {
       fontWeight: 400,
-      fontSize: 15,
+      fontSize: 13,
       color: colors.alpha.black[50],
     },
     overline: {
-      fontSize: 13,
+      fontSize: 12,
       fontWeight: 700,
       textTransform: "uppercase",
     },

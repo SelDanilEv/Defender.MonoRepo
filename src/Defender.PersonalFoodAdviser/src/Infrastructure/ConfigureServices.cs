@@ -1,10 +1,12 @@
 using System.Reflection;
 using Defender.Common.Clients.Identity;
 using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Repositories;
+using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Services;
 using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Wrapper;
-using Defender.PersonalFoodAdviser.Application.Configuration.Options;
 using Defender.PersonalFoodAdviser.Application.Helpers.LocalSecretHelper;
+using Defender.PersonalFoodAdviser.Application.Configuration.Options;
 using Defender.PersonalFoodAdviser.Infrastructure.Clients.Service;
+using Defender.PersonalFoodAdviser.Infrastructure.Configuration.Options;
 using Defender.PersonalFoodAdviser.Infrastructure.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,7 +32,10 @@ public static class ConfigureServices
 
     private static IServiceCollection RegisterClientWrappers(this IServiceCollection services)
     {
+        services.AddSingleton<TimeProvider>(TimeProvider.System);
         services.AddTransient<IServiceWrapper, ServiceWrapper>();
+        services.AddSingleton<Clients.Gemini.IGeminiModelFallbackService, Clients.Gemini.GeminiModelFallbackService>();
+        services.AddHostedService<Clients.Gemini.GeminiModelLoopMaintenanceService>();
 
         return services;
     }
@@ -42,6 +47,9 @@ public static class ConfigureServices
         services.AddSingleton<IMenuSessionRepository, MenuSessionRepository>();
         services.AddSingleton<IDishRatingRepository, DishRatingRepository>();
         services.AddSingleton<IImageBlobRepository, ImageBlobRepository>();
+        services.AddSingleton<IMenuParsingOutboxRepository, MenuParsingOutboxRepository>();
+        services.AddSingleton<IRecommendationsOutboxRepository, RecommendationsOutboxRepository>();
+        services.AddSingleton<IGeminiModelLoopStateRepository, GeminiModelLoopStateRepository>();
 
         return services;
     }
@@ -50,10 +58,9 @@ public static class ConfigureServices
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.PostConfigure<HuggingFaceOptions>(opts =>
-        {
-            opts.ApiKey = LocalSecretsHelper.GetSecretSync(LocalSecret.HuggingFaceApiKey);
-        });
+        services.Configure<MenuIntelligenceOptions>(configuration.GetSection(MenuIntelligenceOptions.SectionName));
+        services.Configure<HuggingFaceOptions>(configuration.GetSection(HuggingFaceOptions.SectionName));
+        services.Configure<GeminiOptions>(configuration.GetSection(GeminiOptions.SectionName));
 
         services.RegisterIdentityClient(
             (serviceProvider, client) =>
@@ -61,10 +68,27 @@ public static class ConfigureServices
                 client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<ServiceOptions>>().Value.Url);
             });
 
-        services.AddHttpClient<Application.Common.Interfaces.Services.IHuggingFaceClient, Clients.HuggingFace.HuggingFaceClient>((sp, client) =>
+        services.AddHttpClient<Clients.HuggingFace.HuggingFaceClient>((sp, client) =>
         {
-            var opts = sp.GetRequiredService<IOptions<Application.Configuration.Options.HuggingFaceOptions>>().Value;
+            var opts = sp.GetRequiredService<IOptions<HuggingFaceOptions>>().Value;
             client.BaseAddress = new Uri(opts.BaseUrl.TrimEnd('/') + "/");
+        });
+
+        services.AddHttpClient<Clients.Gemini.GeminiClient>((sp, client) =>
+        {
+            var opts = sp.GetRequiredService<IOptions<GeminiOptions>>().Value;
+            client.BaseAddress = new Uri(opts.BaseUrl.TrimEnd('/') + "/");
+        });
+
+        services.AddTransient<IMenuIntelligenceClient>(sp =>
+        {
+            var provider = sp.GetRequiredService<IOptions<MenuIntelligenceOptions>>().Value.Provider;
+
+            return provider switch
+            {
+                MenuIntelligenceProvider.Gemini => sp.GetRequiredService<Clients.Gemini.GeminiClient>(),
+                _ => sp.GetRequiredService<Clients.HuggingFace.HuggingFaceClient>()
+            };
         });
 
         return services;

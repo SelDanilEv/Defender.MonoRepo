@@ -4,11 +4,6 @@ import {
   Button,
   Card,
   CardContent,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Grid,
   LinearProgress,
   Typography,
@@ -19,10 +14,11 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import useUtils from "src/appUtils";
 import { foodAdviserApi, MenuSessionDto } from "src/api/foodAdviser";
+import DishRatingDialog from "src/components/DishRatingDialog";
 
-const POLL_INTERVAL_MS = 5000;
-const POLL_MAX_ATTEMPTS = 36;
 const TOP_RECOMMENDATIONS = 3;
+const AUTO_POLL_INTERVAL_MS = 15_000;
+const AUTO_POLL_WINDOW_MS = 3 * 60 * 1000;
 
 const FoodAdviserSessionRecommendationsPage = () => {
   const u = useUtils();
@@ -30,50 +26,128 @@ const FoodAdviserSessionRecommendationsPage = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [session, setSession] = useState<MenuSessionDto | null>(null);
   const [recommendations, setRecommendations] = useState<string[]>([]);
-  const [pollStopped, setPollStopped] = useState(false);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [manualRefreshWarning, setManualRefreshWarning] = useState<string | null>(null);
   const [ratingDish, setRatingDish] = useState<string | null>(null);
   const [ratingValue, setRatingValue] = useState<number>(3);
   const [submitting, setSubmitting] = useState(false);
+  const [autoPollingStartedAt, setAutoPollingStartedAt] = useState<number | null>(null);
+  const utilsRef = useRef(u);
+  const pollingStartedAtRef = useRef<number | null>(null);
+  const pollingInFlightRef = useRef(false);
+  utilsRef.current = u;
+
+  const getStatusLabel = useCallback((status: string | null | undefined) => {
+    if (!status) {
+      return u.t("foodAdviser:session_pending_creation");
+    }
+
+    const statusKey = `foodAdviser:status_${status.toLowerCase()}`;
+    const localizedStatus = u.t(statusKey);
+
+    return localizedStatus === statusKey ? status : localizedStatus;
+  }, [u]);
+
+  const startAutoPolling = useCallback(() => {
+    const startedAt = Date.now();
+    pollingStartedAtRef.current = startedAt;
+    setAutoPollingStartedAt(startedAt);
+  }, []);
+
+  const stopAutoPolling = useCallback(() => {
+    pollingStartedAtRef.current = null;
+    setAutoPollingStartedAt(null);
+  }, []);
 
   const loadSession = useCallback(() => {
     if (!sessionId) return;
-    foodAdviserApi.getSession(sessionId, u).then((data) => {
-      if (data) setSession(data);
-    });
-  }, [sessionId, u]);
+    return foodAdviserApi.getSession(sessionId, utilsRef.current).then((data) => {
+      if (!data) return;
 
-  const loadRecommendations = useCallback(() => {
-    if (!sessionId) return;
-    setLoadingRecommendations(true);
-    foodAdviserApi.getRecommendations(sessionId, u).then((data) => {
-      if (data && data.length > 0) setRecommendations(data);
-    }).finally(() => setLoadingRecommendations(false));
-  }, [sessionId, u]);
-
-  useEffect(() => {
-    loadSession();
-    loadRecommendations();
-  }, [loadSession, loadRecommendations]);
-
-  const loadRecommendationsRef = useRef(loadRecommendations);
-  loadRecommendationsRef.current = loadRecommendations;
-  const pollAttemptsRef = useRef(0);
-
-  useEffect(() => {
-    if (!sessionId || recommendations.length > 0 || pollStopped) return;
-    pollAttemptsRef.current = 0;
-    const id = setInterval(() => {
-      pollAttemptsRef.current += 1;
-      if (pollAttemptsRef.current >= POLL_MAX_ATTEMPTS) {
-        clearInterval(id);
-        setPollStopped(true);
+      setSession(data);
+      if (data.recommendationWarningMessage) {
+        setManualRefreshWarning(data.recommendationWarningMessage);
         return;
       }
-      loadRecommendationsRef.current();
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(id);
-  }, [sessionId, recommendations.length, pollStopped]);
+
+      setManualRefreshWarning(null);
+    });
+  }, [sessionId]);
+
+  const loadRecommendations = useCallback((options?: { silent?: boolean }) => {
+    if (!sessionId) return;
+
+    if (!options?.silent) {
+      setLoadingRecommendations(true);
+    }
+
+    return foodAdviserApi.getRecommendations(sessionId, utilsRef.current)
+      .then((data) => {
+        setRecommendations(data ?? []);
+      })
+      .finally(() => {
+        if (!options?.silent) {
+          setLoadingRecommendations(false);
+        }
+      });
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (!sessionId) {
+      return;
+    }
+
+    startAutoPolling();
+    loadSession();
+    loadRecommendations();
+  }, [loadSession, loadRecommendations, sessionId, startAutoPolling]);
+
+  useEffect(() => {
+    if (!sessionId || !autoPollingStartedAt) {
+      return;
+    }
+
+    if (manualRefreshWarning || recommendations.length > 0) {
+      stopAutoPolling();
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      const startedAt = pollingStartedAtRef.current;
+
+      if (!startedAt || Date.now() - startedAt >= AUTO_POLL_WINDOW_MS) {
+        stopAutoPolling();
+        return;
+      }
+
+      if (pollingInFlightRef.current) {
+        return;
+      }
+
+      pollingInFlightRef.current = true;
+      Promise.all([
+        loadSession(),
+        loadRecommendations({ silent: true }),
+      ]).finally(() => {
+        pollingInFlightRef.current = false;
+
+        const nextStartedAt = pollingStartedAtRef.current;
+        if (nextStartedAt && Date.now() - nextStartedAt >= AUTO_POLL_WINDOW_MS) {
+          stopAutoPolling();
+        }
+      });
+    }, AUTO_POLL_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [
+    autoPollingStartedAt,
+    loadRecommendations,
+    loadSession,
+    manualRefreshWarning,
+    recommendations.length,
+    sessionId,
+    stopAutoPolling,
+  ]);
 
   const handleSubmitRating = () => {
     if (!ratingDish) return;
@@ -89,22 +163,48 @@ const FoodAdviserSessionRecommendationsPage = () => {
   };
 
   const handleRefresh = () => {
-    if (recommendations.length === 0) {
-      setPollStopped(false);
+    if (!sessionId) {
+      return;
     }
+
+    if (manualRefreshWarning) {
+      setManualRefreshWarning(null);
+      setRecommendations([]);
+
+      foodAdviserApi
+        .requestRecommendations(sessionId, utilsRef.current)
+        .then(() => {
+          startAutoPolling();
+          loadSession();
+          loadRecommendations();
+        })
+        .catch(() => {
+          setManualRefreshWarning(manualRefreshWarning);
+        });
+      return;
+    }
+
+    startAutoPolling();
+    loadSession();
     loadRecommendations();
   };
 
   return (
-    <Box>
-      <Typography variant="h4" sx={{ mb: 2 }}>
-        {u.t("foodAdviser:recommendations_title")}
-      </Typography>
-      {!!session && (
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-          Session status: {session.status}
+    <Box sx={{ pt: 1 }}>
+      <Box sx={{ mb: 2.5, textAlign: "center" }}>
+        <Typography variant="h4" sx={{ mb: 1 }}>
+          {u.t("foodAdviser:recommendations_title")}
         </Typography>
-      )}
+        {!!session && (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ maxWidth: 560, mx: "auto" }}
+          >
+            {u.t("foodAdviser:session_status")}: {getStatusLabel(session.status)}
+          </Typography>
+        )}
+      </Box>
       {loadingRecommendations && recommendations.length === 0 && (
         <LinearProgress sx={{ mb: 2 }} />
       )}
@@ -113,19 +213,23 @@ const FoodAdviserSessionRecommendationsPage = () => {
           <Grid item xs={12}>
             <Card>
               <CardContent>
-                <Box display="flex" alignItems="center" gap={1}>
-                  {!pollStopped && <CircularProgress size={16} />}
-                  <Typography color="text.secondary">
+                <Typography color="text.secondary">
                   {!sessionId
                     ? u.t("foodAdviser:recommendations_empty")
-                    : pollStopped
-                    ? u.t("foodAdviser:recommendations_timeout")
-                    : u.t("foodAdviser:polling")}
-                  </Typography>
-                </Box>
-                {pollStopped && (
+                    : manualRefreshWarning
+                    ? manualRefreshWarning
+                    : u.t("foodAdviser:recommendations_pending_manual")}
+                </Typography>
+                {manualRefreshWarning && (
                   <Alert severity="warning" sx={{ mt: 1.5 }}>
-                    Background generation may still finish later. You can refresh and check again.
+                    {u.t("foodAdviser:recommendations_manual_refresh_hint")}
+                  </Alert>
+                )}
+                {!manualRefreshWarning && sessionId && (
+                  <Alert severity="info" sx={{ mt: 1.5 }}>
+                    {autoPollingStartedAt
+                      ? u.t("foodAdviser:recommendations_auto_refresh_hint")
+                      : u.t("foodAdviser:recommendations_manual_only_hint")}
                   </Alert>
                 )}
                 <Box sx={{ mt: 1.5 }}>
@@ -135,7 +239,7 @@ const FoodAdviserSessionRecommendationsPage = () => {
                     onClick={handleRefresh}
                     disabled={loadingRecommendations}
                   >
-                    Refresh
+                    {u.t("foodAdviser:recommendations_refresh")}
                   </Button>
                 </Box>
               </CardContent>
@@ -181,7 +285,7 @@ const FoodAdviserSessionRecommendationsPage = () => {
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                  More suggestions
+                  {u.t("foodAdviser:recommendations_more")}
                 </Typography>
                 <Typography variant="body2">
                   {recommendations.slice(TOP_RECOMMENDATIONS).join(", ")}
@@ -197,67 +301,20 @@ const FoodAdviserSessionRecommendationsPage = () => {
         </Grid>
       </Grid>
 
-      <Dialog open={!!ratingDish} onClose={() => setRatingDish(null)}>
-        <DialogTitle>{u.t("foodAdviser:rate_dish")}</DialogTitle>
-        <DialogContent>
-          {ratingDish && (
-            <Typography variant="body2" gutterBottom>
-              {ratingDish}
-            </Typography>
-          )}
-          <Box display="flex" gap={1} alignItems="center" sx={{ mt: 1 }}>
-            <Typography variant="body2">1</Typography>
-            <Button
-              size="small"
-              variant={ratingValue === 1 ? "contained" : "outlined"}
-              onClick={() => setRatingValue(1)}
-            >
-              1
-            </Button>
-            <Button
-              size="small"
-              variant={ratingValue === 2 ? "contained" : "outlined"}
-              onClick={() => setRatingValue(2)}
-            >
-              2
-            </Button>
-            <Button
-              size="small"
-              variant={ratingValue === 3 ? "contained" : "outlined"}
-              onClick={() => setRatingValue(3)}
-            >
-              3
-            </Button>
-            <Button
-              size="small"
-              variant={ratingValue === 4 ? "contained" : "outlined"}
-              onClick={() => setRatingValue(4)}
-            >
-              4
-            </Button>
-            <Button
-              size="small"
-              variant={ratingValue === 5 ? "contained" : "outlined"}
-              onClick={() => setRatingValue(5)}
-            >
-              5
-            </Button>
-            <Typography variant="body2">5</Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setRatingDish(null)}>
-            {u.t("foodAdviser:back")}
-          </Button>
-          <Button
-            variant="contained"
-            onClick={handleSubmitRating}
-            disabled={submitting}
-          >
-            {u.t("foodAdviser:rating_submit")}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DishRatingDialog
+        open={!!ratingDish}
+        dishName={ratingDish}
+        ratingValue={ratingValue}
+        submitting={submitting}
+        title={u.t("foodAdviser:rate_dish")}
+        submitLabel={u.t("foodAdviser:rating_submit")}
+        cancelLabel={u.t("foodAdviser:back")}
+        lowHint={u.t("foodAdviser:rating_1")}
+        highHint={u.t("foodAdviser:rating_5")}
+        onChange={setRatingValue}
+        onClose={() => setRatingDish(null)}
+        onSubmit={handleSubmitRating}
+      />
     </Box>
   );
 };

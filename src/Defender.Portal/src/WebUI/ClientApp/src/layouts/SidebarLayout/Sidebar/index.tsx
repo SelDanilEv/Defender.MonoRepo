@@ -4,6 +4,7 @@ import {
   alpha,
   styled,
   Divider,
+  Typography,
   useTheme,
   lighten,
   darken,
@@ -31,24 +32,29 @@ const SidebarWrapper = styled(Box)(
 const SidebarLogo = () => {
   return (
     <Box
-      mx={2}
+      mx={1.5}
       sx={{
-        width: 270,
-        height: 70,
+        width: "calc(100% - 24px)",
+        minHeight: 52,
         display: "flex",
+        alignItems: "center",
+        gap: 1.8,
       }}
     >
-      <Logo height={75} width={75} />
-      <Box
-        marginLeft={3}
-        paddingRight={3}
-        fontSize={17}
+      <Logo compact height={46} width={46} />
+      <Typography
+        variant="body2"
         sx={{
-          display: "inline",
+          fontSize: 14,
+          fontWeight: 700,
+          lineHeight: 1.15,
+          maxWidth: 108,
+          whiteSpace: "normal",
+          wordBreak: "break-word",
         }}
       >
         {config.NAME_OF_APP}
-      </Box>
+      </Typography>
     </Box>
   );
 };
@@ -58,12 +64,12 @@ const SideScrollbar = () => {
 
   return (
     <Scrollbar>
-      <Box mt={3}>
+      <Box mt={2}>
         <SidebarLogo />
       </Box>
       <Divider
         sx={{
-          mt: theme.spacing(3),
+          mt: theme.spacing(2),
           mx: theme.spacing(2),
           overflowX: "hidden",
           background: theme.colors.alpha.trueWhite[10],

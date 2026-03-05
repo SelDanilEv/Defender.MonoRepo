@@ -15,4 +15,5 @@ public class ImageBlob : IBaseModel
 
     public byte[] Data { get; set; } = [];
     public string ContentType { get; set; } = "image/jpeg";
+    public string ImageHash { get; set; } = string.Empty;
 }

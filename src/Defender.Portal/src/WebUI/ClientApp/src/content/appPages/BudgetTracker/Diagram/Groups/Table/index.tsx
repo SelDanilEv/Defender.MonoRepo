@@ -13,7 +13,7 @@ import {
   Typography,
   useTheme,
   CardHeader,
-  Chip,
+  Stack,
 } from "@mui/material";
 import { connect } from "react-redux";
 import chroma from "chroma-js";
@@ -36,6 +36,7 @@ import { BudgetDiagramGroup } from "src/models/budgetTracker/BudgetDiagramGroups
 import GroupDialogBody from "./GroupDialogBody";
 import { UpdateGroup } from "./GroupDialogBody/actions";
 import DefaultTableConsts from "src/consts/DefaultTableConsts";
+import TagChip from "src/components/TagChip";
 
 interface GroupsTableProps {
   groups: BudgetDiagramGroup[];
@@ -90,11 +91,29 @@ const GroupsTable = (props: GroupsTableProps) => {
 
   const generateTags = (tags: string[]): JSX.Element => {
     return (
-      <>
+      <Box
+        sx={{
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 0.5,
+        }}
+      >
         {tags.map((tag, index) => (
-          <Chip sx={{ mx: 0.5, my: 0.2 }} key={index} label={tag} />
+          <TagChip
+            sx={{
+              height: 28,
+              "& .MuiChip-label": {
+                px: 1,
+                fontSize: "0.82rem",
+              },
+            }}
+            key={index}
+            label={tag}
+            size="small"
+          />
         ))}
-      </>
+      </Box>
     );
   };
 
@@ -104,10 +123,9 @@ const GroupsTable = (props: GroupsTableProps) => {
         <TableRow hover key={model.id}>
           <TableCell align="center">
             <Typography
-              variant="body1"
+              variant="body2"
               fontWeight="bold"
               color="text.primary"
-              gutterBottom
               noWrap
             >
               {model.name}
@@ -115,141 +133,127 @@ const GroupsTable = (props: GroupsTableProps) => {
           </TableCell>
           {u.isMobile ? null : (
             <TableCell align="center">
-              <Typography
-                variant="body1"
-                fontWeight="bold"
-                color="text.primary"
-                gutterBottom
-              >
-                {generateTags(model.tags)}
-              </Typography>
+              {generateTags(model.tags)}
             </TableCell>
           )}
           <TableCell align="center">
-            <Typography
-              variant="body1"
-              fontWeight="bold"
-              color="text.primary"
-              gutterBottom
-              noWrap
-            >
+            <Box
+              sx={{
+                width: 18,
+                height: 18,
+                backgroundColor: model.mainColor,
+                borderRadius: "4px",
+                display: "inline-block",
+              }}
+            />
+          </TableCell>
+          <TableCell align="center">
+            {model.showTrendLine ? (
               <Box
                 sx={{
-                  padding: "9px",
-                  width: 24,
-                  height: 24,
-                  backgroundColor: model.mainColor,
+                  width: 18,
+                  height: 18,
+                  backgroundColor: model.trendLineColor,
                   borderRadius: "4px",
                   display: "inline-block",
                 }}
               />
-            </Typography>
-          </TableCell>
-          <TableCell align="center">
-            <Typography
-              variant="body1"
-              fontWeight="bold"
-              color="text.primary"
-              gutterBottom
-              noWrap
-            >
-              {model.showTrendLine ? (
-                <Box
-                  sx={{
-                    padding: "9px",
-                    width: 24,
-                    height: 24,
-                    backgroundColor: model.trendLineColor,
-                    borderRadius: "4px",
-                    display: "inline-block",
-                  }}
-                />
-              ) : (
-                <LockedIconButton disabled color="inherit" size="small">
-                  <VisibilityOffIcon fontSize="small" />
-                </LockedIconButton>
-              )}
-            </Typography>
-          </TableCell>
-          <TableCell align="center">
-            {model.isActive ? (
-              <LockedIconButton
-                sx={{
-                  "&:hover": { background: theme.colors.success.light },
-                  color: theme.palette.success.light,
-                }}
-                onClick={(event) => {
-                  event.stopPropagation();
-
-                  UpdateGroup(
-                    {
-                      id: model.id,
-                      isActive: !model.isActive,
-                    } as BudgetDiagramGroup,
-                    u,
-                    refresh
-                  );
-                }}
-                color="inherit"
-                size="small"
-              >
-                <VisibilityIcon fontSize="small" />
-              </LockedIconButton>
             ) : (
               <LockedIconButton
-                sx={{
-                  "&:hover": { background: theme.colors.error.light },
-                  color: theme.palette.error.light,
-                }}
-                onClick={(event) => {
-                  event.stopPropagation();
-
-                  UpdateGroup(
-                    {
-                      id: model.id,
-                      isActive: !model.isActive,
-                    } as BudgetDiagramGroup,
-                    u,
-                    refresh
-                  );
-                }}
+                disabled
                 color="inherit"
                 size="small"
+                sx={{ p: 0.4 }}
               >
                 <VisibilityOffIcon fontSize="small" />
               </LockedIconButton>
             )}
+          </TableCell>
+          <TableCell align="center">
+            <Stack direction="row" spacing={0.25} justifyContent="center">
+              {model.isActive ? (
+                <LockedIconButton
+                  sx={{
+                    p: 0.45,
+                    "&:hover": { background: theme.colors.success.light },
+                    color: theme.palette.success.light,
+                  }}
+                  onClick={(event) => {
+                    event.stopPropagation();
 
-            <LockedIconButton
-              sx={{
-                "&:hover": { background: theme.colors.warning.lighter },
-                color: theme.palette.warning.dark,
-              }}
-              onClick={(event) => {
-                event.stopPropagation();
-                setModelToUpdate(model);
-                setDialogMode(DialogMode.Update);
-              }}
-              color="inherit"
-              size="small"
-            >
-              <EditNoteIcon fontSize="small" />
-            </LockedIconButton>
-            <LockedIconButton
-              sx={{
-                "&:hover": { background: theme.colors.error.lighter },
-                color: theme.palette.error.dark,
-              }}
-              onClick={(event) => {
-                event.stopPropagation();
-                setModelToUpdate(model);
-                setDialogMode(DialogMode.Delete);
-              }}
-              color="inherit"
-              size="small"
-            >
-              <DeleteIcon fontSize="small" />
-            </LockedIconButton>
+                    UpdateGroup(
+                      {
+                        id: model.id,
+                        isActive: !model.isActive,
+                      } as BudgetDiagramGroup,
+                      u,
+                      refresh
+                    );
+                  }}
+                  color="inherit"
+                  size="small"
+                >
+                  <VisibilityIcon fontSize="small" />
+                </LockedIconButton>
+              ) : (
+                <LockedIconButton
+                  sx={{
+                    p: 0.45,
+                    "&:hover": { background: theme.colors.error.light },
+                    color: theme.palette.error.light,
+                  }}
+                  onClick={(event) => {
+                    event.stopPropagation();
+
+                    UpdateGroup(
+                      {
+                        id: model.id,
+                        isActive: !model.isActive,
+                      } as BudgetDiagramGroup,
+                      u,
+                      refresh
+                    );
+                  }}
+                  color="inherit"
+                  size="small"
+                >
+                  <VisibilityOffIcon fontSize="small" />
+                </LockedIconButton>
+              )}
+
+              <LockedIconButton
+                sx={{
+                  p: 0.45,
+                  "&:hover": { background: theme.colors.warning.lighter },
+                  color: theme.palette.warning.dark,
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setModelToUpdate(model);
+                  setDialogMode(DialogMode.Update);
+                }}
+                color="inherit"
+                size="small"
+              >
+                <EditNoteIcon fontSize="small" />
+              </LockedIconButton>
+              <LockedIconButton
+                sx={{
+                  p: 0.45,
+                  "&:hover": { background: theme.colors.error.lighter },
+                  color: theme.palette.error.dark,
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setModelToUpdate(model);
+                  setDialogMode(DialogMode.Delete);
+                }}
+                color="inherit"
+                size="small"
+              >
+                <DeleteIcon fontSize="small" />
+              </LockedIconButton>
+            </Stack>
           </TableCell>
         </TableRow>
       );
@@ -262,7 +266,13 @@ const GroupsTable = (props: GroupsTableProps) => {
         action={
           <>
             <LockedButton
-              sx={{ mr: "1em" }}
+              sx={{
+                mr: 1,
+                minWidth: 44,
+                width: 44,
+                height: 44,
+                p: 0,
+              }}
               variant="outlined"
               color="success"
               onClick={() => {
@@ -273,7 +283,13 @@ const GroupsTable = (props: GroupsTableProps) => {
               <AddIcon />
             </LockedButton>
             <LockedButton
-              sx={{ mr: "1em" }}
+              sx={{
+                mr: 1,
+                minWidth: 44,
+                width: 44,
+                height: 44,
+                p: 0,
+              }}
               variant="outlined"
               onClick={refresh}
             >
@@ -287,19 +303,28 @@ const GroupsTable = (props: GroupsTableProps) => {
           </Typography>
         }
         titleTypographyProps={{
-          style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+          style: { fontSize: u.isMobile ? "1.3em" : "1.65em" },
         }}
+        sx={{ py: 1.25, px: 2 }}
       />
       <Divider />
       <TableContainer
         sx={{
-          fontSize: u.isMobile ? "0.9em" : "1.5em",
           "& .MuiTableCell-root": {
-            fontSize: u.isMobile ? "0.8em" : "0.8em",
+            px: u.isMobile ? 1 : 1.5,
+            py: 1.25,
+            fontSize: "0.88rem",
+            lineHeight: 1.3,
+          },
+          "& .MuiTableHead-root .MuiTableCell-root": {
+            py: 1.5,
+            fontSize: "0.82rem",
+            fontWeight: 700,
+            letterSpacing: "0.03em",
           },
         }}
       >
-        <Table>
+        <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell align="center">
@@ -325,18 +350,22 @@ const GroupsTable = (props: GroupsTableProps) => {
         </Table>
       </TableContainer>
       <Box
-        p={2}
         sx={{
           display: "flex",
           alignItems: "center",
           justifyContent: "right",
+          gap: 0.5,
+          px: 1.5,
+          pt: 0.5,
+          pb: 0.75,
         }}
       >
         <Typography
           variant="body2"
           sx={{
             textAlign: "center",
-            fontSize: u.isMobile ? "0.6em" : "1em",
+            fontSize: u.isMobile ? "0.68rem" : "0.8rem",
+            lineHeight: 1.2,
           }}
         >
           {u.t("table_rows_per_page_label")}
@@ -350,6 +379,32 @@ const GroupsTable = (props: GroupsTableProps) => {
           rowsPerPage={tablePagination.pageSize}
           rowsPerPageOptions={[10, 25, 50, 100]}
           labelRowsPerPage=""
+          sx={{
+            "& .MuiTablePagination-toolbar": {
+              minHeight: 32,
+              pl: 0,
+              pr: 0,
+              py: 0,
+            },
+            "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+              fontSize: "0.78rem",
+              my: 0,
+            },
+            "& .MuiInputBase-root": {
+              fontSize: "0.78rem",
+              mr: 0.5,
+            },
+            "& .MuiTablePagination-select": {
+              py: 0.25,
+              minHeight: 0,
+            },
+            "& .MuiTablePagination-actions": {
+              ml: 0.5,
+            },
+            "& .MuiTablePagination-actions .MuiIconButton-root": {
+              p: 0.4,
+            },
+          }}
         />
       </Box>
       <CustomDialog

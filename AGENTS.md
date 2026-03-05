@@ -25,6 +25,8 @@
 - Use block-scoped namespaces and place `using` directives outside namespaces.
 - Prefer `var` in most cases.
 - Naming: interfaces start with `I`; types/methods/properties use `PascalCase`; keep namespaces aligned with folder paths.
+- Frontend: reuse existing shared components whenever possible and keep a single standard implementation for each UI element type across the app. Only introduce a second variant when the user explicitly asks for it.
+- Frontend: for React UI work in `Defender.Portal`, use Material UI (`@mui/material`, `@mui/icons-material`) as the default component library and styling base unless the user explicitly asks for something else.
 
 ## Testing Guidelines
 - Primary test stack is xUnit with Moq.

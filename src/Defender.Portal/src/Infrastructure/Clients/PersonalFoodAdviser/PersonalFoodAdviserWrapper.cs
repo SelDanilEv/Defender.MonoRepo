@@ -15,8 +15,14 @@ public class PersonalFoodAdviserWrapper(IPersonalFoodAdviserClient client) : Bas
     public Task<PortalMenuSessionDto> CreateSessionAsync(CancellationToken cancellationToken = default)
         => ExecuteSafelyAsync(() => client.CreateSessionAsync(cancellationToken));
 
+    public Task<IReadOnlyList<PortalMenuSessionDto>> GetSessionsAsync(CancellationToken cancellationToken = default)
+        => ExecuteSafelyAsync(() => client.GetSessionsAsync(cancellationToken));
+
     public Task<PortalMenuSessionDto?> GetSessionAsync(Guid sessionId, CancellationToken cancellationToken = default)
         => ExecuteSafelyAsync(() => client.GetSessionAsync(sessionId, cancellationToken));
+
+    public Task<bool> DeleteSessionAsync(Guid sessionId, CancellationToken cancellationToken = default)
+        => ExecuteSafelyAsync(() => client.DeleteSessionAsync(sessionId, cancellationToken));
 
     public Task<IReadOnlyList<string>> UploadSessionImagesAsync(Guid sessionId, Stream[] fileStreams, string[] contentTypes, CancellationToken cancellationToken = default)
         => ExecuteSafelyAsync(() => client.UploadSessionImagesAsync(sessionId, fileStreams, contentTypes, cancellationToken));
@@ -32,6 +38,9 @@ public class PersonalFoodAdviserWrapper(IPersonalFoodAdviserClient client) : Bas
 
     public Task<IReadOnlyList<string>?> GetRecommendationsAsync(Guid sessionId, CancellationToken cancellationToken = default)
         => ExecuteSafelyAsync(() => client.GetRecommendationsAsync(sessionId, cancellationToken));
+
+    public Task<IReadOnlyList<PortalDishRatingDto>> GetRatingsAsync(CancellationToken cancellationToken = default)
+        => ExecuteSafelyAsync(() => client.GetRatingsAsync(cancellationToken));
 
     public Task SubmitRatingAsync(string dishName, int rating, Guid? sessionId, CancellationToken cancellationToken = default)
         => ExecuteSafelyAsync(() => client.SubmitRatingAsync(dishName, rating, sessionId, cancellationToken));

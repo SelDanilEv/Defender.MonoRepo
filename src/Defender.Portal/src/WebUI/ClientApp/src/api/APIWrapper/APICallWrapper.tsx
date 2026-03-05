@@ -33,11 +33,8 @@ const APICallWrapper = async ({
 
     const response = await fetch(url, options);
 
-    switch (response.status) {
-      case 200:
-      case 201:
-      case 202:
-        onSuccess(response);
+    if (response.ok) {
+        await onSuccess(response);
 
         if (showSuccess || successMessage) {
           if (!successMessage && utils != null) {
@@ -47,25 +44,39 @@ const APICallWrapper = async ({
           SuccessToast(successMessage);
         }
         return;
+    }
+
+    switch (response.status) {
       case 401:
-        onFailure(response);
+        await onFailure(response);
         break;
       case 403:
-        utils?.e("error:ForbiddenAccess");
+        utils?.e("ForbiddenAccess");
         break;
       default:
-        onFailure(response);
+        await onFailure(response);
 
         if (showError) {
-          let error = await response.json();
-          if (utils) utils.e(error.detail);
+          const errorText = await response.text();
+          let errorDetail = "UnhandledError";
+
+          if (errorText) {
+            try {
+              const error = JSON.parse(errorText);
+              errorDetail = error?.detail || errorDetail;
+            } catch {
+              errorDetail = errorText;
+            }
+          }
+
+          if (utils) utils.e(errorDetail);
           break;
         }
     }
   } catch (error) {
     console.error(error);
     await onFailure(error);
-    if (utils) utils.e(error.detail);
+    if (utils) utils.e((error as any)?.detail || "UnhandledError");
   } finally {
     await onFinal();
     if (doLock) LoadingStateService.FinishLoading();

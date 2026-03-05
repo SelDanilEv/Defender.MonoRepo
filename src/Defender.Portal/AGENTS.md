@@ -17,6 +17,10 @@
   - `BudgetTracker`, `Identity`, `RiskGames`, `UserManagement`, `Wallet`
 - Persistence helpers: `src/Infrastructure/Repositories/UserActivityRepository.cs`
 
+## Frontend conventions
+- Use Material UI (`@mui/material`, `@mui/icons-material`) as the default UI library for React components in `src/WebUI/ClientApp`.
+- Prefer extending existing shared components and MUI patterns before introducing custom primitives or another component library.
+
 ## Main controllers
 - `AccountController`
 - `AuthorizationController`

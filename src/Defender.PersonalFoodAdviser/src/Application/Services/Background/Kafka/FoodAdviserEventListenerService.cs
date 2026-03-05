@@ -59,17 +59,18 @@ public class FoodAdviserEventListenerService(
         try
         {
             logger.LogInformation(
-                "Processing RecommendationsRequested for session {SessionId}, user {UserId}, confirmedItemsCount {ConfirmedItemsCount}, trySomethingNew {TrySomethingNew}",
+                "Processing RecommendationsRequested for session {SessionId}, user {UserId}, confirmedItemsCount {ConfirmedItemsCount}, trySomethingNew {TrySomethingNew}, attempt {Attempt}",
                 evt.SessionId,
                 evt.UserId,
                 evt.ConfirmedItems.Count,
-                evt.TrySomethingNew);
+                evt.TrySomethingNew,
+                evt.Attempt);
             await recommendationProcessor.ProcessAsync(evt);
-            logger.LogInformation("Processed RecommendationsRequested for session {SessionId}", evt.SessionId);
+            logger.LogInformation("Processed RecommendationsRequested for session {SessionId}, attempt {Attempt}", evt.SessionId, evt.Attempt);
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Error handling RecommendationsRequested for session {SessionId}", evt.SessionId);
+            logger.LogError(ex, "Error handling RecommendationsRequested for session {SessionId}, attempt {Attempt}", evt.SessionId, evt.Attempt);
         }
     }
 }

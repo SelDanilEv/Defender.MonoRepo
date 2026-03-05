@@ -36,6 +36,8 @@ public static class ConfigureServices
     {
         services.AddHostedService<CreateKafkaTopicsService>();
         services.AddHostedService<FoodAdviserEventListenerService>();
+        services.AddHostedService<MenuParsingOutboxPublisherService>();
+        services.AddHostedService<RecommendationsOutboxPublisherService>();
         return services;
     }
 
@@ -48,6 +50,10 @@ public static class ConfigureServices
         services.AddTransient<IImageUploadService, ImageUploadService>();
         services.AddTransient<IMenuParsingProcessor, MenuParsingProcessor>();
         services.AddTransient<IRecommendationProcessor, RecommendationProcessor>();
+        services.AddSingleton<IMenuParsingOutboxService, MenuParsingOutboxService>();
+        services.AddSingleton<IMenuParsingKafkaPublisher, MenuParsingKafkaPublisher>();
+        services.AddSingleton<IRecommendationsOutboxService, RecommendationsOutboxService>();
+        services.AddSingleton<IRecommendationsKafkaPublisher, RecommendationsKafkaPublisher>();
 
         return services;
     }

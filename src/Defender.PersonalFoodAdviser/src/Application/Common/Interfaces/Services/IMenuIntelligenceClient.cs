@@ -1,6 +1,6 @@
 namespace Defender.PersonalFoodAdviser.Application.Common.Interfaces.Services;
 
-public interface IHuggingFaceClient
+public interface IMenuIntelligenceClient
 {
     Task<IReadOnlyList<string>> ExtractDishNamesFromImagesAsync(IReadOnlyList<byte[]> imageBytes, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<string>> GetRankedRecommendationsAsync(
