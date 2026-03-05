@@ -331,7 +331,7 @@ public class GeminiClientTests
     }
 
     [Fact]
-    public async Task ExtractDishNamesFromImages_WhenVisionModelReturnsTooManyRequests_SwitchesOnlyVisionRoute()
+    public async Task ExtractDishNamesFromImages_WhenVisionModelReturnsTooManyRequests_SkipsFailedRequestAndSwitchesOnlyVisionRoute()
     {
         var handler = new MockHttpMessageHandler(
             CreateResponse(HttpStatusCode.TooManyRequests, """
@@ -380,10 +380,9 @@ public class GeminiClientTests
             opts.RecommendationFallbackModels = ["gemini-2.5-flash"];
         });
 
-        var ex = await Assert.ThrowsAsync<HttpRequestException>(() => client.ExtractDishNamesFromImagesAsync([new byte[] { 0x01 }]));
-        Assert.Equal(HttpStatusCode.TooManyRequests, ex.StatusCode);
-
+        var firstAttempt = await client.ExtractDishNamesFromImagesAsync([new byte[] { 0x01 }]);
         var dishes = await client.ExtractDishNamesFromImagesAsync([new byte[] { 0x01 }]);
+
         var ranked = await client.GetRankedRecommendationsAsync(
             ["Ramen", "Curry"],
             [],
@@ -392,11 +391,53 @@ public class GeminiClientTests
             false,
             2);
 
+        Assert.Empty(firstAttempt);
         Assert.Equal(["Ramen", "Curry"], dishes);
         Assert.Equal(["Curry", "Ramen"], ranked);
         Assert.Equal(3, handler.RequestUris.Count);
         Assert.Contains(handler.RequestUris, uri => uri.Contains("gemini-2.5-flash:generateContent", StringComparison.Ordinal));
         Assert.Equal(2, handler.RequestUris.Count(uri => uri.Contains("gemini-2.5-flash-lite:generateContent", StringComparison.Ordinal)));
+    }
+
+    [Fact]
+    public async Task ExtractDishNamesFromImages_WhenFirstImageIsRateLimited_ContinuesWithRemainingImages()
+    {
+        var handler = new MockHttpMessageHandler(
+            CreateResponse(HttpStatusCode.TooManyRequests, """
+                                                     {
+                                                       "error": {
+                                                         "code": 429,
+                                                         "message": "rate limited"
+                                                       }
+                                                     }
+                                                     """),
+            CreateResponse(HttpStatusCode.OK, """
+                                            {
+                                              "candidates": [
+                                                {
+                                                  "content": {
+                                                    "parts": [
+                                                      {
+                                                        "text": "Tom Yum Soup"
+                                                      }
+                                                    ]
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                            """));
+        var client = CreateClient(handler, apiKey: "test-key", configureOptions: opts =>
+        {
+            opts.VisionModel = "gemini-2.5-flash";
+            opts.VisionFallbackModels = ["gemini-2.5-flash-lite"];
+        });
+
+        var dishes = await client.ExtractDishNamesFromImagesAsync([new byte[] { 0x01 }, new byte[] { 0x02 }]);
+
+        Assert.Equal(["Tom Yum Soup"], dishes);
+        Assert.Equal(2, handler.RequestUris.Count);
+        Assert.Contains("gemini-2.5-flash:generateContent", handler.RequestUris[0], StringComparison.Ordinal);
+        Assert.Contains("gemini-2.5-flash-lite:generateContent", handler.RequestUris[1], StringComparison.Ordinal);
     }
 
     private static GeminiClient CreateClientWithResponse(string responseJson, string apiKey)
