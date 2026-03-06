@@ -51,7 +51,7 @@ const WelcomeLayout: FC = (props: any) => {
         },
         onFailure: async (response) => {
           if (response.status == 401) {
-            logoutPortal(u, props.logout());
+            logoutPortal(u, props.logout);
           }
         },
         showError: false,

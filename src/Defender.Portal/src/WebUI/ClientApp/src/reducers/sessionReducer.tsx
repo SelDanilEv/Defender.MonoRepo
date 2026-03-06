@@ -31,23 +31,22 @@ const sessionReducer = (
       };
       break;
     case logoutActionName:
-      if (state.isAuthenticated) {
-        state = {
-          ...state,
-          isAuthenticated: false,
-          user: {
-            id: "",
-            nickname: "",
-            email: "",
-            phone: "",
-            isEmailVerified: false,
-            isPhoneVerified: false,
-            isBlocked: false,
-            roles: [],
-            createdDate: undefined,
-          },
-        };
-      }
+      state = {
+        ...state,
+        token: "",
+        isAuthenticated: false,
+        user: {
+          id: "",
+          nickname: "",
+          email: "",
+          phone: "",
+          isEmailVerified: false,
+          isPhoneVerified: false,
+          isBlocked: false,
+          roles: [],
+          createdDate: undefined,
+        },
+      };
       break;
     case updateLanguageActionName:
       if (state.language) {

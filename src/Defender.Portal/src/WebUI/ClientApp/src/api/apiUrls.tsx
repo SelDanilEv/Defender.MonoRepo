@@ -15,6 +15,7 @@ const APIEndpoints = {
     login: "login",
     create: "create",
     google: "google",
+    logout: "logout",
   },
   account: {
     updateInfo: "update",

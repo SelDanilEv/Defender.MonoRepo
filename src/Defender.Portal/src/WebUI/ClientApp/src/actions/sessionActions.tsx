@@ -1,4 +1,5 @@
 import { UserAccountInfo } from "src/models/UserAccountInfo";
+import apiUrls from "src/api/apiUrls";
 import {
   loginActionName,
   logoutActionName,
@@ -21,7 +22,14 @@ export function login(session) {
 }
 
 export function logout() {
-  return (dispath) => {
+  return async (dispath) => {
+    try {
+      await fetch(apiUrls.authorization.logout, {
+        method: "POST",
+        credentials: "same-origin",
+      });
+    } catch {}
+
     dispath({
       type: logoutActionName,
       payload: "",

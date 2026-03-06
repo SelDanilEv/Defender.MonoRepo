@@ -3,6 +3,17 @@ import config from "src/config.json";
 const stateName = config.LOCAL_STORAGE_KEY + ":state";
 
 class StateLoader {
+  private sanitizeState = (state: any) => {
+    if (!state) {
+      return state;
+    }
+
+    return {
+      ...state,
+      token: "",
+    };
+  };
+
   loadState = () => {
     try {
       let serializedState = localStorage.getItem(stateName);
@@ -11,7 +22,7 @@ class StateLoader {
         return this.initializeState();
       }
 
-      let stateJson = JSON.parse(serializedState);
+      let stateJson = this.sanitizeState(JSON.parse(serializedState));
 
       const state = {
         session: stateJson,
@@ -25,7 +36,7 @@ class StateLoader {
 
   saveState = (state) => {
     try {
-      let serializedState = JSON.stringify(state);
+      let serializedState = JSON.stringify(this.sanitizeState(state));
       localStorage.setItem(stateName, serializedState);
     } catch (err) {}
   };

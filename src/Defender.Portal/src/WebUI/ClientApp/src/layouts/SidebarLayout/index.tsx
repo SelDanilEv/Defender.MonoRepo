@@ -1,7 +1,7 @@
-import { FC, ReactNode, useLayoutEffect, useEffect } from "react";
+import { FC, ReactNode, useEffect } from "react";
 import { Box, alpha, lighten } from "@mui/material";
 import { connect } from "react-redux";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -11,6 +11,7 @@ import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import { logout } from "src/actions/sessionActions";
 import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
+import { getProtectedRedirectPath } from "src/layouts/authGuard";
 
 interface SidebarLayoutProps {
   children?: ReactNode;
@@ -19,10 +20,10 @@ interface SidebarLayoutProps {
 const SidebarLayout: FC<SidebarLayoutProps> = (props: any) => {
   const u = useUtils();
   const theme = u.react.theme;
+  const redirectPath = getProtectedRedirectPath(props.session);
 
   useEffect(() => {
-    if (!props.session.isAuthenticated || !props.session.user.isEmailVerified) {
-      logout();
+    if (redirectPath) {
       return;
     }
 
@@ -33,12 +34,16 @@ const SidebarLayout: FC<SidebarLayoutProps> = (props: any) => {
       },
       utils: u,
       onFailure: async (response) => {
-        if (response.status == 401) {
-          logoutPortal(u, props.logout());
+        if (response.status === 401) {
+          logoutPortal(u, props.logout);
         }
       },
     });
-  }, []);
+  }, [redirectPath]);
+
+  if (redirectPath) {
+    return <Navigate to={redirectPath} replace />;
+  }
 
   return (
     <>

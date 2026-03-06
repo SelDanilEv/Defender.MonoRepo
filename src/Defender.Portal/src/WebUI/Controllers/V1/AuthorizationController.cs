@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+using AutoMapper;
+using Defender.Common.Helpers;
 using Defender.Portal.Application.DTOs.Auth;
 using Defender.Portal.Application.Modules.Authorization.Commands;
 using MediatR;
@@ -14,8 +15,10 @@ public class AuthorizationController(IMediator mediator, IMapper mapper) : BaseA
     public async Task<ActionResult> LoginWithPasswordAsync(
         [FromBody] LoginWithPasswordCommand command)
     {
-        return await ProcessApiCallWithoutMappingAsync
-            (command);
+        var session = await _mediator.Send(command);
+        AuthCookieHelper.SetAuthCookie(Response, session.Token ?? string.Empty);
+
+        return Ok(session);
     }
 
     [HttpPost("google")]
@@ -24,8 +27,10 @@ public class AuthorizationController(IMediator mediator, IMapper mapper) : BaseA
     public async Task<ActionResult> LoginWithGoogleTokenAsync(
         [FromBody] LoginWithGoogleTokenCommand command)
     {
-        return await ProcessApiCallWithoutMappingAsync
-            (command);
+        var session = await _mediator.Send(command);
+        AuthCookieHelper.SetAuthCookie(Response, session.Token ?? string.Empty);
+
+        return Ok(session);
     }
 
     [HttpPost("create")]
@@ -34,7 +39,17 @@ public class AuthorizationController(IMediator mediator, IMapper mapper) : BaseA
     public async Task<ActionResult> CreateUserAsync(
         [FromBody] CreateAccountCommand command)
     {
-        return await ProcessApiCallWithoutMappingAsync
-            (command);
+        var session = await _mediator.Send(command);
+        AuthCookieHelper.SetAuthCookie(Response, session.Token ?? string.Empty);
+
+        return Ok(session);
+    }
+
+    [HttpPost("logout")]
+    [ProducesResponseType(typeof(void), StatusCodes.Status200OK)]
+    public ActionResult Logout()
+    {
+        AuthCookieHelper.ClearAuthCookie(Response);
+        return Ok();
     }
 }

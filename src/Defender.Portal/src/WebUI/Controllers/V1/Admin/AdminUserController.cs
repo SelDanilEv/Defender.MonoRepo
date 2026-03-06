@@ -1,8 +1,9 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Defender.Common.Attributes;
 using Defender.Common.Consts;
 using Defender.Common.DB.Pagination;
 using Defender.Common.DTOs;
+using Defender.Common.Helpers;
 using Defender.Portal.Application.DTOs.Accounts;
 using Defender.Portal.Application.DTOs.Admin;
 using Defender.Portal.Application.DTOs.Auth;
@@ -25,7 +26,10 @@ public class AdminUserController(IMediator mediator, IMapper mapper)
     public async Task<ActionResult> CreateUserAsync(
         [FromBody] LoginUserAsAdminCommand command)
     {
-        return await ProcessApiCallWithoutMappingAsync(command);
+        var session = await _mediator.Send(command);
+        AuthCookieHelper.SetAuthCookie(Response, session.Token ?? string.Empty);
+
+        return Ok(session);
     }
 
     [HttpGet("search/full-user-info")]

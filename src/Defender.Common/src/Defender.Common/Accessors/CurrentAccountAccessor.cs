@@ -57,6 +57,24 @@ public class CurrentAccountAccessor(IHttpContextAccessor httpContextAccessor)
 
     public string? Token
     {
-        get { return httpContextAccessor?.HttpContext?.Request?.Headers?.Authorization; }
+        get
+        {
+            var request = httpContextAccessor?.HttpContext?.Request;
+            if (request == null)
+            {
+                return null;
+            }
+
+            var headerToken = request.Headers.Authorization.ToString();
+            if (!string.IsNullOrWhiteSpace(headerToken))
+            {
+                return headerToken;
+            }
+
+            var cookieToken = AuthCookieHelper.GetAuthToken(request);
+            return string.IsNullOrWhiteSpace(cookieToken)
+                ? null
+                : $"Bearer {cookieToken}";
+        }
     }
 }

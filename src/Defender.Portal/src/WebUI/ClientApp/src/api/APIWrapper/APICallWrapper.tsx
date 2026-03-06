@@ -1,6 +1,5 @@
 import APICallProps from "./interfaces/APICallProps";
 
-import store from "src/state/store";
 import LoadingStateService from "src/services/LoadingStateService";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 
@@ -23,10 +22,8 @@ const APICallWrapper = async ({
       options.headers = {};
     }
 
-    let session = store.getState().session;
-
-    if (session.isAuthenticated) {
-      options.headers["Authorization"] = `Bearer ${session.token}`;
+    if (!options.credentials) {
+      options.credentials = "same-origin";
     }
 
     options.headers["Content-Type"] = "application/json";

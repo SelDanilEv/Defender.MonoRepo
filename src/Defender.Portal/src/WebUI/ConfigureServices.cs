@@ -82,6 +82,18 @@ public static class ConfigureServices
                         Encoding.UTF8.GetBytes(SecretsHelper.GetSecretSync(Secret.JwtSecret, true))
                     ),
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        if (string.IsNullOrWhiteSpace(context.Token))
+                        {
+                            context.Token = AuthCookieHelper.GetAuthToken(context.Request);
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         return services;
