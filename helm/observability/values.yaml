@@ -37,6 +37,8 @@ loki:
   isDefault: false
   loki:
     auth_enabled: false
+    containerSecurityContext:
+      readOnlyRootFilesystem: false
     commonConfig:
       path_prefix: /var/loki
       replication_factor: 1
@@ -54,8 +56,7 @@ loki:
   singleBinary:
     replicas: 1
     persistence:
-      enabled: true
-      size: 20Gi
+      enabled: false
   deploymentMode: SingleBinary
   backend:
     replicas: 0
