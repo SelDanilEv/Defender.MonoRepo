@@ -1,5 +1,5 @@
-import { combineReducers, applyMiddleware, createStore } from "redux";
-import thunk from "redux-thunk";
+import { combineReducers } from "redux";
+import { configureStore } from "@reduxjs/toolkit";
 
 import stateLoader from "./StateLoader";
 
@@ -9,17 +9,26 @@ import wallet from "src/reducers/walletReducer";
 import budgetTrackerSetup from "src/reducers/budgetTrackerSetupReducer";
 import budgetTrackerGroups from "src/reducers/budgetTrackerGroupsReducer";
 
-export default createStore(
-  combineReducers({
-    wallet,
-    session,
-    loading,
-    budgetTrackerSetup,
-    budgetTrackerGroups,
-  }),
-  stateLoader.loadState(),
-  applyMiddleware(
-    //comment for production
-    thunk
-  )
-);
+const rootReducer = combineReducers({
+  wallet,
+  session,
+  loading,
+  budgetTrackerSetup,
+  budgetTrackerGroups,
+});
+
+const store = configureStore({
+  reducer: rootReducer,
+  preloadedState: stateLoader.loadState(),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+      immutableCheck: false,
+    }),
+  devTools: process.env.NODE_ENV !== "production",
+});
+
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = typeof store.dispatch;
+
+export default store;

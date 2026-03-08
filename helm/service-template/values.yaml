@@ -10,6 +10,26 @@ service:
   port: 80
   targetPort: 8080
 
+probes:
+  path: /api/Home/health
+  startup:
+    enabled: true
+    failureThreshold: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+  readiness:
+    enabled: true
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 6
+  liveness:
+    enabled: true
+    initialDelaySeconds: 30
+    periodSeconds: 20
+    timeoutSeconds: 5
+    failureThreshold: 3
+
 resources:
   requests:
     cpu: "125m"

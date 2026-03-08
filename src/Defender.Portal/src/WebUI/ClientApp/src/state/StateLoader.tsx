@@ -1,9 +1,15 @@
 import config from "src/config.json";
+import type { Session } from "src/models/Session";
 
 const stateName = config.LOCAL_STORAGE_KEY + ":state";
+type SessionPreloadedState = {
+  session: Partial<Session>;
+};
 
 class StateLoader {
-  private sanitizeState = (state: any) => {
+  private sanitizeState = (
+    state?: Partial<Session> | null
+  ): Partial<Session> | null | undefined => {
     if (!state) {
       return state;
     }
@@ -14,15 +20,19 @@ class StateLoader {
     };
   };
 
-  loadState = () => {
+  loadState = (): SessionPreloadedState | Record<string, never> => {
     try {
-      let serializedState = localStorage.getItem(stateName);
+      const serializedState = localStorage.getItem(stateName);
 
       if (serializedState === null) {
         return this.initializeState();
       }
 
-      let stateJson = this.sanitizeState(JSON.parse(serializedState));
+      const stateJson = this.sanitizeState(JSON.parse(serializedState) as Partial<Session> | null);
+
+      if (!stateJson) {
+        return this.initializeState();
+      }
 
       const state = {
         session: stateJson,
@@ -34,9 +44,9 @@ class StateLoader {
     }
   };
 
-  saveState = (state) => {
+  saveState = (state: Partial<Session>) => {
     try {
-      let serializedState = JSON.stringify(this.sanitizeState(state));
+      const serializedState = JSON.stringify(this.sanitizeState(state));
       localStorage.setItem(stateName, serializedState);
     } catch (err) {}
   };
@@ -49,7 +59,7 @@ class StateLoader {
     }
   };
 
-  initializeState = () => {
+  initializeState = (): Record<string, never> => {
     return {};
   };
 }

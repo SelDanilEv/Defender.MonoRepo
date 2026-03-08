@@ -13,7 +13,7 @@
 - Business modules: `src/Application/Modules/`
   - `Transactions`, `Wallets`
 - Data access: `src/Infrastructure/Repositories/`
-  - `TransactionRepository`, `WalletRepositoryRepository`
+  - `TransactionRepository`, `WalletRepository`
 
 ## Main controllers
 - `TransactionController`

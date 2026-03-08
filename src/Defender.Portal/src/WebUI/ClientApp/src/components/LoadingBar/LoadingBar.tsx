@@ -1,8 +1,13 @@
 import Box from "@mui/material/Box";
 import LinearProgress from "@mui/material/LinearProgress";
 import { connect } from "react-redux";
+import type { RootState } from "src/state/store";
 
-const LoadingBar = (props: any) => {
+interface LoadingBarProps {
+  isLoading: boolean;
+}
+
+const LoadingBar = ({ isLoading }: LoadingBarProps) => {
   return (
     <Box
       sx={{
@@ -13,12 +18,12 @@ const LoadingBar = (props: any) => {
         height: "5px",
       }}
     >
-      {props.isLoading && <LinearProgress />}
+      {isLoading && <LinearProgress />}
     </Box>
   );
 };
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: RootState): LoadingBarProps => {
   return {
     isLoading: state.loading.loading,
   };

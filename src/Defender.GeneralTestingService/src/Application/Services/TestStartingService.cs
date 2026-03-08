@@ -30,6 +30,6 @@ public class TestStartingService : ITestStartingService
             }
         }
 
-        Task.WaitAll(tasks.ToArray());
+        await Task.WhenAll(tasks);
     }
 }

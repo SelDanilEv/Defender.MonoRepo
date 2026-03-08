@@ -1,4 +1,5 @@
 import config from "src/config.json";
+import type { Session } from "src/models/Session";
 import stateLoader from "src/state/StateLoader";
 
 const stateKey = `${config.LOCAL_STORAGE_KEY}:state`;
@@ -32,7 +33,7 @@ describe("StateLoader", () => {
       })
     );
 
-    const loaded = stateLoader.loadState() as any;
+    const loaded = stateLoader.loadState() as { session: Partial<Session> };
 
     expect(loaded.session.token).toBe("");
     expect(loaded.session.isAuthenticated).toBe(true);

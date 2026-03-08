@@ -78,6 +78,7 @@ public class DefaultKafkaProducer<TValue> : IDefaultKafkaProducer<TValue>, IDisp
         catch (ProduceException<Null, TValue> ex)
         {
             OnProduceError(ex);
+            throw;
         }
     }
 

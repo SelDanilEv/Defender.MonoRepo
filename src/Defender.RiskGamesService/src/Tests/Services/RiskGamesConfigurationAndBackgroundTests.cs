@@ -85,6 +85,32 @@ public class RiskGamesConfigurationAndBackgroundTests
     }
 
     [Fact]
+    public async Task BackgroundServices_PrivateHandlers_WhenEventHandlerFails_Rethrows()
+    {
+        var stringConsumer = new Mock<IDefaultKafkaConsumer<string>>();
+        var guidConsumer = new Mock<IDefaultKafkaConsumer<Guid>>();
+        var lotteryProcessing = new Mock<ILotteryProcessingService>();
+        lotteryProcessing
+            .Setup(x => x.QueueLotteriesForProcessing(It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("failed"));
+        var lotteryManagement = new Mock<ILotteryManagementService>();
+        var eventLogger = new Mock<ILogger<EventListenerService>>();
+        var eventService = new EventListenerService(
+            stringConsumer.Object,
+            guidConsumer.Object,
+            lotteryProcessing.Object,
+            lotteryManagement.Object,
+            eventLogger.Object);
+
+        var handleStringEvent = typeof(EventListenerService)
+            .GetMethod("HandleStringEvent", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+        var task = (Task)handleStringEvent.Invoke(eventService, ["StartLotteriesProcessing"])!;
+
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await task);
+    }
+
+    [Fact]
     public async Task TransactionStatusesListenerService_PrivateHandler_HandlesLotteryPaymentAndSkipsOtherEvents()
     {
         var consumer = new Mock<IDefaultKafkaConsumer<TransactionStatusUpdatedEvent>>();

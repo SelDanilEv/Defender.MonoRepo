@@ -2,31 +2,45 @@ import stateLoader from "src/state/StateLoader";
 import { Session } from "src/models/Session";
 import { UserAccountInfo } from "src/models/UserAccountInfo";
 
+type SessionAction = {
+  type: string;
+  payload?: Session | UserAccountInfo | string;
+};
+
+const initialUser: UserAccountInfo = {
+  id: "",
+  nickname: "",
+  email: "",
+  phone: "",
+  isEmailVerified: false,
+  isPhoneVerified: false,
+  isBlocked: false,
+  roles: [],
+  createdDate: undefined,
+};
+
+const initialState: Session = {
+  user: initialUser,
+  language: "en",
+  isAuthenticated: false,
+  token: "",
+};
+
 const sessionReducer = (
-  state: Session = {
-    user: {
-      id: "",
-      nickname: "",
-      email: "",
-      phone: "",
-      isEmailVerified: false,
-      isPhoneVerified: false,
-      isBlocked: false,
-      roles: [],
-      createdDate: undefined,
-    },
-    language: "en",
-    isAuthenticated: false,
-    token: "",
-  },
-  action: any
+  state: Session = initialState,
+  action: SessionAction
 ) => {
   switch (action.type) {
     case loginActionName:
+      if (!action.payload || typeof action.payload === "string") {
+        return state;
+      }
+
+      const sessionPayload = action.payload as Session;
       state = {
         ...state,
-        user: action.payload.user,
-        token: action.payload.token,
+        user: sessionPayload.user,
+        token: sessionPayload.token,
         isAuthenticated: true,
       };
       break;
@@ -35,21 +49,11 @@ const sessionReducer = (
         ...state,
         token: "",
         isAuthenticated: false,
-        user: {
-          id: "",
-          nickname: "",
-          email: "",
-          phone: "",
-          isEmailVerified: false,
-          isPhoneVerified: false,
-          isBlocked: false,
-          roles: [],
-          createdDate: undefined,
-        },
+        user: initialUser,
       };
       break;
     case updateLanguageActionName:
-      if (state.language) {
+      if (state.language && typeof action.payload === "string") {
         state = {
           ...state,
           language: action.payload,
@@ -57,7 +61,11 @@ const sessionReducer = (
       }
       break;
     case updateUserInfoActionName:
-      let updatedUser = action.payload as UserAccountInfo;
+      if (!action.payload || typeof action.payload === "string") {
+        return state;
+      }
+
+      const updatedUser = action.payload as UserAccountInfo;
       state = {
         ...state,
         user: {
@@ -81,3 +89,5 @@ export const loginActionName = "LOGIN";
 export const logoutActionName = "LOGOUT";
 export const updateLanguageActionName = "UPDATE_LANGUAGE";
 export const updateUserInfoActionName = "UPDATE_USER_INFO";
+
+export type { SessionAction };

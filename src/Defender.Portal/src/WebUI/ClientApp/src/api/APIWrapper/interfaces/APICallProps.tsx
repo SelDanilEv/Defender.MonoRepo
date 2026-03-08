@@ -1,10 +1,17 @@
+import type IUtils from "src/appUtils/interface";
+
+export interface APICallFailure {
+  status: number;
+  detail?: string;
+}
+
 interface APICallProps {
   url: string;
-  options: any;
-  utils?: any;
-  onSuccess?: (response: any) => Promise<void>;
-  onFailure?: (response: any) => Promise<void>;
-  onFinal?: () => Promise<void>;
+  options: RequestInit;
+  utils?: IUtils | null;
+  onSuccess?: (response: Response) => Promise<void> | void;
+  onFailure?: (response: Response | APICallFailure) => Promise<void> | void;
+  onFinal?: () => Promise<void> | void;
   showSuccess?: boolean;
   successMessage?: string;
   showError?: boolean;

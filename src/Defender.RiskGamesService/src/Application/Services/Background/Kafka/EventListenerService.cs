@@ -52,6 +52,7 @@ public class EventListenerService(
         }
         catch (Exception ex) {
             logger.LogError(ex, "Error while handling event: {Event}", @event);
+            throw;
         }
     }
 }

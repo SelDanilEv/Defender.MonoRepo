@@ -9,8 +9,8 @@ export default interface IUtils {
     theme: Theme;
   };
   t: (key: string) => string;
-  log: (...values: any) => void;
-  debug: (value: any) => void;
+  log: (...values: unknown[]) => void;
+  debug: (value: unknown) => void;
   e: (errorCode: string) => void;
   isMobile: boolean;
   isLargeScreen: boolean;

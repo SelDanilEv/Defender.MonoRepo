@@ -1,5 +1,6 @@
 import apiUrls from "src/api/apiUrls";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
+import type IUtils from "src/appUtils/interface";
 
 export interface PreferencesDto {
   userId: string;
@@ -53,7 +54,7 @@ const withAuth = (options: RequestInit): RequestInit => {
 };
 
 export const foodAdviserApi = {
-  getPreferences: (utils: any) =>
+  getPreferences: (utils?: IUtils | null) =>
     new Promise<PreferencesDto | null>((resolve) => {
       APICallWrapper({
         url: apiUrls.foodAdviser.getPreferences,
@@ -71,7 +72,7 @@ export const foodAdviserApi = {
   updatePreferences: (
     likes: string[],
     dislikes: string[],
-    utils: any
+    utils?: IUtils | null
   ): Promise<PreferencesDto> =>
     new Promise((resolve, reject) => {
       APICallWrapper({
@@ -95,7 +96,7 @@ export const foodAdviserApi = {
       });
     }),
 
-  createSession: (utils: any): Promise<MenuSessionDto> =>
+  createSession: (utils?: IUtils | null): Promise<MenuSessionDto> =>
     new Promise((resolve, reject) => {
       APICallWrapper({
         url: apiUrls.foodAdviser.createSession,
@@ -114,7 +115,7 @@ export const foodAdviserApi = {
       });
     }),
 
-  getSessions: (utils: any): Promise<MenuSessionDto[]> =>
+  getSessions: (utils?: IUtils | null): Promise<MenuSessionDto[]> =>
     new Promise((resolve) => {
       APICallWrapper({
         url: apiUrls.foodAdviser.getSessions,
@@ -129,7 +130,10 @@ export const foodAdviserApi = {
       });
     }),
 
-  getSession: (sessionId: string, utils: any): Promise<MenuSessionDto | null> =>
+  getSession: (
+    sessionId: string,
+    utils?: IUtils | null
+  ): Promise<MenuSessionDto | null> =>
     new Promise((resolve) => {
       APICallWrapper({
         url: `${apiUrls.foodAdviser.getSession}/${sessionId}`,
@@ -144,7 +148,7 @@ export const foodAdviserApi = {
       });
     }),
 
-  deleteSession: (sessionId: string, utils: any): Promise<void> =>
+  deleteSession: (sessionId: string, utils?: IUtils | null): Promise<void> =>
     new Promise((resolve, reject) => {
       APICallWrapper({
         url: `${apiUrls.foodAdviser.deleteSession}/${sessionId}`,
@@ -157,7 +161,7 @@ export const foodAdviserApi = {
       });
     }),
 
-  getRatings: (utils: any): Promise<DishRatingDto[]> =>
+  getRatings: (utils?: IUtils | null): Promise<DishRatingDto[]> =>
     new Promise((resolve) => {
       APICallWrapper({
         url: apiUrls.foodAdviser.getRatings,
@@ -175,7 +179,7 @@ export const foodAdviserApi = {
   uploadSessionImages: (
     sessionId: string,
     files: File[],
-    utils: any
+    utils?: IUtils | null
   ): Promise<string[]> =>
     new Promise((resolve, reject) => {
       const formData = new FormData();
@@ -199,7 +203,7 @@ export const foodAdviserApi = {
     sessionId: string,
     confirmedItems: string[],
     trySomethingNew: boolean,
-    utils: any
+    utils?: IUtils | null
   ): Promise<MenuSessionDto> =>
     new Promise((resolve, reject) => {
       APICallWrapper({
@@ -223,7 +227,7 @@ export const foodAdviserApi = {
       });
     }),
 
-  requestParsing: (sessionId: string, utils: any): Promise<void> =>
+  requestParsing: (sessionId: string, utils?: IUtils | null): Promise<void> =>
     new Promise((resolve, reject) => {
       APICallWrapper({
         url: `${apiUrls.foodAdviser.requestParsing}/${sessionId}/request-parsing`,
@@ -235,7 +239,10 @@ export const foodAdviserApi = {
       });
     }),
 
-  requestRecommendations: (sessionId: string, utils: any): Promise<void> =>
+  requestRecommendations: (
+    sessionId: string,
+    utils?: IUtils | null
+  ): Promise<void> =>
     new Promise((resolve, reject) => {
       APICallWrapper({
         url: `${apiUrls.foodAdviser.requestRecommendations}/${sessionId}/request-recommendations`,
@@ -249,7 +256,7 @@ export const foodAdviserApi = {
 
   getRecommendations: (
     sessionId: string,
-    utils: any
+    utils?: IUtils | null
   ): Promise<string[] | null> =>
     new Promise((resolve) => {
       APICallWrapper({
@@ -269,7 +276,7 @@ export const foodAdviserApi = {
     dishName: string,
     rating: number,
     sessionId: string | null,
-    utils: any
+    utils?: IUtils | null
   ): Promise<void> =>
     new Promise((resolve, reject) => {
       APICallWrapper({

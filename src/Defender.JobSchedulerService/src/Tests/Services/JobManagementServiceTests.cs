@@ -1,3 +1,4 @@
+using Confluent.Kafka;
 using Defender.JobSchedulerService.Application.Common.Interfaces.Repositories;
 using Defender.JobSchedulerService.Application.Services;
 using Defender.JobSchedulerService.Domain.Entities;
@@ -66,5 +67,34 @@ public class JobManagementServiceTests
         _scheduledJobRepository.Verify(
             x => x.UpdateScheduledJobAsync(It.IsAny<Defender.Common.DB.Model.UpdateModelRequest<ScheduledJob>>()),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task RunJobAsync_WhenProduceFails_DoesNotUpdate()
+    {
+        var job = new ScheduledJob
+        {
+            Id = Guid.NewGuid(),
+            Topic = "jobs-topic",
+            Event = "{\"x\":1}",
+            Schedule = new Schedule
+            {
+                NextStartTime = DateTime.UtcNow.AddMinutes(-2),
+                EachMinutes = 1
+            }
+        };
+        _kafkaProducer
+            .Setup(x => x.ProduceAsync(job.Topic, job.Event, It.IsAny<CancellationToken>()))
+            .Returns(Task.FromException(
+                new ProduceException<Null, string>(
+                    new Error(ErrorCode.Local_MsgTimedOut),
+                    new DeliveryResult<Null, string>())));
+        var sut = new JobManagementService(_kafkaProducer.Object, _scheduledJobRepository.Object);
+
+        await Assert.ThrowsAsync<ProduceException<Null, string>>(() => sut.RunJobAsync(job));
+
+        _scheduledJobRepository.Verify(
+            x => x.UpdateScheduledJobAsync(It.IsAny<Defender.Common.DB.Model.UpdateModelRequest<ScheduledJob>>()),
+            Times.Never);
     }
 }

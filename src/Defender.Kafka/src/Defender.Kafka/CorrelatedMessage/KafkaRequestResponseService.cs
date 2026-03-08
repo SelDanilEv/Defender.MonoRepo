@@ -1,8 +1,9 @@
-﻿using Confluent.Kafka;
+using Confluent.Kafka;
 using Defender.Kafka.Configuration.Options;
-using Microsoft.Extensions.Options;
-using System.Text.Json;
 using Defender.Kafka.Service;
+using Microsoft.Extensions.Options;
+using System.Diagnostics;
+using System.Text.Json;
 
 namespace Defender.Kafka.CorrelatedMessage;
 
@@ -60,6 +61,10 @@ public class KafkaRequestResponseService : IKafkaRequestResponseService
         using var producer = _producerFactory(producerConfig);
         using var consumer = _consumerFactory(consumerConfig);
 
+        requestTopic = _kafkaEnvPrefixer.AddEnvPrefix(requestTopic);
+        responseTopic = _kafkaEnvPrefixer.AddEnvPrefix(responseTopic);
+        consumer.Subscribe(responseTopic);
+
         var message = new Message<string, string>
         {
             Key = correlatedKafkaRequest.CorrelationId,
@@ -68,22 +73,42 @@ public class KafkaRequestResponseService : IKafkaRequestResponseService
 
         await producer.ProduceAsync(requestTopic, message, cancellationToken);
 
-        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-        cts.CancelAfter(timeout);
+        var stopwatch = Stopwatch.StartNew();
+        var maxConsumeWait = TimeSpan.FromMilliseconds(250);
 
-        while (!cts.Token.IsCancellationRequested)
+        while (stopwatch.Elapsed < timeout)
         {
-            var consumeResult = consumer.Consume(cts.Token);
-            if (consumeResult == null) continue;
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var remaining = timeout - stopwatch.Elapsed;
+            var consumeTimeout = remaining < maxConsumeWait ? remaining : maxConsumeWait;
+            var consumeResult = consumer.Consume(consumeTimeout);
+            if (consumeResult?.Message == null)
+            {
+                continue;
+            }
+
+            if (!string.Equals(consumeResult.Message.Key, correlatedKafkaRequest.CorrelationId, StringComparison.Ordinal))
+            {
+                continue;
+            }
 
             try
             {
                 var response =
                     JsonSerializer.Deserialize<CorrelatedKafkaResponse<TResponse>>(consumeResult.Message.Value);
-                if (consumeResult.Message.Key == correlatedKafkaRequest.CorrelationId)
+                if (response == null)
                 {
-                    return response!.GetResult;
+                    continue;
                 }
+
+                if (!string.IsNullOrWhiteSpace(response.CorrelationId)
+                    && !string.Equals(response.CorrelationId, correlatedKafkaRequest.CorrelationId, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                return response.GetResult;
             }
             catch (JsonException)
             {

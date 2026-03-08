@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 import App from "src/app/App";
+import ErrorBoundary from "src/components/ErrorBoundary";
 import { SidebarProvider } from "src/contexts/SidebarContext";
 import store from "src/state/store";
 import * as serviceWorkerRegistration from "src/serviceWorkerRegistration";
@@ -19,7 +20,12 @@ ReactDOM.render(
       <SidebarProvider>
         <BrowserRouter>
           <GoogleOAuthProvider clientId={config.GOOGLE_CLIENT_ID}>
-            <App />
+            <ErrorBoundary
+              fallbackTitle="The application ran into an unexpected error"
+              fallbackDescription="Try the application again. If this keeps happening, reload the page."
+            >
+              <App />
+            </ErrorBoundary>
           </GoogleOAuthProvider>
         </BrowserRouter>
       </SidebarProvider>

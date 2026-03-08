@@ -1,11 +1,9 @@
 import { useRoutes } from "react-router-dom";
-import { connect, Provider } from "react-redux";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { CssBaseline } from "@mui/material";
 
-import stateLoader from "src/state/StateLoader";
-import store from "src/state/store";
+import { useAppSelector } from "src/state/hooks";
 import LoadingBar from "src/components/LoadingBar/LoadingBar";
 import AppToastContainer from "src/components/ToastContainer";
 import ThemeProvider from "src/theme/ThemeProvider";
@@ -17,31 +15,20 @@ import "react-toastify/dist/ReactToastify.css";
 import "src/localization/i18n";
 import DateLocales from "src/consts/DateLocales";
 
-const App = (props: any) => {
+const App = () => {
   const content = useRoutes(router);
-
-  // store.subscribe(() => {
-  //   stateLoader.saveState(store.getState());
-  // });
+  const currentLanguage = useAppSelector((state) => state.session.language);
 
   return (
-    <Provider store={store}>
-      <ThemeProvider>
-        <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={DateLocales[props.currentLanguage]}>
-          <AppToastContainer />
-          <LoadingBar />
-          <CssBaseline />
-          {content}
-        </LocalizationProvider>
-      </ThemeProvider>
-    </Provider>
+    <ThemeProvider>
+      <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={DateLocales[currentLanguage]}>
+        <AppToastContainer />
+        <LoadingBar />
+        <CssBaseline />
+        {content}
+      </LocalizationProvider>
+    </ThemeProvider>
   );
 };
 
-const mapStateToProps = (state: any) => {
-  return {
-    currentLanguage: state.session.language,
-  };
-};
-
-export default connect(mapStateToProps)(App);
+export default App;

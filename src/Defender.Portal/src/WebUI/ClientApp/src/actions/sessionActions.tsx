@@ -1,3 +1,5 @@
+import type { AppDispatch } from "src/state/store";
+import type { Session } from "src/models/Session";
 import { UserAccountInfo } from "src/models/UserAccountInfo";
 import apiUrls from "src/api/apiUrls";
 import {
@@ -8,13 +10,13 @@ import {
 } from "src/reducers/sessionReducer";
 import { cleanWalletInfoActionName } from "src/reducers/walletReducer";
 
-export function login(session) {
+export function login(session: Session) {
   if (!session.isAuthenticated) {
     return;
   }
 
-  return (dispath) => {
-    dispath({
+  return (dispatch: AppDispatch) => {
+    dispatch({
       type: loginActionName,
       payload: session,
     });
@@ -22,7 +24,7 @@ export function login(session) {
 }
 
 export function logout() {
-  return async (dispath) => {
+  return async (dispatch: AppDispatch) => {
     try {
       await fetch(apiUrls.authorization.logout, {
         method: "POST",
@@ -30,20 +32,20 @@ export function logout() {
       });
     } catch {}
 
-    dispath({
+    dispatch({
       type: logoutActionName,
       payload: "",
     });
-    dispath({
+    dispatch({
       type: cleanWalletInfoActionName,
       payload: "",
     });
   };
 }
 
-export function updateLanguage(language) {
-  return (dispath) => {
-    dispath({
+export function updateLanguage(language: string) {
+  return (dispatch: AppDispatch) => {
+    dispatch({
       type: updateLanguageActionName,
       payload: language,
     });
@@ -51,8 +53,8 @@ export function updateLanguage(language) {
 }
 
 export function updateUserInfo(updatedUser: UserAccountInfo) {
-  return (dispath) => {
-    dispath({
+  return (dispatch: AppDispatch) => {
+    dispatch({
       type: updateUserInfoActionName,
       payload: updatedUser,
     });

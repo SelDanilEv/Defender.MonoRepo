@@ -5,14 +5,20 @@ import { RouteObject } from "react-router";
 import SidebarLayout from "src/layouts/SidebarLayout";
 import EmptyLayout from "src/layouts/EmptyLayout";
 
+import ErrorBoundary from "src/components/ErrorBoundary";
 import SuspenseLoader from "src/components/SuspenseLoader";
 import WelcomeLayout from "./layouts/WelcomeLayout";
 
 const Loader = (Component) => (props) =>
   (
-    <Suspense fallback={<SuspenseLoader />}>
-      <Component {...props} />
-    </Suspense>
+    <ErrorBoundary
+      fallbackTitle="This page is temporarily unavailable"
+      fallbackDescription="Only this page failed. You can try again or navigate to another area of the portal."
+    >
+      <Suspense fallback={<SuspenseLoader />}>
+        <Component {...props} />
+      </Suspense>
+    </ErrorBoundary>
   );
 
 // Welcome

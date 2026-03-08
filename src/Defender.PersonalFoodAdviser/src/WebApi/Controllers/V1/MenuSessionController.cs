@@ -1,8 +1,11 @@
 using Defender.Common.Attributes;
 using Defender.Common.Consts;
-using Defender.PersonalFoodAdviser.Application.Common.Interfaces.Services;
 using Defender.PersonalFoodAdviser.Application.DTOs;
+using Defender.PersonalFoodAdviser.Application.Modules.MenuSessions.Commands;
+using Defender.PersonalFoodAdviser.Application.Modules.MenuSessions.Queries;
 using Defender.PersonalFoodAdviser.Domain.Entities;
+using AutoMapper;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Roles = Defender.Common.Consts.Roles;
@@ -12,10 +15,10 @@ namespace WebApi.Controllers.V1;
 [Route("api/V1/[controller]")]
 [ApiController]
 public class MenuSessionController(
-    IMenuSessionService menuSessionService,
-    Defender.PersonalFoodAdviser.Application.Common.Interfaces.Services.IImageUploadService imageUploadService,
+    IMediator mediator,
+    IMapper mapper,
     Defender.Common.Interfaces.ICurrentAccountAccessor currentAccountAccessor,
-    ILogger<MenuSessionController> logger) : ControllerBase
+    ILogger<MenuSessionController> logger) : BaseApiController(mediator, mapper)
 {
     private const int MaxImageCount = 10;
     private const long MaxImageSizeBytes = 10 * 1024 * 1024;
@@ -29,7 +32,14 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Create menu session requested by user {UserId}", userId);
-        var session = await menuSessionService.CreateAsync(userId, cancellationToken);
+
+        var command = new CreateMenuSessionCommand
+        {
+            UserId = userId
+        };
+
+        var session = await ProcessApiCallWithoutMappingAsync<CreateMenuSessionCommand, MenuSession>(command);
+
         logger.LogInformation("Menu session {SessionId} created for user {UserId}", session.Id, userId);
         return CreatedAtAction(nameof(Get), new { sessionId = session.Id }, session);
     }
@@ -43,7 +53,14 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Get all menu sessions requested by user {UserId}", userId);
-        var sessions = await menuSessionService.GetByUserIdAsync(userId, cancellationToken);
+
+        var query = new GetMenuSessionsByUserQuery
+        {
+            UserId = userId
+        };
+
+        var sessions = await ProcessApiCallWithoutMappingAsync<GetMenuSessionsByUserQuery, IReadOnlyList<MenuSession>>(query);
+
         logger.LogInformation("Returning {Count} menu sessions for user {UserId}", sessions.Count, userId);
         return Ok(sessions);
     }
@@ -58,7 +75,14 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Get menu session requested: session {SessionId}, user {UserId}", sessionId, userId);
-        var session = await menuSessionService.GetByIdAsync(sessionId, userId, cancellationToken);
+
+        var query = new GetMenuSessionByIdQuery
+        {
+            SessionId = sessionId,
+            UserId = userId
+        };
+
+        var session = await ProcessApiCallWithoutMappingAsync<GetMenuSessionByIdQuery, MenuSession?>(query);
         if (session == null)
         {
             logger.LogWarning("Menu session not found or not owned: session {SessionId}, user {UserId}", sessionId, userId);
@@ -78,7 +102,15 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Delete menu session requested: session {SessionId}, user {UserId}", sessionId, userId);
-        var deleted = await menuSessionService.DeleteAsync(sessionId, userId, cancellationToken);
+
+        var command = new DeleteMenuSessionCommand
+        {
+            SessionId = sessionId,
+            UserId = userId
+        };
+
+        var deleted = await ProcessApiCallWithoutMappingAsync<DeleteMenuSessionCommand, bool>(command);
+
         if (!deleted)
         {
             logger.LogWarning("Delete menu session failed: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
@@ -132,21 +164,29 @@ public class MenuSessionController(
             files.Count,
             files.Sum(file => file.Length));
 
-        var session = await menuSessionService.GetByIdAsync(sessionId, userId, cancellationToken);
-        if (session == null)
-        {
-            logger.LogWarning("Upload rejected: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
-            return NotFound();
-        }
         var list = new List<(Stream Stream, string ContentType)>();
         foreach (var file in files)
         {
             var stream = file.OpenReadStream();
             list.Add((stream, file.ContentType ?? "image/jpeg"));
         }
+
+        var command = new UploadMenuSessionImagesCommand
+        {
+            SessionId = sessionId,
+            UserId = userId,
+            Files = list
+        };
+
         try
         {
-            var refs = await imageUploadService.UploadAsync(sessionId, list, cancellationToken);
+            var refs = await ProcessApiCallWithoutMappingAsync<UploadMenuSessionImagesCommand, IReadOnlyList<string>>(command);
+            if (refs.Count == 0)
+            {
+                logger.LogWarning("Upload rejected: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
+                return NotFound();
+            }
+
             logger.LogInformation("Upload completed: session {SessionId}, user {UserId}, uploadedRefsCount {RefsCount}", sessionId, userId, refs.Count);
             return Ok(refs);
         }
@@ -167,7 +207,16 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Update image refs requested: session {SessionId}, user {UserId}, refCount {RefCount}", sessionId, userId, imageRefs?.Count ?? 0);
-        var session = await menuSessionService.UpdateImageRefsAsync(sessionId, userId, imageRefs ?? [], cancellationToken);
+
+        var command = new UpdateMenuSessionImageRefsCommand
+        {
+            SessionId = sessionId,
+            UserId = userId,
+            ImageRefs = imageRefs ?? []
+        };
+
+        var session = await ProcessApiCallWithoutMappingAsync<UpdateMenuSessionImageRefsCommand, MenuSession?>(command);
+
         if (session == null)
         {
             logger.LogWarning("Update image refs failed: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
@@ -193,12 +242,16 @@ public class MenuSessionController(
             request?.ConfirmedItems?.Count ?? 0,
             request?.TrySomethingNew ?? false);
 
-        var session = await menuSessionService.ConfirmAsync(
-            sessionId,
-            userId,
-            request?.ConfirmedItems ?? [],
-            request?.TrySomethingNew ?? false,
-            cancellationToken);
+        var command = new ConfirmMenuSessionCommand
+        {
+            SessionId = sessionId,
+            UserId = userId,
+            ConfirmedItems = request?.ConfirmedItems ?? [],
+            TrySomethingNew = request?.TrySomethingNew ?? false
+        };
+
+        var session = await ProcessApiCallWithoutMappingAsync<ConfirmMenuSessionCommand, MenuSession?>(command);
+
         if (session == null)
         {
             logger.LogWarning("Confirm menu failed: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
@@ -218,14 +271,21 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Request parsing received: session {SessionId}, user {UserId}", sessionId, userId);
-        var session = await menuSessionService.GetByIdAsync(sessionId, userId, cancellationToken);
-        if (session == null)
+
+        var command = new RequestMenuSessionParsingCommand
+        {
+            SessionId = sessionId,
+            UserId = userId
+        };
+
+        var parsed = await ProcessApiCallWithoutMappingAsync<RequestMenuSessionParsingCommand, bool>(command);
+        if (!parsed)
         {
             logger.LogWarning("Request parsing rejected: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
             return NotFound();
         }
-        await menuSessionService.RequestParsingAsync(sessionId, userId, cancellationToken);
-        logger.LogInformation("Request parsing queued: session {SessionId}, imageRefsCount {ImageRefsCount}", sessionId, session.ImageRefs.Count);
+
+        logger.LogInformation("Request parsing queued: session {SessionId}", sessionId);
         return Accepted();
     }
 
@@ -239,14 +299,21 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Request recommendations received: session {SessionId}, user {UserId}", sessionId, userId);
-        var session = await menuSessionService.GetByIdAsync(sessionId, userId, cancellationToken);
-        if (session == null)
+
+        var command = new RequestMenuSessionRecommendationsCommand
+        {
+            SessionId = sessionId,
+            UserId = userId
+        };
+
+        var requested = await ProcessApiCallWithoutMappingAsync<RequestMenuSessionRecommendationsCommand, bool>(command);
+        if (!requested)
         {
             logger.LogWarning("Request recommendations rejected: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
             return NotFound();
         }
-        await menuSessionService.RequestRecommendationsAsync(sessionId, userId, cancellationToken);
-        logger.LogInformation("Request recommendations queued: session {SessionId}, confirmedItemsCount {ConfirmedCount}", sessionId, session.ConfirmedItems.Count);
+
+        logger.LogInformation("Request recommendations queued: session {SessionId}", sessionId);
         return Accepted();
     }
 
@@ -260,20 +327,28 @@ public class MenuSessionController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         logger.LogInformation("Get recommendations requested: session {SessionId}, user {UserId}", sessionId, userId);
-        var session = await menuSessionService.GetByIdAsync(sessionId, userId, cancellationToken);
-        if (session == null)
+
+        var query = new GetMenuSessionRecommendationsQuery
+        {
+            SessionId = sessionId,
+            UserId = userId
+        };
+
+        var recommendations = await ProcessApiCallWithoutMappingAsync<GetMenuSessionRecommendationsQuery, IReadOnlyList<string>?>(query);
+        if (recommendations == null)
         {
             logger.LogWarning("Get recommendations failed: session {SessionId} not found or not owned by user {UserId}", sessionId, userId);
             return NotFound();
         }
 
-        if (session.RankedItems.Count == 0)
+        if (recommendations.Count == 0)
         {
             logger.LogInformation("No recommendations available: session {SessionId}, user {UserId}", sessionId, userId);
             return NoContent();
         }
-        logger.LogInformation("Recommendations returned: session {SessionId}, user {UserId}, count {Count}", sessionId, userId, session.RankedItems.Count);
-        return Ok(session.RankedItems);
+
+        logger.LogInformation("Recommendations returned: session {SessionId}, user {UserId}, count {Count}", sessionId, userId, recommendations.Count);
+        return Ok(recommendations);
     }
 
     private static bool IsImageFile(string? contentType)

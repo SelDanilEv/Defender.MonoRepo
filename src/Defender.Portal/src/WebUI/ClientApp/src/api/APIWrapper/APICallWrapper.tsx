@@ -1,7 +1,39 @@
-import APICallProps from "./interfaces/APICallProps";
+import APICallProps, { APICallFailure } from "./interfaces/APICallProps";
 
 import LoadingStateService from "src/services/LoadingStateService";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
+
+const getRequestOptions = (options: RequestInit): RequestInit => {
+  const headers = new Headers(options.headers);
+
+  if (!headers.has("Content-Type") && !(options.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  return {
+    ...options,
+    credentials: options.credentials ?? "same-origin",
+    headers,
+  };
+};
+
+const getErrorDetail = (error: unknown): string => {
+  if (
+    typeof error === "object" &&
+    error !== null &&
+    "detail" in error &&
+    typeof error.detail === "string"
+  ) {
+    return error.detail;
+  }
+
+  return "UnhandledError";
+};
+
+const toFailure = (error: unknown): APICallFailure => ({
+  status: 0,
+  detail: getErrorDetail(error),
+});
 
 const APICallWrapper = async ({
   url,
@@ -18,17 +50,8 @@ const APICallWrapper = async ({
   try {
     if (doLock) LoadingStateService.StartLoading();
 
-    if (!options.headers) {
-      options.headers = {};
-    }
-
-    if (!options.credentials) {
-      options.credentials = "same-origin";
-    }
-
-    options.headers["Content-Type"] = "application/json";
-
-    const response = await fetch(url, options);
+    const requestOptions = getRequestOptions(options);
+    const response = await fetch(url, requestOptions);
 
     if (response.ok) {
         await onSuccess(response);
@@ -72,8 +95,8 @@ const APICallWrapper = async ({
     }
   } catch (error) {
     console.error(error);
-    await onFailure(error);
-    if (utils) utils.e((error as any)?.detail || "UnhandledError");
+    await onFailure(toFailure(error));
+    if (utils) utils.e(getErrorDetail(error));
   } finally {
     await onFinal();
     if (doLock) LoadingStateService.FinishLoading();

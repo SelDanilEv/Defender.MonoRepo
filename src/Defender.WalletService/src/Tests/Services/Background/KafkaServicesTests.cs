@@ -63,15 +63,13 @@ public class KafkaServicesTests
     }
 
     [Fact]
-    public async Task HandleStringEvent_WhenCleanupThrowsException_DoesNotRethrow()
+    public async Task HandleStringEvent_WhenCleanupThrowsException_Rethrows()
     {
         var cacheCleanup = new Mock<IPostgresCacheCleanupService>();
         cacheCleanup.Setup(x => x.CheckAndRunCleanupAsync()).ThrowsAsync(new InvalidOperationException("failed"));
         var sut = CreateEventListenerService(cacheCleanup);
 
-        var exception = await Record.ExceptionAsync(() => InvokeHandleStringEventAsync(sut, KafkaEvent.StartCacheCleanup.GetName()));
-
-        Assert.Null(exception);
+        await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeHandleStringEventAsync(sut, KafkaEvent.StartCacheCleanup.GetName()));
     }
 
     private static EventListenerService CreateEventListenerService(Mock<IPostgresCacheCleanupService> cacheCleanup)
