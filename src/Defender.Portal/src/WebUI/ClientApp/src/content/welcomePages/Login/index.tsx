@@ -25,9 +25,10 @@ const Login = (props: any) => {
             gap="10px"
           />
         </Box>
-        <Box sx={{ display: "flex", gap: "15px", justifyContent: "center" }}>
+        <Box sx={{ display: "flex", gap: "10px", justifyContent: "center" }}>
           <LoginByGoogle />
           <WelcomeMenuButton
+            compact
             text={u.t("welcome:create_account")}
             path="/welcome/create"
           />

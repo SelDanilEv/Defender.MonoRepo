@@ -67,7 +67,12 @@ const getSessionActionPath = (session: MenuSessionDto) => {
   return `/food-adviser/session/${session.id}/review`;
 };
 
-const FoodAdviserSessionsPage = () => {
+export const shouldShowHeaderNewSessionButton = (
+  isLoading: boolean,
+  sessionsCount: number
+) => isLoading || sessionsCount > 0;
+
+export const FoodAdviserSessionsPage = () => {
   const u = useUtils();
   const navigate = useNavigate();
   const utilsRef = useRef(u);
@@ -86,6 +91,10 @@ const FoodAdviserSessionsPage = () => {
     sessionId: string;
     ratingValue: number;
   } | null>(null);
+  const showHeaderNewSessionButton = shouldShowHeaderNewSessionButton(
+    loading,
+    sessions.length
+  );
 
   useEffect(() => {
     setLoading(true);
@@ -233,9 +242,11 @@ const FoodAdviserSessionsPage = () => {
         </Typography>
       </Box>
       <Box display="flex" gap={1} flexWrap="wrap" sx={{ mb: 2 }}>
-        <Button variant="contained" onClick={() => navigate("/food-adviser/session/new")}>
-          {u.t("foodAdviser:new_session")}
-        </Button>
+        {showHeaderNewSessionButton && (
+          <Button variant="contained" onClick={() => navigate("/food-adviser/session/new")}>
+            {u.t("foodAdviser:new_session")}
+          </Button>
+        )}
         <Button variant="outlined" onClick={() => navigate("/food-adviser")}>
           {u.t("foodAdviser:back")}
         </Button>

@@ -1,6 +1,5 @@
 import apiUrls from "src/api/apiUrls";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
-import store from "src/state/store";
 
 export interface PreferencesDto {
   userId: string;
@@ -47,12 +46,10 @@ const parseJsonSafe = async <T>(response: Response): Promise<T | null> => {
 };
 
 const withAuth = (options: RequestInit): RequestInit => {
-  const session = store.getState().session;
-  const headers = new Headers(options.headers as HeadersInit);
-  if (session.isAuthenticated && session.token) {
-    headers.set("Authorization", `Bearer ${session.token}`);
-  }
-  return { ...options, headers };
+  return {
+    ...options,
+    credentials: options.credentials ?? "same-origin",
+  };
 };
 
 export const foodAdviserApi = {

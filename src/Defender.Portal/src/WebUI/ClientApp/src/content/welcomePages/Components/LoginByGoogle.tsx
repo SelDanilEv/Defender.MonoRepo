@@ -70,11 +70,22 @@ const LoginByGoogle = (props: any) => {
 
   return (
     <Box>
-      <LockedButton variant="outlined" onClick={() => login()}>
+      <LockedButton
+        variant="outlined"
+        size="small"
+        sx={{
+          minWidth: 34,
+          width: 34,
+          height: 28,
+          minHeight: 28,
+          p: 0.25,
+        }}
+        onClick={() => login()}
+      >
         <Avatar
-          style={{
-            height: "100%",
-            width: "100%",
+          sx={{
+            height: 18,
+            width: 18,
           }}
           src="/static/images/logo/google.svg"
           alt=""

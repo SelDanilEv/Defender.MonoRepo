@@ -11,6 +11,29 @@ namespace Defender.PersonalFoodAdviser.Tests.Infrastructure.Clients;
 
 public class MenuIntelligenceRegistrationTests
 {
+    [Fact]
+    public void AddInfrastructureServices_WhenProviderNotConfigured_ResolvesGeminiClient()
+    {
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                ["HuggingFaceOptions:BaseUrl"] = "https://api-inference.huggingface.co",
+                ["GeminiOptions:BaseUrl"] = "https://generativelanguage.googleapis.com/v1beta"
+            })
+            .Build();
+
+        var services = new ServiceCollection();
+        services.AddLogging();
+        services.AddSingleton<IConfiguration>(configuration);
+        services.AddInfrastructureServices(configuration);
+        services.AddSingleton<IGeminiModelLoopStateRepository, FakeGeminiModelLoopStateRepository>();
+
+        using var serviceProvider = services.BuildServiceProvider();
+        var client = serviceProvider.GetRequiredService<IMenuIntelligenceClient>();
+
+        Assert.IsType<GeminiClient>(client);
+    }
+
     [Theory]
     [InlineData("HuggingFace", typeof(HuggingFaceClient))]
     [InlineData("Gemini", typeof(GeminiClient))]

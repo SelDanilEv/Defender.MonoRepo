@@ -11,6 +11,13 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$runStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+
+function Write-Step {
+    param([string]$Message)
+    $elapsed = [TimeSpan]::FromSeconds([math]::Floor($runStopwatch.Elapsed.TotalSeconds))
+    Write-Host ("[{0:hh\:mm\:ss}] {1}" -f $elapsed, $Message)
+}
 
 $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $outputRootPath = Join-Path $repoRoot $OutputRoot
@@ -44,6 +51,7 @@ elseif ($PSBoundParameters.ContainsKey('ContinueOnFailure')) {
 
 $hasLocalDotnetCoverage = $false
 $hasLocalReportGenerator = $false
+Write-Step 'Checking local tool availability (dotnet-coverage, reportgenerator)...'
 try {
     dotnet tool run dotnet-coverage --version *> $null
     if ($LASTEXITCODE -eq 0) { $hasLocalDotnetCoverage = $true }
@@ -54,8 +62,10 @@ try {
     if ($LASTEXITCODE -eq 0) { $hasLocalReportGenerator = $true }
 }
 catch { }
+Write-Step ("Tool resolution complete. dotnet-coverage(local): {0}; reportgenerator(local): {1}" -f $hasLocalDotnetCoverage, $hasLocalReportGenerator)
 
 if (-not $SkipTestRun) {
+    Write-Step "Preparing raw coverage directory at: $rawRoot"
     if (Test-Path $rawRoot) {
         Remove-Item -Path $rawRoot -Recurse -Force
     }
@@ -77,7 +87,17 @@ if (-not $SkipTestRun) {
             $null
         }
     } | Where-Object { $_ })
-    Write-Host "Processing $($serviceDirs.Count) services/libraries for coverage (from all_systems + all_libs)."
+    Write-Step "Processing $($serviceDirs.Count) services/libraries for coverage (from all_systems + all_libs)."
+
+    $totalTestProjects = @(
+        foreach ($serviceDir in $serviceDirs) {
+            Get-ChildItem -Path $serviceDir.FullName -Recurse -Filter *.Tests.csproj -File |
+                Where-Object { $_.FullName -notmatch '\\(obj|bin)\\' }
+        }
+    ).Count
+    Write-Step "Discovered $totalTestProjects test projects."
+
+    $testProjectIndex = 0
 
     foreach ($serviceDir in $serviceDirs) {
         $testProjects = @(Get-ChildItem -Path $serviceDir.FullName -Recurse -Filter *.Tests.csproj -File |
@@ -93,8 +113,10 @@ if (-not $SkipTestRun) {
         foreach ($testProject in $testProjects) {
             $projectName = [System.IO.Path]::GetFileNameWithoutExtension($testProject.Name)
             $coverageFile = Join-Path $serviceRaw ($projectName + '.cobertura.xml')
+            $testProjectIndex++
+            $projectStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
 
-            Write-Host "Running tests with coverage for $($serviceDir.Name) :: $projectName"
+            Write-Step "[$testProjectIndex/$totalTestProjects] Running tests with coverage for $($serviceDir.Name) :: $projectName"
 
             $innerCommand = "dotnet test `"$($testProject.FullName)`" -c $Configuration --nologo"
             if ($hasLocalDotnetCoverage) {
@@ -116,7 +138,7 @@ if (-not $SkipTestRun) {
                 $projectRef = "$($serviceDir.Name) :: $projectName"
                 $failedProjects.Add($projectRef)
                 if ($shouldContinueOnFailure) {
-                    Write-Warning "Tests failed for $projectRef, continuing..."
+                    Write-Warning "Tests failed for $projectRef after $([math]::Round($projectStopwatch.Elapsed.TotalSeconds, 1))s, continuing..."
                 }
                 else {
                     throw "dotnet test failed for $projectRef"
@@ -125,7 +147,10 @@ if (-not $SkipTestRun) {
             elseif (-not (Test-Path $coverageFile)) {
                 $projectRef = "$($serviceDir.Name) :: $projectName"
                 $projectsWithoutCoverage.Add($projectRef)
-                Write-Warning "No coverage file generated for $projectRef"
+                Write-Warning "No coverage file generated for $projectRef after $([math]::Round($projectStopwatch.Elapsed.TotalSeconds, 1))s"
+            }
+            else {
+                Write-Step "Completed $($serviceDir.Name) :: $projectName in $([math]::Round($projectStopwatch.Elapsed.TotalSeconds, 1))s"
             }
         }
     }
@@ -147,10 +172,12 @@ $coverageFiles = @(Get-ChildItem -Path $rawRoot -Recurse -Filter *.cobertura.xml
 if (-not $coverageFiles -or $coverageFiles.Count -eq 0) {
     throw "No cobertura files found under $rawRoot. Run without -SkipTestRun or verify tests are generating coverage."
 }
+Write-Step "Collected $($coverageFiles.Count) cobertura files."
 
 New-Item -ItemType Directory -Path $dashboardRoot -Force | Out-Null
 
 $reportsPattern = (Join-Path $rawRoot '**/*.cobertura.xml').Replace('\\', '/')
+Write-Step "Generating dashboard with reportgenerator into: $dashboardRoot"
 
 if ($hasLocalReportGenerator) {
     dotnet tool run reportgenerator `
@@ -176,14 +203,16 @@ if ($LASTEXITCODE -ne 0) {
 $indexFile = Join-Path $dashboardRoot 'index.html'
 $textSummary = Join-Path $dashboardRoot 'Summary.txt'
 
-Write-Host "Coverage dashboard generated: $indexFile"
+Write-Step "Coverage dashboard generated: $indexFile"
 if (Test-Path $textSummary) {
     Write-Host ''
     Get-Content $textSummary -TotalCount 15 | Out-Host
     Write-Host '...'
-    Write-Host "Full summary: $textSummary"
+    Write-Step "Full summary: $textSummary"
 }
 
 if ($OpenReport) {
     Start-Process $indexFile
 }
+
+Write-Step "Done in $([math]::Round($runStopwatch.Elapsed.TotalSeconds, 1))s."

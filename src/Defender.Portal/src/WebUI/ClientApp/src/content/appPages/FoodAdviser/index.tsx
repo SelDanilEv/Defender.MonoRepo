@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Dispatch, KeyboardEvent, SetStateAction } from "react";
 import { connect } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -34,6 +34,8 @@ const arraysEqual = (left: string[], right: string[]): boolean =>
 
 const FoodAdviserHomePage = () => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
   const navigate = useNavigate();
   const [prefs, setPrefs] = useState<PreferencesDto | null>(null);
   const [likes, setLikes] = useState<string[]>([]);
@@ -43,13 +45,17 @@ const FoodAdviserHomePage = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    foodAdviserApi.getPreferences(u).then((data) => {
+    const loadPreferences = async () => {
+      const data = await foodAdviserApi.getPreferences(utilsRef.current);
+
       if (data) {
         setPrefs(data);
         setLikes(normalizeItems(data.likes || []));
         setDislikes(normalizeItems(data.dislikes || []));
       }
-    });
+    };
+
+    void loadPreferences();
   }, []);
 
   const hasChanges = prefs

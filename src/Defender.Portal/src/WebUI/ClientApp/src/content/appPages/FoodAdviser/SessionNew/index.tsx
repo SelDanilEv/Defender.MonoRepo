@@ -40,6 +40,7 @@ const FoodAdviserSessionNewPage = () => {
   const [creatingSession, setCreatingSession] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [parsing, setParsing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [pollTimedOut, setPollTimedOut] = useState(false);
   const pollingStartedAtRef = useRef<number | null>(null);
   const pollingInFlightRef = useRef(false);
@@ -230,6 +231,21 @@ const FoodAdviserSessionNewPage = () => {
     }
   };
 
+  const handleRefresh = async () => {
+    if (!session?.id || creatingSession || uploading || refreshing) {
+      return;
+    }
+
+    setPollTimedOut(false);
+    setRefreshing(true);
+
+    try {
+      await pollSession(session.id);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   return (
     <Box sx={{ pt: 1 }}>
       <Box sx={{ mb: 2.5, textAlign: "center" }}>
@@ -381,6 +397,13 @@ const FoodAdviserSessionNewPage = () => {
               </Stack>
               <Box display="flex" gap={1} flexWrap="wrap" alignItems="center" sx={{ mt: 1.5 }}>
                 <Button
+                  variant="outlined"
+                  onClick={() => navigate("/food-adviser")}
+                  disabled={isBusy}
+                >
+                  {u.t("foodAdviser:back")}
+                </Button>
+                <Button
                   variant="contained"
                   disabled={files.length === 0 || isBusy}
                   onClick={handleUploadAndParse}
@@ -388,6 +411,15 @@ const FoodAdviserSessionNewPage = () => {
                   {isBusy
                     ? u.t("foodAdviser:polling")
                     : u.t("foodAdviser:start_parsing")}
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={handleRefresh}
+                  disabled={!session?.id || creatingSession || uploading || refreshing}
+                >
+                  {refreshing
+                    ? u.t("foodAdviser:polling")
+                    : u.t("foodAdviser:recommendations_refresh")}
                 </Button>
                 {creatingSession && (
                   <Typography variant="body2" color="text.secondary">
