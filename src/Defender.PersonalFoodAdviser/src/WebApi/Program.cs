@@ -2,6 +2,7 @@ using Defender.Common.Extension;
 using Defender.PersonalFoodAdviser.Application;
 using Defender.PersonalFoodAdviser.Infrastructure;
 using Hellang.Middleware.ProblemDetails;
+using Prometheus;
 using Serilog;
 using WebApi;
 
@@ -50,6 +51,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseProblemDetails();
+
+var metricsEnabled = builder.Configuration.GetValue("Defender:Observability:Metrics:Enabled", false);
+if (metricsEnabled)
+{
+    app.UseHttpMetrics();
+    app.MapMetrics("/metrics");
+}
 
 app.MapControllerRoute(
     name: "default",

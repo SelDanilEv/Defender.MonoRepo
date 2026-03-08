@@ -1,0 +1,18 @@
+global:
+  environment: dev
+
+kube-prometheus-stack:
+  grafana:
+    ingress:
+      enabled: false
+  prometheus:
+    prometheusSpec:
+      retention: 7d
+
+loki:
+  singleBinary:
+    persistence:
+      enabled: false
+
+promtail:
+  tolerations: []

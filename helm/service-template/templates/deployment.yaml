@@ -12,6 +12,19 @@ spec:
     metadata:
       labels:
         app: {{ .Release.Name }}
+{{- $metricsEnabled := .Values.metrics.enabled | default false }}
+{{- $podAnnotations := .Values.podAnnotations | default dict }}
+{{- if or $metricsEnabled $podAnnotations }}
+      annotations:
+{{- with $podAnnotations }}
+{{- toYaml . | nindent 8 }}
+{{- end }}
+{{- if $metricsEnabled }}
+        prometheus.io/scrape: "true"
+        prometheus.io/path: {{ .Values.metrics.path | quote }}
+        prometheus.io/port: {{ .Values.metrics.port | toString | quote }}
+{{- end }}
+{{- end }}
     spec:
       containers:
         - name: {{ .Release.Name }}

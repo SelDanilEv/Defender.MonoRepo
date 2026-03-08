@@ -10,6 +10,13 @@ service:
   port: 80
   targetPort: 8080
 
+metrics:
+  enabled: true
+  path: /metrics
+  port: 8080
+
+podAnnotations: {}
+
 probes:
   path: /api/Home/health
   startup:
@@ -40,5 +47,6 @@ resources:
 
 configMapData:
   ASPNETCORE_ENVIRONMENT: "Prod"
+  Defender__Observability__Metrics__Enabled: "true"
 
 secretName: basic-secret

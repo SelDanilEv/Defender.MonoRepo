@@ -559,6 +559,7 @@ Services involved: Portal (admin views), backend services
 ## Additional Resources
 
 - ArgoCD docs: [docs/README-ARGOCD.md](./docs/README-ARGOCD.md)
+- Observability setup: [docs/OBSERVABILITY-SETUP.md](./docs/OBSERVABILITY-SETUP.md)
 - Workflow docs: [.github/workflows/README.md](./.github/workflows/README.md)
 - Service-specific docs: service-level `README.md` and `AGENTS.md` files
 - API docs: `/swagger` endpoint on each API service

@@ -372,10 +372,11 @@ Used exclusively for distributed caching via `Defender.DistributedCache`. Provid
 
 ### Local Development (Docker Compose)
 
-`src/docker-compose.yml` provides two profiles:
+`src/docker-compose.yml` provides three profiles:
 
 | Profile | Purpose | Config |
 |---------|---------|--------|
+| `debug` | Observability-only tooling (Prometheus/Loki/Promtail/Grafana) without full app stack | Local docker config |
 | `local` | Full local stack with Kafka/Zookeeper | `secrets.local.list`, `ASPNETCORE_ENVIRONMENT=Local` |
 | `dev` | Services pointing to remote infrastructure | `secrets.dev.list`, `ASPNETCORE_ENVIRONMENT=Dev` |
 

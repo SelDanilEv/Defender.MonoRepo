@@ -14,6 +14,7 @@ x-service-local: &service-local
     - local
   environment:
     - ASPNETCORE_ENVIRONMENT=Local
+    - Defender__Observability__Metrics__Enabled=true
   env_file:
     - ../secrets/secrets.local.list
   depends_on:
@@ -27,6 +28,7 @@ x-service-dev: &service-dev
     - dev
   environment:
     - ASPNETCORE_ENVIRONMENT=Dev
+    - Defender__Observability__Metrics__Enabled=true
   env_file:
     - ../secrets/secrets.dev.list
 
@@ -34,6 +36,14 @@ x-portal-base: &portal-base
   build:
     context: .
     dockerfile: Dockerfile.Portal
+  networks:
+    - external-network
+
+x-observability: &observability
+  profiles:
+    - debug
+    - local
+    - dev
   networks:
     - external-network
 
@@ -385,7 +395,65 @@ services:
     networks:
       - external-network
 
+  local-prometheus:
+    <<: *observability
+    image: prom/prometheus:v2.54.1
+    container_name: local-prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+    volumes:
+      - ./observability/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+
+  local-loki:
+    <<: *observability
+    image: grafana/loki:3.2.1
+    container_name: local-loki
+    command: -config.file=/etc/loki/local-config.yml
+    volumes:
+      - ./observability/loki/loki-config.yml:/etc/loki/local-config.yml:ro
+      - loki_data:/loki
+    ports:
+      - "3100:3100"
+
+  local-promtail:
+    <<: *observability
+    image: grafana/promtail:3.2.1
+    container_name: local-promtail
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      local-loki:
+        condition: service_started
+    volumes:
+      - ./observability/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  local-grafana:
+    <<: *observability
+    image: grafana/grafana:11.2.0
+    container_name: local-grafana
+    depends_on:
+      local-prometheus:
+        condition: service_started
+      local-loki:
+        condition: service_started
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro
+      - ./observability/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
+    ports:
+      - "3000:3000"
+
 volumes:
   mongo_local_data:
   mongo_local_config:
   postgres_data:
+  prometheus_data:
+  loki_data:
+  grafana_data:

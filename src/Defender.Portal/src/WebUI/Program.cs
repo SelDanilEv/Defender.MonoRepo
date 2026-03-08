@@ -3,6 +3,7 @@ using Defender.Portal.Application;
 using Defender.Portal.Infrastructure;
 using Defender.Portal.WebUI;
 using Hellang.Middleware.ProblemDetails;
+using Prometheus;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -48,6 +49,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseProblemDetails();
+
+var metricsEnabled = builder.Configuration.GetValue("Defender:Observability:Metrics:Enabled", false);
+if (metricsEnabled)
+{
+    app.UseHttpMetrics();
+    app.MapMetrics("/metrics");
+}
 
 app.MapControllerRoute(
     name: "default",

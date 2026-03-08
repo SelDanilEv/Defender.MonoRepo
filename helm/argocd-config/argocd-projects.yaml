@@ -78,3 +78,27 @@ spec:
       kind: Ingress
     - group: autoscaling
       kind: HorizontalPodAutoscaler
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: observability
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: observability-project
+    app.kubernetes.io/part-of: argocd
+spec:
+  description: Observability stack project for Defender
+  sourceRepos:
+    - 'https://github.com/SelDanilEv/Defender.MonoRepo.git'
+  destinations:
+    - namespace: defender-observability
+      server: https://kubernetes.default.svc
+    - namespace: defender-observability-prod
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  namespaceResourceWhitelist:
+    - group: '*'
+      kind: '*'

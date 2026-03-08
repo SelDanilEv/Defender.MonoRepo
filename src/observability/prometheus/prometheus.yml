@@ -1,0 +1,52 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets:
+          - "local-prometheus:9090"
+
+  - job_name: "defender-local"
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "local-identity-service:8080"
+          - "local-user-management-service:8080"
+          - "local-notification-service:8080"
+          - "local-job-scheduler-service:8080"
+          - "local-wallet-service:8080"
+          - "local-risk-games-service:8080"
+          - "local-budget-tracker-service:8080"
+          - "local-personal-food-adviser-service:8080"
+          - "local-portal:8080"
+
+  - job_name: "defender-dev"
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "dev-identity-service:8080"
+          - "dev-user-management-service:8080"
+          - "dev-notification-service:8080"
+          - "dev-job-scheduler-service:8080"
+          - "dev-wallet-service:8080"
+          - "dev-risk-games-service:8080"
+          - "dev-budget-tracker-service:8080"
+          - "dev-personal-food-adviser-service:8080"
+          - "dev-portal:8080"
+
+  - job_name: "defender-debug-host"
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - "host.docker.internal:47050"
+          - "host.docker.internal:47051"
+          - "host.docker.internal:47052"
+          - "host.docker.internal:47053"
+          - "host.docker.internal:47057"
+          - "host.docker.internal:47058"
+          - "host.docker.internal:47059"
+          - "host.docker.internal:47060"
+          - "host.docker.internal:47061"
+          - "host.docker.internal:47062"

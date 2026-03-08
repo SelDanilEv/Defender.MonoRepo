@@ -1,0 +1,61 @@
+global:
+  environment: dev
+
+kube-prometheus-stack:
+  grafana:
+    enabled: true
+    adminPassword: admin
+    defaultDashboardsTimezone: utc
+  prometheus:
+    prometheusSpec:
+      retention: 7d
+      scrapeInterval: 30s
+  alertmanager:
+    enabled: true
+  kube-state-metrics:
+    enabled: true
+  nodeExporter:
+    enabled: true
+
+loki:
+  enabled: true
+  fullnameOverride: loki
+  isDefault: false
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    storage:
+      type: filesystem
+      bucketNames:
+        chunks: chunks
+        ruler: ruler
+        admin: admin
+    useTestSchema: true
+  singleBinary:
+    replicas: 1
+  deploymentMode: SingleBinary
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  monitoring:
+    selfMonitoring:
+      enabled: false
+    serviceMonitor:
+      enabled: true
+  test:
+    enabled: false
+  lokiCanary:
+    enabled: false
+
+promtail:
+  enabled: true
+  config:
+    clients:
+      - url: http://loki:3100/loki/api/v1/push
+    snippets:
+      pipelineStages:
+        - cri: {}
