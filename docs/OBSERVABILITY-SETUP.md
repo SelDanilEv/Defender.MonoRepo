@@ -139,3 +139,8 @@ Before enabling in prod, replace defaults in [`helm/observability/values-prod.ya
 - Grafana ingress host/domain
 - storage sizes and storage class settings
 - alert routing and receiver configs
+
+Loki storage behavior:
+
+- Default/dev values use ephemeral filesystem storage under `/tmp/loki` (free-tier friendly, no PVC requirement).
+- Prod values override Loki to persistent `/var/loki` with PVC enabled.

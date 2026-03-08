@@ -32,6 +32,14 @@ kube-prometheus-stack:
                 storage: 10Gi
 
 loki:
+  loki:
+    commonConfig:
+      path_prefix: /var/loki
+    storage:
+      filesystem:
+        chunks_directory: /var/loki/chunks
+        rules_directory: /var/loki/rules
+        admin_api_directory: /var/loki/admin
   singleBinary:
     persistence:
       enabled: true
