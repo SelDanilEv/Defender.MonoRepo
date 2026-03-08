@@ -2,10 +2,24 @@ global:
   environment: dev
 
 kube-prometheus-stack:
+  crds:
+    enabled: true
   grafana:
     enabled: true
     adminPassword: admin
     defaultDashboardsTimezone: utc
+    sidecar:
+      datasources:
+        uid: P000000001
+    additionalDataSources:
+      - name: Loki
+        uid: L000000001
+        type: loki
+        access: proxy
+        url: http://loki:3100
+        isDefault: false
+        jsonData:
+          maxLines: 1000
   prometheus:
     prometheusSpec:
       retention: 7d
@@ -24,6 +38,7 @@ loki:
   loki:
     auth_enabled: false
     commonConfig:
+      path_prefix: /var/loki
       replication_factor: 1
     storage:
       type: filesystem
@@ -32,8 +47,15 @@ loki:
         ruler: ruler
         admin: admin
     useTestSchema: true
+  chunksCache:
+    enabled: false
+  resultsCache:
+    enabled: false
   singleBinary:
     replicas: 1
+    persistence:
+      enabled: true
+      size: 20Gi
   deploymentMode: SingleBinary
   backend:
     replicas: 0

@@ -12,7 +12,8 @@ kube-prometheus-stack:
 loki:
   singleBinary:
     persistence:
-      enabled: false
+      enabled: true
+      size: 10Gi
 
 promtail:
   tolerations: []

@@ -89,6 +89,21 @@ ArgoCD applications:
 ArgoCD project:
 
 - [`helm/argocd-config/argocd-projects.yaml`](../helm/argocd-config/argocd-projects.yaml) adds project `observability`.
+- The project explicitly allows `kube-system` because `kube-prometheus-stack` creates shared Kubernetes service monitors there.
+
+### What is provisioned by default in Kubernetes
+
+Grafana dashboards are shipped from [`helm/observability/dashboards`](../helm/observability/dashboards) and auto-imported by sidecar:
+
+- `Defender Overview` (extended with restart/OOM/throttling/memory pressure)
+- `Defender RED Metrics`
+- `Defender Runtime Health`
+- `Defender Errors & Logs`
+
+Grafana datasources are provisioned with stable UIDs for dashboard compatibility:
+
+- Prometheus `P000000001`
+- Loki `L000000001`
 
 ## 4. Deploy with ArgoCD
 
@@ -109,6 +124,12 @@ kubectl apply -f helm/argocd-applications/prod/observability-app.yaml -n argocd
 ```bash
 kubectl apply -f helm/argocd-applications/dev/observability-app.yaml -n argocd
 ```
+
+Both observability apps are configured with ArgoCD sync options required for large CRDs and first-time operator installs:
+
+- `ServerSideApply=true`
+- `Replace=true`
+- `SkipDryRunOnMissingResource=true`
 
 ## 5. Production Hardening Checklist
 

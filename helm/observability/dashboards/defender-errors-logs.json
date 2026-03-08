@@ -1,0 +1,40 @@
+{
+  "editable": true,
+  "id": null,
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "P000000001" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "targets": [{ "editorMode": "code", "expr": "sum by (job) (rate(http_requests_received_total{code=~\"5..\"}[5m]))", "legendFormat": "{{job}}", "refId": "A" }],
+      "title": "5xx Requests by Job",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "P000000001" },
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "targets": [{ "editorMode": "code", "expr": "sum by (job) (increase(http_requests_received_total{code=~\"5..\"}[1h]))", "legendFormat": "{{job}}", "refId": "A" }],
+      "title": "5xx Volume (1h)",
+      "type": "barchart"
+    },
+    {
+      "datasource": { "type": "loki", "uid": "L000000001" },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 8 },
+      "id": 3,
+      "options": { "showLabels": true, "sortOrder": "Descending", "wrapLogMessage": true },
+      "targets": [{ "editorMode": "code", "expr": "{namespace=~\"defender.*\"} |= \"error\"", "queryType": "range", "refId": "A" }],
+      "title": "Recent Error Logs",
+      "type": "logs"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 39,
+  "tags": ["defender", "errors", "logs"],
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "Defender Errors & Logs",
+  "uid": "defender-errors-logs",
+  "version": 1
+}

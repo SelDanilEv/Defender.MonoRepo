@@ -20,7 +20,7 @@ This document reflects the current ArgoCD setup in this repository.
 ### ArgoCD Project Configuration
 
 - `helm/argocd-config/argocd-projects.yaml`
-- Includes project `observability` for observability namespaces.
+- Includes project `observability` for observability namespaces and `kube-system` destination used by kube-prometheus-stack resources.
 
 ### Workflows
 
@@ -70,6 +70,12 @@ kubectl apply -f helm/argocd-applications/dev/observability-app.yaml -n argocd
 ```
 
 For full observability details, see `docs/OBSERVABILITY-SETUP.md`.
+
+Observability apps include sync options tuned for operator/CRD workloads:
+
+- `ServerSideApply=true`
+- `Replace=true`
+- `SkipDryRunOnMissingResource=true`
 
 ## Image Promotion Flow
 
