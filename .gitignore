@@ -33,6 +33,7 @@ mono_crash.*
 
 # Dependent charts
 *.tgz
+!helm/observability/charts/*.tgz
 
 # Build results
 [Dd]ebug/

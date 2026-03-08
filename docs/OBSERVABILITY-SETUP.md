@@ -23,6 +23,25 @@ Observability containers are added to [`src/docker-compose.yml`](../src/docker-c
 
 All observability services are available in profiles: `debug`, `local`, `dev`.
 
+### Provisioned dashboards (built-in in this repo)
+
+Grafana auto-loads dashboards from `src/observability/grafana/provisioning/dashboards/json`:
+
+- `Defender Overview`
+- `Defender RED Metrics`
+- `Defender Runtime Health`
+- `Defender Errors & Logs`
+
+`Defender Overview` includes critical summary panels:
+
+- availability (%)
+- total RPS
+- 5xx error %
+- p95 latency
+- per-job request rate
+- per-job CPU and memory pressure
+- error logs and all service logs
+
 ### Run only observability (debug mode)
 
 ```bash
