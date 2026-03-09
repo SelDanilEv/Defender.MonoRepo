@@ -27,6 +27,7 @@ kube-prometheus-stack:
     enabled: false
   grafana:
     enabled: true
+    defaultDashboardsEnabled: false
     adminPassword: admin
     defaultDashboardsTimezone: utc
     sidecar:
