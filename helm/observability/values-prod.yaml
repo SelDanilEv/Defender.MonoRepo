@@ -14,7 +14,7 @@ kube-prometheus-stack:
       enabled: true
       ingressClassName: traefik
       hosts:
-        - grafana.defender.local
+        - argo-grafana
   prometheus:
     prometheusSpec:
       retention: 30d
