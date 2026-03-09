@@ -62,7 +62,7 @@ const APIEndpoints = {
     getGroups: "groups",
     group: "group",
   },
-  foodAdviser: {
+  foodAdvisor: {
     getPreferences: "preferences",
     updatePreferences: "preferences",
     createSession: "session",

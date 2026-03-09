@@ -50,7 +50,7 @@ graph TB
     subgraph domainServices [Domain Services]
         RiskGames["RiskGamesService"]
         BudgetTracker["BudgetTracker"]
-        FoodAdviser["PersonalFoodAdviser"]
+        FoodAdvisor["PersonalFoodAdvisor"]
     end
 
     subgraph infra [Infrastructure Services]
@@ -79,7 +79,7 @@ graph TB
     Portal --> Notification
     Portal --> RiskGames
     Portal --> BudgetTracker
-    Portal --> FoodAdviser
+    Portal --> FoodAdvisor
 
     Identity --> MongoDB
     UserMgmt --> MongoDB
@@ -90,16 +90,16 @@ graph TB
     RiskGames --> MongoDB
     RiskGames --> Kafka
     BudgetTracker --> MongoDB
-    FoodAdviser --> MongoDB
-    FoodAdviser --> Kafka
+    FoodAdvisor --> MongoDB
+    FoodAdvisor --> Kafka
     JobScheduler --> MongoDB
     JobScheduler --> Kafka
     Portal --> Postgres
 
     Identity --> Google
     Notification --> SendinBlue
-    FoodAdviser --> Gemini
-    FoodAdviser --> HuggingFace
+    FoodAdvisor --> Gemini
+    FoodAdvisor --> HuggingFace
     BudgetTracker --> ExchangeRates
 ```
 
@@ -183,7 +183,7 @@ Defender.MonoRepo/
 │   ├── Defender.JobSchedulerService/
 │   ├── Defender.Kafka/          # Shared library
 │   ├── Defender.NotificationService/
-│   ├── Defender.PersonalFoodAdviser/
+│   ├── Defender.PersonalFoodAdvisor/
 │   ├── Defender.Portal/         # BFF + React SPA
 │   ├── Defender.RiskGamesService/
 │   ├── Defender.UserManagementService/
@@ -215,7 +215,7 @@ Defender.MonoRepo/
 | **Defender.GeneralTestingService** | 47059 | End-to-end regression testing (login, wallet, transfers). Not included in CI build | Portal, Identity |
 | **Defender.RiskGamesService** | 47060 | Lottery games, draws, ticket purchasing, prize distribution | Kafka, Wallet |
 | **Defender.BudgetTracker** | 47061 | Personal budget tracking, position management, exchange rates, diagrams | Exchange Rates API |
-| **Defender.PersonalFoodAdviser** | 47062 | AI-powered menu parsing, dish extraction, personalized food recommendations | Gemini AI, HuggingFace, Kafka |
+| **Defender.PersonalFoodAdvisor** | 47062 | AI-powered menu parsing, dish extraction, personalized food recommendations | Gemini AI, HuggingFace, Kafka |
 
 ---
 
@@ -277,7 +277,7 @@ The Portal frontend is a React 17 Single-Page Application served by the Portal's
 - **Banking** -- Wallet operations, transactions
 - **Budget Tracker** -- Position management, group management, diagrams
 - **Games** -- Lottery participation and results
-- **Food Adviser** -- Menu upload, AI-powered dish extraction and recommendations
+- **Food Advisor** -- Menu upload, AI-powered dish extraction and recommendations
 - **Admin** -- User management, banking administration
 - **Configuration** -- Health checks, system settings
 
@@ -317,15 +317,15 @@ graph LR
     Kafka -->|"Lottery Draw Events"| RiskGames
     RiskGames -->|"Transaction Events"| Kafka
     Kafka -->|"Transaction Updates"| Wallet
-    FoodAdviser -->|"Outbox Messages"| Kafka
-    Kafka -->|"Parsing/Recommendation Results"| FoodAdviser
+    FoodAdvisor -->|"Outbox Messages"| Kafka
+    Kafka -->|"Parsing/Recommendation Results"| FoodAdvisor
 ```
 
 Key Kafka flows:
 - **Job Scheduling**: `JobSchedulerService` publishes scheduled events (e.g., `ScheduleNewLotteryDraws`, `StartLotteriesProcessing`) to Kafka topics.
 - **Lottery Processing**: `RiskGamesService` consumes job events, processes lottery draws, and publishes transaction events.
 - **Wallet Updates**: `WalletService` consumes transaction status updates from Kafka.
-- **Food Adviser Outbox**: `PersonalFoodAdviser` uses an outbox pattern with Kafka for menu parsing and recommendation processing.
+- **Food Advisor Outbox**: `PersonalFoodAdvisor` uses an outbox pattern with Kafka for menu parsing and recommendation processing.
 
 ---
 

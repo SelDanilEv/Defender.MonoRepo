@@ -3,7 +3,7 @@
 ## Project Structure & Module Organization
 - `src/` contains production microservices and shared libraries (`Defender.Common`, `Defender.Kafka`, `Defender.DistributedCache`).
 - Each service follows layered structure under `src/Defender.<Service>/src/`: `Application`, `Domain`, `Infrastructure`, and `WebApi`/`WebUI`.
-- Service tests live next to code in `*.Tests` projects (example: `src/Defender.PersonalFoodAdviser/src/Defender.PersonalFoodAdviser.Tests`).
+- Service tests live next to code in `*.Tests` projects (example: `src/Defender.PersonalFoodAdvisor/src/Defender.PersonalFoodAdvisor.Tests`).
 - `tools/` contains support apps (for example, secret management and Mongo migration tools).
 - `helm/` stores Kubernetes/ArgoCD manifests; `scripts/` contains automation; `secrets/` stores local env-file templates.
 - For service-specific guidance, check that service’s local `AGENTS.md` when present.

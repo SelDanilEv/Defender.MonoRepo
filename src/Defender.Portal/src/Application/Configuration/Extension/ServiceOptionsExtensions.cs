@@ -13,7 +13,7 @@ public static class ServiceOptionsExtensions
         services.Configure<WalletOptions>(configuration.GetSection(nameof(WalletOptions)));
         services.Configure<RiskGamesOptions>(configuration.GetSection(nameof(RiskGamesOptions)));
         services.Configure<BudgetTrackerOptions>(configuration.GetSection(nameof(BudgetTrackerOptions)));
-        services.Configure<PersonalFoodAdviserOptions>(configuration.GetSection(nameof(PersonalFoodAdviserOptions)));
+        services.Configure<PersonalFoodAdvisorOptions>(configuration.GetSection(nameof(PersonalFoodAdvisorOptions)));
 
         return services;
     }

@@ -287,20 +287,20 @@ const RoleBasedMenu = (props: any) => {
         );
         result.push(
           <List
-            key={"food_adviser"}
+            key={"food_advisor"}
             component="div"
             subheader={
               <ListSubheader component="div" disableSticky>
-                {u.t("sidebar_menu:header_food_adviser")}
+                {u.t("sidebar_menu:header_food_advisor")}
               </ListSubheader>
             }
           >
             <SubMenuWrapper>
               <List component="div">
                 <MenuItem
-                  to="/food-adviser"
+                  to="/food-advisor"
                   icon={<RestaurantIcon style={{ fontSize: "1.1em" }} />}
-                  text={u.t("sidebar_menu:page_food_adviser")}
+                  text={u.t("sidebar_menu:page_food_advisor")}
                 />
               </List>
             </SubMenuWrapper>

@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
@@ -51,17 +51,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defender.NotificationServic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "Defender.NotificationService\src\WebApi\WebApi.csproj", "{5B5F3013-2D70-4497-A7FB-C08AAD4E9774}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Defender.PersonalFoodAdviser", "Defender.PersonalFoodAdviser", "{CF2E20A4-4434-BC58-957C-20692CC225B4}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Defender.PersonalFoodAdvisor", "Defender.PersonalFoodAdvisor", "{CF2E20A4-4434-BC58-957C-20692CC225B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Defender.PersonalFoodAdviser\src\Application\Application.csproj", "{5E0C4249-17D5-4D62-9993-E2C5391B0ADC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Defender.PersonalFoodAdvisor\src\Application\Application.csproj", "{5E0C4249-17D5-4D62-9993-E2C5391B0ADC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Defender.PersonalFoodAdviser\src\Domain\Domain.csproj", "{9B195DF3-7FC4-4BD2-B353-161A103D526C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Defender.PersonalFoodAdvisor\src\Domain\Domain.csproj", "{9B195DF3-7FC4-4BD2-B353-161A103D526C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Defender.PersonalFoodAdviser\src\Infrastructure\Infrastructure.csproj", "{84E91061-A8E3-4699-A4B4-A4798E871D01}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Defender.PersonalFoodAdvisor\src\Infrastructure\Infrastructure.csproj", "{84E91061-A8E3-4699-A4B4-A4798E871D01}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defender.PersonalFoodAdviser.Tests", "Defender.PersonalFoodAdviser\src\Tests\Defender.PersonalFoodAdviser.Tests.csproj", "{EBC1D441-50B7-4D98-A4FF-C4C22CA9A95F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Defender.PersonalFoodAdvisor.Tests", "Defender.PersonalFoodAdvisor\src\Tests\Defender.PersonalFoodAdvisor.Tests.csproj", "{EBC1D441-50B7-4D98-A4FF-C4C22CA9A95F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "Defender.PersonalFoodAdviser\src\WebApi\WebApi.csproj", "{8BD12554-04D1-4F38-BED1-F4B834531BE7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi", "Defender.PersonalFoodAdvisor\src\WebApi\WebApi.csproj", "{8BD12554-04D1-4F38-BED1-F4B834531BE7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Defender.Portal", "Defender.Portal", "{78AC0782-8D79-803C-7557-0626E0D01D92}"
 EndProject

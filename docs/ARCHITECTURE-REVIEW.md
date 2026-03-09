@@ -335,7 +335,7 @@ Severity levels:
 **Locations**:
 - `src/Defender.BudgetTracker/src/WebApi/ConfigureServices.cs`
 - `src/Defender.JobSchedulerService/src/WebApi/ConfigureServices.cs`
-- `src/Defender.PersonalFoodAdviser/src/WebApi/ConfigureServices.cs`
+- `src/Defender.PersonalFoodAdvisor/src/WebApi/ConfigureServices.cs`
 
 **Current state**: Several backend Web API services still register their HTTP layer with `AddWebUIServices(...)`.
 
@@ -383,7 +383,7 @@ Severity levels:
 - `src/Defender.IdentityService/src/Application/Helpers/LocalSecretHelper/LocalSecretsHelper.cs`
 - `src/Defender.JobSchedulerService/src/Application/Helpers/LocalSecretHelper/LocalSecretsHelper.cs`
 - `src/Defender.NotificationService/src/Application/Helpers/LocalSecretHelper/LocalSecretsHelper.cs`
-- `src/Defender.PersonalFoodAdviser/src/Application/Helpers/LocalSecretHelper/LocalSecretsHelper.cs`
+- `src/Defender.PersonalFoodAdvisor/src/Application/Helpers/LocalSecretHelper/LocalSecretsHelper.cs`
 - `src/Defender.Portal/src/Application/Helpers/LocalSecretHelper/LocalSecretsHelper.cs`
 
 **Current state**: The helper is still copied across multiple services with only minor service-specific variation.

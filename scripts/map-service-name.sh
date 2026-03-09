@@ -37,8 +37,8 @@ case "$SERVICE_NAME" in
     "Defender.BudgetTracker")
         echo "budget-tracker"
         ;;
-    "Defender.PersonalFoodAdviser")
-        echo "personal-food-adviser"
+    "Defender.PersonalFoodAdvisor")
+        echo "personal-food-advisor"
         ;;
     *)
         echo "$SERVICE_NAME"

@@ -19,7 +19,7 @@ scrape_configs:
           - "local-wallet-service:8080"
           - "local-risk-games-service:8080"
           - "local-budget-tracker-service:8080"
-          - "local-personal-food-adviser-service:8080"
+          - "local-personal-food-advisor-service:8080"
           - "local-portal:8080"
 
   - job_name: "defender-dev"
@@ -33,7 +33,7 @@ scrape_configs:
           - "dev-wallet-service:8080"
           - "dev-risk-games-service:8080"
           - "dev-budget-tracker-service:8080"
-          - "dev-personal-food-adviser-service:8080"
+          - "dev-personal-food-advisor-service:8080"
           - "dev-portal:8080"
 
   - job_name: "defender-debug-host"

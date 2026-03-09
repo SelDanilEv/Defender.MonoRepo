@@ -10,7 +10,7 @@ import en_lottery from "src/localization/en/lottery.json";
 import en_sidebar_menu from "src/localization/en/sidebar_menu.json";
 import en_welcome from "src/localization/en/welcome.json";
 import en_budgetTracker from "src/localization/en/budgetTracker.json";
-import en_foodAdviser from "src/localization/en/foodAdviser.json";
+import en_foodAdvisor from "src/localization/en/foodAdvisor.json";
 
 import ru from "src/localization/ru/ru.json";
 import ru_home from "src/localization/ru/home.json";
@@ -19,7 +19,7 @@ import ru_lottery from "src/localization/ru/lottery.json";
 import ru_sidebar_menu from "src/localization/ru/sidebar_menu.json";
 import ru_welcome from "src/localization/ru/welcome.json";
 import ru_budgetTracker from "src/localization/ru/budgetTracker.json";
-import ru_foodAdviser from "src/localization/ru/foodAdviser.json";
+import ru_foodAdvisor from "src/localization/ru/foodAdvisor.json";
 
 const resources: any = {
   en: {
@@ -30,7 +30,7 @@ const resources: any = {
     sidebar_menu: en_sidebar_menu,
     welcome: en_welcome,
     budgetTracker: en_budgetTracker,
-    foodAdviser: en_foodAdviser,
+    foodAdvisor: en_foodAdvisor,
   },
   ru: {
     translation: ru,
@@ -40,7 +40,7 @@ const resources: any = {
     sidebar_menu: ru_sidebar_menu,
     welcome: ru_welcome,
     budgetTracker: ru_budgetTracker,
-    foodAdviser: ru_foodAdviser,
+    foodAdvisor: ru_foodAdvisor,
   },
 };
 

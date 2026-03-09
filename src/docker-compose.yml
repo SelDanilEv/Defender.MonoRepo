@@ -276,15 +276,15 @@ services:
     ports:
       - "47061:8080"
 
-  local-personal-food-adviser-service:
+  local-personal-food-advisor-service:
     <<: [*service-base, *service-local]
     build:
       context: .
       dockerfile: Dockerfile.Service
       args:
-        SERVICE_DIR: Defender.PersonalFoodAdviser
-    image: local-personal-food-adviser-service
-    container_name: LocalPersonalFoodAdviserService
+        SERVICE_DIR: Defender.PersonalFoodAdvisor
+    image: local-personal-food-advisor-service
+    container_name: LocalPersonalFoodAdvisorService
     ports:
       - "47062:8080"
 
@@ -300,15 +300,15 @@ services:
     ports:
       - "47061:8080"
 
-  dev-personal-food-adviser-service:
+  dev-personal-food-advisor-service:
     <<: [*service-base, *service-dev]
     build:
       context: .
       dockerfile: Dockerfile.Service
       args:
-        SERVICE_DIR: Defender.PersonalFoodAdviser
-    image: local-personal-food-adviser-service
-    container_name: LocalPersonalFoodAdviserService
+        SERVICE_DIR: Defender.PersonalFoodAdvisor
+    image: local-personal-food-advisor-service
+    container_name: LocalPersonalFoodAdvisorService
     ports:
       - "47062:8080"
 

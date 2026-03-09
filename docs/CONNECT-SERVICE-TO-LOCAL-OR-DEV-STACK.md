@@ -22,7 +22,7 @@ Most services require these environment variables:
 - `Defender_App_JwtSecret`
 - `Defender_App_MongoDBConnectionString`
 
-Some services require extra secrets. Example for Personal Food Adviser:
+Some services require extra secrets. Example for Personal Food Advisor:
 
 - `Defender_App_HuggingFaceApiKey`
 
@@ -47,7 +47,7 @@ docker compose -f src/docker-compose.yml --profile local stop <compose-service-n
 Example:
 
 ```powershell
-docker compose -f src/docker-compose.yml --profile local stop local-personal-food-adviser-service
+docker compose -f src/docker-compose.yml --profile local stop local-personal-food-advisor-service
 ```
 
 ### 3. Run service from Visual Studio on the same port
@@ -138,14 +138,14 @@ If your service runs as `Debug`, it will publish/consume `local_` topics.
   - verify topic leader exists (no `Leader: none`)
 - 401/Invalid JWT: ensure `Defender_App_JwtSecret` matches stack secret.
 
-## Personal Food Adviser quick example
+## Personal Food Advisor quick example
 
 ```powershell
 # stack up
 docker compose -f src/docker-compose.yml --profile local up -d
 
 # free port 47062
-docker compose -f src/docker-compose.yml --profile local stop local-personal-food-adviser-service
+docker compose -f src/docker-compose.yml --profile local stop local-personal-food-advisor-service
 
 # run WebApi profile from Visual Studio (http://localhost:47062)
 # use Debug env so Kafka is localhost:9092 in appsettings.Debug.json

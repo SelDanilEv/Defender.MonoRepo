@@ -138,8 +138,8 @@ generate_argocd_app "Defender.IdentityService" "identity" "values-identity.yaml"
 # Budget Tracker service
 generate_argocd_app "Defender.BudgetTracker" "budget-tracker" "values-budget-tracker.yaml"
 
-# Personal Food Adviser service
-generate_argocd_app "Defender.PersonalFoodAdviser" "personal-food-adviser" "values-personal-food-adviser.yaml"
+# Personal Food Advisor service
+generate_argocd_app "Defender.PersonalFoodAdvisor" "personal-food-advisor" "values-personal-food-advisor.yaml"
 generate_observability_app
 
 echo "All ArgoCD Applications generated successfully in $ARGOCD_APPS_DIR"

@@ -26,16 +26,6 @@ kube-prometheus-stack:
             resources:
               requests:
                 storage: 50Gi
-  alertmanager:
-    alertmanagerSpec:
-      storage:
-        volumeClaimTemplate:
-          spec:
-            accessModes:
-              - ReadWriteOnce
-            resources:
-              requests:
-                storage: 10Gi
 
 loki:
   loki:

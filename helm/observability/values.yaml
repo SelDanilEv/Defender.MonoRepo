@@ -46,7 +46,7 @@ kube-prometheus-stack:
       retention: 7d
       scrapeInterval: 30s
   alertmanager:
-    enabled: true
+    enabled: false
   kube-state-metrics:
     enabled: true
   nodeExporter:

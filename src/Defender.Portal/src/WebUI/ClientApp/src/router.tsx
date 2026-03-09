@@ -75,22 +75,22 @@ const BudgetTrackerReviewsPage = Loader(
   lazy(() => import("src/content/appPages/BudgetTracker/Review"))
 );
 
-// Food Adviser
+// Food Advisor
 
-const FoodAdviserHomePage = Loader(
-  lazy(() => import("src/content/appPages/FoodAdviser"))
+const FoodAdvisorHomePage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdvisor"))
 );
-const FoodAdviserSessionNewPage = Loader(
-  lazy(() => import("src/content/appPages/FoodAdviser/SessionNew"))
+const FoodAdvisorSessionNewPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdvisor/SessionNew"))
 );
-const FoodAdviserSessionReviewPage = Loader(
-  lazy(() => import("src/content/appPages/FoodAdviser/SessionReview"))
+const FoodAdvisorSessionReviewPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdvisor/SessionReview"))
 );
-const FoodAdviserSessionRecommendationsPage = Loader(
-  lazy(() => import("src/content/appPages/FoodAdviser/SessionRecommendations"))
+const FoodAdvisorSessionRecommendationsPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdvisor/SessionRecommendations"))
 );
-const FoodAdviserSessionsPage = Loader(
-  lazy(() => import("src/content/appPages/FoodAdviser/Sessions"))
+const FoodAdvisorSessionsPage = Loader(
+  lazy(() => import("src/content/appPages/FoodAdvisor/Sessions"))
 );
 
 // Home
@@ -313,28 +313,28 @@ const routes: RouteObject[] = [
     ],
   },
   {
-    path: "food-adviser",
+    path: "food-advisor",
     element: <SidebarLayout />,
     children: [
       {
         path: "",
-        element: <FoodAdviserHomePage />,
+        element: <FoodAdvisorHomePage />,
       },
       {
         path: "session/new",
-        element: <FoodAdviserSessionNewPage />,
+        element: <FoodAdvisorSessionNewPage />,
       },
       {
         path: "session/:sessionId/review",
-        element: <FoodAdviserSessionReviewPage />,
+        element: <FoodAdvisorSessionReviewPage />,
       },
       {
         path: "session/:sessionId/recommendations",
-        element: <FoodAdviserSessionRecommendationsPage />,
+        element: <FoodAdvisorSessionRecommendationsPage />,
       },
       {
         path: "sessions",
-        element: <FoodAdviserSessionsPage />,
+        element: <FoodAdvisorSessionsPage />,
       },
       {
         path: "*",

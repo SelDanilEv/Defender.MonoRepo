@@ -32,9 +32,9 @@ const quickLinks = [
     icon: StackedLineChartIcon,
   },
   {
-    key: "food_adviser",
-    labelKey: "home:quick_menu_food_adviser",
-    to: "/food-adviser",
+    key: "food_advisor",
+    labelKey: "home:quick_menu_food_advisor",
+    to: "/food-advisor",
     icon: RestaurantMenuIcon,
   },
   {

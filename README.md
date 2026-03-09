@@ -108,7 +108,7 @@ Defender.MonoRepo/
 |   |-- Defender.NotificationService/
 |   |-- Defender.JobSchedulerService/
 |   |-- Defender.BudgetTracker/
-|   |-- Defender.PersonalFoodAdviser/
+|   |-- Defender.PersonalFoodAdvisor/
 |   |-- Defender.GeneralTestingService/
 |   |-- Defender.Common/
 |   |-- Defender.Kafka/
@@ -231,7 +231,7 @@ Minimal end-to-end bootstrap for a new local environment:
 | Defender.GeneralTestingService | `LocalGeneralTestingService` | `http://localhost:47059` | `http://localhost:47059/swagger` |
 | Defender.RiskGamesService | `LocalRiskGamesService` | `http://localhost:47060` | `http://localhost:47060/swagger` |
 | Defender.BudgetTracker | `LocalBudgetTrackerService` | `http://localhost:47061` | `http://localhost:47061/swagger` |
-| Defender.PersonalFoodAdviser | `LocalPersonalFoodAdviserService` | `http://localhost:47062` | `http://localhost:47062/swagger` |
+| Defender.PersonalFoodAdvisor | `LocalPersonalFoodAdvisorService` | `http://localhost:47062` | `http://localhost:47062/swagger` |
 
 #### Local Infrastructure Services
 
@@ -397,7 +397,7 @@ See [README-ARGOCD.md](./docs/README-ARGOCD.md) for details.
 5. Defender.RiskGamesService - Lottery and gaming
 6. Defender.NotificationService - Outbound notifications
 7. Defender.BudgetTracker - Budget tracking and reviews
-8. Defender.PersonalFoodAdviser - Menu parsing and food recommendations
+8. Defender.PersonalFoodAdvisor - Menu parsing and food recommendations
 
 ### Supporting Services
 
@@ -419,8 +419,8 @@ See [README-ARGOCD.md](./docs/README-ARGOCD.md) for details.
 #### Defender.Portal
 
 - Business purpose: the primary user-facing channel and BFF that composes multiple backend services into one coherent product experience.
-- Primary responsibilities: authenticate users, orchestrate cross-service workflows, and expose account, wallet, gaming, budget, and food-adviser views in a single UI.
-- Key integrations: `Defender.IdentityService`, `Defender.UserManagementService`, `Defender.WalletService`, `Defender.RiskGamesService`, `Defender.BudgetTracker`, `Defender.PersonalFoodAdviser`, and `Defender.NotificationService`.
+- Primary responsibilities: authenticate users, orchestrate cross-service workflows, and expose account, wallet, gaming, budget, and food-advisor views in a single UI.
+- Key integrations: `Defender.IdentityService`, `Defender.UserManagementService`, `Defender.WalletService`, `Defender.RiskGamesService`, `Defender.BudgetTracker`, `Defender.PersonalFoodAdvisor`, and `Defender.NotificationService`.
 - Business value: reduces frontend complexity, centralizes user journeys, and shortens time-to-deliver new cross-domain features.
 
 #### Defender.IdentityService
@@ -465,7 +465,7 @@ See [README-ARGOCD.md](./docs/README-ARGOCD.md) for details.
 - Key integrations: `Defender.Portal` for user interaction and wallet-linked data flows where budget context depends on transactional state.
 - Business value: helps users build better financial habits and increases long-term product stickiness.
 
-#### Defender.PersonalFoodAdviser
+#### Defender.PersonalFoodAdvisor
 
 - Business purpose: food-advisory domain that turns menu data into personalized dining recommendations.
 - Primary responsibilities: ingest/parse menu content, manage user preference context, and produce recommendation/session outcomes for UI consumption.

@@ -1,0 +1,12 @@
+image:
+  repository: defendersd/defender.personal-food-advisor
+  tag: latest
+  pullPolicy: Always
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: argo-personal-food-advisor
+      paths:
+        - path: /
+          pathType: Prefix
