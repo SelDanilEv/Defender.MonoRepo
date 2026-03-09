@@ -43,6 +43,7 @@ loki:
       retention_period: 336h
     compactor:
       retention_enabled: true
+      delete_request_store: filesystem
     commonConfig:
       path_prefix: /var/loki
     storage:
