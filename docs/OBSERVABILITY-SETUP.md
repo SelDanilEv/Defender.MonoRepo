@@ -89,7 +89,7 @@ ArgoCD applications:
 ArgoCD project:
 
 - [`helm/argocd-config/argocd-projects.yaml`](../helm/argocd-config/argocd-projects.yaml) adds project `observability`.
-- The project explicitly allows `kube-system` because `kube-prometheus-stack` creates shared Kubernetes service monitors there.
+- The project targets only dedicated observability namespaces to keep Argo permissions minimal and predictable.
 
 ### What is provisioned by default in Kubernetes
 
