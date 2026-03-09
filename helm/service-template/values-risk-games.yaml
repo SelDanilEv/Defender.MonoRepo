@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.risk-games
-  tag: 20260308-66
+  tag: 20260309-82
   pullPolicy: Always
 ingress:
   enabled: true
