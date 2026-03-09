@@ -39,6 +39,10 @@ kube-prometheus-stack:
 
 loki:
   loki:
+    limits_config:
+      retention_period: 336h
+    compactor:
+      retention_enabled: true
     commonConfig:
       path_prefix: /var/loki
     storage:
