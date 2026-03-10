@@ -15,6 +15,12 @@ kube-prometheus-stack:
       ingressClassName: traefik
       hosts:
         - argo-grafana
+    grafana.ini:
+      server:
+        domain: argo-grafana
+        root_url: "%(protocol)s://%(domain)s/"
+      security:
+        csrf_trusted_origins: "http://argo-grafana,https://argo-grafana"
   prometheus:
     prometheusSpec:
       retention: 30d
