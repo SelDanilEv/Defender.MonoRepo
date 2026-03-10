@@ -443,6 +443,9 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SERVER_DOMAIN=grafana.home.coded-by-danil.dev
+      - GF_SERVER_ROOT_URL=https://grafana.home.coded-by-danil.dev/
+      - GF_SECURITY_CSRF_TRUSTED_ORIGINS=https://grafana.home.coded-by-danil.dev,http://localhost:3000
     volumes:
       - grafana_data:/var/lib/grafana
       - ./observability/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources:ro

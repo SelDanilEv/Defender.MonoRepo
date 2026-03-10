@@ -268,6 +268,7 @@ public class GeminiClientTests
 
         Assert.NotNull(handler.LastRequestBody);
         Assert.Contains("Extract only standalone menu products that can be ordered directly", handler.LastRequestBody, StringComparison.Ordinal);
+        Assert.Contains("image can be low quality", handler.LastRequestBody, StringComparison.Ordinal);
         Assert.Contains("items", handler.LastRequestBody, StringComparison.Ordinal);
         Assert.Contains("Return only valid JSON", handler.LastRequestBody, StringComparison.Ordinal);
         Assert.Contains("Ignore size labels and portion variants", handler.LastRequestBody, StringComparison.Ordinal);
