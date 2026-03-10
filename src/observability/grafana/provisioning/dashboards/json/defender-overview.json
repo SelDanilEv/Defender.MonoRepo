@@ -123,7 +123,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(http_requests_received_total[5m]))",
+          "expr": "sum(rate(http_requests_received_total[5m])) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -187,7 +187,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "(sum(rate(http_requests_received_total{code=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_received_total[5m])), 0.001)) * 100",
+          "expr": "((sum(rate(http_requests_received_total{code=~\"5..\"}[5m])) / clamp_min(sum(rate(http_requests_received_total[5m])), 0.001)) * 100) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -251,7 +251,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) or vector(0)",
           "legendFormat": "",
           "refId": "A"
         }
@@ -292,12 +292,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job) (rate(http_requests_received_total[5m]))",
-          "legendFormat": "{{job}}",
+          "expr": "sum by (service) (rate(http_requests_received_total{service!=\"\"}[5m])) or on() vector(0)",
+          "legendFormat": "{{service}}",
           "refId": "A"
         }
       ],
-      "title": "Request Rate by Job",
+      "title": "Request Rate by Service",
       "type": "timeseries"
     },
     {
@@ -333,18 +333,18 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job) (rate(process_cpu_seconds_total[5m]))",
-          "legendFormat": "{{job}}",
+          "expr": "sum by (service) (rate(process_cpu_seconds_total{service!=\"\"}[5m]))",
+          "legendFormat": "{{service}}",
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "sum by (job) (process_working_set_bytes) / 1024 / 1024",
-          "legendFormat": "{{job}} memory (MiB)",
+          "expr": "sum by (service) (process_working_set_bytes{service!=\"\"}) / 1024 / 1024",
+          "legendFormat": "{{service}} memory (MiB)",
           "refId": "B"
         }
       ],
-      "title": "CPU and Memory Pressure by Job",
+      "title": "CPU and Memory Pressure by Service",
       "type": "timeseries"
     },
     {
@@ -403,7 +403,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{container=~\"Local.*|dev-.*|local-.*\"} |= ``",
+          "expr": "{container=~\"Local.*|dev-.*|local-.*\"}",
           "queryType": "range",
           "refId": "A"
         }

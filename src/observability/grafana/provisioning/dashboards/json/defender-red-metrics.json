@@ -50,7 +50,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(http_requests_received_total[5m]))",
+          "expr": "sum(rate(http_requests_received_total[5m])) or vector(0)",
           "legendFormat": "RPS",
           "refId": "A"
         }
@@ -94,7 +94,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(http_requests_received_total{code=~\"5..\"}[5m]))",
+          "expr": "sum(rate(http_requests_received_total{code=~\"5..\"}[5m])) or vector(0)",
           "legendFormat": "5xx/s",
           "refId": "A"
         }
@@ -126,7 +126,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m])))",
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(http_request_duration_seconds_bucket[5m]))) or vector(0)",
           "legendFormat": "p95",
           "refId": "A"
         }
@@ -157,12 +157,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job) (rate(http_requests_received_total[5m]))",
-          "legendFormat": "{{job}}",
+          "expr": "sum by (service) (rate(http_requests_received_total{service!=\"\"}[5m])) or on() vector(0)",
+          "legendFormat": "{{service}}",
           "refId": "A"
         }
       ],
-      "title": "RPS by Job",
+      "title": "RPS by Service",
       "type": "timeseries"
     }
   ],

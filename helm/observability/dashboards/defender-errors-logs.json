@@ -7,8 +7,8 @@
       "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "id": 1,
-      "targets": [{ "editorMode": "code", "expr": "sum by (job) (rate(http_requests_received_total{code=~\"5..\"}[5m]))", "legendFormat": "{{job}}", "refId": "A" }],
-      "title": "5xx Requests by Job",
+      "targets": [{ "editorMode": "code", "expr": "sum by (service) (rate(http_requests_received_total{service!=\"\",code=~\"5..\"}[5m])) or on() vector(0)", "legendFormat": "{{service}}", "refId": "A" }],
+      "title": "5xx Requests by Service",
       "type": "timeseries"
     },
     {
@@ -16,8 +16,8 @@
       "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
       "id": 2,
-      "targets": [{ "editorMode": "code", "expr": "sum by (job) (increase(http_requests_received_total{code=~\"5..\"}[1h]))", "legendFormat": "{{job}}", "refId": "A" }],
-      "title": "5xx Volume (1h)",
+      "targets": [{ "editorMode": "code", "expr": "sum by (service) (increase(http_requests_received_total{service!=\"\",code=~\"5..\"}[1h])) or on() vector(0)", "legendFormat": "{{service}}", "refId": "A" }],
+      "title": "5xx Volume by Service (1h)",
       "type": "barchart"
     },
     {
@@ -25,7 +25,7 @@
       "gridPos": { "h": 10, "w": 24, "x": 0, "y": 8 },
       "id": 3,
       "options": { "showLabels": true, "sortOrder": "Descending", "wrapLogMessage": true },
-      "targets": [{ "editorMode": "code", "expr": "{namespace=~\"defender.*\"} |= \"error\"", "queryType": "range", "refId": "A" }],
+      "targets": [{ "editorMode": "code", "expr": "{namespace=~\".+\"} |~ \"(?i)(error|exception|fail)\"", "queryType": "range", "refId": "A" }],
       "title": "Recent Error Logs",
       "type": "logs"
     }

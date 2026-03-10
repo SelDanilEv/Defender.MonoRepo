@@ -31,12 +31,12 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum by (job, code) (rate(http_requests_received_total{code=~\"4..|5..\"}[5m]))",
-          "legendFormat": "{{job}} {{code}}",
+          "expr": "sum by (service, code) (rate(http_requests_received_total{service!=\"\",code=~\"4..|5..\"}[5m])) or on() vector(0)",
+          "legendFormat": "{{service}} {{code}}",
           "refId": "A"
         }
       ],
-      "title": "HTTP Error Rate by Job/Code",
+      "title": "HTTP Error Rate by Service/Code",
       "type": "timeseries"
     },
     {

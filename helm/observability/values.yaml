@@ -46,6 +46,9 @@ kube-prometheus-stack:
     prometheusSpec:
       retention: 7d
       scrapeInterval: 30s
+      serviceMonitorSelectorNilUsesHelmValues: false
+      serviceMonitorSelector: {}
+      serviceMonitorNamespaceSelector: {}
   alertmanager:
     enabled: false
   kube-state-metrics:
