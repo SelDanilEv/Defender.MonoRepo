@@ -63,7 +63,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "{container=~\"Local.*|dev-.*|local-.*\"} |= `error`",
+          "expr": "{container=~\"Local(IdentityService|UserManagementService|NotificationService|JobSchedulerService|WalletService|RiskGamesService|BudgetTrackerService|PersonalFoodAdviserService|PersonalFoodAdvisorService|Portal|GeneralTestingService)\"} |= `error`",
           "queryType": "range",
           "refId": "A"
         }
