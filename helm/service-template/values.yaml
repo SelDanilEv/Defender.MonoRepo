@@ -11,7 +11,7 @@ service:
   targetPort: 8080
 
 metrics:
-  enabled: true
+  enabled: false
   path: /metrics
   port: 8080
 
@@ -47,6 +47,6 @@ resources:
 
 configMapData:
   ASPNETCORE_ENVIRONMENT: "Prod"
-  Defender__Observability__Metrics__Enabled: "true"
+  Defender__Observability__Metrics__Enabled: "false"
 
 secretName: basic-secret
