@@ -169,7 +169,7 @@ Defender.MonoRepo/
 ├── .github/workflows/           # CI/CD pipelines
 ├── docs/                        # Project documentation
 ├── helm/
-│   ├── argocd-applications/     # ArgoCD Application manifests (per env)
+│   ├── argocd-applications/     # ArgoCD Application manifests
 │   ├── argocd-config/           # ArgoCD server configuration
 │   └── service-template/        # Shared Helm chart + per-service values
 ├── scripts/                     # Automation scripts (bash, PowerShell)
@@ -405,7 +405,7 @@ Two shared Dockerfiles using multi-stage Alpine-based builds:
 
 ### ArgoCD (GitOps)
 
-- **Application manifests** in `helm/argocd-applications/dev/` -- one per service.
+- **Application manifests** in `helm/argocd-applications/` -- one per service.
 - **Config** in `helm/argocd-config/` -- projects, RBAC, ArgoCD server settings.
 - **Sync**: ArgoCD watches the `helm/service-template/` chart with per-service value files and auto-syncs on changes.
 
