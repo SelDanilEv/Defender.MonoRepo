@@ -15,7 +15,9 @@ spec:
   ingress:
     # Temporary recovery posture: allow repo-server gRPC from any in-cluster source.
     # This avoids selector-specific policy engine edge-cases that can deadlock Argo sync.
-    - ports:
+    - from:
+        - namespaceSelector: {}
+      ports:
         - protocol: TCP
           port: 8081
     # Keep metrics reachable for namespace-level scraping/debugging.
