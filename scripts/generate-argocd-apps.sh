@@ -66,51 +66,6 @@ EOF
     echo "Generated ArgoCD Application for ${clean_name}"
 }
 
-generate_observability_app() {
-    cat > "$ARGOCD_APPS_DIR/${ENVIRONMENT}/observability-app.yaml" << EOF
-apiVersion: argoproj.io/v1alpha1
-kind: Application
-metadata:
-  name: observability
-  namespace: ${ARGOCD_NAMESPACE}
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
-  labels:
-    app.kubernetes.io/name: observability
-    app.kubernetes.io/part-of: defender
-    app.kubernetes.io/instance: observability
-spec:
-  project: observability
-  source:
-    repoURL: https://github.com/${GITHUB_REPO}.git
-    targetRevision: main
-    path: helm/observability
-    helm:
-      valueFiles:
-        - values.yaml
-        - values-dev.yaml
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: defender-observability
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - PrunePropagationPolicy=foreground
-      - PruneLast=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
-EOF
-
-    echo "Generated ArgoCD Application for observability"
-}
-
 # Generate applications for all services based on the workflow matrix
 echo "Generating ArgoCD Applications..."
 
@@ -140,6 +95,5 @@ generate_argocd_app "Defender.BudgetTracker" "budget-tracker" "values-budget-tra
 
 # Personal Food Advisor service
 generate_argocd_app "Defender.PersonalFoodAdvisor" "personal-food-advisor" "values-personal-food-advisor.yaml"
-generate_observability_app
 
 echo "All ArgoCD Applications generated successfully in $ARGOCD_APPS_DIR"

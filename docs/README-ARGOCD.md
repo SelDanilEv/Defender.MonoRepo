@@ -6,7 +6,6 @@ This document reflects the current ArgoCD setup in this repository.
 
 - Service deployments are managed as ArgoCD Applications using Helm.
 - Service chart: `helm/service-template`
-- Observability chart: `helm/observability`
 - Application manifests: `helm/argocd-applications/<env>/`
 
 ## Current Repository State
@@ -14,8 +13,7 @@ This document reflects the current ArgoCD setup in this repository.
 ### ArgoCD Application Manifests
 
 - `helm/argocd-applications/dev/*.yaml` for service apps
-- `helm/argocd-applications/dev/observability-app.yaml`
-- `helm/argocd-applications/prod/observability-app.yaml`
+- Observability ArgoCD Applications are currently disabled and are not included in the app-of-apps manifests.
 
 ### ArgoCD Project Configuration
 
@@ -54,28 +52,6 @@ Get-ChildItem helm/argocd-applications/dev/*.yaml |
   Where-Object { $_.Name -ne "observability-app.yaml" } |
   ForEach-Object { kubectl apply -f $_.FullName -n argocd }
 ```
-
-## Deploying Observability Apps
-
-Prod (primary):
-
-```bash
-kubectl apply -f helm/argocd-applications/prod/observability-app.yaml -n argocd
-```
-
-Dev (optional):
-
-```bash
-kubectl apply -f helm/argocd-applications/dev/observability-app.yaml -n argocd
-```
-
-For full observability details, see `docs/OBSERVABILITY-SETUP.md`.
-
-Observability apps include sync options tuned for operator/CRD workloads:
-
-- `ServerSideApply=true`
-- `Replace=true`
-- `SkipDryRunOnMissingResource=true`
 
 ## Image Promotion Flow
 
