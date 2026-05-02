@@ -20,9 +20,5 @@ spec:
       ports:
         - protocol: TCP
           port: 8081
-    # Keep metrics reachable for namespace-level scraping/debugging.
-    - from:
-        - namespaceSelector: {}
-      ports:
         - protocol: TCP
           port: 8084
