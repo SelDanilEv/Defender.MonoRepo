@@ -5,11 +5,12 @@ This guide implements the observability rollout plan for all runtime environment
 - Docker `debug`
 - Docker `local`
 - Docker `dev`
-- ArgoCD `prod` (cloud cluster, currently disabled in Git)
+- ArgoCD `prod` (cloud cluster)
+- ArgoCD `dev` (optional)
 
 ## ArgoCD Scope (Important)
 
-If your ArgoCD instance has only production applications, keep a single application manifest layout. At the moment, the observability app manifest has been removed from ArgoCD so the stack is not deployed through GitOps.
+If your ArgoCD instance has only production applications, deploy only the prod observability app and skip all dev ArgoCD steps.
 
 ## 1. Docker Environments (`debug`, `local`, `dev`)
 
@@ -65,12 +66,10 @@ All web entrypoints now support `/metrics` with `prometheus-net` when the featur
 
 - `Defender__Observability__Metrics__Enabled=true`
 
-This flag was previously enabled in:
+This flag is enabled in:
 
 - Docker local/dev compose env
 - Helm service template config map defaults
-
-It is currently disabled in both places.
 
 ## 3. Kubernetes/ArgoCD
 
@@ -81,6 +80,11 @@ Includes:
 - `kube-prometheus-stack` (Prometheus + Alertmanager + Grafana)
 - `loki`
 - `promtail`
+
+ArgoCD applications:
+
+- Prod (primary): [`helm/argocd-applications/prod/observability-app.yaml`](../helm/argocd-applications/prod/observability-app.yaml)
+- Dev (optional): [`helm/argocd-applications/dev/observability-app.yaml`](../helm/argocd-applications/dev/observability-app.yaml)
 
 ArgoCD project:
 
@@ -109,7 +113,23 @@ Grafana datasources are provisioned with stable UIDs for dashboard compatibility
 kubectl apply -f helm/argocd-config/argocd-projects.yaml -n argocd
 ```
 
-2. Recreate an ArgoCD application manifest for `helm/observability` only when you want to enable the stack again.
+2. Apply prod observability application:
+
+```bash
+kubectl apply -f helm/argocd-applications/prod/observability-app.yaml -n argocd
+```
+
+3. Optional: apply dev observability application:
+
+```bash
+kubectl apply -f helm/argocd-applications/dev/observability-app.yaml -n argocd
+```
+
+Both observability apps are configured with ArgoCD sync options required for large CRDs and first-time operator installs:
+
+- `ServerSideApply=true`
+- `Replace=true`
+- `SkipDryRunOnMissingResource=true`
 
 ## 5. Production Hardening Checklist
 

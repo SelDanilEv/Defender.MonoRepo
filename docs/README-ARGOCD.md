@@ -7,14 +7,15 @@ This document reflects the current ArgoCD setup in this repository.
 - Service deployments are managed as ArgoCD Applications using Helm.
 - Service chart: `helm/service-template`
 - Observability chart: `helm/observability`
-- Application manifests: `helm/argocd-applications/`
+- Application manifests: `helm/argocd-applications/<env>/`
 
 ## Current Repository State
 
 ### ArgoCD Application Manifests
 
-- `helm/argocd-applications/*.yaml` for service apps
-- Observability is not currently deployed through ArgoCD in this repository
+- `helm/argocd-applications/dev/*.yaml` for service apps
+- `helm/argocd-applications/dev/observability-app.yaml`
+- `helm/argocd-applications/prod/observability-app.yaml`
 
 ### ArgoCD Project Configuration
 
@@ -38,22 +39,43 @@ Apply ArgoCD projects first:
 kubectl apply -f helm/argocd-config/argocd-projects.yaml -n argocd
 ```
 
-## Deploying Service Apps
+## Deploying Service Apps (Dev)
 
 Example:
 
 ```bash
-kubectl apply -f helm/argocd-applications/identity-app.yaml -n argocd
+kubectl apply -f helm/argocd-applications/dev/identity-app.yaml -n argocd
 ```
 
-Apply all service apps (PowerShell):
+Apply all dev service apps (PowerShell):
 
 ```powershell
-Get-ChildItem helm/argocd-applications/*.yaml |
+Get-ChildItem helm/argocd-applications/dev/*.yaml |
+  Where-Object { $_.Name -ne "observability-app.yaml" } |
   ForEach-Object { kubectl apply -f $_.FullName -n argocd }
 ```
 
-Observability is still defined as a Helm chart in `helm/observability`, but its ArgoCD application manifest is intentionally not present right now.
+## Deploying Observability Apps
+
+Prod (primary):
+
+```bash
+kubectl apply -f helm/argocd-applications/prod/observability-app.yaml -n argocd
+```
+
+Dev (optional):
+
+```bash
+kubectl apply -f helm/argocd-applications/dev/observability-app.yaml -n argocd
+```
+
+For full observability details, see `docs/OBSERVABILITY-SETUP.md`.
+
+Observability apps include sync options tuned for operator/CRD workloads:
+
+- `ServerSideApply=true`
+- `Replace=true`
+- `SkipDryRunOnMissingResource=true`
 
 ## Image Promotion Flow
 
