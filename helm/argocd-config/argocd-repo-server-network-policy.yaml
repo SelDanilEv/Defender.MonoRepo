@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: argocd-repo-server-network-policy
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: argocd-repo-server-network-policy
+    app.kubernetes.io/part-of: argocd
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: argocd-repo-server
+  policyTypes:
+    - Ingress
+  ingress:
+    # Allow Argo control-plane pods in the argocd namespace to reach repo-server gRPC.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: argocd
+      ports:
+        - protocol: TCP
+          port: 8081
+    # Keep metrics reachable for namespace-level scraping/debugging.
+    - from:
+        - namespaceSelector: {}
+      ports:
+        - protocol: TCP
+          port: 8084
