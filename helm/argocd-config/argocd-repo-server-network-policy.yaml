@@ -13,12 +13,9 @@ spec:
   policyTypes:
     - Ingress
   ingress:
-    # Allow Argo control-plane pods in the argocd namespace to reach repo-server gRPC.
-    - from:
-        - namespaceSelector:
-            matchLabels:
-              kubernetes.io/metadata.name: argocd
-      ports:
+    # Temporary recovery posture: allow repo-server gRPC from any in-cluster source.
+    # This avoids selector-specific policy engine edge-cases that can deadlock Argo sync.
+    - ports:
         - protocol: TCP
           port: 8081
     # Keep metrics reachable for namespace-level scraping/debugging.
