@@ -9,6 +9,7 @@ metadata:
     app.kubernetes.io/name: budget-tracker
     app.kubernetes.io/part-of: defender
     app.kubernetes.io/instance: budget-tracker
+    defender.coded-by-danil.dev/sync-probe: "2026-05-02"
 spec:
   project: auto-deploy-dev
   source:
