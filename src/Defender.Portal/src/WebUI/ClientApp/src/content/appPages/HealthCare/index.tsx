@@ -4,6 +4,13 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { healthCareApi, HealthEvent, HealthEventType } from "src/api/healthCare";
 import useUtils from "src/appUtils";
+import {
+  buildHealthCareChartData,
+  eventAxisMax,
+  eventAxisMin,
+  medicationLane,
+  sleepLane,
+} from "./chartData";
 
 const nowInput = () => new Date().toISOString().slice(0, 16);
 
@@ -24,10 +31,7 @@ const HealthCarePage = () => {
 
   useEffect(() => { refresh(); }, []);
 
-  const chartEvents = useMemo(
-    () => events.filter((event) => event.type === "Temperature" && event.temperatureCelsius !== undefined),
-    [events]
-  );
+  const chartData = useMemo(() => buildHealthCareChartData(events), [events]);
 
   const addEvent = async () => {
     await healthCareApi.createEvent({
@@ -93,11 +97,31 @@ const HealthCarePage = () => {
 
         <Grid item xs={12} md={8}>
           <Card><CardContent>
-            <Typography variant="h4" mb={1}>{u.t("healthCare:temperature_chart")}</Typography>
+            <Typography variant="h4" mb={1}>{u.t("healthCare:events_chart")}</Typography>
             <LineChart
               height={300}
-              xAxis={[{ scaleType: "point", data: chartEvents.map((event) => new Date(event.startedAt).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })) }]}
-              series={[{ label: "°C", data: chartEvents.map((event) => event.temperatureCelsius || null) }]}
+              margin={{ left: 55, right: 90 }}
+              xAxis={[{ scaleType: "point", data: chartData.xLabels }]}
+              yAxis={[
+                { id: "temperature", label: "°C" },
+                {
+                  id: "events",
+                  position: "right",
+                  min: eventAxisMin,
+                  max: eventAxisMax,
+                  valueFormatter: (value) =>
+                    value === medicationLane
+                      ? u.t("healthCare:event_medication")
+                      : value === sleepLane
+                        ? u.t("healthCare:event_sleep")
+                        : "",
+                },
+              ]}
+              series={[
+                { label: "°C", data: chartData.temperatureData, yAxisId: "temperature", showMark: true },
+                { label: u.t("healthCare:event_medication"), data: chartData.medicationData, yAxisId: "events", showMark: true },
+                { label: u.t("healthCare:event_sleep"), data: chartData.sleepData, yAxisId: "events", showMark: true },
+              ]}
             />
             <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
               {events.map((event) => (
