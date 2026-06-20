@@ -44,7 +44,7 @@ Apply these changes so the new service is built, deployed, and listed everywhere
 - **Solution**: In [src/Defender.Core.slnx](src/Defender.Core.slnx), add a new `<Folder>` block for `Defender.{ServiceName}` with the same structure as an existing WebApi service (e.g. Defender.WalletService): Application, Domain, Infrastructure, WebApi. Use paths relative to `src/` (e.g. `Defender.PaymentService/src/Application/Application.csproj`). If the service has a Common project, add it like Defender.RiskGamesService or Defender.WalletService.
 - **Helm**: In `helm/service-template/`, add a new file `values-{kebab-name}.yaml`. Copy [helm/service-template/values-wallet.yaml](helm/service-template/values-wallet.yaml) and set:
   - `image.repository` (e.g. `defendersd/defender.{kebab-name}` or your registry path).
-  - `image.tag` (e.g. initial tag or `latest`).
+  - `image.tag` (use the pinned tag promoted by `.github/workflows/promote-image-tag.yml`; `latest` is only a temporary initial value).
   - `ingress.hosts[0].host` (e.g. `argo-{kebab-name}`).
 - **CI/CD**: In [.github/workflows/docker-build-publish.yml](.github/workflows/docker-build-publish.yml):
   - Add `Defender.{ServiceName}` to `workflow_dispatch.inputs.service.options`.
@@ -64,6 +64,8 @@ Apply these changes so the new service is built, deployed, and listed everywhere
 
 - Build the new service from the `src` directory (e.g. `dotnet build Defender.{ServiceName}/Defender.{ServiceName}.sln` or build via the main solution).
 - Confirm the workflow matrix, `map-service-name.sh`, `all_systems.sh`, and `generate-argocd-apps.sh` all use the same `Defender.{ServiceName}` and `{kebab-name}`.
+- After the image build succeeds, run `Promote Image Tag` for the new service so ArgoCD deploys the pinned tag from `helm/service-template/values-{kebab-name}.yaml`.
+- If the PR also changes another deployable app, such as `Defender.Portal`, promote that app too.
 
 ---
 

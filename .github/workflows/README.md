@@ -60,6 +60,22 @@ The workflow automatically creates tags based on the git event:
 - **Default branch**: `latest`
 - **Pull requests**: `pr-123-sha`
 
+## Deployment Tag Promotion
+
+Building and publishing an image does not update what ArgoCD deploys by itself. ArgoCD renders
+`helm/service-template` and uses the pinned tag from the matching `values-*.yaml` file:
+
+```yaml
+image:
+  repository: defendersd/defender.portal
+  tag: 20260620-100
+```
+
+After a successful build, run `Promote Image Tag` for every deployable service changed by the PR.
+For example, if a change touches both `Defender.HealthCareService` and `Defender.Portal`, promote
+both services to their newly published build tags. The promote workflow commits the updated
+`helm/service-template/values-*.yaml` file, and ArgoCD deploys that pinned tag from git.
+
 ## Usage Examples
 
 ### Build All Services
@@ -78,6 +94,13 @@ git push origin v1.0.0
 3. Click "Run workflow"
 4. Enter the service name (e.g., `Defender.Portal`)
 5. Click "Run workflow"
+
+### Promote Built Image For Deployment
+1. Open the successful "Build and Publish Docker Images" run.
+2. Find the published tag for each changed service, usually `YYYYMMDD-<run-number>`.
+3. Select "Promote Image Tag".
+4. Enter the same service name and image tag.
+5. Confirm that the workflow commits the matching `helm/service-template/values-*.yaml` update.
 
 ## Image Names
 

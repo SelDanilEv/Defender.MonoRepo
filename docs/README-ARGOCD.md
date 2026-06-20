@@ -55,11 +55,31 @@ Get-ChildItem helm/argocd-applications/dev/*.yaml |
 
 ## Image Promotion Flow
 
-Service image tags are updated in `helm/service-template/values-*.yaml` via:
+ArgoCD deploys the image tag pinned in git. The deployment template renders:
+
+```yaml
+image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+```
+
+So the effective deployed version comes from the service values file, for example:
+
+```yaml
+# helm/service-template/values-portal.yaml
+image:
+  repository: defendersd/defender.portal
+  tag: 20260620-100
+```
+
+The Docker build workflow publishes images and tags, but it does not choose the deployed tag.
+Service image tags are promoted into `helm/service-template/values-*.yaml` via:
 
 - `.github/workflows/promote-image-tag.yml`
 
 After value files are updated in git, ArgoCD sync applies the change.
+
+When a PR changes multiple deployable services, promote each affected service. For example, a
+feature that changes both `Defender.Portal` and `Defender.HealthCareService` needs one promotion
+for `values-portal.yaml` and one promotion for `values-health-care.yaml`.
 
 ## Validation Checklist
 
