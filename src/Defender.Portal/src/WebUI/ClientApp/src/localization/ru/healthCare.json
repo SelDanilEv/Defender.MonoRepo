@@ -39,5 +39,5 @@
   "no_events_to_display": "Нет событий для отображения.",
   "medication_fallback": "Лекарство",
   "sleep_until": "Сон до {{time}}",
-  "unit_tablet": "табл."
+  "unit_tablet": "mg"
 }

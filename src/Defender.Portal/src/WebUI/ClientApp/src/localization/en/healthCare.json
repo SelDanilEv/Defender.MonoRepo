@@ -39,5 +39,5 @@
   "no_events_to_display": "No events to display.",
   "medication_fallback": "Medication",
   "sleep_until": "Sleep until {{time}}",
-  "unit_tablet": "tab."
+  "unit_tablet": "mg"
 }
