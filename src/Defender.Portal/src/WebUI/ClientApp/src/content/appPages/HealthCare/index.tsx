@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  Autocomplete,
   Box,
   Button,
   Card,
@@ -51,6 +52,22 @@ const toDateTimeInput = (value?: string) =>
 
 const dateTimeInputProps = { step: 1800 };
 
+const uniqueMedicationNames = (events: HealthEvent[]) => {
+  const names = new Map<string, string>();
+
+  events
+    .filter((event) => event.type === "Medication" && event.medicationName)
+    .forEach((event) => {
+      const name = event.medicationName?.trim();
+
+      if (name) {
+        names.set(name.toLocaleLowerCase(), name);
+      }
+    });
+
+  return [...names.values()].sort((left, right) => left.localeCompare(right));
+};
+
 const HealthCarePage = () => {
   const u = useUtils();
 
@@ -75,6 +92,10 @@ const HealthCarePage = () => {
   const chartData = useMemo(
     () => buildHealthCareChartData(events, chartTimeRange),
     [events, chartTimeRange]
+  );
+  const medicationNameOptions = useMemo(
+    () => uniqueMedicationNames(events),
+    [events]
   );
 
   useEffect(() => {
@@ -203,7 +224,16 @@ const HealthCarePage = () => {
               {type === "Sleep" && <TextField label={u.t("healthCare:sleep_end")} type="datetime-local" value={endedAt} onChange={(e) => setEndedAt(e.target.value)} onBlur={() => setEndedAt(snapDateTimeInput(endedAt))} inputProps={dateTimeInputProps} InputLabelProps={{ shrink: true }} size="small" />}
               {type === "Temperature" && <TextField label={u.t("healthCare:temperature_celsius")} value={temperature} onChange={(e) => setTemperature(e.target.value)} size="small" />}
               {type === "Medication" && <>
-                <TextField label={u.t("healthCare:medication_name")} value={medicationName} onChange={(e) => setMedicationName(e.target.value)} size="small" />
+                <Autocomplete
+                  freeSolo
+                  options={medicationNameOptions}
+                  value={medicationName}
+                  onChange={(_, value) => setMedicationName(value || "")}
+                  onInputChange={(_, value) => setMedicationName(value)}
+                  renderInput={(params) => (
+                    <TextField {...params} label={u.t("healthCare:medication_name")} size="small" />
+                  )}
+                />
                 <TextField label={u.t("healthCare:medication_amount")} value={medicationAmount} onChange={(e) => setMedicationAmount(e.target.value)} size="small" />
                 <TextField label={u.t("healthCare:medication_unit")} value={medicationUnit} onChange={(e) => setMedicationUnit(e.target.value)} size="small" />
               </>}
