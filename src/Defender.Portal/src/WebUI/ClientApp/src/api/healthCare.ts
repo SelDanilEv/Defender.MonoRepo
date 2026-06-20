@@ -33,7 +33,7 @@ const snapToHalfHour = (value: string) => {
 };
 
 export const healthCareApi = {
-  getEvents: async () => load().sort((a, b) => a.startedAt.localeCompare(b.startedAt)),
+  getEvents: async () => load().sort((a, b) => b.startedAt.localeCompare(a.startedAt)),
   createEvent: async (event: Omit<HealthEvent, "id">) => {
     const events = load();
     const item = {
@@ -43,6 +43,16 @@ export const healthCareApi = {
       endedAt: event.endedAt ? snapToHalfHour(event.endedAt) : undefined,
     };
     save([...events, item]);
+    return item;
+  },
+  updateEvent: async (event: HealthEvent) => {
+    const item = {
+      ...event,
+      startedAt: snapToHalfHour(event.startedAt),
+      endedAt: event.endedAt ? snapToHalfHour(event.endedAt) : undefined,
+    };
+
+    save(load().map((storedEvent) => storedEvent.id === item.id ? item : storedEvent));
     return item;
   },
   deleteEvent: async (id: string) => save(load().filter((event) => event.id !== id)),

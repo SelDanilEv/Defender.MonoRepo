@@ -1,6 +1,26 @@
 import { useEffect, useMemo, useState } from "react";
-import { Box, Button, Card, CardContent, Chip, Grid, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  IconButton,
+  MenuItem,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { healthCareApi, HealthEvent, HealthEventType } from "src/api/healthCare";
 import useUtils from "src/appUtils";
@@ -14,6 +34,9 @@ import {
 } from "./chartData";
 
 const nowInput = () => new Date().toISOString().slice(0, 16);
+
+const toDateTimeInput = (value?: string) =>
+  value ? new Date(value).toISOString().slice(0, 16) : nowInput();
 
 const HealthCarePage = () => {
   const u = useUtils();
@@ -30,6 +53,7 @@ const HealthCarePage = () => {
   const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
   const [shareLink, setShareLink] = useState("");
   const [shareCopied, setShareCopied] = useState(false);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   const refresh = () => healthCareApi.getEvents().then(setEvents);
 
@@ -45,8 +69,19 @@ const HealthCarePage = () => {
     setShareCopied(false);
   }, [events, chartTimeRange]);
 
-  const addEvent = async () => {
-    await healthCareApi.createEvent({
+  const resetForm = () => {
+    setEditingEventId(null);
+    setType("Temperature");
+    setStartedAt(nowInput());
+    setEndedAt(nowInput());
+    setTemperature("37.0");
+    setMedicationName("");
+    setMedicationAmount("1");
+    setMedicationUnit(u.t("healthCare:unit_tablet"));
+    setNotes("");
+  };
+
+  const eventPayload = () => ({
       type,
       startedAt: new Date(startedAt).toISOString(),
       endedAt: type === "Sleep" ? new Date(endedAt).toISOString() : undefined,
@@ -55,8 +90,41 @@ const HealthCarePage = () => {
       medicationAmount: type === "Medication" ? Number(medicationAmount) : undefined,
       medicationUnit: type === "Medication" ? medicationUnit : undefined,
       notes,
-    });
-    setNotes("");
+  });
+
+  const saveEvent = async () => {
+    if (editingEventId) {
+      await healthCareApi.updateEvent({
+        ...eventPayload(),
+        id: editingEventId,
+      });
+    } else {
+      await healthCareApi.createEvent(eventPayload());
+    }
+
+    resetForm();
+    refresh();
+  };
+
+  const editEvent = (event: HealthEvent) => {
+    setEditingEventId(event.id);
+    setType(event.type);
+    setStartedAt(toDateTimeInput(event.startedAt));
+    setEndedAt(toDateTimeInput(event.endedAt || event.startedAt));
+    setTemperature(String(event.temperatureCelsius || "37.0"));
+    setMedicationName(event.medicationName || "");
+    setMedicationAmount(String(event.medicationAmount || "1"));
+    setMedicationUnit(event.medicationUnit || u.t("healthCare:unit_tablet"));
+    setNotes(event.notes || "");
+  };
+
+  const deleteEvent = async (id: string) => {
+    await healthCareApi.deleteEvent(id);
+
+    if (editingEventId === id) {
+      resetForm();
+    }
+
     refresh();
   };
 
@@ -79,6 +147,12 @@ const HealthCarePage = () => {
     if (event.type === "Medication") return `${event.medicationName || u.t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
     const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     return u.t("healthCare:sleep_until", { time });
+  };
+
+  const formatType = (eventType: HealthEventType) => {
+    if (eventType === "Temperature") return u.t("healthCare:event_temperature");
+    if (eventType === "Medication") return u.t("healthCare:event_medication");
+    return u.t("healthCare:event_sleep");
   };
 
   return (
@@ -121,7 +195,14 @@ const HealthCarePage = () => {
                 <TextField label={u.t("healthCare:medication_unit")} value={medicationUnit} onChange={(e) => setMedicationUnit(e.target.value)} size="small" />
               </>}
               <TextField label={u.t("healthCare:notes")} value={notes} onChange={(e) => setNotes(e.target.value)} size="small" multiline minRows={2} />
-              <Button variant="contained" onClick={addEvent}>{u.t("healthCare:add")}</Button>
+              <Stack direction="row" gap={1}>
+                <Button variant="contained" onClick={saveEvent}>
+                  {editingEventId ? u.t("healthCare:save") : u.t("healthCare:add")}
+                </Button>
+                {editingEventId && (
+                  <Button variant="outlined" onClick={resetForm}>{u.t("healthCare:cancel")}</Button>
+                )}
+              </Stack>
             </Stack>
           </CardContent></Card>
         </Grid>
@@ -173,11 +254,56 @@ const HealthCarePage = () => {
             ) : (
               <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
             )}
-            <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
-              {events.map((event) => (
-                <Chip key={event.id} label={`${new Date(event.startedAt).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}: ${formatEvent(event)}`} onDelete={() => healthCareApi.deleteEvent(event.id).then(refresh)} color={event.type === "Sleep" ? "info" : event.type === "Medication" ? "secondary" : "primary"} variant="outlined" />
-              ))}
-            </Stack>
+            <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
+            <TableContainer>
+              <Table size="small">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>{u.t("healthCare:grid_started_at")}</TableCell>
+                    <TableCell>{u.t("healthCare:grid_type")}</TableCell>
+                    <TableCell>{u.t("healthCare:grid_value")}</TableCell>
+                    <TableCell>{u.t("healthCare:notes")}</TableCell>
+                    <TableCell align="right">{u.t("healthCare:grid_actions")}</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {events.map((event) => (
+                    <TableRow key={event.id} selected={editingEventId === event.id}>
+                      <TableCell>
+                        {new Date(event.startedAt).toLocaleString([], {
+                          day: "2-digit",
+                          month: "2-digit",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </TableCell>
+                      <TableCell>{formatType(event.type)}</TableCell>
+                      <TableCell>{formatEvent(event)}</TableCell>
+                      <TableCell>{event.notes || ""}</TableCell>
+                      <TableCell align="right">
+                        <Tooltip title={u.t("healthCare:edit")}>
+                          <IconButton size="small" onClick={() => editEvent(event)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title={u.t("healthCare:delete")}>
+                          <IconButton size="small" onClick={() => deleteEvent(event.id)}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {events.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5}>
+                        <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </TableContainer>
           </CardContent></Card>
         </Grid>
       </Grid>
