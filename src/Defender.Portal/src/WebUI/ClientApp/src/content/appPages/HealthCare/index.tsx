@@ -33,10 +33,23 @@ import {
   sleepLane,
 } from "./chartData";
 
-const nowInput = () => new Date().toISOString().slice(0, 16);
+const snapDateTimeInput = (value: string) => {
+  const [date, time] = value.split("T");
+  const [hour, minute] = (time || "").split(":");
+
+  if (!date || !hour || !minute) {
+    return value;
+  }
+
+  return `${date}T${hour}:${Number(minute) < 30 ? "00" : "30"}`;
+};
+
+const nowInput = () => snapDateTimeInput(new Date().toISOString().slice(0, 16));
 
 const toDateTimeInput = (value?: string) =>
-  value ? new Date(value).toISOString().slice(0, 16) : nowInput();
+  value ? snapDateTimeInput(new Date(value).toISOString().slice(0, 16)) : nowInput();
+
+const dateTimeInputProps = { step: 1800 };
 
 const HealthCarePage = () => {
   const u = useUtils();
@@ -83,8 +96,8 @@ const HealthCarePage = () => {
 
   const eventPayload = () => ({
       type,
-      startedAt: new Date(startedAt).toISOString(),
-      endedAt: type === "Sleep" ? new Date(endedAt).toISOString() : undefined,
+      startedAt: new Date(snapDateTimeInput(startedAt)).toISOString(),
+      endedAt: type === "Sleep" ? new Date(snapDateTimeInput(endedAt)).toISOString() : undefined,
       temperatureCelsius: type === "Temperature" ? Number(temperature) : undefined,
       medicationName: type === "Medication" ? medicationName : undefined,
       medicationAmount: type === "Medication" ? Number(medicationAmount) : undefined,
@@ -186,8 +199,8 @@ const HealthCarePage = () => {
                 <MenuItem value="Medication">{u.t("healthCare:event_medication")}</MenuItem>
                 <MenuItem value="Sleep">{u.t("healthCare:event_sleep")}</MenuItem>
               </TextField>
-              <TextField label={u.t("healthCare:start")} type="datetime-local" value={startedAt} onChange={(e) => setStartedAt(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />
-              {type === "Sleep" && <TextField label={u.t("healthCare:sleep_end")} type="datetime-local" value={endedAt} onChange={(e) => setEndedAt(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />}
+              <TextField label={u.t("healthCare:start")} type="datetime-local" value={startedAt} onChange={(e) => setStartedAt(e.target.value)} onBlur={() => setStartedAt(snapDateTimeInput(startedAt))} inputProps={dateTimeInputProps} InputLabelProps={{ shrink: true }} size="small" />
+              {type === "Sleep" && <TextField label={u.t("healthCare:sleep_end")} type="datetime-local" value={endedAt} onChange={(e) => setEndedAt(e.target.value)} onBlur={() => setEndedAt(snapDateTimeInput(endedAt))} inputProps={dateTimeInputProps} InputLabelProps={{ shrink: true }} size="small" />}
               {type === "Temperature" && <TextField label={u.t("healthCare:temperature_celsius")} value={temperature} onChange={(e) => setTemperature(e.target.value)} size="small" />}
               {type === "Medication" && <>
                 <TextField label={u.t("healthCare:medication_name")} value={medicationName} onChange={(e) => setMedicationName(e.target.value)} size="small" />
