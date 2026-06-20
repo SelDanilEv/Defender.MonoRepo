@@ -10,6 +10,7 @@ import AllInboxIcon from "@mui/icons-material/AllInbox";
 import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import GradingIcon from "@mui/icons-material/Grading";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 
 import MenuItem from "./MenuItem";
 import useUtils from "src/appUtils";
@@ -280,6 +281,27 @@ const RoleBasedMenu = (props: any) => {
                   to="/games/lottery"
                   icon={<LocalActivityIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_lottery")}
+                />
+              </List>
+            </SubMenuWrapper>
+          </List>
+        );
+        result.push(
+          <List
+            key={"health_care"}
+            component="div"
+            subheader={
+              <ListSubheader component="div" disableSticky>
+                {u.t("sidebar_menu:header_health_care")}
+              </ListSubheader>
+            }
+          >
+            <SubMenuWrapper>
+              <List component="div">
+                <MenuItem
+                  to="/health-care"
+                  icon={<LocalHospitalIcon style={{ fontSize: "1.1em" }} />}
+                  text={u.t("sidebar_menu:page_health_care")}
                 />
               </List>
             </SubMenuWrapper>

@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Defender.HealthCareService.Application</RootNamespace>
+        <AssemblyName>Defender.HealthCareService.Application</AssemblyName>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+        <PackageReference Include="MediatR" />
+        <PackageReference Include="Microsoft.Extensions.Http" />
+        <PackageReference Include="Serilog" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Domain\Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Common\Behaviours\" />
+      <Folder Include="Models\" />
+    </ItemGroup>
+
+</Project>
