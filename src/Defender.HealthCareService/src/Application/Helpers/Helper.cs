@@ -1,0 +1,7 @@
+﻿namespace Defender.HealthCareService.Application.Helpers;
+
+public class Helper
+{
+    public static bool Help(bool help)
+        => help;
+}

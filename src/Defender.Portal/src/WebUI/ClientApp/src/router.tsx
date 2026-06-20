@@ -93,6 +93,15 @@ const FoodAdvisorSessionsPage = Loader(
   lazy(() => import("src/content/appPages/FoodAdvisor/Sessions"))
 );
 
+// Health Care
+
+const HealthCarePage = Loader(
+  lazy(() => import("src/content/appPages/HealthCare"))
+);
+const HealthCareSharePage = Loader(
+  lazy(() => import("src/content/appPages/HealthCare/Share"))
+);
+
 // Home
 
 const HomePage = Loader(lazy(() => import("src/content/appPages/HomePage")));
@@ -160,6 +169,16 @@ const routes: RouteObject[] = [
       {
         path: "*",
         element: <Status404 />,
+      },
+    ],
+  },
+  {
+    path: "health-care/share",
+    element: <EmptyLayout />,
+    children: [
+      {
+        path: "",
+        element: <HealthCareSharePage />,
       },
     ],
   },
@@ -263,6 +282,20 @@ const routes: RouteObject[] = [
             element: <Status404 />,
           },
         ],
+      },
+      {
+        path: "*",
+        element: <Status404 />,
+      },
+    ],
+  },
+  {
+    path: "health-care",
+    element: <SidebarLayout />,
+    children: [
+      {
+        path: "",
+        element: <HealthCarePage />,
       },
       {
         path: "*",
