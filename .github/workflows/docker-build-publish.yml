@@ -16,6 +16,7 @@ on:
         options:
           - "ALL"
           - "Defender.BudgetTracker"
+          - "Defender.HealthCareService"
           - "Defender.IdentityService"
           - "Defender.JobSchedulerService"
           - "Defender.NotificationService"
@@ -147,6 +148,10 @@ jobs:
             dockerfile: "Dockerfile.Service"
             project_type: "WebApi"
             service_dir: "Defender.BudgetTracker"
+          - name: "defender.health-care"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.HealthCareService"
 
     steps:
       - name: Checkout code
@@ -242,6 +247,10 @@ jobs:
             dockerfile: "Dockerfile.Service"
             project_type: "WebApi"
             service_dir: "Defender.BudgetTracker"
+          - name: "defender.health-care"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.HealthCareService"
 
     steps:
       - name: Checkout code
@@ -413,6 +422,7 @@ jobs:
               "Defender.JobSchedulerService") echo "clean_name=defender.job-scheduler" ;;
               "Defender.IdentityService") echo "clean_name=defender.identity" ;;
               "Defender.BudgetTracker") echo "clean_name=defender.budget-tracker" ;;
+              "Defender.HealthCareService") echo "clean_name=defender.health-care" ;;
               *) echo "clean_name=$SERVICE_NAME" ;;
             esac
           fi

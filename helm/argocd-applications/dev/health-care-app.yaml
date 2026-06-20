@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: health-care
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: health-care
+    app.kubernetes.io/part-of: defender
+    app.kubernetes.io/instance: health-care
+spec:
+  project: auto-deploy-dev
+  source:
+    repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
+    targetRevision: main
+    path: helm/service-template
+    helm:
+      valueFiles:
+        - values-health-care.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: defender
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

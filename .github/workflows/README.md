@@ -20,9 +20,11 @@ The workflow automatically builds the following services:
 - `Defender.WalletService` (uses Dockerfile.Service)
 - `Defender.RiskGamesService` (uses Dockerfile.Service)
 - `Defender.NotificationService` (uses Dockerfile.Service)
+- `Defender.PersonalFoodAdvisor` (uses Dockerfile.Service)
 - `Defender.JobSchedulerService` (uses Dockerfile.Service)
 - `Defender.IdentityService` (uses Dockerfile.Service)
-- `Defender.GeneralTestingService` (uses Dockerfile.Service)
+- `Defender.BudgetTracker` (uses Dockerfile.Service)
+- `Defender.HealthCareService` (uses Dockerfile.Service)
 
 ## Triggers
 

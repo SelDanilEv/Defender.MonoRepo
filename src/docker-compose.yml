@@ -312,6 +312,30 @@ services:
     ports:
       - "47062:8080"
 
+  local-health-care-service:
+    <<: [*service-base, *service-local]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.HealthCareService
+    image: local-health-care-service
+    container_name: LocalHealthCareService
+    ports:
+      - "47063:8080"
+
+  dev-health-care-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.HealthCareService
+    image: local-health-care-service
+    container_name: LocalHealthCareService
+    ports:
+      - "47063:8080"
+
   mongo_local:
     container_name: "mongo_local"
     image: mongo:7.0

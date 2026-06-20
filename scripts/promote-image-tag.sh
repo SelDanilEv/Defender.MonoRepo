@@ -16,7 +16,7 @@ if [ -z "$IMAGE_TAG" ]; then
     exit 1
 fi
 
-VALID_SERVICES=("portal" "user-management" "wallet" "risk-games" "notification" "job-scheduler" "identity" "budget-tracker")
+VALID_SERVICES=("portal" "user-management" "wallet" "risk-games" "notification" "job-scheduler" "identity" "budget-tracker" "health-care")
 
 if [ "$SERVICE" != "ALL" ]; then
     VALID=false

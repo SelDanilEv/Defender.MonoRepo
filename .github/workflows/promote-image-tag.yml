@@ -11,6 +11,7 @@ on:
         options:
           - "ALL"
           - "Defender.BudgetTracker"
+          - "Defender.HealthCareService"
           - "Defender.IdentityService"
           - "Defender.JobSchedulerService"
           - "Defender.NotificationService"

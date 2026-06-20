@@ -211,6 +211,17 @@
         "resolved": "0.7.3",
         "contentHash": "U9Ix4l4cl58Kzz1rJzj5hoVTjmbx1qGMwzAcbv1j/d3NzrFaESIurQyg+ow4mivCgkE3S413y+U9k4WdnEIkRA=="
       },
+      "defender.common": {
+        "type": "Project",
+        "dependencies": {
+          "AutoMapper": "[16.0.0, )",
+          "FluentValidation": "[12.1.1, )",
+          "MediatR": "[14.0.0, )",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.2, )",
+          "MongoDB.Driver": "[3.6.0, )",
+          "Newtonsoft.Json": "[13.0.4, )"
+        }
+      },
       "Defender.HealthCareService.Application": {
         "type": "Project",
         "dependencies": {
@@ -239,21 +250,10 @@
       "AutoMapper": {
         "type": "CentralTransitive",
         "requested": "[16.0.0, )",
-        "resolved": "13.0.1",
-        "contentHash": "/Fx1SbJ16qS7dU4i604Sle+U9VLX+WSNVJggk6MupKVkYvvBm4XqYaeFuf67diHefHKHs50uQIS2YEDFhPCakQ=="
-      },
-      "Defender.Common": {
-        "type": "CentralTransitive",
-        "requested": "[1.6.3, )",
-        "resolved": "1.6.3",
-        "contentHash": "hf0YIaFBSnO9OCJ6LMroVYVW8A4IMTOVNNvf0dF284rQyrP5r7uLFUyMTbzZubGwQjaAE0592W1VT2oCl4OSvg==",
+        "resolved": "16.0.0",
+        "contentHash": "JIhkKjEsUcIPPbCR7cGQlH3a2ySLW2Tof6CXcJb5WbaoUkniREpJOlC2ROkaM/nck2b5JjptLIUdHvbItGvLGQ==",
         "dependencies": {
-          "AutoMapper": "13.0.1",
-          "FluentValidation": "11.11.0",
-          "MediatR": "12.4.1",
-          "Microsoft.AspNetCore.Authentication.JwtBearer": "8.0.11",
-          "MongoDB.Driver": "3.0.0",
-          "Newtonsoft.Json": "13.0.3"
+          "Microsoft.IdentityModel.JsonWebTokens": "8.14.0"
         }
       },
       "FluentValidation": {
@@ -283,7 +283,7 @@
       },
       "Microsoft.OpenApi": {
         "type": "CentralTransitive",
-        "requested": "[3.3.1, )",
+        "requested": "[2.3.0, )",
         "resolved": "2.3.0",
         "contentHash": "5RZpjyt0JMmoc/aEgY9c1vE5pusdDGvkPl9qKIy9KFbRiIXD+w7gBJxX+unSjzzOcfgRoYxnO4okZyqDAL2WEw=="
       },
@@ -303,8 +303,8 @@
       "Newtonsoft.Json": {
         "type": "CentralTransitive",
         "requested": "[13.0.4, )",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+        "resolved": "13.0.4",
+        "contentHash": "pdgNNMai3zv51W5aq268sujXUyx7SNdE2bj1wZcWjAQrKMFZV260lbqYop1d2GM67JI1huLRwxo9ZqnfF/lC6A=="
       },
       "Serilog": {
         "type": "CentralTransitive",
