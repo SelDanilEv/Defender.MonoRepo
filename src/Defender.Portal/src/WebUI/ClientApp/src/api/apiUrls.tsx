@@ -77,6 +77,11 @@ const APIEndpoints = {
     getRatings: "ratings",
     submitRating: "rating",
   },
+  healthCare: {
+    events: "events",
+    chartShares: "chart-shares",
+    publicChartShares: "public/chart-shares",
+  },
 };
 
 const APIUrls = () => {

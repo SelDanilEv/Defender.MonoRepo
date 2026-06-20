@@ -1,38 +1,61 @@
 using Defender.Common.Attributes;
 using Defender.Common.Consts;
+using Defender.Common.Interfaces;
+using Defender.HealthCareService.Application.Common.Interfaces.Repositories;
 using Defender.HealthCareService.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1;
 
-public record HealthChartShareRequest(IReadOnlyList<HealthEvent> Events);
+public record HealthChartShareRequest(DateTimeOffset? From, DateTimeOffset? To);
 public record HealthChartShareDto(string Token, string PublicUrl, IReadOnlyList<HealthEvent> Events, DateTimeOffset CreatedAtUtc);
 
-public class HealthChartSharesController : ControllerBase
+public class HealthChartSharesController(
+    ICurrentAccountAccessor currentAccountAccessor,
+    IHealthEventRepository healthEventRepository,
+    IHealthChartShareRepository healthChartShareRepository) : ControllerBase
 {
-    private static readonly Dictionary<string, HealthChartShareDto> Shares = new();
-
     [HttpPost("api/health-chart-shares")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(HealthChartShareDto), StatusCodes.Status201Created)]
-    public ActionResult<HealthChartShareDto> CreateShare([FromBody] HealthChartShareRequest request)
+    public async Task<ActionResult<HealthChartShareDto>> CreateShare([FromBody] HealthChartShareRequest request)
     {
-        var token = Guid.NewGuid().ToString("N");
-        var share = new HealthChartShareDto(
-            token,
-            $"/api/public/health-chart-shares/{token}",
-            request.Events.OrderBy(e => e.StartedAt).ToList(),
-            DateTimeOffset.UtcNow);
+        var userId = currentAccountAccessor.GetAccountId();
+        var share = await healthChartShareRepository.AddHealthChartShareAsync(new HealthChartShare
+        {
+            Token = Guid.NewGuid().ToString("N"),
+            UserId = userId,
+            From = request.From,
+            To = request.To,
+            CreatedAtUtc = DateTimeOffset.UtcNow,
+        });
+        var events = await healthEventRepository.GetHealthEventsAsync(userId, request.From, request.To);
+        var shareDto = new HealthChartShareDto(
+            share.Token,
+            $"/api/public/health-chart-shares/{share.Token}",
+            events,
+            share.CreatedAtUtc);
 
-        Shares[token] = share;
-        return Created(share.PublicUrl, share);
+        return Created(shareDto.PublicUrl, shareDto);
     }
 
     [HttpGet("api/public/health-chart-shares/{token}")]
     [ProducesResponseType(typeof(HealthChartShareDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<HealthChartShareDto> GetPublicShare(string token)
+    public async Task<ActionResult<HealthChartShareDto>> GetPublicShare(string token)
     {
-        return Shares.TryGetValue(token, out var share) ? Ok(share) : NotFound();
+        var share = await healthChartShareRepository.GetHealthChartShareByTokenAsync(token);
+
+        if (share == null)
+        {
+            return NotFound();
+        }
+
+        var events = await healthEventRepository.GetHealthEventsAsync(share.UserId, share.From, share.To);
+        return Ok(new HealthChartShareDto(
+            share.Token,
+            $"/api/public/health-chart-shares/{share.Token}",
+            events,
+            share.CreatedAtUtc));
     }
 }

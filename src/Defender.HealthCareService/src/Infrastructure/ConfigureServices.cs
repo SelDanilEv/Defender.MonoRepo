@@ -37,6 +37,7 @@ public static class ConfigureServices
     private static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         services.AddSingleton<IHealthEventRepository, HealthEventRepository>();
+        services.AddSingleton<IHealthChartShareRepository, HealthChartShareRepository>();
 
         return services;
     }

@@ -8,6 +8,7 @@ using Defender.Portal.Application.Common.Interfaces.Repositories;
 using Defender.Portal.Application.Common.Interfaces.Wrappers;
 using Defender.Portal.Application.Configuration.Options;
 using Defender.Portal.Infrastructure.Clients.BudgetTracker;
+using Defender.Portal.Infrastructure.Clients.HealthCare;
 using Defender.Portal.Infrastructure.Clients.Identity;
 using Defender.Portal.Infrastructure.Clients.PersonalFoodAdvisor;
 using Defender.Portal.Infrastructure.Clients.RiskGames;
@@ -42,6 +43,7 @@ public static class ConfigureServices
         services.AddTransient<IRiskGamesWrapper, RiskGamesWrapper>();
         services.AddTransient<IBudgetTrackerWrapper, BudgetTrackerWrapper>();
         services.AddTransient<IPersonalFoodAdvisorWrapper, PersonalFoodAdvisorWrapper>();
+        services.AddTransient<IHealthCareWrapper, HealthCareWrapper>();
 
         //services.AddHostedService<KeepAliveHostedService>();
 
@@ -91,6 +93,11 @@ public static class ConfigureServices
         services.AddHttpClient<IPersonalFoodAdvisorClient, PersonalFoodAdvisorClient>((serviceProvider, client) =>
         {
             client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<PersonalFoodAdvisorOptions>>().Value.Url.TrimEnd('/') + "/");
+        });
+
+        services.AddHttpClient<IHealthCareClient, HealthCareClient>((serviceProvider, client) =>
+        {
+            client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<HealthCareOptions>>().Value.Url.TrimEnd('/') + "/");
         });
 
         return services;

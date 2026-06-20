@@ -19,7 +19,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { LineChart } from "@mui/x-charts/LineChart";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
@@ -28,29 +28,22 @@ import useUtils from "src/appUtils";
 import {
   buildHealthCareChartData,
   ChartTimeRange,
-  eventAxisMax,
-  eventAxisMin,
-  medicationLane,
-  sleepLane,
+  getTimeRangeBounds,
 } from "./chartData";
+import HealthCareChart from "./HealthCareChart";
 
-const snapDateTimeInput = (value: string) => {
-  const [date, time] = value.split("T");
-  const [hour, minute] = (time || "").split(":");
+const snapDate = (value: Date) => {
+  const snapped = new Date(value);
+  snapped.setSeconds(0, 0);
+  snapped.setMinutes(snapped.getMinutes() < 30 ? 0 : 30);
 
-  if (!date || !hour || !minute) {
-    return value;
-  }
-
-  return `${date}T${hour}:${Number(minute) < 30 ? "00" : "30"}`;
+  return snapped;
 };
 
-const nowInput = () => snapDateTimeInput(new Date().toISOString().slice(0, 16));
+const nowInput = () => snapDate(new Date());
 
 const toDateTimeInput = (value?: string) =>
-  value ? snapDateTimeInput(new Date(value).toISOString().slice(0, 16)) : nowInput();
-
-const dateTimeInputProps = { step: 1800 };
+  value ? snapDate(new Date(value)) : nowInput();
 
 const uniqueMedicationNames = (events: HealthEvent[]) => {
   const names = new Map<string, string>();
@@ -73,8 +66,8 @@ const HealthCarePage = () => {
 
   const [events, setEvents] = useState<HealthEvent[]>([]);
   const [type, setType] = useState<HealthEventType>("Temperature");
-  const [startedAt, setStartedAt] = useState(nowInput());
-  const [endedAt, setEndedAt] = useState(nowInput());
+  const [startedAt, setStartedAt] = useState<Date>(nowInput());
+  const [endedAt, setEndedAt] = useState<Date>(nowInput());
   const [temperature, setTemperature] = useState("37.0");
   const [medicationName, setMedicationName] = useState("");
   const [medicationAmount, setMedicationAmount] = useState("1");
@@ -85,9 +78,9 @@ const HealthCarePage = () => {
   const [shareCopied, setShareCopied] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
-  const refresh = () => healthCareApi.getEvents().then(setEvents);
+  const refresh = () => healthCareApi.getEvents(undefined, undefined, u).then(setEvents);
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => { refresh(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const chartData = useMemo(
     () => buildHealthCareChartData(events, chartTimeRange),
@@ -117,8 +110,8 @@ const HealthCarePage = () => {
 
   const eventPayload = () => ({
       type,
-      startedAt: new Date(snapDateTimeInput(startedAt)).toISOString(),
-      endedAt: type === "Sleep" ? new Date(snapDateTimeInput(endedAt)).toISOString() : undefined,
+      startedAt: snapDate(startedAt).toISOString(),
+      endedAt: type === "Sleep" ? snapDate(endedAt).toISOString() : undefined,
       temperatureCelsius: type === "Temperature" ? Number(temperature) : undefined,
       medicationName: type === "Medication" ? medicationName : undefined,
       medicationAmount: type === "Medication" ? Number(medicationAmount) : undefined,
@@ -131,9 +124,9 @@ const HealthCarePage = () => {
       await healthCareApi.updateEvent({
         ...eventPayload(),
         id: editingEventId,
-      });
+      }, u);
     } else {
-      await healthCareApi.createEvent(eventPayload());
+      await healthCareApi.createEvent(eventPayload(), u);
     }
 
     resetForm();
@@ -153,7 +146,7 @@ const HealthCarePage = () => {
   };
 
   const deleteEvent = async (id: string) => {
-    await healthCareApi.deleteEvent(id);
+    await healthCareApi.deleteEvent(id, u);
 
     if (editingEventId === id) {
       resetForm();
@@ -163,8 +156,15 @@ const HealthCarePage = () => {
   };
 
   const shareChart = async () => {
-    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(chartData.chartEvents))));
-    const url = `${window.location.origin}/health-care/share?data=${payload}`;
+    const bounds = getTimeRangeBounds(chartTimeRange);
+    const share = await healthCareApi.createShare(
+      {
+        from: bounds.from?.toISOString(),
+        to: bounds.to?.toISOString(),
+      },
+      u
+    );
+    const url = `${window.location.origin}${share.publicUrl}`;
     setShareLink(url);
     setShareCopied(false);
 
@@ -220,8 +220,22 @@ const HealthCarePage = () => {
                 <MenuItem value="Medication">{u.t("healthCare:event_medication")}</MenuItem>
                 <MenuItem value="Sleep">{u.t("healthCare:event_sleep")}</MenuItem>
               </TextField>
-              <TextField label={u.t("healthCare:start")} type="datetime-local" value={startedAt} onChange={(e) => setStartedAt(e.target.value)} onBlur={() => setStartedAt(snapDateTimeInput(startedAt))} inputProps={dateTimeInputProps} InputLabelProps={{ shrink: true }} size="small" />
-              {type === "Sleep" && <TextField label={u.t("healthCare:sleep_end")} type="datetime-local" value={endedAt} onChange={(e) => setEndedAt(e.target.value)} onBlur={() => setEndedAt(snapDateTimeInput(endedAt))} inputProps={dateTimeInputProps} InputLabelProps={{ shrink: true }} size="small" />}
+              <DateTimePicker
+                label={u.t("healthCare:start")}
+                value={startedAt}
+                onChange={(value) => value && setStartedAt(snapDate(value))}
+                minutesStep={30}
+                slotProps={{ textField: { size: "small" } }}
+              />
+              {type === "Sleep" && (
+                <DateTimePicker
+                  label={u.t("healthCare:sleep_end")}
+                  value={endedAt}
+                  onChange={(value) => value && setEndedAt(snapDate(value))}
+                  minutesStep={30}
+                  slotProps={{ textField: { size: "small" } }}
+                />
+              )}
               {type === "Temperature" && <TextField label={u.t("healthCare:temperature_celsius")} value={temperature} onChange={(e) => setTemperature(e.target.value)} size="small" />}
               {type === "Medication" && <>
                 <Autocomplete
@@ -268,35 +282,7 @@ const HealthCarePage = () => {
                 <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
               </TextField>
             </Stack>
-            {chartData.chartEvents.length > 0 ? (
-              <LineChart
-                height={300}
-                margin={{ left: 55, right: 90 }}
-                xAxis={[{ scaleType: "point", data: chartData.xLabels }]}
-                yAxis={[
-                  { id: "temperature", label: "°C" },
-                  {
-                    id: "events",
-                    position: "right",
-                    min: eventAxisMin,
-                    max: eventAxisMax,
-                    valueFormatter: (value) =>
-                      value === medicationLane
-                        ? u.t("healthCare:event_medication")
-                        : value === sleepLane
-                          ? u.t("healthCare:event_sleep")
-                          : "",
-                  },
-                ]}
-                series={[
-                  { label: "°C", data: chartData.temperatureData, yAxisId: "temperature", showMark: true },
-                  { label: u.t("healthCare:event_medication"), data: chartData.medicationData, yAxisId: "events", showMark: true },
-                  { label: u.t("healthCare:event_sleep"), data: chartData.sleepData, yAxisId: "events", showMark: true },
-                ]}
-              />
-            ) : (
-              <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
-            )}
+            <HealthCareChart events={events} timeRange={chartTimeRange} />
             <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
             <TableContainer>
               <Table size="small">

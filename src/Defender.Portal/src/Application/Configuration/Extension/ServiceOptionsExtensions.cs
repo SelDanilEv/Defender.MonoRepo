@@ -14,6 +14,7 @@ public static class ServiceOptionsExtensions
         services.Configure<RiskGamesOptions>(configuration.GetSection(nameof(RiskGamesOptions)));
         services.Configure<BudgetTrackerOptions>(configuration.GetSection(nameof(BudgetTrackerOptions)));
         services.Configure<PersonalFoodAdvisorOptions>(configuration.GetSection(nameof(PersonalFoodAdvisorOptions)));
+        services.Configure<HealthCareOptions>(configuration.GetSection(nameof(HealthCareOptions)));
 
         return services;
     }

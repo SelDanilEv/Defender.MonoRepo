@@ -1,25 +1,22 @@
 using Defender.Common.Attributes;
 using Defender.Common.Consts;
+using Defender.Common.Interfaces;
+using Defender.HealthCareService.Application.Common.Interfaces.Repositories;
 using Defender.HealthCareService.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1;
 
-public class HealthEventsController : ControllerBase
+public class HealthEventsController(
+    ICurrentAccountAccessor currentAccountAccessor,
+    IHealthEventRepository healthEventRepository) : ControllerBase
 {
-    private static readonly List<HealthEvent> Events = [];
-
     [HttpGet("api/health-events")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(IReadOnlyList<HealthEvent>), StatusCodes.Status200OK)]
-    public ActionResult<IReadOnlyList<HealthEvent>> GetEvents([FromQuery] Guid userId, [FromQuery] DateTimeOffset? from, [FromQuery] DateTimeOffset? to)
+    public async Task<ActionResult<IReadOnlyList<HealthEvent>>> GetEvents([FromQuery] DateTimeOffset? from, [FromQuery] DateTimeOffset? to)
     {
-        var result = Events
-            .Where(e => userId == Guid.Empty || e.UserId == userId)
-            .Where(e => from == null || e.StartedAt >= from)
-            .Where(e => to == null || e.StartedAt <= to)
-            .OrderBy(e => e.StartedAt)
-            .ToList();
+        var result = await healthEventRepository.GetHealthEventsAsync(currentAccountAccessor.GetAccountId(), from, to);
 
         return Ok(result);
     }
@@ -27,26 +24,52 @@ public class HealthEventsController : ControllerBase
     [HttpPost("api/health-events")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(HealthEvent), StatusCodes.Status201Created)]
-    public ActionResult<HealthEvent> CreateEvent([FromBody] HealthEvent request)
+    public async Task<ActionResult<HealthEvent>> CreateEvent([FromBody] HealthEvent request)
     {
         request.Id = request.Id == Guid.Empty ? Guid.NewGuid() : request.Id;
+        request.UserId = currentAccountAccessor.GetAccountId();
         request.StartedAt = SnapToHalfHour(request.StartedAt);
         if (request.EndedAt != null)
         {
             request.EndedAt = SnapToHalfHour(request.EndedAt.Value);
         }
 
-        Events.Add(request);
+        await healthEventRepository.AddHealthEventAsync(request);
         return Created($"/api/health-events/{request.Id}", request);
+    }
+
+    [HttpPut("api/health-events/{id:guid}")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(HealthEvent), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<HealthEvent>> UpdateEvent(Guid id, [FromBody] HealthEvent request)
+    {
+        var userId = currentAccountAccessor.GetAccountId();
+        var existing = await healthEventRepository.GetHealthEventByIdAsync(userId, id);
+
+        if (existing == null)
+        {
+            return NotFound();
+        }
+
+        request.Id = id;
+        request.UserId = userId;
+        request.StartedAt = SnapToHalfHour(request.StartedAt);
+        if (request.EndedAt != null)
+        {
+            request.EndedAt = SnapToHalfHour(request.EndedAt.Value);
+        }
+
+        return Ok(await healthEventRepository.UpdateHealthEventAsync(request));
     }
 
     [HttpDelete("api/health-events/{id:guid}")]
     [Auth(Roles.User)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public IActionResult DeleteEvent(Guid id)
+    public async Task<IActionResult> DeleteEvent(Guid id)
     {
-        var removed = Events.RemoveAll(e => e.Id == id) > 0;
+        var removed = await healthEventRepository.DeleteHealthEventAsync(currentAccountAccessor.GetAccountId(), id);
         return removed ? NoContent() : NotFound();
     }
 

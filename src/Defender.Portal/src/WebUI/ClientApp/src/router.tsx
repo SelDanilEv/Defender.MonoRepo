@@ -177,6 +177,10 @@ const routes: RouteObject[] = [
     element: <EmptyLayout />,
     children: [
       {
+        path: ":token",
+        element: <HealthCareSharePage />,
+      },
+      {
         path: "",
         element: <HealthCareSharePage />,
       },

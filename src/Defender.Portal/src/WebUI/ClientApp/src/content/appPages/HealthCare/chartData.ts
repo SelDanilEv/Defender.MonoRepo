@@ -17,16 +17,29 @@ export const filterEventsByTimeRange = (
   timeRange: ChartTimeRange,
   now = new Date()
 ) => {
+  const bounds = getTimeRangeBounds(timeRange, now);
+
+  if (!bounds.from) {
+    return events;
+  }
+
+  return events.filter((event) => new Date(event.startedAt) >= bounds.from!);
+};
+
+export const getTimeRangeBounds = (
+  timeRange: ChartTimeRange,
+  now = new Date()
+) => {
   const days = rangeDays[timeRange];
 
   if (!days) {
-    return events;
+    return { from: undefined, to: undefined };
   }
 
   const from = new Date(now);
   from.setDate(from.getDate() - days);
 
-  return events.filter((event) => new Date(event.startedAt) >= from);
+  return { from, to: now };
 };
 
 const eventTimeLabel = (event: HealthEvent) =>
@@ -45,15 +58,31 @@ export const buildHealthCareChartData = (
     (left, right) =>
       new Date(left.startedAt).getTime() - new Date(right.startedAt).getTime()
   );
+  const temperatureEvents = chartEvents.filter(
+    (event) =>
+      event.type === "Temperature" && event.temperatureCelsius !== undefined
+  );
+  const bounds = getTimeRangeBounds(timeRange);
+  const eventTimes = chartEvents.flatMap((event) => [
+    new Date(event.startedAt).getTime(),
+    event.endedAt ? new Date(event.endedAt).getTime() : new Date(event.startedAt).getTime(),
+  ]);
+  const fallbackNow = Date.now();
+  const minTime =
+    bounds.from?.getTime() ??
+    (eventTimes.length > 0 ? Math.min(...eventTimes) : fallbackNow - 60 * 60 * 1000);
+  const maxTime =
+    bounds.to?.getTime() ??
+    (eventTimes.length > 0 ? Math.max(...eventTimes) : fallbackNow);
 
   return {
     chartEvents,
+    temperatureEvents,
+    minTime,
+    maxTime: maxTime === minTime ? minTime + 60 * 60 * 1000 : maxTime,
     xLabels: chartEvents.map(eventTimeLabel),
-    temperatureData: chartEvents.map((event) =>
-      event.type === "Temperature" && event.temperatureCelsius !== undefined
-        ? event.temperatureCelsius
-        : null
-    ),
+    temperatureXAxis: temperatureEvents.map((event) => new Date(event.startedAt)),
+    temperatureData: temperatureEvents.map((event) => event.temperatureCelsius ?? null),
     medicationData: chartEvents.map((event) =>
       event.type === "Medication" ? medicationLane : null
     ),
