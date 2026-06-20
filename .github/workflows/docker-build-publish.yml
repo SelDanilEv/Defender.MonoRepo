@@ -415,15 +415,15 @@ jobs:
             echo "dockerfile=Dockerfile.Service" >> $GITHUB_OUTPUT
             echo "project_type=WebApi" >> $GITHUB_OUTPUT
             case "$SERVICE_NAME" in
-              "Defender.UserManagementService") echo "clean_name=defender.user-management" ;;
-              "Defender.WalletService") echo "clean_name=defender.wallet" ;;
-              "Defender.RiskGamesService") echo "clean_name=defender.risk-games" ;;
-              "Defender.NotificationService") echo "clean_name=defender.notification" ;;
-              "Defender.JobSchedulerService") echo "clean_name=defender.job-scheduler" ;;
-              "Defender.IdentityService") echo "clean_name=defender.identity" ;;
-              "Defender.BudgetTracker") echo "clean_name=defender.budget-tracker" ;;
-              "Defender.HealthCareService") echo "clean_name=defender.health-care" ;;
-              *) echo "clean_name=$SERVICE_NAME" ;;
+              "Defender.UserManagementService") echo "clean_name=defender.user-management" >> $GITHUB_OUTPUT ;;
+              "Defender.WalletService") echo "clean_name=defender.wallet" >> $GITHUB_OUTPUT ;;
+              "Defender.RiskGamesService") echo "clean_name=defender.risk-games" >> $GITHUB_OUTPUT ;;
+              "Defender.NotificationService") echo "clean_name=defender.notification" >> $GITHUB_OUTPUT ;;
+              "Defender.JobSchedulerService") echo "clean_name=defender.job-scheduler" >> $GITHUB_OUTPUT ;;
+              "Defender.IdentityService") echo "clean_name=defender.identity" >> $GITHUB_OUTPUT ;;
+              "Defender.BudgetTracker") echo "clean_name=defender.budget-tracker" >> $GITHUB_OUTPUT ;;
+              "Defender.HealthCareService") echo "clean_name=defender.health-care" >> $GITHUB_OUTPUT ;;
+              *) echo "clean_name=$SERVICE_NAME" >> $GITHUB_OUTPUT ;;
             esac
           fi
           echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
