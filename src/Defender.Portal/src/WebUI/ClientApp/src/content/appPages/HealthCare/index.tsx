@@ -3,10 +3,13 @@ import { Box, Button, Card, CardContent, Chip, Grid, MenuItem, Stack, TextField,
 import { LineChart } from "@mui/x-charts/LineChart";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { healthCareApi, HealthEvent, HealthEventType } from "src/api/healthCare";
+import useUtils from "src/appUtils";
 
 const nowInput = () => new Date().toISOString().slice(0, 16);
 
 const HealthCarePage = () => {
+  const u = useUtils();
+
   const [events, setEvents] = useState<HealthEvent[]>([]);
   const [type, setType] = useState<HealthEventType>("Temperature");
   const [startedAt, setStartedAt] = useState(nowInput());
@@ -14,7 +17,7 @@ const HealthCarePage = () => {
   const [temperature, setTemperature] = useState("37.0");
   const [medicationName, setMedicationName] = useState("");
   const [medicationAmount, setMedicationAmount] = useState("1");
-  const [medicationUnit, setMedicationUnit] = useState("табл.");
+  const [medicationUnit, setMedicationUnit] = useState(() => u.t("healthCare:unit_tablet"));
   const [notes, setNotes] = useState("");
 
   const refresh = () => healthCareApi.getEvents().then(setEvents);
@@ -49,47 +52,48 @@ const HealthCarePage = () => {
 
   const formatEvent = (event: HealthEvent) => {
     if (event.type === "Temperature") return `${event.temperatureCelsius} °C`;
-    if (event.type === "Medication") return `${event.medicationName || "Лекарство"} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
-    return `Сон до ${new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+    if (event.type === "Medication") return `${event.medicationName || u.t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
+    const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return u.t("healthCare:sleep_until", { time });
   };
 
   return (
     <Box p={1}>
       <Stack direction="row" alignItems="center" gap={1} mb={2}>
         <LocalHospitalIcon color="primary" />
-        <Typography variant="h3">Health Care</Typography>
-        <Button variant="outlined" size="small" onClick={shareChart} disabled={events.length === 0}>Поделиться графиком</Button>
+        <Typography variant="h3">{u.t("healthCare:page_title")}</Typography>
+        <Button variant="outlined" size="small" onClick={shareChart} disabled={events.length === 0}>{u.t("healthCare:share_chart")}</Button>
       </Stack>
       <Typography color="text.secondary" mb={2}>
-        Отмечайте температуру, лекарства и сон в 30-минутном таймфрейме. График показывает только заполненные температурные фреймы, а сон и лекарства добавлены как события, чтобы не засорять пустыми интервалами.
+        {u.t("healthCare:page_description")}
       </Typography>
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
           <Card><CardContent>
             <Stack gap={2}>
-              <TextField select label="Тип события" value={type} onChange={(e) => setType(e.target.value as HealthEventType)} size="small">
-                <MenuItem value="Temperature">Температура</MenuItem>
-                <MenuItem value="Medication">Лекарство</MenuItem>
-                <MenuItem value="Sleep">Сон</MenuItem>
+              <TextField select label={u.t("healthCare:event_type")} value={type} onChange={(e) => setType(e.target.value as HealthEventType)} size="small">
+                <MenuItem value="Temperature">{u.t("healthCare:event_temperature")}</MenuItem>
+                <MenuItem value="Medication">{u.t("healthCare:event_medication")}</MenuItem>
+                <MenuItem value="Sleep">{u.t("healthCare:event_sleep")}</MenuItem>
               </TextField>
-              <TextField label="Начало" type="datetime-local" value={startedAt} onChange={(e) => setStartedAt(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />
-              {type === "Sleep" && <TextField label="Конец сна" type="datetime-local" value={endedAt} onChange={(e) => setEndedAt(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />}
-              {type === "Temperature" && <TextField label="Температура, °C" value={temperature} onChange={(e) => setTemperature(e.target.value)} size="small" />}
+              <TextField label={u.t("healthCare:start")} type="datetime-local" value={startedAt} onChange={(e) => setStartedAt(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />
+              {type === "Sleep" && <TextField label={u.t("healthCare:sleep_end")} type="datetime-local" value={endedAt} onChange={(e) => setEndedAt(e.target.value)} InputLabelProps={{ shrink: true }} size="small" />}
+              {type === "Temperature" && <TextField label={u.t("healthCare:temperature_celsius")} value={temperature} onChange={(e) => setTemperature(e.target.value)} size="small" />}
               {type === "Medication" && <>
-                <TextField label="Название" value={medicationName} onChange={(e) => setMedicationName(e.target.value)} size="small" />
-                <TextField label="Количество" value={medicationAmount} onChange={(e) => setMedicationAmount(e.target.value)} size="small" />
-                <TextField label="Единица" value={medicationUnit} onChange={(e) => setMedicationUnit(e.target.value)} size="small" />
+                <TextField label={u.t("healthCare:medication_name")} value={medicationName} onChange={(e) => setMedicationName(e.target.value)} size="small" />
+                <TextField label={u.t("healthCare:medication_amount")} value={medicationAmount} onChange={(e) => setMedicationAmount(e.target.value)} size="small" />
+                <TextField label={u.t("healthCare:medication_unit")} value={medicationUnit} onChange={(e) => setMedicationUnit(e.target.value)} size="small" />
               </>}
-              <TextField label="Заметка" value={notes} onChange={(e) => setNotes(e.target.value)} size="small" multiline minRows={2} />
-              <Button variant="contained" onClick={addEvent}>Добавить</Button>
+              <TextField label={u.t("healthCare:notes")} value={notes} onChange={(e) => setNotes(e.target.value)} size="small" multiline minRows={2} />
+              <Button variant="contained" onClick={addEvent}>{u.t("healthCare:add")}</Button>
             </Stack>
           </CardContent></Card>
         </Grid>
 
         <Grid item xs={12} md={8}>
           <Card><CardContent>
-            <Typography variant="h4" mb={1}>График температуры</Typography>
+            <Typography variant="h4" mb={1}>{u.t("healthCare:temperature_chart")}</Typography>
             <LineChart
               height={300}
               xAxis={[{ scaleType: "point", data: chartEvents.map((event) => new Date(event.startedAt).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })) }]}

@@ -8,7 +8,7 @@ export default interface IUtils {
     locationState: <T>(element: string) => T;
     theme: Theme;
   };
-  t: (key: string) => string;
+  t: (key: string, options?: object) => string;
   log: (...values: unknown[]) => void;
   debug: (value: unknown) => void;
   e: (errorCode: string) => void;
