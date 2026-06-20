@@ -6,6 +6,7 @@ import { healthCareApi, HealthEvent, HealthEventType } from "src/api/healthCare"
 import useUtils from "src/appUtils";
 import {
   buildHealthCareChartData,
+  ChartTimeRange,
   eventAxisMax,
   eventAxisMin,
   medicationLane,
@@ -26,12 +27,23 @@ const HealthCarePage = () => {
   const [medicationAmount, setMedicationAmount] = useState("1");
   const [medicationUnit, setMedicationUnit] = useState(() => u.t("healthCare:unit_tablet"));
   const [notes, setNotes] = useState("");
+  const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
+  const [shareLink, setShareLink] = useState("");
+  const [shareCopied, setShareCopied] = useState(false);
 
   const refresh = () => healthCareApi.getEvents().then(setEvents);
 
   useEffect(() => { refresh(); }, []);
 
-  const chartData = useMemo(() => buildHealthCareChartData(events), [events]);
+  const chartData = useMemo(
+    () => buildHealthCareChartData(events, chartTimeRange),
+    [events, chartTimeRange]
+  );
+
+  useEffect(() => {
+    setShareLink("");
+    setShareCopied(false);
+  }, [events, chartTimeRange]);
 
   const addEvent = async () => {
     await healthCareApi.createEvent({
@@ -49,9 +61,17 @@ const HealthCarePage = () => {
   };
 
   const shareChart = async () => {
-    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(events))));
+    const payload = btoa(unescape(encodeURIComponent(JSON.stringify(chartData.chartEvents))));
     const url = `${window.location.origin}/health-care/share?data=${payload}`;
-    await navigator.clipboard.writeText(url);
+    setShareLink(url);
+    setShareCopied(false);
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+    } catch {
+      setShareCopied(false);
+    }
   };
 
   const formatEvent = (event: HealthEvent) => {
@@ -66,11 +86,22 @@ const HealthCarePage = () => {
       <Stack direction="row" alignItems="center" gap={1} mb={2}>
         <LocalHospitalIcon color="primary" />
         <Typography variant="h3">{u.t("healthCare:page_title")}</Typography>
-        <Button variant="outlined" size="small" onClick={shareChart} disabled={events.length === 0}>{u.t("healthCare:share_chart")}</Button>
+        <Button variant="outlined" size="small" onClick={shareChart} disabled={chartData.chartEvents.length === 0}>{u.t("healthCare:share_chart")}</Button>
       </Stack>
       <Typography color="text.secondary" mb={2}>
         {u.t("healthCare:page_description")}
       </Typography>
+      {shareLink && (
+        <TextField
+          fullWidth
+          label={u.t("healthCare:share_link")}
+          value={shareLink}
+          helperText={shareCopied ? u.t("healthCare:copied_to_clipboard") : u.t("healthCare:share_link_helper")}
+          InputProps={{ readOnly: true }}
+          size="small"
+          sx={{ mb: 2 }}
+        />
+      )}
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
@@ -97,32 +128,51 @@ const HealthCarePage = () => {
 
         <Grid item xs={12} md={8}>
           <Card><CardContent>
-            <Typography variant="h4" mb={1}>{u.t("healthCare:events_chart")}</Typography>
-            <LineChart
-              height={300}
-              margin={{ left: 55, right: 90 }}
-              xAxis={[{ scaleType: "point", data: chartData.xLabels }]}
-              yAxis={[
-                { id: "temperature", label: "°C" },
-                {
-                  id: "events",
-                  position: "right",
-                  min: eventAxisMin,
-                  max: eventAxisMax,
-                  valueFormatter: (value) =>
-                    value === medicationLane
-                      ? u.t("healthCare:event_medication")
-                      : value === sleepLane
-                        ? u.t("healthCare:event_sleep")
-                        : "",
-                },
-              ]}
-              series={[
-                { label: "°C", data: chartData.temperatureData, yAxisId: "temperature", showMark: true },
-                { label: u.t("healthCare:event_medication"), data: chartData.medicationData, yAxisId: "events", showMark: true },
-                { label: u.t("healthCare:event_sleep"), data: chartData.sleepData, yAxisId: "events", showMark: true },
-              ]}
-            />
+            <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={1}>
+              <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
+              <TextField
+                select
+                label={u.t("healthCare:chart_time_range")}
+                value={chartTimeRange}
+                onChange={(event) => setChartTimeRange(event.target.value as ChartTimeRange)}
+                size="small"
+                sx={{ minWidth: 180 }}
+              >
+                <MenuItem value="day">{u.t("healthCare:range_day")}</MenuItem>
+                <MenuItem value="week">{u.t("healthCare:range_week")}</MenuItem>
+                <MenuItem value="month">{u.t("healthCare:range_month")}</MenuItem>
+                <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
+              </TextField>
+            </Stack>
+            {chartData.chartEvents.length > 0 ? (
+              <LineChart
+                height={300}
+                margin={{ left: 55, right: 90 }}
+                xAxis={[{ scaleType: "point", data: chartData.xLabels }]}
+                yAxis={[
+                  { id: "temperature", label: "°C" },
+                  {
+                    id: "events",
+                    position: "right",
+                    min: eventAxisMin,
+                    max: eventAxisMax,
+                    valueFormatter: (value) =>
+                      value === medicationLane
+                        ? u.t("healthCare:event_medication")
+                        : value === sleepLane
+                          ? u.t("healthCare:event_sleep")
+                          : "",
+                  },
+                ]}
+                series={[
+                  { label: "°C", data: chartData.temperatureData, yAxisId: "temperature", showMark: true },
+                  { label: u.t("healthCare:event_medication"), data: chartData.medicationData, yAxisId: "events", showMark: true },
+                  { label: u.t("healthCare:event_sleep"), data: chartData.sleepData, yAxisId: "events", showMark: true },
+                ]}
+              />
+            ) : (
+              <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
+            )}
             <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
               {events.map((event) => (
                 <Chip key={event.id} label={`${new Date(event.startedAt).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}: ${formatEvent(event)}`} onDelete={() => healthCareApi.deleteEvent(event.id).then(refresh)} color={event.type === "Sleep" ? "info" : event.type === "Medication" ? "secondary" : "primary"} variant="outlined" />
