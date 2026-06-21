@@ -30,7 +30,15 @@ public partial class ApiException(
             return new ServiceException(ErrorCode.Unknown);
         }
 
-        var details = Newtonsoft.Json.JsonConvert.DeserializeObject<ProblemDetails>(Response);
+        ProblemDetails? details;
+        try
+        {
+            details = Newtonsoft.Json.JsonConvert.DeserializeObject<ProblemDetails>(Response);
+        }
+        catch (Newtonsoft.Json.JsonException)
+        {
+            return new ServiceException(ErrorCode.Unknown);
+        }
 
         if (details == null || string.IsNullOrEmpty(details?.Detail))
         {

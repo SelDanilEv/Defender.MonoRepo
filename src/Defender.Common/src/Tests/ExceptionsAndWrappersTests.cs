@@ -45,6 +45,16 @@ public class ExceptionsAndWrappersTests
     }
 
     [Fact]
+    public void ApiExceptionToServiceException_WhenResponseIsPlainText_ReturnsUnknownServiceException()
+    {
+        var exception = CreateApiException("Wellbeing score must be between 1 and 5.");
+
+        var result = exception.ToServiceException();
+
+        Assert.True(result.IsErrorCode(ErrorCode.Unknown));
+    }
+
+    [Fact]
     public void ApiExceptionToServiceException_WhenProblemDetailsContainsErrorCode_ReturnsMappedServiceException()
     {
         var exception = CreateApiException("{\"detail\":\"CM_NotFound\"}");
