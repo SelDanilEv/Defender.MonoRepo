@@ -10,5 +10,7 @@ public interface IHealthCareWrapper
     Task<PortalHealthEventDto?> UpdateEventAsync(Guid id, PortalHealthEventDto healthEvent, CancellationToken cancellationToken = default);
     Task<bool> DeleteEventAsync(Guid id, CancellationToken cancellationToken = default);
     Task<PortalHealthChartShareDto> CreateShareAsync(CreateHealthChartShareRequest request, CancellationToken cancellationToken = default);
+    Task<PortalHealthChartShareDto?> GetCurrentShareAsync(CancellationToken cancellationToken = default);
+    Task<PortalHealthChartShareDto?> UpdateShareStatusAsync(UpdateHealthChartShareStatusRequest request, CancellationToken cancellationToken = default);
     Task<PortalHealthChartShareDto?> GetPublicShareAsync(string token, CancellationToken cancellationToken = default);
 }

@@ -22,6 +22,12 @@ public class HealthCareWrapper(IHealthCareClient client) : BaseSwaggerWrapper, I
     public Task<PortalHealthChartShareDto> CreateShareAsync(CreateHealthChartShareRequest request, CancellationToken cancellationToken = default)
         => ExecuteSafelyAsync(() => client.CreateShareAsync(request, cancellationToken));
 
+    public Task<PortalHealthChartShareDto?> GetCurrentShareAsync(CancellationToken cancellationToken = default)
+        => ExecuteSafelyAsync(() => client.GetCurrentShareAsync(cancellationToken));
+
+    public Task<PortalHealthChartShareDto?> UpdateShareStatusAsync(UpdateHealthChartShareStatusRequest request, CancellationToken cancellationToken = default)
+        => ExecuteSafelyAsync(() => client.UpdateShareStatusAsync(request, cancellationToken));
+
     public Task<PortalHealthChartShareDto?> GetPublicShareAsync(string token, CancellationToken cancellationToken = default)
         => ExecuteSafelyAsync(() => client.GetPublicShareAsync(token, cancellationToken));
 }

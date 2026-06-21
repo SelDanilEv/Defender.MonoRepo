@@ -15,5 +15,8 @@ public interface IHealthEventRepository
 public interface IHealthChartShareRepository
 {
     Task<HealthChartShare> AddHealthChartShareAsync(HealthChartShare share);
+    Task<HealthChartShare> UpdateHealthChartShareAsync(HealthChartShare share);
     Task<HealthChartShare?> GetHealthChartShareByTokenAsync(string token);
+    Task<HealthChartShare?> GetHealthChartShareByUserIdAsync(Guid userId);
+    Task DisableOtherHealthChartSharesAsync(Guid userId, Guid activeShareId);
 }

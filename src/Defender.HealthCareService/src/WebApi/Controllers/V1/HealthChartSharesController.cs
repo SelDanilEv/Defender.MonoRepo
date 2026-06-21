@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers.V1;
 
 public record HealthChartShareRequest(DateTimeOffset? From, DateTimeOffset? To);
+public record HealthChartShareStatusRequest(bool IsEnabled);
 public record HealthChartShareDto(
     string Token,
     string PublicUrl,
     IReadOnlyList<HealthEvent> Events,
     DateTimeOffset? From,
     DateTimeOffset? To,
+    bool IsEnabled,
     DateTimeOffset CreatedAtUtc);
 
 public class HealthChartSharesController(
@@ -27,24 +29,65 @@ public class HealthChartSharesController(
     public async Task<ActionResult<HealthChartShareDto>> CreateShare([FromBody] HealthChartShareRequest request)
     {
         var userId = currentAccountAccessor.GetAccountId();
-        var share = await healthChartShareRepository.AddHealthChartShareAsync(new HealthChartShare
+        var share = await healthChartShareRepository.GetHealthChartShareByUserIdAsync(userId);
+
+        if (share == null)
         {
-            Token = Guid.NewGuid().ToString("N"),
-            UserId = userId,
-            From = request.From,
-            To = request.To,
-            CreatedAtUtc = DateTimeOffset.UtcNow,
-        });
+            share = await healthChartShareRepository.AddHealthChartShareAsync(new HealthChartShare
+            {
+                Token = Guid.NewGuid().ToString("N"),
+                UserId = userId,
+                From = request.From,
+                To = request.To,
+                IsEnabled = true,
+                CreatedAtUtc = DateTimeOffset.UtcNow,
+            });
+        }
+        else
+        {
+            share.From = request.From;
+            share.To = request.To;
+            share.IsEnabled = true;
+            share = await healthChartShareRepository.UpdateHealthChartShareAsync(share);
+        }
+
+        await healthChartShareRepository.DisableOtherHealthChartSharesAsync(userId, share.Id);
+
         var events = await healthEventRepository.GetHealthEventsAsync(userId, request.From, request.To);
-        var shareDto = new HealthChartShareDto(
-            share.Token,
-            $"/api/public/health-chart-shares/{share.Token}",
-            events,
-            share.From,
-            share.To,
-            share.CreatedAtUtc);
+        var shareDto = ToDto(share, events);
 
         return Created(shareDto.PublicUrl, shareDto);
+    }
+
+    [HttpGet("api/health-chart-shares/current")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(HealthChartShareDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<HealthChartShareDto>> GetCurrentShare()
+    {
+        var share = await healthChartShareRepository.GetHealthChartShareByUserIdAsync(currentAccountAccessor.GetAccountId());
+
+        return share == null ? NotFound() : Ok(ToDto(share, []));
+    }
+
+    [HttpPut("api/health-chart-shares/status")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(HealthChartShareDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<HealthChartShareDto>> UpdateShareStatus([FromBody] HealthChartShareStatusRequest request)
+    {
+        var share = await healthChartShareRepository.GetHealthChartShareByUserIdAsync(currentAccountAccessor.GetAccountId());
+
+        if (share == null)
+        {
+            return NotFound();
+        }
+
+        share.IsEnabled = request.IsEnabled;
+        share = await healthChartShareRepository.UpdateHealthChartShareAsync(share);
+        await healthChartShareRepository.DisableOtherHealthChartSharesAsync(share.UserId, share.Id);
+
+        return Ok(ToDto(share, []));
     }
 
     [HttpGet("api/public/health-chart-shares/{token}")]
@@ -54,18 +97,24 @@ public class HealthChartSharesController(
     {
         var share = await healthChartShareRepository.GetHealthChartShareByTokenAsync(token);
 
-        if (share == null)
+        if (share == null || !share.IsEnabled)
         {
             return NotFound();
         }
 
         var events = await healthEventRepository.GetHealthEventsAsync(share.UserId, share.From, share.To);
-        return Ok(new HealthChartShareDto(
+        return Ok(ToDto(share, events));
+    }
+
+    private static HealthChartShareDto ToDto(
+        HealthChartShare share,
+        IReadOnlyList<HealthEvent> events) =>
+        new(
             share.Token,
             $"/api/public/health-chart-shares/{share.Token}",
             events,
             share.From,
             share.To,
-            share.CreatedAtUtc));
-    }
+            share.IsEnabled,
+            share.CreatedAtUtc);
 }

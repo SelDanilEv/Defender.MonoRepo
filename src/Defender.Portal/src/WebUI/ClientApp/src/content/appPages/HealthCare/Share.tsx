@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Box, Card, CardContent, Chip, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import { Box, Card, CardContent, Chip, LinearProgress, MenuItem, Stack, TextField, Typography } from "@mui/material";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { useParams } from "react-router";
 import { healthCareApi, HealthChartShare, HealthEvent } from "src/api/healthCare";
@@ -61,6 +61,7 @@ const HealthCareSharePage = () => {
   const u = useUtils();
   const { token } = useParams();
   const [share, setShare] = useState<HealthChartShare | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("all");
   const events = useMemo(() => share?.events ?? [], [share?.events]);
   const rangeAnchor = useMemo(
@@ -75,13 +76,64 @@ const HealthCareSharePage = () => {
   useEffect(() => {
     if (!token) {
       setShare(null);
+      setIsLoading(false);
       return;
     }
 
-    healthCareApi.getPublicShare(token, u).then((share) => {
-      setShare(share);
-    });
+    setIsLoading(true);
+    healthCareApi
+      .getPublicShare(token, u)
+      .then((share) => {
+        setShare(share);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const content = isLoading ? (
+    <LinearProgress />
+  ) : !share ? (
+    <Typography color="text.secondary">
+      {u.t("healthCare:share_unavailable")}
+    </Typography>
+  ) : (
+    <>
+      <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={1}>
+        <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
+        <TextField
+          select
+          label={u.t("healthCare:chart_time_range")}
+          value={chartTimeRange}
+          onChange={(event) => setChartTimeRange(event.target.value as ChartTimeRange)}
+          size="small"
+          sx={{ minWidth: 180 }}
+        >
+          <MenuItem value="day">{u.t("healthCare:range_day")}</MenuItem>
+          <MenuItem value="week">{u.t("healthCare:range_week")}</MenuItem>
+          <MenuItem value="month">{u.t("healthCare:range_month")}</MenuItem>
+          <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
+        </TextField>
+      </Stack>
+      <Typography variant="body2" color="text.secondary" mb={1.5}>
+        {u.t("healthCare:shared_range", {
+          range: formatSharedRange(share?.from, share?.to, u.t("healthCare:range_all")),
+        })}
+      </Typography>
+      <WellbeingSummary
+        events={visibleEvents}
+        timeRange="all"
+        title={u.t("healthCare:latest_wellbeing")}
+        scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
+      />
+      <HealthCareChart events={visibleEvents} timeRange="all" />
+      <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
+        {visibleEvents.map((event) => (
+          <Chip key={event.id} label={`${new Date(event.startedAt).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}: ${formatEvent(event, u.t)}`} color={chipColor(event)} variant="outlined" />
+        ))}
+      </Stack>
+    </>
+  );
 
   return (
     <Box p={2}>
@@ -95,41 +147,7 @@ const HealthCareSharePage = () => {
       <Typography color="text.secondary" mb={2}>
         {u.t("healthCare:share_description")}
       </Typography>
-      <Card><CardContent>
-        <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={1}>
-          <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
-          <TextField
-            select
-            label={u.t("healthCare:chart_time_range")}
-            value={chartTimeRange}
-            onChange={(event) => setChartTimeRange(event.target.value as ChartTimeRange)}
-            size="small"
-            sx={{ minWidth: 180 }}
-          >
-            <MenuItem value="day">{u.t("healthCare:range_day")}</MenuItem>
-            <MenuItem value="week">{u.t("healthCare:range_week")}</MenuItem>
-            <MenuItem value="month">{u.t("healthCare:range_month")}</MenuItem>
-            <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
-          </TextField>
-        </Stack>
-        <Typography variant="body2" color="text.secondary" mb={1.5}>
-          {u.t("healthCare:shared_range", {
-            range: formatSharedRange(share?.from, share?.to, u.t("healthCare:range_all")),
-          })}
-        </Typography>
-        <WellbeingSummary
-          events={visibleEvents}
-          timeRange="all"
-          title={u.t("healthCare:latest_wellbeing")}
-          scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
-        />
-        <HealthCareChart events={visibleEvents} timeRange="all" />
-        <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
-          {visibleEvents.map((event) => (
-            <Chip key={event.id} label={`${new Date(event.startedAt).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}: ${formatEvent(event, u.t)}`} color={chipColor(event)} variant="outlined" />
-          ))}
-        </Stack>
-      </CardContent></Card>
+      <Card><CardContent>{content}</CardContent></Card>
     </Box>
   );
 };

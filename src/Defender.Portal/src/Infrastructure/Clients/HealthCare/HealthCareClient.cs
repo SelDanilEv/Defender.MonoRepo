@@ -97,6 +97,26 @@ public class HealthCareClient(
         return (await response.Content.ReadFromJsonAsync<PortalHealthChartShareDto>(JsonOptions, cancellationToken))!;
     }
 
+    public async Task<PortalHealthChartShareDto?> GetCurrentShareAsync(CancellationToken cancellationToken = default)
+    {
+        await SetAuthHeaderAsync();
+        var response = await httpClient.GetAsync($"{BaseUrl}/api/health-chart-shares/current", cancellationToken);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        await EnsureSuccessOrThrowAsync(response, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<PortalHealthChartShareDto>(JsonOptions, cancellationToken);
+    }
+
+    public async Task<PortalHealthChartShareDto?> UpdateShareStatusAsync(UpdateHealthChartShareStatusRequest request, CancellationToken cancellationToken = default)
+    {
+        await SetAuthHeaderAsync();
+        var response = await httpClient.PutAsJsonAsync($"{BaseUrl}/api/health-chart-shares/status", request, JsonOptions, cancellationToken);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.NotFound) return null;
+        await EnsureSuccessOrThrowAsync(response, cancellationToken);
+        return await response.Content.ReadFromJsonAsync<PortalHealthChartShareDto>(JsonOptions, cancellationToken);
+    }
+
     public async Task<PortalHealthChartShareDto?> GetPublicShareAsync(string token, CancellationToken cancellationToken = default)
     {
         httpClient.DefaultRequestHeaders.Authorization = null;

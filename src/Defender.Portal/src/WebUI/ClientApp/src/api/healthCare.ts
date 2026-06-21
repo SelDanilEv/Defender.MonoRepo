@@ -24,12 +24,17 @@ export interface HealthChartShare {
   events: HealthEvent[];
   from?: string;
   to?: string;
+  isEnabled: boolean;
   createdAtUtc: string;
 }
 
 export interface HealthChartShareRequest {
   from?: string;
   to?: string;
+}
+
+export interface HealthChartShareStatusRequest {
+  isEnabled: boolean;
 }
 
 const parseJsonSafe = async <T>(response: Response): Promise<T | null> => {
@@ -159,6 +164,42 @@ export const healthCareApi = {
             return;
           }
           reject();
+        },
+        onFailure: async () => reject(),
+        showError: true,
+      });
+    }),
+
+  getCurrentShare: (utils?: IUtils | null): Promise<HealthChartShare | null> =>
+    new Promise((resolve) => {
+      APICallWrapper({
+        url: `${apiUrls.healthCare.chartShares}/current`,
+        options: { method: "GET" },
+        utils,
+        onSuccess: async (response) => {
+          const data = await parseJsonSafe<HealthChartShare>(response);
+          resolve(data);
+        },
+        onFailure: async () => resolve(null),
+        showError: false,
+      });
+    }),
+
+  updateShareStatus: (
+    request: HealthChartShareStatusRequest,
+    utils?: IUtils | null
+  ): Promise<HealthChartShare | null> =>
+    new Promise((resolve, reject) => {
+      APICallWrapper({
+        url: `${apiUrls.healthCare.chartShares}/status`,
+        options: {
+          method: "PUT",
+          body: JSON.stringify(request),
+        },
+        utils,
+        onSuccess: async (response) => {
+          const data = await parseJsonSafe<HealthChartShare>(response);
+          resolve(data);
         },
         onFailure: async () => reject(),
         showError: true,

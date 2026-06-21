@@ -61,6 +61,26 @@ public class HealthCareController(
         return Created(publicUrl, result with { PublicUrl = publicUrl });
     }
 
+    [HttpGet("chart-shares/current")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(PortalHealthChartShareDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> GetCurrentShare(CancellationToken cancellationToken)
+    {
+        var result = await healthCareWrapper.GetCurrentShareAsync(cancellationToken);
+        return result == null ? NotFound() : Ok(result with { PublicUrl = $"/health-care/share/{result.Token}" });
+    }
+
+    [HttpPut("chart-shares/status")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(PortalHealthChartShareDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> UpdateShareStatus([FromBody] UpdateHealthChartShareStatusRequest request, CancellationToken cancellationToken)
+    {
+        var result = await healthCareWrapper.UpdateShareStatusAsync(request, cancellationToken);
+        return result == null ? NotFound() : Ok(result with { PublicUrl = $"/health-care/share/{result.Token}" });
+    }
+
     [HttpGet("public/chart-shares/{token}")]
     [ProducesResponseType(typeof(PortalHealthChartShareDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

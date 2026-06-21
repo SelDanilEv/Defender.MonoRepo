@@ -6,4 +6,5 @@ public record PortalHealthChartShareDto(
     IReadOnlyList<PortalHealthEventDto> Events,
     DateTimeOffset? From,
     DateTimeOffset? To,
+    bool IsEnabled,
     DateTimeOffset CreatedAtUtc);

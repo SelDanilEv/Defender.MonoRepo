@@ -80,10 +80,32 @@ public class HealthChartShareRepository : BaseMongoRepository<HealthChartShare>,
         return await AddItemAsync(share);
     }
 
+    public async Task<HealthChartShare> UpdateHealthChartShareAsync(HealthChartShare share)
+    {
+        return await ReplaceItemAsync(share);
+    }
+
     public async Task<HealthChartShare?> GetHealthChartShareByTokenAsync(string token)
     {
         return await _mongoCollection
             .Find(share => share.Token == token)
             .FirstOrDefaultAsync();
+    }
+
+    public async Task<HealthChartShare?> GetHealthChartShareByUserIdAsync(Guid userId)
+    {
+        return await _mongoCollection
+            .Find(share => share.UserId == userId)
+            .SortBy(share => share.CreatedAtUtc)
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task DisableOtherHealthChartSharesAsync(Guid userId, Guid activeShareId)
+    {
+        var filter = Builders<HealthChartShare>.Filter.Eq(share => share.UserId, userId)
+            & Builders<HealthChartShare>.Filter.Ne(share => share.Id, activeShareId);
+        var update = Builders<HealthChartShare>.Update.Set(share => share.IsEnabled, false);
+
+        await _mongoCollection.UpdateManyAsync(filter, update);
     }
 }

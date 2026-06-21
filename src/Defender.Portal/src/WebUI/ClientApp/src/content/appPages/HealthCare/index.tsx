@@ -25,7 +25,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import { healthCareApi, HealthEvent, HealthEventType } from "src/api/healthCare";
+import { healthCareApi, HealthChartShare, HealthEvent, HealthEventType } from "src/api/healthCare";
 import useUtils from "src/appUtils";
 import {
   buildHealthCareChartData,
@@ -82,15 +82,20 @@ const HealthCarePage = () => {
   const [wellbeingScore, setWellbeingScore] = useState(3);
   const [notes, setNotes] = useState("");
   const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
-  const [shareLink, setShareLink] = useState("");
+  const [share, setShare] = useState<HealthChartShare | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
+  const [shareStatusUpdating, setShareStatusUpdating] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const refresh = () => healthCareApi.getEvents(undefined, undefined, u).then(setEvents);
+  const refreshShare = () => healthCareApi.getCurrentShare(u).then(setShare);
 
-  useEffect(() => { refresh(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    refresh();
+    refreshShare();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const chartData = useMemo(
     () => buildHealthCareChartData(events, chartTimeRange),
@@ -104,9 +109,14 @@ const HealthCarePage = () => {
     () => paginateHealthEvents(events, page, rowsPerPage),
     [events, page, rowsPerPage]
   );
+  const shareLink = share ? `${window.location.origin}${share.publicUrl}` : "";
+  const shareHelperText = shareCopied
+    ? u.t("healthCare:copied_to_clipboard")
+    : share?.isEnabled
+      ? u.t("healthCare:share_link_active_helper")
+      : u.t("healthCare:share_link_disabled_helper");
 
   useEffect(() => {
-    setShareLink("");
     setShareCopied(false);
   }, [events, chartTimeRange]);
 
@@ -202,7 +212,7 @@ const HealthCarePage = () => {
       u
     );
     const url = `${window.location.origin}${share.publicUrl}`;
-    setShareLink(url);
+    setShare(share);
     setShareCopied(false);
 
     try {
@@ -210,6 +220,25 @@ const HealthCarePage = () => {
       setShareCopied(true);
     } catch {
       setShareCopied(false);
+    }
+  };
+
+  const updateShareStatus = async (isEnabled: boolean) => {
+    if (shareStatusUpdating) {
+      return;
+    }
+
+    setShareStatusUpdating(true);
+
+    try {
+      const updatedShare = await healthCareApi.updateShareStatus({ isEnabled }, u);
+
+      if (updatedShare) {
+        setShare(updatedShare);
+        setShareCopied(false);
+      }
+    } finally {
+      setShareStatusUpdating(false);
     }
   };
 
@@ -246,17 +275,32 @@ const HealthCarePage = () => {
       <Stack direction="row" alignItems="center" gap={1} mb={2}>
         <LocalHospitalIcon color="primary" />
         <Typography variant="h3">{u.t("healthCare:page_title")}</Typography>
-        <Button variant="outlined" size="small" onClick={shareChart} disabled={chartData.chartEvents.length === 0}>{u.t("healthCare:share_chart")}</Button>
+        <Stack direction="row" gap={1} flexWrap="wrap">
+          <Button variant="outlined" size="small" onClick={shareChart} disabled={chartData.chartEvents.length === 0}>
+            {share ? u.t("healthCare:update_shared_range") : u.t("healthCare:share_chart")}
+          </Button>
+          {share && (
+            <Button
+              variant="outlined"
+              color={share.isEnabled ? "warning" : "success"}
+              size="small"
+              disabled={shareStatusUpdating}
+              onClick={() => updateShareStatus(!share.isEnabled)}
+            >
+              {share.isEnabled ? u.t("healthCare:stop_sharing") : u.t("healthCare:resume_sharing")}
+            </Button>
+          )}
+        </Stack>
       </Stack>
       <Typography color="text.secondary" mb={2}>
         {u.t("healthCare:page_description")}
       </Typography>
-      {shareLink && (
+      {share && (
         <TextField
           fullWidth
           label={u.t("healthCare:share_link")}
           value={shareLink}
-          helperText={shareCopied ? u.t("healthCare:copied_to_clipboard") : u.t("healthCare:share_link_helper")}
+          helperText={shareHelperText}
           InputProps={{ readOnly: true }}
           size="small"
           sx={{ mb: 2 }}

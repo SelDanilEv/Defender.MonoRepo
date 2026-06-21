@@ -19,5 +19,8 @@ public class HealthChartShare : IBaseModel
 
     public DateTimeOffset? To { get; set; }
 
+    [BsonDefaultValue(true)]
+    public bool IsEnabled { get; set; } = true;
+
     public DateTimeOffset CreatedAtUtc { get; set; } = DateTimeOffset.UtcNow;
 }
