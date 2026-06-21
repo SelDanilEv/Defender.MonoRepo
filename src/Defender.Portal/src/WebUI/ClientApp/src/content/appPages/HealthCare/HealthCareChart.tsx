@@ -53,6 +53,11 @@ const HealthCareChart = ({ events, timeRange = "all", height = 300 }: HealthCare
               connectNulls: true,
             },
           ]}
+          slotProps={{
+            legend: {
+              hidden: true,
+            },
+          }}
         />
       ) : (
         <Box height={height} display="flex" alignItems="center" justifyContent="center">
