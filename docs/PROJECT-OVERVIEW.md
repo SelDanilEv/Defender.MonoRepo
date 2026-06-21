@@ -444,7 +444,7 @@ graph LR
 
 ### Image Promotion (`promote-image-tag.yml`)
 
-Manual workflow that updates `helm/service-template/values-*.yaml` with a specific image tag, commits, and pushes -- triggering ArgoCD sync.
+Manual workflow that updates `helm/service-template/values-*.yaml` with a specific image tag, commits, and pushes -- triggering ArgoCD sync. After the promotion commit, ArgoCD can take up to 3 minutes to detect and deploy the new version.
 
 ---
 

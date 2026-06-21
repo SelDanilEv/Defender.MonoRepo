@@ -76,6 +76,7 @@ Service image tags are promoted into `helm/service-template/values-*.yaml` via:
 - `.github/workflows/promote-image-tag.yml`
 
 After value files are updated in git, ArgoCD sync applies the change.
+ArgoCD can take up to 3 minutes after the promotion commit to detect the new git state and deploy the new image tag.
 
 When a PR changes multiple deployable services, promote each affected service. For example, a
 feature that changes both `Defender.Portal` and `Defender.HealthCareService` needs one promotion

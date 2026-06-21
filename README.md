@@ -376,6 +376,7 @@ See [README-ARGOCD.md](./docs/README-ARGOCD.md) for details.
    - Manual dispatch only
    - Updates Helm values image tags
    - Commits and pushes changes when required
+   - ArgoCD can take up to 3 minutes after the promotion commit to detect and deploy the new version
 
 #### Build Process
 

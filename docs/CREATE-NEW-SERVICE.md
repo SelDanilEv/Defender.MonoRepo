@@ -65,6 +65,7 @@ Apply these changes so the new service is built, deployed, and listed everywhere
 - Build the new service from the `src` directory (e.g. `dotnet build Defender.{ServiceName}/Defender.{ServiceName}.sln` or build via the main solution).
 - Confirm the workflow matrix, `map-service-name.sh`, `all_systems.sh`, and `generate-argocd-apps.sh` all use the same `Defender.{ServiceName}` and `{kebab-name}`.
 - After the image build succeeds, run `Promote Image Tag` for the new service so ArgoCD deploys the pinned tag from `helm/service-template/values-{kebab-name}.yaml`.
+- After the promotion commit, allow up to 3 minutes for ArgoCD to detect the new git state and deploy the new version.
 - If the PR also changes another deployable app, such as `Defender.Portal`, promote that app too.
 
 ---
