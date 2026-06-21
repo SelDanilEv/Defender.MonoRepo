@@ -55,6 +55,51 @@ public class HealthEventsControllerTests
         Assert.Null(savedEvent.WellbeingScore);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData(36.3)]
+    [InlineData(40.6)]
+    public async Task CreateEvent_WhenTemperatureIsInvalid_ReturnsBadRequest(double? temperatureCelsius)
+    {
+        var repository = new Mock<IHealthEventRepository>();
+        var controller = CreateController(repository);
+
+        var result = await controller.CreateEvent(new HealthEvent
+        {
+            Type = HealthEventType.Temperature,
+            StartedAt = DateTimeOffset.UtcNow,
+            TemperatureCelsius = temperatureCelsius == null ? null : Convert.ToDecimal(temperatureCelsius),
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+        repository.Verify(
+            x => x.AddHealthEventAsync(It.IsAny<HealthEvent>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateEvent_WhenNonTemperatureHasTemperature_ClearsTemperatureBeforeSaving()
+    {
+        HealthEvent? savedEvent = null;
+        var repository = new Mock<IHealthEventRepository>();
+        repository
+            .Setup(x => x.AddHealthEventAsync(It.IsAny<HealthEvent>()))
+            .Callback<HealthEvent>(healthEvent => savedEvent = healthEvent)
+            .ReturnsAsync((HealthEvent healthEvent) => healthEvent);
+        var controller = CreateController(repository);
+
+        await controller.CreateEvent(new HealthEvent
+        {
+            Type = HealthEventType.Wellbeing,
+            StartedAt = DateTimeOffset.UtcNow,
+            TemperatureCelsius = 37.2m,
+            WellbeingScore = 5,
+        });
+
+        Assert.NotNull(savedEvent);
+        Assert.Null(savedEvent.TemperatureCelsius);
+    }
+
     private static HealthEventsController CreateController(Mock<IHealthEventRepository> repository)
     {
         var currentAccountAccessor = new Mock<ICurrentAccountAccessor>();

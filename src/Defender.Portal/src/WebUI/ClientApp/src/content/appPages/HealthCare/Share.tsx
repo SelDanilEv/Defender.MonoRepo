@@ -14,7 +14,12 @@ import HealthCareChart from "./HealthCareChart";
 import WellbeingSummary from "./WellbeingSummary";
 
 const formatEvent = (event: HealthEvent, t: (key: string, options?: object) => string) => {
-  if (event.type === "Temperature") return `${event.temperatureCelsius} C`;
+  if (event.type === "Temperature") {
+    return event.temperatureCelsius === undefined || event.temperatureCelsius === null
+      ? "-"
+      : `${event.temperatureCelsius.toFixed(1)} \u00b0C`;
+  }
+
   if (event.type === "Medication") return `${event.medicationName || t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
   if (event.type === "Wellbeing") return `${wellbeingScoreToEmoji(event.wellbeingScore)} ${event.wellbeingScore || ""}/5`;
   const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });

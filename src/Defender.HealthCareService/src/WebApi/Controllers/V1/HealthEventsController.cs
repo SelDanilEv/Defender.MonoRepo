@@ -89,6 +89,8 @@ public class HealthEventsController(
     {
         if (request.Type == HealthEventType.Wellbeing)
         {
+            request.TemperatureCelsius = null;
+
             if (request.WellbeingScore is < 1 or > 5 or null)
             {
                 return BadRequest("Wellbeing score must be between 1 and 5.");
@@ -98,6 +100,18 @@ public class HealthEventsController(
         }
 
         request.WellbeingScore = null;
+
+        if (request.Type == HealthEventType.Temperature)
+        {
+            if (request.TemperatureCelsius is null or < 36.4m or > 40.5m)
+            {
+                return BadRequest("Temperature must be between 36.4 and 40.5 Celsius.");
+            }
+
+            return null;
+        }
+
+        request.TemperatureCelsius = null;
 
         return null;
     }

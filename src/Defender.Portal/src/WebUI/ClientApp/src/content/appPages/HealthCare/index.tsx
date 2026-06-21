@@ -163,7 +163,7 @@ const HealthCarePage = () => {
     setType(event.type);
     setStartedAt(toDateTimeInput(event.startedAt));
     setEndedAt(toDateTimeInput(event.endedAt || event.startedAt));
-    setTemperature(String(event.temperatureCelsius || "37.0"));
+    setTemperature(String(event.temperatureCelsius ?? "37.0"));
     setMedicationName(event.medicationName || "");
     setMedicationAmount(String(event.medicationAmount || "1"));
     setMedicationUnit(event.medicationUnit || u.t("healthCare:unit_tablet"));
@@ -214,7 +214,12 @@ const HealthCarePage = () => {
   };
 
   const formatEvent = (event: HealthEvent) => {
-    if (event.type === "Temperature") return `${event.temperatureCelsius} °C`;
+    if (event.type === "Temperature") {
+      return event.temperatureCelsius === undefined || event.temperatureCelsius === null
+        ? "-"
+        : `${event.temperatureCelsius.toFixed(1)} \u00b0C`;
+    }
+
     if (event.type === "Medication") return `${event.medicationName || u.t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
     if (event.type === "Wellbeing") return `${wellbeingScoreToEmoji(event.wellbeingScore)} ${event.wellbeingScore || ""}/5`;
     const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
