@@ -225,6 +225,8 @@ const HealthCarePage = () => {
                 value={startedAt}
                 onChange={(value) => value && setStartedAt(snapDate(value))}
                 minutesStep={30}
+                timeSteps={{ minutes: 30 }}
+                skipDisabled
                 slotProps={{ textField: { size: "small" } }}
               />
               {type === "Sleep" && (
@@ -233,6 +235,8 @@ const HealthCarePage = () => {
                   value={endedAt}
                   onChange={(value) => value && setEndedAt(snapDate(value))}
                   minutesStep={30}
+                  timeSteps={{ minutes: 30 }}
+                  skipDisabled
                   slotProps={{ textField: { size: "small" } }}
                 />
               )}

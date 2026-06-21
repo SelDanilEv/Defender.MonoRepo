@@ -17,6 +17,7 @@ public class HealthEvent : IBaseModel
     [BsonRepresentation(BsonType.String)]
     public Guid Id { get; set; } = Guid.NewGuid();
 
+    [BsonRepresentation(BsonType.String)]
     public Guid UserId { get; set; }
 
     public HealthEventType Type { get; set; }

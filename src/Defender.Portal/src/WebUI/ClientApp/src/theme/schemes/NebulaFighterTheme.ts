@@ -376,8 +376,51 @@ export const NebulaFighterTheme = createTheme({
           flexDirection: "column",
           minHeight: "100%",
           width: "100%",
+          scrollbarColor: `${colors.primary.light} transparent`,
+          scrollbarWidth: "thin",
           MozOsxFontSmoothing: "grayscale",
           WebkitFontSmoothing: "antialiased",
+        },
+        "*": {
+          scrollbarWidth: "thin",
+          scrollbarColor: `${colors.primary.light} transparent`,
+        },
+        "*::-webkit-scrollbar": {
+          width: 6,
+          height: 6,
+        },
+        "*::-webkit-scrollbar-track": {
+          background: "transparent",
+        },
+        "*::-webkit-scrollbar-thumb": {
+          backgroundColor: colors.primary.light,
+          borderRadius: 8,
+          border: "2px solid transparent",
+          backgroundClip: "content-box",
+        },
+        "*::-webkit-scrollbar-thumb:hover": {
+          backgroundColor: colors.primary.main,
+        },
+        "*::-webkit-scrollbar-corner": {
+          background: "transparent",
+        },
+        ".MuiPickersPopper-paper .MuiMultiSectionDigitalClockSection-root, .MuiPickersModalDialog-root .MuiMultiSectionDigitalClockSection-root, .MuiPickersPopper-paper .MuiDigitalClock-list, .MuiPickersModalDialog-root .MuiDigitalClock-list": {
+          scrollbarWidth: "thin",
+          scrollbarColor: `${colors.primary.light} transparent`,
+          scrollbarGutter: "stable",
+        },
+        ".MuiPickersPopper-paper .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar, .MuiPickersModalDialog-root .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar, .MuiPickersPopper-paper .MuiDigitalClock-list::-webkit-scrollbar, .MuiPickersModalDialog-root .MuiDigitalClock-list::-webkit-scrollbar": {
+          width: 4,
+        },
+        ".MuiPickersPopper-paper .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar-track, .MuiPickersModalDialog-root .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar-track, .MuiPickersPopper-paper .MuiDigitalClock-list::-webkit-scrollbar-track, .MuiPickersModalDialog-root .MuiDigitalClock-list::-webkit-scrollbar-track": {
+          background: "transparent",
+        },
+        ".MuiPickersPopper-paper .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar-thumb, .MuiPickersModalDialog-root .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar-thumb, .MuiPickersPopper-paper .MuiDigitalClock-list::-webkit-scrollbar-thumb, .MuiPickersModalDialog-root .MuiDigitalClock-list::-webkit-scrollbar-thumb": {
+          backgroundColor: colors.primary.light,
+          borderRadius: 8,
+        },
+        ".MuiPickersPopper-paper .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar-thumb:hover, .MuiPickersModalDialog-root .MuiMultiSectionDigitalClockSection-root::-webkit-scrollbar-thumb:hover, .MuiPickersPopper-paper .MuiDigitalClock-list::-webkit-scrollbar-thumb:hover, .MuiPickersModalDialog-root .MuiDigitalClock-list::-webkit-scrollbar-thumb:hover": {
+          backgroundColor: colors.primary.main,
         },
         ".child-popover .MuiPaper-root .MuiList-root": {
           flexDirection: "column",

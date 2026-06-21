@@ -12,6 +12,7 @@ public class HealthChartShare : IBaseModel
 
     public string Token { get; set; } = string.Empty;
 
+    [BsonRepresentation(BsonType.String)]
     public Guid UserId { get; set; }
 
     public DateTimeOffset? From { get; set; }
