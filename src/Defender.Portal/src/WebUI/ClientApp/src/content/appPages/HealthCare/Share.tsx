@@ -1,5 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
-import { Box, Card, CardContent, Chip, LinearProgress, MenuItem, Stack, TextField, Typography } from "@mui/material";
+import type { ChangeEvent } from "react";
+import {
+  Box,
+  Card,
+  CardContent,
+  LinearProgress,
+  MenuItem,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TextField,
+  Typography,
+} from "@mui/material";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { useParams } from "react-router";
 import { healthCareApi, HealthChartShare, HealthEvent } from "src/api/healthCare";
@@ -8,6 +25,7 @@ import LanguageSwitcher from "src/components/LanguageSwitcher";
 import {
   ChartTimeRange,
   filterEventsByTimeRange,
+  paginateHealthEvents,
   wellbeingScoreToEmoji,
 } from "./chartData";
 import HealthCareChart from "./HealthCareChart";
@@ -24,14 +42,6 @@ const formatEvent = (event: HealthEvent, t: (key: string, options?: object) => s
   if (event.type === "Wellbeing") return `${wellbeingScoreToEmoji(event.wellbeingScore)} ${event.wellbeingScore || ""}/5`;
   const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   return t("healthCare:sleep_until", { time });
-};
-
-const chipColor = (event: HealthEvent) => {
-  if (event.type === "Sleep") return "info";
-  if (event.type === "Medication") return "secondary";
-  if (event.type === "Wellbeing") return "success";
-
-  return "primary";
 };
 
 const formatSharedRange = (
@@ -62,7 +72,9 @@ const HealthCareSharePage = () => {
   const { token } = useParams();
   const [share, setShare] = useState<HealthChartShare | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("all");
+  const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const events = useMemo(() => share?.events ?? [], [share?.events]);
   const rangeAnchor = useMemo(
     () => (share?.to ? new Date(share.to) : undefined),
@@ -71,6 +83,10 @@ const HealthCareSharePage = () => {
   const visibleEvents = useMemo(
     () => filterEventsByTimeRange(events, chartTimeRange, rangeAnchor),
     [events, chartTimeRange, rangeAnchor]
+  );
+  const pagedEvents = useMemo(
+    () => paginateHealthEvents(visibleEvents, page, rowsPerPage),
+    [visibleEvents, page, rowsPerPage]
   );
 
   useEffect(() => {
@@ -90,6 +106,33 @@ const HealthCareSharePage = () => {
         setIsLoading(false);
       });
   }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const maxPage =
+      visibleEvents.length === 0
+        ? 0
+        : Math.max(0, Math.ceil(visibleEvents.length / rowsPerPage) - 1);
+
+    setPage((currentPage) => Math.min(currentPage, maxPage));
+  }, [visibleEvents.length, rowsPerPage]);
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const formatType = (eventType: HealthEvent["type"]) => {
+    if (eventType === "Temperature") return u.t("healthCare:event_temperature");
+    if (eventType === "Medication") return u.t("healthCare:event_medication");
+    if (eventType === "Wellbeing") return u.t("healthCare:event_wellbeing");
+    return u.t("healthCare:event_sleep");
+  };
 
   const content = isLoading ? (
     <LinearProgress />
@@ -127,11 +170,77 @@ const HealthCareSharePage = () => {
         scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
       />
       <HealthCareChart events={visibleEvents} timeRange="all" />
-      <Stack direction="row" flexWrap="wrap" gap={1} mt={2}>
-        {visibleEvents.map((event) => (
-          <Chip key={event.id} label={`${new Date(event.startedAt).toLocaleString([], { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })}: ${formatEvent(event, u.t)}`} color={chipColor(event)} variant="outlined" />
-        ))}
-      </Stack>
+      <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
+      <TableContainer>
+        <Table size="small">
+          <TableHead>
+            <TableRow>
+              <TableCell>{u.t("healthCare:grid_started_at")}</TableCell>
+              <TableCell>{u.t("healthCare:grid_type")}</TableCell>
+              <TableCell>{u.t("healthCare:grid_value")}</TableCell>
+              <TableCell>{u.t("healthCare:notes")}</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {pagedEvents.map((event) => (
+              <TableRow key={event.id}>
+                <TableCell>
+                  {new Date(event.startedAt).toLocaleString([], {
+                    day: "2-digit",
+                    month: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </TableCell>
+                <TableCell>{formatType(event.type)}</TableCell>
+                <TableCell>{formatEvent(event, u.t)}</TableCell>
+                <TableCell>{event.notes || ""}</TableCell>
+              </TableRow>
+            ))}
+            {visibleEvents.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      {visibleEvents.length > 0 && (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end",
+            flexWrap: "wrap",
+            gap: 0.5,
+            px: 1.5,
+            pt: 0.5,
+          }}
+        >
+          <Typography
+            variant="body2"
+            sx={{
+              textAlign: "center",
+              fontSize: { xs: "0.68rem", sm: "0.8rem" },
+              lineHeight: 1.2,
+            }}
+          >
+            {u.t("table_rows_per_page_label")}
+          </Typography>
+          <TablePagination
+            component="div"
+            count={visibleEvents.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            rowsPerPageOptions={[10, 25, 50]}
+            labelRowsPerPage=""
+          />
+        </Box>
+      )}
     </>
   );
 
