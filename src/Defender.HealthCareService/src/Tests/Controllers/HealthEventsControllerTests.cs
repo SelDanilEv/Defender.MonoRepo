@@ -1,0 +1,73 @@
+using Defender.Common.Enums;
+using Defender.Common.Interfaces;
+using Defender.HealthCareService.Application.Common.Interfaces.Repositories;
+using Defender.HealthCareService.Domain.Entities;
+using Microsoft.AspNetCore.Mvc;
+using Moq;
+using WebApi.Controllers.V1;
+
+namespace Defender.HealthCareService.Tests.Controllers;
+
+public class HealthEventsControllerTests
+{
+    [Theory]
+    [InlineData(null)]
+    [InlineData(0)]
+    [InlineData(6)]
+    public async Task CreateEvent_WhenWellbeingScoreIsInvalid_ReturnsBadRequest(int? wellbeingScore)
+    {
+        var repository = new Mock<IHealthEventRepository>();
+        var controller = CreateController(repository);
+
+        var result = await controller.CreateEvent(new HealthEvent
+        {
+            Type = HealthEventType.Wellbeing,
+            StartedAt = DateTimeOffset.UtcNow,
+            WellbeingScore = wellbeingScore,
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+        repository.Verify(
+            x => x.AddHealthEventAsync(It.IsAny<HealthEvent>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateEvent_WhenNonWellbeingHasWellbeingScore_ClearsScoreBeforeSaving()
+    {
+        HealthEvent? savedEvent = null;
+        var repository = new Mock<IHealthEventRepository>();
+        repository
+            .Setup(x => x.AddHealthEventAsync(It.IsAny<HealthEvent>()))
+            .Callback<HealthEvent>(healthEvent => savedEvent = healthEvent)
+            .ReturnsAsync((HealthEvent healthEvent) => healthEvent);
+        var controller = CreateController(repository);
+
+        await controller.CreateEvent(new HealthEvent
+        {
+            Type = HealthEventType.Temperature,
+            StartedAt = DateTimeOffset.UtcNow,
+            TemperatureCelsius = 37.2m,
+            WellbeingScore = 5,
+        });
+
+        Assert.NotNull(savedEvent);
+        Assert.Null(savedEvent.WellbeingScore);
+    }
+
+    private static HealthEventsController CreateController(Mock<IHealthEventRepository> repository)
+    {
+        var currentAccountAccessor = new Mock<ICurrentAccountAccessor>();
+        currentAccountAccessor
+            .Setup(x => x.GetAccountId())
+            .Returns(Guid.Parse("11111111-1111-1111-1111-111111111111"));
+        currentAccountAccessor
+            .Setup(x => x.GetRoles())
+            .Returns([]);
+        currentAccountAccessor
+            .Setup(x => x.GetHighestRole())
+            .Returns(Role.User);
+
+        return new HealthEventsController(currentAccountAccessor.Object, repository.Object);
+    }
+}

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { ChangeEvent } from "react";
 import {
   Autocomplete,
   Box,
@@ -14,6 +15,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   TextField,
   Tooltip,
@@ -29,8 +31,13 @@ import {
   buildHealthCareChartData,
   ChartTimeRange,
   getTimeRangeBounds,
+  paginateHealthEvents,
+  wellbeingScoreToEmoji,
 } from "./chartData";
 import HealthCareChart from "./HealthCareChart";
+import TemperatureSlider, { normalizeTemperature } from "./TemperatureSlider";
+import WellbeingSelector from "./WellbeingSelector";
+import WellbeingSummary from "./WellbeingSummary";
 
 const snapDate = (value: Date) => {
   const snapped = new Date(value);
@@ -72,11 +79,14 @@ const HealthCarePage = () => {
   const [medicationName, setMedicationName] = useState("");
   const [medicationAmount, setMedicationAmount] = useState("1");
   const [medicationUnit, setMedicationUnit] = useState(() => u.t("healthCare:unit_tablet"));
+  const [wellbeingScore, setWellbeingScore] = useState(3);
   const [notes, setNotes] = useState("");
   const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
   const [shareLink, setShareLink] = useState("");
   const [shareCopied, setShareCopied] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const refresh = () => healthCareApi.getEvents(undefined, undefined, u).then(setEvents);
 
@@ -90,11 +100,24 @@ const HealthCarePage = () => {
     () => uniqueMedicationNames(events),
     [events]
   );
+  const pagedEvents = useMemo(
+    () => paginateHealthEvents(events, page, rowsPerPage),
+    [events, page, rowsPerPage]
+  );
 
   useEffect(() => {
     setShareLink("");
     setShareCopied(false);
   }, [events, chartTimeRange]);
+
+  useEffect(() => {
+    const maxPage =
+      events.length === 0
+        ? 0
+        : Math.max(0, Math.ceil(events.length / rowsPerPage) - 1);
+
+    setPage((currentPage) => Math.min(currentPage, maxPage));
+  }, [events.length, rowsPerPage]);
 
   const resetForm = () => {
     setEditingEventId(null);
@@ -105,6 +128,7 @@ const HealthCarePage = () => {
     setMedicationName("");
     setMedicationAmount("1");
     setMedicationUnit(u.t("healthCare:unit_tablet"));
+    setWellbeingScore(3);
     setNotes("");
   };
 
@@ -112,10 +136,11 @@ const HealthCarePage = () => {
       type,
       startedAt: snapDate(startedAt).toISOString(),
       endedAt: type === "Sleep" ? snapDate(endedAt).toISOString() : undefined,
-      temperatureCelsius: type === "Temperature" ? Number(temperature) : undefined,
+      temperatureCelsius: type === "Temperature" ? Number(normalizeTemperature(temperature).toFixed(1)) : undefined,
       medicationName: type === "Medication" ? medicationName : undefined,
       medicationAmount: type === "Medication" ? Number(medicationAmount) : undefined,
       medicationUnit: type === "Medication" ? medicationUnit : undefined,
+      wellbeingScore: type === "Wellbeing" ? wellbeingScore : undefined,
       notes,
   });
 
@@ -142,6 +167,7 @@ const HealthCarePage = () => {
     setMedicationName(event.medicationName || "");
     setMedicationAmount(String(event.medicationAmount || "1"));
     setMedicationUnit(event.medicationUnit || u.t("healthCare:unit_tablet"));
+    setWellbeingScore(event.wellbeingScore || 3);
     setNotes(event.notes || "");
   };
 
@@ -153,6 +179,17 @@ const HealthCarePage = () => {
     }
 
     refresh();
+  };
+
+  const handleChangePage = (_event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
   };
 
   const shareChart = async () => {
@@ -179,6 +216,7 @@ const HealthCarePage = () => {
   const formatEvent = (event: HealthEvent) => {
     if (event.type === "Temperature") return `${event.temperatureCelsius} °C`;
     if (event.type === "Medication") return `${event.medicationName || u.t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
+    if (event.type === "Wellbeing") return `${wellbeingScoreToEmoji(event.wellbeingScore)} ${event.wellbeingScore || ""}/5`;
     const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
     return u.t("healthCare:sleep_until", { time });
   };
@@ -186,8 +224,17 @@ const HealthCarePage = () => {
   const formatType = (eventType: HealthEventType) => {
     if (eventType === "Temperature") return u.t("healthCare:event_temperature");
     if (eventType === "Medication") return u.t("healthCare:event_medication");
+    if (eventType === "Wellbeing") return u.t("healthCare:event_wellbeing");
     return u.t("healthCare:event_sleep");
   };
+
+  const wellbeingDescriptions = [
+    u.t("healthCare:wellbeing_1"),
+    u.t("healthCare:wellbeing_2"),
+    u.t("healthCare:wellbeing_3"),
+    u.t("healthCare:wellbeing_4"),
+    u.t("healthCare:wellbeing_5"),
+  ];
 
   return (
     <Box p={1}>
@@ -219,6 +266,7 @@ const HealthCarePage = () => {
                 <MenuItem value="Temperature">{u.t("healthCare:event_temperature")}</MenuItem>
                 <MenuItem value="Medication">{u.t("healthCare:event_medication")}</MenuItem>
                 <MenuItem value="Sleep">{u.t("healthCare:event_sleep")}</MenuItem>
+                <MenuItem value="Wellbeing">{u.t("healthCare:event_wellbeing")}</MenuItem>
               </TextField>
               <DateTimePicker
                 label={u.t("healthCare:start")}
@@ -240,7 +288,13 @@ const HealthCarePage = () => {
                   slotProps={{ textField: { size: "small" } }}
                 />
               )}
-              {type === "Temperature" && <TextField label={u.t("healthCare:temperature_celsius")} value={temperature} onChange={(e) => setTemperature(e.target.value)} size="small" />}
+              {type === "Temperature" && (
+                <TemperatureSlider
+                  label={u.t("healthCare:temperature_celsius")}
+                  value={temperature}
+                  onChange={setTemperature}
+                />
+              )}
               {type === "Medication" && <>
                 <Autocomplete
                   freeSolo
@@ -255,6 +309,14 @@ const HealthCarePage = () => {
                 <TextField label={u.t("healthCare:medication_amount")} value={medicationAmount} onChange={(e) => setMedicationAmount(e.target.value)} size="small" />
                 <TextField label={u.t("healthCare:medication_unit")} value={medicationUnit} onChange={(e) => setMedicationUnit(e.target.value)} size="small" />
               </>}
+              {type === "Wellbeing" && (
+                <WellbeingSelector
+                  label={u.t("healthCare:wellbeing")}
+                  score={wellbeingScore}
+                  descriptions={wellbeingDescriptions}
+                  onChange={setWellbeingScore}
+                />
+              )}
               <TextField label={u.t("healthCare:notes")} value={notes} onChange={(e) => setNotes(e.target.value)} size="small" multiline minRows={2} />
               <Stack direction="row" gap={1}>
                 <Button variant="contained" onClick={saveEvent}>
@@ -286,6 +348,12 @@ const HealthCarePage = () => {
                 <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
               </TextField>
             </Stack>
+            <WellbeingSummary
+              events={events}
+              timeRange={chartTimeRange}
+              title={u.t("healthCare:latest_wellbeing")}
+              scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
+            />
             <HealthCareChart events={events} timeRange={chartTimeRange} />
             <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
             <TableContainer>
@@ -300,7 +368,7 @@ const HealthCarePage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {events.map((event) => (
+                  {pagedEvents.map((event) => (
                     <TableRow key={event.id} selected={editingEventId === event.id}>
                       <TableCell>
                         {new Date(event.startedAt).toLocaleString([], {
@@ -337,6 +405,40 @@ const HealthCarePage = () => {
                 </TableBody>
               </Table>
             </TableContainer>
+            {events.length > 0 && (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "flex-end",
+                  flexWrap: "wrap",
+                  gap: 0.5,
+                  px: 1.5,
+                  pt: 0.5,
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    textAlign: "center",
+                    fontSize: { xs: "0.68rem", sm: "0.8rem" },
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {u.t("table_rows_per_page_label")}
+                </Typography>
+                <TablePagination
+                  component="div"
+                  count={events.length}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  rowsPerPage={rowsPerPage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  rowsPerPageOptions={[10, 25, 50]}
+                  labelRowsPerPage=""
+                />
+              </Box>
+            )}
           </CardContent></Card>
         </Grid>
       </Grid>

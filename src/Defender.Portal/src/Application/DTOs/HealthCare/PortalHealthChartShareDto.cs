@@ -4,4 +4,6 @@ public record PortalHealthChartShareDto(
     string Token,
     string PublicUrl,
     IReadOnlyList<PortalHealthEventDto> Events,
+    DateTimeOffset? From,
+    DateTimeOffset? To,
     DateTimeOffset CreatedAtUtc);

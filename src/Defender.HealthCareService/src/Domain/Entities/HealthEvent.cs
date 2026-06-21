@@ -10,7 +10,8 @@ public enum HealthEventType
 {
     Temperature,
     Medication,
-    Sleep
+    Sleep,
+    Wellbeing
 }
 
 public class HealthEvent : IBaseModel
@@ -35,6 +36,8 @@ public class HealthEvent : IBaseModel
     public decimal? MedicationAmount { get; set; }
 
     public string? MedicationUnit { get; set; }
+
+    public int? WellbeingScore { get; set; }
 
     public string? Notes { get; set; }
 }

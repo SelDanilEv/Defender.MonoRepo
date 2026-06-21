@@ -6,6 +6,8 @@ export const medicationLane = 1;
 export const sleepLane = 2;
 export type ChartTimeRange = "day" | "week" | "month" | "all";
 
+const wellbeingEmojiByScore = ["😢", "😟", "😐", "🙂", "😄"];
+
 const rangeDays: Partial<Record<ChartTimeRange, number>> = {
   day: 1,
   week: 7,
@@ -40,6 +42,42 @@ export const getTimeRangeBounds = (
   from.setDate(from.getDate() - days);
 
   return { from, to: now };
+};
+
+export const wellbeingScoreToEmoji = (score?: number) => {
+  if (!score) {
+    return "";
+  }
+
+  const normalizedScore = Math.max(1, Math.min(5, Math.round(score)));
+
+  return wellbeingEmojiByScore[normalizedScore - 1];
+};
+
+export const getLatestWellbeingEvent = (
+  events: HealthEvent[],
+  timeRange: ChartTimeRange = "all",
+  now = new Date()
+) =>
+  [...filterEventsByTimeRange(events, timeRange, now)]
+    .filter(
+      (event) =>
+        event.type === "Wellbeing" && event.wellbeingScore !== undefined
+    )
+    .sort(
+      (left, right) =>
+        new Date(right.startedAt).getTime() -
+        new Date(left.startedAt).getTime()
+    )[0];
+
+export const paginateHealthEvents = (
+  events: HealthEvent[],
+  page: number,
+  rowsPerPage: number
+) => {
+  const startIndex = page * rowsPerPage;
+
+  return events.slice(startIndex, startIndex + rowsPerPage);
 };
 
 const eventTimeLabel = (event: HealthEvent) =>

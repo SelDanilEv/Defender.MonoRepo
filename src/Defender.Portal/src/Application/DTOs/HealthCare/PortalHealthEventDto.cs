@@ -7,7 +7,8 @@ public enum PortalHealthEventType
 {
     Temperature,
     Medication,
-    Sleep
+    Sleep,
+    Wellbeing
 }
 
 public class PortalHealthEventDto
@@ -29,6 +30,8 @@ public class PortalHealthEventDto
     public decimal? MedicationAmount { get; set; }
 
     public string? MedicationUnit { get; set; }
+
+    public int? WellbeingScore { get; set; }
 
     public string? Notes { get; set; }
 }

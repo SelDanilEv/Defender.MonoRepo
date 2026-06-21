@@ -47,7 +47,6 @@ const HealthCareChart = ({ events, timeRange = "all", height = 300 }: HealthCare
           yAxis={[{ id: "temperature", label: "C" }]}
           series={[
             {
-              label: "C",
               data: chartData.temperatureData,
               yAxisId: "temperature",
               showMark: true,

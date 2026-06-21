@@ -26,6 +26,12 @@ public class HealthEventsController(
     [ProducesResponseType(typeof(HealthEvent), StatusCodes.Status201Created)]
     public async Task<ActionResult<HealthEvent>> CreateEvent([FromBody] HealthEvent request)
     {
+        var validationResult = ValidateHealthEvent(request);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
         request.Id = request.Id == Guid.Empty ? Guid.NewGuid() : request.Id;
         request.UserId = currentAccountAccessor.GetAccountId();
         request.StartedAt = SnapToHalfHour(request.StartedAt);
@@ -44,6 +50,12 @@ public class HealthEventsController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<HealthEvent>> UpdateEvent(Guid id, [FromBody] HealthEvent request)
     {
+        var validationResult = ValidateHealthEvent(request);
+        if (validationResult != null)
+        {
+            return validationResult;
+        }
+
         var userId = currentAccountAccessor.GetAccountId();
         var existing = await healthEventRepository.GetHealthEventByIdAsync(userId, id);
 
@@ -71,6 +83,23 @@ public class HealthEventsController(
     {
         var removed = await healthEventRepository.DeleteHealthEventAsync(currentAccountAccessor.GetAccountId(), id);
         return removed ? NoContent() : NotFound();
+    }
+
+    private BadRequestObjectResult? ValidateHealthEvent(HealthEvent request)
+    {
+        if (request.Type == HealthEventType.Wellbeing)
+        {
+            if (request.WellbeingScore is < 1 or > 5 or null)
+            {
+                return BadRequest("Wellbeing score must be between 1 and 5.");
+            }
+
+            return null;
+        }
+
+        request.WellbeingScore = null;
+
+        return null;
     }
 
     private static DateTimeOffset SnapToHalfHour(DateTimeOffset value)

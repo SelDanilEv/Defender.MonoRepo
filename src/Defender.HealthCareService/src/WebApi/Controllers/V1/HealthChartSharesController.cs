@@ -8,7 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 namespace WebApi.Controllers.V1;
 
 public record HealthChartShareRequest(DateTimeOffset? From, DateTimeOffset? To);
-public record HealthChartShareDto(string Token, string PublicUrl, IReadOnlyList<HealthEvent> Events, DateTimeOffset CreatedAtUtc);
+public record HealthChartShareDto(
+    string Token,
+    string PublicUrl,
+    IReadOnlyList<HealthEvent> Events,
+    DateTimeOffset? From,
+    DateTimeOffset? To,
+    DateTimeOffset CreatedAtUtc);
 
 public class HealthChartSharesController(
     ICurrentAccountAccessor currentAccountAccessor,
@@ -34,6 +40,8 @@ public class HealthChartSharesController(
             share.Token,
             $"/api/public/health-chart-shares/{share.Token}",
             events,
+            share.From,
+            share.To,
             share.CreatedAtUtc);
 
         return Created(shareDto.PublicUrl, shareDto);
@@ -56,6 +64,8 @@ public class HealthChartSharesController(
             share.Token,
             $"/api/public/health-chart-shares/{share.Token}",
             events,
+            share.From,
+            share.To,
             share.CreatedAtUtc));
     }
 }
