@@ -1,9 +1,11 @@
 using Defender.Common.Entities;
+using System.Text.Json.Serialization;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Defender.HealthCareService.Domain.Entities;
 
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum HealthEventType
 {
     Temperature,
