@@ -102,19 +102,40 @@ public class HealthChartSharesController(
             return NotFound();
         }
 
-        var events = await healthEventRepository.GetHealthEventsAsync(share.UserId, share.From, share.To);
-        return Ok(ToDto(share, events));
+        var (from, to) = GetEffectivePublicRange(share);
+        var events = await healthEventRepository.GetHealthEventsAsync(share.UserId, from, to);
+        return Ok(ToDto(share, events, from, to));
+    }
+
+    private static (DateTimeOffset? From, DateTimeOffset? To) GetEffectivePublicRange(HealthChartShare share)
+    {
+        if (share.From == null || share.To == null)
+        {
+            return (share.From, share.To);
+        }
+
+        var range = share.To.Value - share.From.Value;
+
+        if (range <= TimeSpan.Zero)
+        {
+            return (share.From, share.To);
+        }
+
+        var to = DateTimeOffset.UtcNow;
+        return (to - range, to);
     }
 
     private static HealthChartShareDto ToDto(
         HealthChartShare share,
-        IReadOnlyList<HealthEvent> events) =>
+        IReadOnlyList<HealthEvent> events,
+        DateTimeOffset? from = null,
+        DateTimeOffset? to = null) =>
         new(
             share.Token,
             $"/api/public/health-chart-shares/{share.Token}",
             events,
-            share.From,
-            share.To,
+            from ?? share.From,
+            to ?? share.To,
             share.IsEnabled,
             share.CreatedAtUtc);
 }
