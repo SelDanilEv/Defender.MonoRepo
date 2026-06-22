@@ -6,6 +6,7 @@
   "stop_sharing": "Stop sharing",
   "resume_sharing": "Resume sharing",
   "share_link": "Public link",
+  "copy_share_link": "Copy public link",
   "share_link_helper": "Public read-only chart link is ready.",
   "share_link_active_helper": "Sharing is active. This URL stays the same.",
   "share_link_disabled_helper": "Sharing is paused. The URL stays reserved and can be resumed.",

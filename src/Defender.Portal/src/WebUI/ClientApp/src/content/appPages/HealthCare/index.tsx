@@ -8,6 +8,7 @@ import {
   CardContent,
   Grid,
   IconButton,
+  InputAdornment,
   MenuItem,
   Stack,
   Table,
@@ -24,6 +25,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { healthCareApi, HealthChartShare, HealthEvent, HealthEventType } from "src/api/healthCare";
 import useUtils from "src/appUtils";
@@ -35,6 +37,7 @@ import {
   wellbeingScoreToEmoji,
 } from "./chartData";
 import HealthCareChart from "./HealthCareChart";
+import { getAbsoluteShareUrl } from "./ShareLink";
 import TemperatureSlider, { normalizeTemperature } from "./TemperatureSlider";
 import WellbeingSelector from "./WellbeingSelector";
 import WellbeingSummary from "./WellbeingSummary";
@@ -109,7 +112,9 @@ const HealthCarePage = () => {
     () => paginateHealthEvents(events, page, rowsPerPage),
     [events, page, rowsPerPage]
   );
-  const shareLink = share ? `${window.location.origin}${share.publicUrl}` : "";
+  const shareLink = share
+    ? getAbsoluteShareUrl(share.publicUrl, window.location.origin)
+    : "";
   const shareHelperText = shareCopied
     ? u.t("healthCare:copied_to_clipboard")
     : share?.isEnabled
@@ -211,12 +216,25 @@ const HealthCarePage = () => {
       },
       u
     );
-    const url = `${window.location.origin}${share.publicUrl}`;
+    const url = getAbsoluteShareUrl(share.publicUrl, window.location.origin);
     setShare(share);
     setShareCopied(false);
 
     try {
       await navigator.clipboard.writeText(url);
+      setShareCopied(true);
+    } catch {
+      setShareCopied(false);
+    }
+  };
+
+  const copyShareLink = async () => {
+    if (!shareLink) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(shareLink);
       setShareCopied(true);
     } catch {
       setShareCopied(false);
@@ -301,7 +319,23 @@ const HealthCarePage = () => {
           label={u.t("healthCare:share_link")}
           value={shareLink}
           helperText={shareHelperText}
-          InputProps={{ readOnly: true }}
+          InputProps={{
+            readOnly: true,
+            endAdornment: (
+              <InputAdornment position="end">
+                <Tooltip title={u.t("healthCare:copy_share_link")}>
+                  <IconButton
+                    aria-label={u.t("healthCare:copy_share_link")}
+                    edge="end"
+                    onClick={copyShareLink}
+                    size="small"
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </InputAdornment>
+            ),
+          }}
           size="small"
           sx={{ mb: 2 }}
         />
