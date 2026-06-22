@@ -58,6 +58,48 @@ public class HealthChartSharesControllerTests
     }
 
     [Fact]
+    public async Task GetPublicShare_WhenEventsAreReturnedOldestFirst_ReturnsMostRecentEventsFirst()
+    {
+        var token = "share-token";
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var oldEvent = new HealthEvent
+        {
+            Id = Guid.Parse("22222222-2222-2222-2222-222222222222"),
+            UserId = userId,
+            Type = HealthEventType.Temperature,
+            StartedAt = DateTimeOffset.Parse("2026-06-21T08:00:00Z"),
+        };
+        var newEvent = new HealthEvent
+        {
+            Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
+            UserId = userId,
+            Type = HealthEventType.Medication,
+            StartedAt = DateTimeOffset.Parse("2026-06-21T10:00:00Z"),
+        };
+        var healthEventRepository = new Mock<IHealthEventRepository>();
+        healthEventRepository
+            .Setup(x => x.GetHealthEventsAsync(userId, null, null))
+            .ReturnsAsync([oldEvent, newEvent]);
+        var shareRepository = new Mock<IHealthChartShareRepository>();
+        shareRepository
+            .Setup(x => x.GetHealthChartShareByTokenAsync(token))
+            .ReturnsAsync(new HealthChartShare
+            {
+                Token = token,
+                UserId = userId,
+                IsEnabled = true,
+                CreatedAtUtc = DateTimeOffset.Parse("2026-06-21T09:00:00Z"),
+            });
+        var controller = CreateController(healthEventRepository, shareRepository);
+
+        var result = await controller.GetPublicShare(token);
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var dto = Assert.IsType<HealthChartShareDto>(okResult.Value);
+        Assert.Equal([newEvent.Id, oldEvent.Id], dto.Events.Select(x => x.Id));
+    }
+
+    [Fact]
     public async Task GetPublicShare_WhenShareIsDisabled_ReturnsNotFound()
     {
         var token = "share-token";

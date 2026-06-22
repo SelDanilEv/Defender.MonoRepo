@@ -133,7 +133,7 @@ public class HealthChartSharesController(
         new(
             share.Token,
             $"/api/public/health-chart-shares/{share.Token}",
-            events,
+            events.OrderByDescending(x => x.StartedAt).ToArray(),
             from ?? share.From,
             to ?? share.To,
             share.IsEnabled,
