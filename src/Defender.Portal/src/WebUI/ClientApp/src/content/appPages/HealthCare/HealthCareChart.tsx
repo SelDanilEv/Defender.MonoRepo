@@ -34,6 +34,7 @@ const HealthCareChart = ({
   const medicationEvents = chartData.chartEvents.filter((event) => event.type === "Medication");
   const sleepEvents = chartData.chartEvents.filter((event) => event.type === "Sleep");
   const margin = u.isMobile ? mobileChartMargin : chartMargin;
+  const medicationLineWidth = u.isMobile ? 14 : 10;
 
   if (chartData.chartEvents.length === 0) {
     return <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>;
@@ -136,9 +137,11 @@ const HealthCareChart = ({
                 bottom={0}
                 sx={{
                   left: `${left}%`,
-                  width: 2,
+                  width: medicationLineWidth,
+                  transform: "translateX(-50%)",
                   bgcolor: "secondary.main",
                   opacity: 0.8,
+                  borderRadius: 999,
                   pointerEvents: "auto",
                 }}
               />
