@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.health-care
-  tag: ed62fb22b9f6b862bf0fda2353fd96e0e84f9f98
+  tag: sha-1cc8683
   pullPolicy: Always
 ingress:
   enabled: true
