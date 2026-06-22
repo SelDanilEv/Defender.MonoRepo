@@ -285,7 +285,7 @@ jobs:
             type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-            type=sha,prefix={{branch}}-
+            type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_number }}
             type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_time }}-${{ steps.build-info.outputs.short_sha }}
@@ -305,8 +305,8 @@ jobs:
           build-args: |
             DOTNET_VERSION=${{ env.DOTNET_VERSION }}
             SERVICE_DIR=${{ matrix.service.service_dir }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.service.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service.name }}
 
       - name: Output image info
         run: |
@@ -454,8 +454,8 @@ jobs:
           build-args: |
             DOTNET_VERSION=${{ env.DOTNET_VERSION }}
             SERVICE_DIR=${{ steps.service-config.outputs.service_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ steps.service-config.outputs.clean_name }}
+          cache-to: type=gha,mode=max,scope=${{ steps.service-config.outputs.clean_name }}
 
       - name: Output image info
         run: |

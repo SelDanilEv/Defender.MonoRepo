@@ -11,15 +11,22 @@ namespace Defender.HealthCareService.Tests.Controllers;
 public class HealthChartSharesControllerTests
 {
     [Fact]
-    public async Task GetPublicShare_WhenShareExists_ReturnsStoredDateRange()
+    public async Task GetPublicShare_WhenShareExists_ReturnsCurrentRollingDateRange()
     {
         var from = DateTimeOffset.Parse("2026-06-20T08:00:00Z");
         var to = DateTimeOffset.Parse("2026-06-21T08:00:00Z");
         var token = "share-token";
         var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
         var healthEventRepository = new Mock<IHealthEventRepository>();
+        DateTimeOffset? requestedFrom = null;
+        DateTimeOffset? requestedTo = null;
         healthEventRepository
-            .Setup(x => x.GetHealthEventsAsync(userId, from, to))
+            .Setup(x => x.GetHealthEventsAsync(userId, It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>()))
+            .Callback<Guid, DateTimeOffset?, DateTimeOffset?>((_, rangeFrom, rangeTo) =>
+            {
+                requestedFrom = rangeFrom;
+                requestedTo = rangeTo;
+            })
             .ReturnsAsync([]);
         var shareRepository = new Mock<IHealthChartShareRepository>();
         shareRepository
@@ -38,8 +45,15 @@ public class HealthChartSharesControllerTests
 
         var okResult = Assert.IsType<OkObjectResult>(result.Result);
         var dto = Assert.IsType<HealthChartShareDto>(okResult.Value);
-        Assert.Equal(from, dto.From);
-        Assert.Equal(to, dto.To);
+        Assert.NotNull(requestedFrom);
+        Assert.NotNull(requestedTo);
+        Assert.NotEqual(from, requestedFrom);
+        Assert.NotEqual(to, requestedTo);
+        var requestedRangeSeconds = (requestedTo.Value - requestedFrom.Value).TotalSeconds;
+        var expectedRangeSeconds = TimeSpan.FromDays(1).TotalSeconds;
+        Assert.InRange(requestedRangeSeconds, expectedRangeSeconds - 1, expectedRangeSeconds + 1);
+        Assert.Equal(requestedFrom, dto.From);
+        Assert.Equal(requestedTo, dto.To);
         Assert.True(dto.IsEnabled);
     }
 

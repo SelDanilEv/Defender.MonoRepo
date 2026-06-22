@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
 import {
   Box,
@@ -67,6 +67,8 @@ const formatSharedRange = (
   return `${formatDate(from)} - ${formatDate(to)}`;
 };
 
+const publicShareRefreshIntervalMs = 10000;
+
 const HealthCareSharePage = () => {
   const u = useUtils();
   const { token } = useParams();
@@ -89,23 +91,42 @@ const HealthCareSharePage = () => {
     [visibleEvents, page, rowsPerPage]
   );
 
-  useEffect(() => {
+  const refreshShare = useCallback((showLoading = false) => {
     if (!token) {
       setShare(null);
       setIsLoading(false);
-      return;
+      return Promise.resolve();
     }
 
-    setIsLoading(true);
-    healthCareApi
+    if (showLoading) {
+      setIsLoading(true);
+    }
+
+    return healthCareApi
       .getPublicShare(token, u)
       .then((share) => {
         setShare(share);
       })
       .finally(() => {
-        setIsLoading(false);
+        if (showLoading) {
+          setIsLoading(false);
+        }
       });
   }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    refreshShare(true);
+
+    if (!token) {
+      return undefined;
+    }
+
+    const intervalId = window.setInterval(() => {
+      refreshShare();
+    }, publicShareRefreshIntervalMs);
+
+    return () => window.clearInterval(intervalId);
+  }, [refreshShare, token]);
 
   useEffect(() => {
     const maxPage =
