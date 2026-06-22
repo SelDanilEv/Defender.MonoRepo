@@ -4,8 +4,14 @@ using Defender.Common.Interfaces;
 using Defender.HealthCareService.Application.Common.Interfaces.Repositories;
 using Defender.HealthCareService.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
 
 namespace WebApi.Controllers.V1;
+
+public record MedicationOptionsResponse(
+    IReadOnlyList<string> Names,
+    IReadOnlyList<string> Amounts,
+    IReadOnlyList<string> Units);
 
 public class HealthEventsController(
     ICurrentAccountAccessor currentAccountAccessor,
@@ -19,6 +25,29 @@ public class HealthEventsController(
         var result = await healthEventRepository.GetHealthEventsAsync(currentAccountAccessor.GetAccountId(), from, to);
 
         return Ok(result);
+    }
+
+    [HttpGet("api/health-events/medication-options")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(typeof(MedicationOptionsResponse), StatusCodes.Status200OK)]
+    public async Task<ActionResult<MedicationOptionsResponse>> GetMedicationOptions()
+    {
+        var events = await healthEventRepository.GetHealthEventsAsync(currentAccountAccessor.GetAccountId(), null, null);
+        var medicationEvents = events
+            .Where(healthEvent => healthEvent.Type == HealthEventType.Medication)
+            .ToArray();
+        var response = new MedicationOptionsResponse(
+            UniqueTextValues(medicationEvents.Select(healthEvent => healthEvent.MedicationName)),
+            medicationEvents
+                .Where(healthEvent => healthEvent.MedicationAmount != null)
+                .Select(healthEvent => healthEvent.MedicationAmount!.Value)
+                .Distinct()
+                .OrderBy(amount => amount)
+                .Select(amount => amount.ToString(CultureInfo.InvariantCulture))
+                .ToArray(),
+            UniqueTextValues(medicationEvents.Select(healthEvent => healthEvent.MedicationUnit)));
+
+        return Ok(response);
     }
 
     [HttpPost("api/health-events")]
@@ -120,5 +149,25 @@ public class HealthEventsController(
     {
         var minutes = value.Minute < 30 ? 0 : 30;
         return new DateTimeOffset(value.Year, value.Month, value.Day, value.Hour, minutes, 0, value.Offset);
+    }
+
+    private static IReadOnlyList<string> UniqueTextValues(IEnumerable<string?> values)
+    {
+        var options = new Dictionary<string, string>();
+
+        foreach (var value in values)
+        {
+            var text = value?.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                continue;
+            }
+
+            options.TryAdd(text.ToLowerInvariant(), text);
+        }
+
+        return options.Values
+            .OrderBy(value => value, StringComparer.CurrentCulture)
+            .ToArray();
     }
 }

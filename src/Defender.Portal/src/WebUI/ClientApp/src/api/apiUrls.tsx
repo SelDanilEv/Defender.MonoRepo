@@ -79,6 +79,7 @@ const APIEndpoints = {
   },
   healthCare: {
     events: "events",
+    medicationOptions: "events/medication-options",
     chartShares: "chart-shares",
     publicChartShares: "public/chart-shares",
   },

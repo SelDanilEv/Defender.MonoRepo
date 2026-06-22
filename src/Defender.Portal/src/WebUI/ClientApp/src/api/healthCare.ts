@@ -28,6 +28,12 @@ export interface HealthChartShare {
   createdAtUtc: string;
 }
 
+export interface MedicationOptions {
+  names: string[];
+  amounts: string[];
+  units: string[];
+}
+
 export interface HealthChartShareRequest {
   from?: string;
   to?: string;
@@ -79,6 +85,21 @@ export const healthCareApi = {
           resolve(Array.isArray(data) ? normalizeEvents(data) : []);
         },
         onFailure: async () => resolve([]),
+        showError: false,
+      });
+    }),
+
+  getMedicationOptions: (utils?: IUtils | null): Promise<MedicationOptions> =>
+    new Promise((resolve) => {
+      APICallWrapper({
+        url: apiUrls.healthCare.medicationOptions,
+        options: { method: "GET" },
+        utils,
+        onSuccess: async (response) => {
+          const data = await parseJsonSafe<MedicationOptions>(response);
+          resolve(data ?? { names: [], amounts: [], units: [] });
+        },
+        onFailure: async () => resolve({ names: [], amounts: [], units: [] }),
         showError: false,
       });
     }),

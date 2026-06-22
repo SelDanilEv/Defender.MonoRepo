@@ -100,6 +100,55 @@ public class HealthEventsControllerTests
         Assert.Null(savedEvent.TemperatureCelsius);
     }
 
+    [Fact]
+    public async Task GetMedicationOptions_WhenMedicationEventsExist_ReturnsDistinctSortedOptions()
+    {
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var repository = new Mock<IHealthEventRepository>();
+        repository
+            .Setup(x => x.GetHealthEventsAsync(userId, null, null))
+            .ReturnsAsync(
+            [
+                new HealthEvent
+                {
+                    Type = HealthEventType.Temperature,
+                    MedicationName = "Ignored",
+                    MedicationAmount = 100m,
+                    MedicationUnit = "Ignored",
+                },
+                new HealthEvent
+                {
+                    Type = HealthEventType.Medication,
+                    MedicationName = "Ibuprofen",
+                    MedicationAmount = 2m,
+                    MedicationUnit = "tablet",
+                },
+                new HealthEvent
+                {
+                    Type = HealthEventType.Medication,
+                    MedicationName = " ibuprofen ",
+                    MedicationAmount = 2m,
+                    MedicationUnit = " Tablet ",
+                },
+                new HealthEvent
+                {
+                    Type = HealthEventType.Medication,
+                    MedicationName = "Paracetamol",
+                    MedicationAmount = 0.5m,
+                    MedicationUnit = "mg",
+                },
+            ]);
+        var controller = CreateController(repository);
+
+        var result = await controller.GetMedicationOptions();
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var options = Assert.IsType<MedicationOptionsResponse>(okResult.Value);
+        Assert.Equal(["Ibuprofen", "Paracetamol"], options.Names);
+        Assert.Equal(["0.5", "2"], options.Amounts);
+        Assert.Equal(["mg", "tablet"], options.Units);
+    }
+
     private static HealthEventsController CreateController(Mock<IHealthEventRepository> repository)
     {
         var currentAccountAccessor = new Mock<ICurrentAccountAccessor>();

@@ -27,7 +27,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import { healthCareApi, HealthChartShare, HealthEvent, HealthEventType } from "src/api/healthCare";
+import { healthCareApi, HealthChartShare, HealthEvent, HealthEventType, MedicationOptions } from "src/api/healthCare";
 import useUtils from "src/appUtils";
 import {
   buildHealthCareChartData,
@@ -55,20 +55,10 @@ const nowInput = () => snapDate(new Date());
 const toDateTimeInput = (value?: string) =>
   value ? snapDate(new Date(value)) : nowInput();
 
-const uniqueMedicationNames = (events: HealthEvent[]) => {
-  const names = new Map<string, string>();
-
-  events
-    .filter((event) => event.type === "Medication" && event.medicationName)
-    .forEach((event) => {
-      const name = event.medicationName?.trim();
-
-      if (name) {
-        names.set(name.toLocaleLowerCase(), name);
-      }
-    });
-
-  return [...names.values()].sort((left, right) => left.localeCompare(right));
+const emptyMedicationOptions: MedicationOptions = {
+  names: [],
+  amounts: [],
+  units: [],
 };
 
 const HealthCarePage = () => {
@@ -85,6 +75,7 @@ const HealthCarePage = () => {
   const [wellbeingScore, setWellbeingScore] = useState(3);
   const [notes, setNotes] = useState("");
   const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
+  const [medicationOptions, setMedicationOptions] = useState<MedicationOptions>(emptyMedicationOptions);
   const [share, setShare] = useState<HealthChartShare | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
   const [shareStatusUpdating, setShareStatusUpdating] = useState(false);
@@ -93,20 +84,18 @@ const HealthCarePage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
   const refresh = () => healthCareApi.getEvents(undefined, undefined, u).then(setEvents);
+  const refreshMedicationOptions = () => healthCareApi.getMedicationOptions(u).then(setMedicationOptions);
   const refreshShare = () => healthCareApi.getCurrentShare(u).then(setShare);
 
   useEffect(() => {
     refresh();
+    refreshMedicationOptions();
     refreshShare();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const chartData = useMemo(
     () => buildHealthCareChartData(events, chartTimeRange),
     [events, chartTimeRange]
-  );
-  const medicationNameOptions = useMemo(
-    () => uniqueMedicationNames(events),
-    [events]
   );
   const pagedEvents = useMemo(
     () => paginateHealthEvents(events, page, rowsPerPage),
@@ -171,6 +160,7 @@ const HealthCarePage = () => {
 
     resetForm();
     refresh();
+    refreshMedicationOptions();
   };
 
   const editEvent = (event: HealthEvent) => {
@@ -194,6 +184,7 @@ const HealthCarePage = () => {
     }
 
     refresh();
+    refreshMedicationOptions();
   };
 
   const handleChangePage = (_event: unknown, newPage: number) => {
@@ -381,7 +372,7 @@ const HealthCarePage = () => {
               {type === "Medication" && <>
                 <Autocomplete
                   freeSolo
-                  options={medicationNameOptions}
+                  options={medicationOptions.names}
                   value={medicationName}
                   onChange={(_, value) => setMedicationName(value || "")}
                   onInputChange={(_, value) => setMedicationName(value)}
@@ -389,8 +380,26 @@ const HealthCarePage = () => {
                     <TextField {...params} label={u.t("healthCare:medication_name")} size="small" />
                   )}
                 />
-                <TextField label={u.t("healthCare:medication_amount")} value={medicationAmount} onChange={(e) => setMedicationAmount(e.target.value)} size="small" />
-                <TextField label={u.t("healthCare:medication_unit")} value={medicationUnit} onChange={(e) => setMedicationUnit(e.target.value)} size="small" />
+                <Autocomplete
+                  freeSolo
+                  options={medicationOptions.amounts}
+                  value={medicationAmount}
+                  onChange={(_, value) => setMedicationAmount(value || "")}
+                  onInputChange={(_, value) => setMedicationAmount(value)}
+                  renderInput={(params) => (
+                    <TextField {...params} label={u.t("healthCare:medication_amount")} size="small" />
+                  )}
+                />
+                <Autocomplete
+                  freeSolo
+                  options={medicationOptions.units}
+                  value={medicationUnit}
+                  onChange={(_, value) => setMedicationUnit(value || "")}
+                  onInputChange={(_, value) => setMedicationUnit(value)}
+                  renderInput={(params) => (
+                    <TextField {...params} label={u.t("healthCare:medication_unit")} size="small" />
+                  )}
+                />
               </>}
               {type === "Wellbeing" && (
                 <WellbeingSelector
