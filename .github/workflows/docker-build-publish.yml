@@ -305,8 +305,8 @@ jobs:
           build-args: |
             DOTNET_VERSION=${{ env.DOTNET_VERSION }}
             SERVICE_DIR=${{ matrix.service.service_dir }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.service.name }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service.name }}
 
       - name: Output image info
         run: |
@@ -454,8 +454,8 @@ jobs:
           build-args: |
             DOTNET_VERSION=${{ env.DOTNET_VERSION }}
             SERVICE_DIR=${{ steps.service-config.outputs.service_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ steps.service-config.outputs.clean_name }}
+          cache-to: type=gha,mode=max,scope=${{ steps.service-config.outputs.clean_name }}
 
       - name: Output image info
         run: |
