@@ -149,6 +149,73 @@ public class HealthEventsControllerTests
         Assert.Equal(["mg", "tablet"], options.Units);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task CreateEvent_WhenAnalysisNameIsMissing_ReturnsBadRequest(string? analysisName)
+    {
+        var repository = new Mock<IHealthEventRepository>();
+        var controller = CreateController(repository);
+
+        var result = await controller.CreateEvent(new HealthEvent
+        {
+            Type = HealthEventType.Analysis,
+            StartedAt = DateTimeOffset.UtcNow,
+            AnalysisName = analysisName,
+            AnalysisStatus = AnalysisStatus.Bad,
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+        repository.Verify(
+            x => x.AddHealthEventAsync(It.IsAny<HealthEvent>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateEvent_WhenAnalysisStatusIsMissing_ReturnsBadRequest()
+    {
+        var repository = new Mock<IHealthEventRepository>();
+        var controller = CreateController(repository);
+
+        var result = await controller.CreateEvent(new HealthEvent
+        {
+            Type = HealthEventType.Analysis,
+            StartedAt = DateTimeOffset.UtcNow,
+            AnalysisName = "CRP",
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+        repository.Verify(
+            x => x.AddHealthEventAsync(It.IsAny<HealthEvent>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task CreateEvent_WhenNonAnalysisHasAnalysisFields_ClearsThemBeforeSaving()
+    {
+        HealthEvent? savedEvent = null;
+        var repository = new Mock<IHealthEventRepository>();
+        repository
+            .Setup(x => x.AddHealthEventAsync(It.IsAny<HealthEvent>()))
+            .Callback<HealthEvent>(healthEvent => savedEvent = healthEvent)
+            .ReturnsAsync((HealthEvent healthEvent) => healthEvent);
+        var controller = CreateController(repository);
+
+        await controller.CreateEvent(new HealthEvent
+        {
+            Type = HealthEventType.Temperature,
+            StartedAt = DateTimeOffset.UtcNow,
+            TemperatureCelsius = 37.2m,
+            AnalysisName = "CRP",
+            AnalysisStatus = AnalysisStatus.HasDeviations,
+        });
+
+        Assert.NotNull(savedEvent);
+        Assert.Null(savedEvent.AnalysisName);
+        Assert.Null(savedEvent.AnalysisStatus);
+    }
+
     private static HealthEventsController CreateController(Mock<IHealthEventRepository> repository)
     {
         var currentAccountAccessor = new Mock<ICurrentAccountAccessor>();

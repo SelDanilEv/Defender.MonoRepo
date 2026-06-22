@@ -5,12 +5,14 @@ import {
   getLatestWellbeingEvent,
   wellbeingScoreToEmoji,
 } from "./chartData";
+import { formatEventDateTime } from "./dateFormat";
 
 interface WellbeingSummaryProps {
   events: HealthEvent[];
   timeRange: ChartTimeRange;
   title: string;
   scoreLabel: (score: number) => string;
+  language: string;
 }
 
 const WellbeingSummary = ({
@@ -18,6 +20,7 @@ const WellbeingSummary = ({
   timeRange,
   title,
   scoreLabel,
+  language,
 }: WellbeingSummaryProps) => {
   const wellbeingEvent = getLatestWellbeingEvent(events, timeRange);
 
@@ -46,12 +49,7 @@ const WellbeingSummary = ({
           label={scoreLabel(wellbeingEvent.wellbeingScore)}
         />
         <Typography variant="body2" color="text.secondary">
-          {new Date(wellbeingEvent.startedAt).toLocaleString([], {
-            day: "2-digit",
-            month: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
+          {formatEventDateTime(new Date(wellbeingEvent.startedAt), language)}
         </Typography>
       </Stack>
     </Box>

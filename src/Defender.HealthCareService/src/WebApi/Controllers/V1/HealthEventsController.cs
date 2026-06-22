@@ -116,10 +116,10 @@ public class HealthEventsController(
 
     private BadRequestObjectResult? ValidateHealthEvent(HealthEvent request)
     {
+        ClearFieldsForType(request);
+
         if (request.Type == HealthEventType.Wellbeing)
         {
-            request.TemperatureCelsius = null;
-
             if (request.WellbeingScore is < 1 or > 5 or null)
             {
                 return BadRequest("Wellbeing score must be between 1 and 5.");
@@ -127,8 +127,6 @@ public class HealthEventsController(
 
             return null;
         }
-
-        request.WellbeingScore = null;
 
         if (request.Type == HealthEventType.Temperature)
         {
@@ -140,9 +138,53 @@ public class HealthEventsController(
             return null;
         }
 
-        request.TemperatureCelsius = null;
+        if (request.Type == HealthEventType.Analysis)
+        {
+            if (string.IsNullOrWhiteSpace(request.AnalysisName))
+            {
+                return BadRequest("Analysis name is required.");
+            }
+
+            if (request.AnalysisStatus == null)
+            {
+                return BadRequest("Analysis status is required.");
+            }
+
+            request.AnalysisName = request.AnalysisName.Trim();
+        }
 
         return null;
+    }
+
+    private static void ClearFieldsForType(HealthEvent request)
+    {
+        if (request.Type != HealthEventType.Temperature)
+        {
+            request.TemperatureCelsius = null;
+        }
+
+        if (request.Type != HealthEventType.Wellbeing)
+        {
+            request.WellbeingScore = null;
+        }
+
+        if (request.Type != HealthEventType.Medication)
+        {
+            request.MedicationName = null;
+            request.MedicationAmount = null;
+            request.MedicationUnit = null;
+        }
+
+        if (request.Type != HealthEventType.Sleep)
+        {
+            request.EndedAt = null;
+        }
+
+        if (request.Type != HealthEventType.Analysis)
+        {
+            request.AnalysisName = null;
+            request.AnalysisStatus = null;
+        }
     }
 
     private static DateTimeOffset SnapToHalfHour(DateTimeOffset value)

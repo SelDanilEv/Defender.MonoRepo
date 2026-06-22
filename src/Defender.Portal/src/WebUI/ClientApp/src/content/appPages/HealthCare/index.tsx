@@ -27,7 +27,14 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import { healthCareApi, HealthChartShare, HealthEvent, HealthEventType, MedicationOptions } from "src/api/healthCare";
+import {
+  AnalysisStatus,
+  healthCareApi,
+  HealthChartShare,
+  HealthEvent,
+  HealthEventType,
+  MedicationOptions,
+} from "src/api/healthCare";
 import useUtils from "src/appUtils";
 import { useAppSelector } from "src/state/hooks";
 import {
@@ -35,8 +42,14 @@ import {
   ChartTimeRange,
   getTimeRangeBounds,
   paginateHealthEvents,
-  wellbeingScoreToEmoji,
 } from "./chartData";
+import { formatEventDateTime } from "./dateFormat";
+import {
+  analysisStatusOptions,
+  formatHealthEventType,
+  formatHealthEventValue,
+  getAnalysisStatusTranslationKey,
+} from "./eventFormatting";
 import HealthCareChart from "./HealthCareChart";
 import { getAbsoluteShareUrl } from "./ShareLink";
 import TemperatureSlider, { normalizeTemperature } from "./TemperatureSlider";
@@ -75,6 +88,8 @@ const HealthCarePage = () => {
   const [medicationAmount, setMedicationAmount] = useState("1");
   const [medicationUnit, setMedicationUnit] = useState(() => u.t("healthCare:unit_tablet"));
   const [wellbeingScore, setWellbeingScore] = useState(3);
+  const [analysisName, setAnalysisName] = useState("");
+  const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>("HasDeviations");
   const [notes, setNotes] = useState("");
   const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
   const [medicationOptions, setMedicationOptions] = useState<MedicationOptions>(emptyMedicationOptions);
@@ -135,6 +150,8 @@ const HealthCarePage = () => {
     setMedicationAmount("1");
     setMedicationUnit(u.t("healthCare:unit_tablet"));
     setWellbeingScore(3);
+    setAnalysisName("");
+    setAnalysisStatus("HasDeviations");
     setNotes("");
   };
 
@@ -147,6 +164,8 @@ const HealthCarePage = () => {
       medicationAmount: type === "Medication" ? Number(medicationAmount) : undefined,
       medicationUnit: type === "Medication" ? medicationUnit : undefined,
       wellbeingScore: type === "Wellbeing" ? wellbeingScore : undefined,
+      analysisName: type === "Analysis" ? analysisName : undefined,
+      analysisStatus: type === "Analysis" ? analysisStatus : undefined,
       notes,
   });
 
@@ -175,6 +194,8 @@ const HealthCarePage = () => {
     setMedicationAmount(String(event.medicationAmount || "1"));
     setMedicationUnit(event.medicationUnit || u.t("healthCare:unit_tablet"));
     setWellbeingScore(event.wellbeingScore || 3);
+    setAnalysisName(event.analysisName || "");
+    setAnalysisStatus(event.analysisStatus || "HasDeviations");
     setNotes(event.notes || "");
   };
 
@@ -253,26 +274,6 @@ const HealthCarePage = () => {
     }
   };
 
-  const formatEvent = (event: HealthEvent) => {
-    if (event.type === "Temperature") {
-      return event.temperatureCelsius === undefined || event.temperatureCelsius === null
-        ? "-"
-        : `${event.temperatureCelsius.toFixed(1)} \u00b0C`;
-    }
-
-    if (event.type === "Medication") return `${event.medicationName || u.t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
-    if (event.type === "Wellbeing") return `${wellbeingScoreToEmoji(event.wellbeingScore)} ${event.wellbeingScore || ""}/5`;
-    const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-    return u.t("healthCare:sleep_until", { time });
-  };
-
-  const formatType = (eventType: HealthEventType) => {
-    if (eventType === "Temperature") return u.t("healthCare:event_temperature");
-    if (eventType === "Medication") return u.t("healthCare:event_medication");
-    if (eventType === "Wellbeing") return u.t("healthCare:event_wellbeing");
-    return u.t("healthCare:event_sleep");
-  };
-
   const wellbeingDescriptions = [
     u.t("healthCare:wellbeing_1"),
     u.t("healthCare:wellbeing_2"),
@@ -345,6 +346,7 @@ const HealthCarePage = () => {
                 <MenuItem value="Medication">{u.t("healthCare:event_medication")}</MenuItem>
                 <MenuItem value="Sleep">{u.t("healthCare:event_sleep")}</MenuItem>
                 <MenuItem value="Wellbeing">{u.t("healthCare:event_wellbeing")}</MenuItem>
+                <MenuItem value="Analysis">{u.t("healthCare:event_analysis")}</MenuItem>
               </TextField>
               <DateTimePicker
                 label={u.t("healthCare:start")}
@@ -413,6 +415,29 @@ const HealthCarePage = () => {
                   onChange={setWellbeingScore}
                 />
               )}
+              {type === "Analysis" && (
+                <>
+                  <TextField
+                    label={u.t("healthCare:analysis_name")}
+                    value={analysisName}
+                    onChange={(event) => setAnalysisName(event.target.value)}
+                    size="small"
+                  />
+                  <TextField
+                    select
+                    label={u.t("healthCare:analysis_status")}
+                    value={analysisStatus}
+                    onChange={(event) => setAnalysisStatus(event.target.value as AnalysisStatus)}
+                    size="small"
+                  >
+                    {analysisStatusOptions.map((status) => (
+                      <MenuItem key={status} value={status}>
+                        {u.t(getAnalysisStatusTranslationKey(status))}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </>
+              )}
               <TextField label={u.t("healthCare:notes")} value={notes} onChange={(e) => setNotes(e.target.value)} size="small" multiline minRows={2} />
               <Stack direction="row" gap={1}>
                 <Button variant="contained" onClick={saveEvent}>
@@ -449,6 +474,7 @@ const HealthCarePage = () => {
               timeRange={chartTimeRange}
               title={u.t("healthCare:latest_wellbeing")}
               scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
+              language={currentLanguage}
             />
             <HealthCareChart events={events} timeRange={chartTimeRange} language={currentLanguage} />
             <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
@@ -467,15 +493,10 @@ const HealthCarePage = () => {
                   {pagedEvents.map((event) => (
                     <TableRow key={event.id} selected={editingEventId === event.id}>
                       <TableCell>
-                        {new Date(event.startedAt).toLocaleString([], {
-                          day: "2-digit",
-                          month: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {formatEventDateTime(new Date(event.startedAt), currentLanguage)}
                       </TableCell>
-                      <TableCell>{formatType(event.type)}</TableCell>
-                      <TableCell>{formatEvent(event)}</TableCell>
+                      <TableCell>{formatHealthEventType(event.type, u.t)}</TableCell>
+                      <TableCell>{formatHealthEventValue(event, u.t, currentLanguage)}</TableCell>
                       <TableCell>{event.notes || ""}</TableCell>
                       <TableCell align="right">
                         <Tooltip title={u.t("healthCare:edit")}>

@@ -14,6 +14,7 @@ interface HealthCareChartProps {
 
 const chartMargin = { left: 55, right: 24, top: 24, bottom: 48 };
 const mobileChartMargin = { left: 36, right: 8, top: 12, bottom: 36 };
+const tooltipTouchDelayMs = 150;
 
 const clamp = (value: number) => Math.max(0, Math.min(100, value));
 
@@ -95,6 +96,8 @@ const HealthCareChart = ({
           return (
             <Tooltip
               key={event.id}
+              enterTouchDelay={tooltipTouchDelayMs}
+              leaveTouchDelay={3000}
               title={u.t("healthCare:sleep_until", {
                 time: formatEventTime(new Date(event.endedAt || event.startedAt), language),
               })}
@@ -129,6 +132,8 @@ const HealthCareChart = ({
           return (
             <Tooltip
               key={event.id}
+              enterTouchDelay={tooltipTouchDelayMs}
+              leaveTouchDelay={3000}
               title={medicationLabel(event, u.t("healthCare:medication_fallback"))}
             >
               <Box
@@ -139,8 +144,9 @@ const HealthCareChart = ({
                   left: `${left}%`,
                   width: medicationLineWidth,
                   transform: "translateX(-50%)",
-                  bgcolor: "secondary.main",
-                  opacity: 0.8,
+                  bgcolor: "#ffffff",
+                  border: "1px solid rgba(15, 23, 42, 0.2)",
+                  boxShadow: "0 1px 4px rgba(15, 23, 42, 0.18)",
                   borderRadius: 999,
                   pointerEvents: "auto",
                 }}

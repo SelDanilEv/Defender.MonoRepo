@@ -4,6 +4,7 @@ import {
   Box,
   Card,
   CardContent,
+  IconButton,
   LinearProgress,
   MenuItem,
   Stack,
@@ -17,6 +18,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { useParams } from "react-router";
 import { healthCareApi, HealthChartShare, HealthEvent } from "src/api/healthCare";
@@ -27,29 +29,19 @@ import {
   ChartTimeRange,
   filterEventsByTimeRange,
   paginateHealthEvents,
-  wellbeingScoreToEmoji,
 } from "./chartData";
-import { formatEventDateTime, formatEventTime } from "./dateFormat";
+import { formatEventDateTime } from "./dateFormat";
+import {
+  formatHealthEventType,
+  formatHealthEventValue,
+} from "./eventFormatting";
 import HealthCareChart from "./HealthCareChart";
+import {
+  dismissHealthCareShareGuide,
+  shouldShowHealthCareShareGuide,
+} from "./ShareGuideState";
 import { getNextDisplayedShare } from "./ShareState";
 import WellbeingSummary from "./WellbeingSummary";
-
-const formatEvent = (
-  event: HealthEvent,
-  t: (key: string, options?: object) => string,
-  language: string
-) => {
-  if (event.type === "Temperature") {
-    return event.temperatureCelsius === undefined || event.temperatureCelsius === null
-      ? "-"
-      : `${event.temperatureCelsius.toFixed(1)} \u00b0C`;
-  }
-
-  if (event.type === "Medication") return `${event.medicationName || t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
-  if (event.type === "Wellbeing") return `${wellbeingScoreToEmoji(event.wellbeingScore)} ${event.wellbeingScore || ""}/5`;
-  const time = formatEventTime(new Date(event.endedAt || event.startedAt), language);
-  return t("healthCare:sleep_until", { time });
-};
 
 const publicShareRefreshIntervalMs = 10000;
 
@@ -62,6 +54,7 @@ const HealthCareSharePage = () => {
   const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [showGuide, setShowGuide] = useState(() => shouldShowHealthCareShareGuide());
   const events = useMemo(() => share?.events ?? [], [share?.events]);
   const rangeAnchor = useMemo(
     () => (share?.to ? new Date(share.to) : undefined),
@@ -136,10 +129,12 @@ const HealthCareSharePage = () => {
   };
 
   const formatType = (eventType: HealthEvent["type"]) => {
-    if (eventType === "Temperature") return u.t("healthCare:event_temperature");
-    if (eventType === "Medication") return u.t("healthCare:event_medication");
-    if (eventType === "Wellbeing") return u.t("healthCare:event_wellbeing");
-    return u.t("healthCare:event_sleep");
+    return formatHealthEventType(eventType, u.t);
+  };
+
+  const closeGuide = () => {
+    dismissHealthCareShareGuide();
+    setShowGuide(false);
   };
 
   const content = isLoading ? (
@@ -150,6 +145,36 @@ const HealthCareSharePage = () => {
     </Typography>
   ) : (
     <>
+      {showGuide && (
+        <Box
+          sx={{
+            position: "relative",
+            mb: 1.5,
+            pr: 5,
+            pl: 1.25,
+            py: 1,
+            borderRadius: 1,
+            bgcolor: "background.default",
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography variant="body2">
+            {u.t("healthCare:share_guide_text")}
+          </Typography>
+          <IconButton
+            onClick={closeGuide}
+            size="small"
+            sx={{
+              position: "absolute",
+              top: 4,
+              right: 4,
+            }}
+            aria-label={u.t("healthCare:close_guide")}
+          >
+            <CloseIcon fontSize="small" />
+          </IconButton>
+        </Box>
+      )}
       <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={{ xs: 0.5, sm: 1 }}>
         <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
         <TextField
@@ -171,6 +196,7 @@ const HealthCareSharePage = () => {
         timeRange="all"
         title={u.t("healthCare:latest_wellbeing")}
         scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
+        language={currentLanguage}
       />
       <HealthCareChart events={visibleEvents} timeRange="all" language={currentLanguage} height={u.isMobile ? 250 : 300} />
       <Typography variant="h4" mt={{ xs: 2, sm: 3 }} mb={1}>{u.t("healthCare:events_grid")}</Typography>
@@ -191,7 +217,7 @@ const HealthCareSharePage = () => {
                   {formatEventDateTime(new Date(event.startedAt), currentLanguage)}
                 </TableCell>
                 <TableCell>{formatType(event.type)}</TableCell>
-                <TableCell>{formatEvent(event, u.t, currentLanguage)}</TableCell>
+                <TableCell>{formatHealthEventValue(event, u.t, currentLanguage)}</TableCell>
                 <TableCell>{event.notes || ""}</TableCell>
               </TableRow>
             ))}

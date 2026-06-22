@@ -21,4 +21,24 @@ public class HealthEventTests
 
         Assert.Equal(5, healthEvent.WellbeingScore);
     }
+
+    [Fact]
+    public void HealthEventType_WhenAnalysisRequested_IsAvailable()
+    {
+        Assert.Equal("Analysis", HealthEventType.Analysis.ToString());
+    }
+
+    [Fact]
+    public void HealthEvent_WhenAnalysisAssigned_StoresAnalysisFields()
+    {
+        var healthEvent = new HealthEvent
+        {
+            Type = HealthEventType.Analysis,
+            AnalysisName = "CRP",
+            AnalysisStatus = AnalysisStatus.Excellent,
+        };
+
+        Assert.Equal("CRP", healthEvent.AnalysisName);
+        Assert.Equal(AnalysisStatus.Excellent, healthEvent.AnalysisStatus);
+    }
 }

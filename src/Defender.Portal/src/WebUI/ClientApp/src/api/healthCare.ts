@@ -2,7 +2,14 @@ import apiUrls from "src/api/apiUrls";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import type IUtils from "src/appUtils/interface";
 
-export type HealthEventType = "Temperature" | "Medication" | "Sleep" | "Wellbeing";
+export type HealthEventType =
+  | "Temperature"
+  | "Medication"
+  | "Sleep"
+  | "Wellbeing"
+  | "Analysis";
+
+export type AnalysisStatus = "Bad" | "HasDeviations" | "Excellent";
 
 export interface HealthEvent {
   id: string;
@@ -15,6 +22,8 @@ export interface HealthEvent {
   medicationAmount?: number;
   medicationUnit?: string;
   wellbeingScore?: number;
+  analysisName?: string;
+  analysisStatus?: AnalysisStatus;
   notes?: string;
 }
 

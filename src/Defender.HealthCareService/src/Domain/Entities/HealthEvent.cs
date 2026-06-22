@@ -11,7 +11,16 @@ public enum HealthEventType
     Temperature,
     Medication,
     Sleep,
-    Wellbeing
+    Wellbeing,
+    Analysis
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum AnalysisStatus
+{
+    Bad,
+    HasDeviations,
+    Excellent
 }
 
 public class HealthEvent : IBaseModel
@@ -38,6 +47,10 @@ public class HealthEvent : IBaseModel
     public string? MedicationUnit { get; set; }
 
     public int? WellbeingScore { get; set; }
+
+    public string? AnalysisName { get; set; }
+
+    public AnalysisStatus? AnalysisStatus { get; set; }
 
     public string? Notes { get; set; }
 }
