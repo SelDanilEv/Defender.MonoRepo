@@ -29,6 +29,7 @@ import {
   wellbeingScoreToEmoji,
 } from "./chartData";
 import HealthCareChart from "./HealthCareChart";
+import { getNextDisplayedShare } from "./ShareState";
 import WellbeingSummary from "./WellbeingSummary";
 
 const formatEvent = (event: HealthEvent, t: (key: string, options?: object) => string) => {
@@ -104,8 +105,10 @@ const HealthCareSharePage = () => {
 
     return healthCareApi
       .getPublicShare(token, u)
-      .then((share) => {
-        setShare(share);
+      .then((fetchedShare) => {
+        setShare((currentShare) =>
+          getNextDisplayedShare(currentShare, fetchedShare, showLoading)
+        );
       })
       .finally(() => {
         if (showLoading) {
