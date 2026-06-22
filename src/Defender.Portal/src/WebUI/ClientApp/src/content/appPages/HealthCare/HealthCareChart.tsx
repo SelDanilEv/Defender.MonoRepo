@@ -3,14 +3,17 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { HealthEvent } from "src/api/healthCare";
 import useUtils from "src/appUtils";
 import { buildHealthCareChartData, ChartTimeRange } from "./chartData";
+import { formatEventTime } from "./dateFormat";
 
 interface HealthCareChartProps {
   events: HealthEvent[];
   timeRange?: ChartTimeRange;
   height?: number;
+  language?: string;
 }
 
 const chartMargin = { left: 55, right: 24, top: 24, bottom: 48 };
+const mobileChartMargin = { left: 36, right: 8, top: 12, bottom: 36 };
 
 const clamp = (value: number) => Math.max(0, Math.min(100, value));
 
@@ -20,11 +23,17 @@ const eventPercent = (time: number, minTime: number, maxTime: number) =>
 const medicationLabel = (event: HealthEvent, fallback: string) =>
   `${event.medicationName || fallback} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`.trim();
 
-const HealthCareChart = ({ events, timeRange = "all", height = 300 }: HealthCareChartProps) => {
+const HealthCareChart = ({
+  events,
+  timeRange = "all",
+  height = 300,
+  language = "en",
+}: HealthCareChartProps) => {
   const u = useUtils();
   const chartData = buildHealthCareChartData(events, timeRange);
   const medicationEvents = chartData.chartEvents.filter((event) => event.type === "Medication");
   const sleepEvents = chartData.chartEvents.filter((event) => event.type === "Sleep");
+  const margin = u.isMobile ? mobileChartMargin : chartMargin;
 
   if (chartData.chartEvents.length === 0) {
     return <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>;
@@ -35,16 +44,17 @@ const HealthCareChart = ({ events, timeRange = "all", height = 300 }: HealthCare
       {chartData.temperatureEvents.length > 0 ? (
         <LineChart
           height={height}
-          margin={chartMargin}
+          margin={margin}
           xAxis={[
             {
               scaleType: "time",
               data: chartData.temperatureXAxis,
               min: new Date(chartData.minTime),
               max: new Date(chartData.maxTime),
+              valueFormatter: (value) => formatEventTime(new Date(value), language),
             },
           ]}
-          yAxis={[{ id: "temperature", label: "C" }]}
+          yAxis={[{ id: "temperature" }]}
           series={[
             {
               data: chartData.temperatureData,
@@ -68,10 +78,10 @@ const HealthCareChart = ({ events, timeRange = "all", height = 300 }: HealthCare
       <Box
         position="absolute"
         sx={{
-          left: chartMargin.left,
-          right: chartMargin.right,
-          top: chartMargin.top,
-          bottom: chartMargin.bottom,
+          left: margin.left,
+          right: margin.right,
+          top: margin.top,
+          bottom: margin.bottom,
           pointerEvents: "none",
         }}
       >
@@ -85,10 +95,7 @@ const HealthCareChart = ({ events, timeRange = "all", height = 300 }: HealthCare
             <Tooltip
               key={event.id}
               title={u.t("healthCare:sleep_until", {
-                time: new Date(event.endedAt || event.startedAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }),
+                time: formatEventTime(new Date(event.endedAt || event.startedAt), language),
               })}
             >
               <Box

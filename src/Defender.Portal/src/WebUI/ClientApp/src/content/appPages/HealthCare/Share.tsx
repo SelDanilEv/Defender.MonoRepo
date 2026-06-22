@@ -22,17 +22,23 @@ import { useParams } from "react-router";
 import { healthCareApi, HealthChartShare, HealthEvent } from "src/api/healthCare";
 import useUtils from "src/appUtils";
 import LanguageSwitcher from "src/components/LanguageSwitcher";
+import { useAppSelector } from "src/state/hooks";
 import {
   ChartTimeRange,
   filterEventsByTimeRange,
   paginateHealthEvents,
   wellbeingScoreToEmoji,
 } from "./chartData";
+import { formatEventDateTime, formatEventTime } from "./dateFormat";
 import HealthCareChart from "./HealthCareChart";
 import { getNextDisplayedShare } from "./ShareState";
 import WellbeingSummary from "./WellbeingSummary";
 
-const formatEvent = (event: HealthEvent, t: (key: string, options?: object) => string) => {
+const formatEvent = (
+  event: HealthEvent,
+  t: (key: string, options?: object) => string,
+  language: string
+) => {
   if (event.type === "Temperature") {
     return event.temperatureCelsius === undefined || event.temperatureCelsius === null
       ? "-"
@@ -41,37 +47,15 @@ const formatEvent = (event: HealthEvent, t: (key: string, options?: object) => s
 
   if (event.type === "Medication") return `${event.medicationName || t("healthCare:medication_fallback")} ${event.medicationAmount || ""} ${event.medicationUnit || ""}`;
   if (event.type === "Wellbeing") return `${wellbeingScoreToEmoji(event.wellbeingScore)} ${event.wellbeingScore || ""}/5`;
-  const time = new Date(event.endedAt || event.startedAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const time = formatEventTime(new Date(event.endedAt || event.startedAt), language);
   return t("healthCare:sleep_until", { time });
-};
-
-const formatSharedRange = (
-  from: string | undefined,
-  to: string | undefined,
-  fallback: string
-) => {
-  if (!from && !to) {
-    return fallback;
-  }
-
-  const formatDate = (value?: string) =>
-    value
-      ? new Date(value).toLocaleString([], {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : fallback;
-
-  return `${formatDate(from)} - ${formatDate(to)}`;
 };
 
 const publicShareRefreshIntervalMs = 10000;
 
 const HealthCareSharePage = () => {
   const u = useUtils();
+  const currentLanguage = useAppSelector((state) => state.session.language);
   const { token } = useParams();
   const [share, setShare] = useState<HealthChartShare | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -166,7 +150,7 @@ const HealthCareSharePage = () => {
     </Typography>
   ) : (
     <>
-      <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={1}>
+      <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={{ xs: 0.5, sm: 1 }}>
         <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
         <TextField
           select
@@ -182,19 +166,14 @@ const HealthCareSharePage = () => {
           <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
         </TextField>
       </Stack>
-      <Typography variant="body2" color="text.secondary" mb={1.5}>
-        {u.t("healthCare:shared_range", {
-          range: formatSharedRange(share?.from, share?.to, u.t("healthCare:range_all")),
-        })}
-      </Typography>
       <WellbeingSummary
         events={visibleEvents}
         timeRange="all"
         title={u.t("healthCare:latest_wellbeing")}
         scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
       />
-      <HealthCareChart events={visibleEvents} timeRange="all" />
-      <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
+      <HealthCareChart events={visibleEvents} timeRange="all" language={currentLanguage} height={u.isMobile ? 250 : 300} />
+      <Typography variant="h4" mt={{ xs: 2, sm: 3 }} mb={1}>{u.t("healthCare:events_grid")}</Typography>
       <TableContainer>
         <Table size="small">
           <TableHead>
@@ -209,15 +188,10 @@ const HealthCareSharePage = () => {
             {pagedEvents.map((event) => (
               <TableRow key={event.id}>
                 <TableCell>
-                  {new Date(event.startedAt).toLocaleString([], {
-                    day: "2-digit",
-                    month: "2-digit",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
+                  {formatEventDateTime(new Date(event.startedAt), currentLanguage)}
                 </TableCell>
                 <TableCell>{formatType(event.type)}</TableCell>
-                <TableCell>{formatEvent(event, u.t)}</TableCell>
+                <TableCell>{formatEvent(event, u.t, currentLanguage)}</TableCell>
                 <TableCell>{event.notes || ""}</TableCell>
               </TableRow>
             ))}
@@ -269,18 +243,21 @@ const HealthCareSharePage = () => {
   );
 
   return (
-    <Box p={2}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mb={2}>
+    <Box p={{ xs: 1, sm: 2 }}>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mb={{ xs: 1, sm: 2 }}>
         <Stack direction="row" alignItems="center" gap={1}>
           <LocalHospitalIcon color="primary" />
-          <Typography variant="h3">{u.t("healthCare:share_page_title")}</Typography>
+          <Typography variant="h3" sx={{ fontSize: { xs: "1.25rem", sm: "1.75rem" } }}>
+            {u.t("healthCare:share_page_title")}
+          </Typography>
         </Stack>
         <LanguageSwitcher />
       </Stack>
-      <Typography color="text.secondary" mb={2}>
-        {u.t("healthCare:share_description")}
-      </Typography>
-      <Card><CardContent>{content}</CardContent></Card>
+      <Card>
+        <CardContent sx={{ p: { xs: 1, sm: 2 }, "&:last-child": { pb: { xs: 1, sm: 2 } } }}>
+          {content}
+        </CardContent>
+      </Card>
     </Box>
   );
 };

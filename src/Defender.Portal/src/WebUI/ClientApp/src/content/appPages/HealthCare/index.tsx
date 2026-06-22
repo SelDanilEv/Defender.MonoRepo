@@ -29,6 +29,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import { healthCareApi, HealthChartShare, HealthEvent, HealthEventType, MedicationOptions } from "src/api/healthCare";
 import useUtils from "src/appUtils";
+import { useAppSelector } from "src/state/hooks";
 import {
   buildHealthCareChartData,
   ChartTimeRange,
@@ -63,6 +64,7 @@ const emptyMedicationOptions: MedicationOptions = {
 
 const HealthCarePage = () => {
   const u = useUtils();
+  const currentLanguage = useAppSelector((state) => state.session.language);
 
   const [events, setEvents] = useState<HealthEvent[]>([]);
   const [type, setType] = useState<HealthEventType>("Temperature");
@@ -285,9 +287,11 @@ const HealthCarePage = () => {
         <LocalHospitalIcon color="primary" />
         <Typography variant="h3">{u.t("healthCare:page_title")}</Typography>
         <Stack direction="row" gap={1} flexWrap="wrap">
-          <Button variant="outlined" size="small" onClick={shareChart} disabled={chartData.chartEvents.length === 0}>
-            {share ? u.t("healthCare:update_shared_range") : u.t("healthCare:share_chart")}
-          </Button>
+          {!share && (
+            <Button variant="outlined" size="small" onClick={shareChart} disabled={chartData.chartEvents.length === 0}>
+              {u.t("healthCare:share_chart")}
+            </Button>
+          )}
           {share && (
             <Button
               variant="outlined"
@@ -446,7 +450,7 @@ const HealthCarePage = () => {
               title={u.t("healthCare:latest_wellbeing")}
               scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
             />
-            <HealthCareChart events={events} timeRange={chartTimeRange} />
+            <HealthCareChart events={events} timeRange={chartTimeRange} language={currentLanguage} />
             <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
             <TableContainer>
               <Table size="small">
