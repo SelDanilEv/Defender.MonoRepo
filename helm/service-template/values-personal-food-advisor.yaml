@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.personal-food-advisor
-  tag: latest
+  tag: 20260622-138
   pullPolicy: Always
 ingress:
   enabled: true
