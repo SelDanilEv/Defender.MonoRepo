@@ -147,6 +147,11 @@ public class LotteryManagementService(
 
         foreach (var lottery in lotteries)
         {
+            if (await lotteryDrawRepository.HasUnprocessedLotteryDrawAsync(lottery.Id))
+            {
+                continue;
+            }
+
             var draw = LotteryDraw.Create(lottery);
 
             var filter = FindModelRequest<LotteryModel>

@@ -52,6 +52,15 @@ public class LotteryDrawRepository : BaseMongoRepository<LotteryDraw>, ILotteryD
         return GetItemAsync(filter);
     }
 
+    public async Task<bool> HasUnprocessedLotteryDrawAsync(Guid lotteryId)
+    {
+        var filter = FindModelRequest<LotteryDraw>
+            .Init(x => x.LotteryId, lotteryId)
+            .And(x => x.IsProcessed, false);
+
+        return await GetItemAsync(filter) is not null;
+    }
+
     public async Task<LotteryDraw> CreateLotteryDrawAsync(LotteryDraw lotteryDraw)
     {
         bool isUnique;

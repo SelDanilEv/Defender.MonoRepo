@@ -6,6 +6,7 @@ using Defender.RiskGamesService.Application.Services.Lottery;
 using Defender.RiskGamesService.Common.Kafka;
 using Defender.RiskGamesService.Domain.Entities.Lottery.Draw;
 using Defender.RiskGamesService.Domain.Entities.Lottery.TicketsSettings;
+using Defender.RiskGamesService.Domain.Entities.Lottery.UserTickets;
 using Defender.RiskGamesService.Domain.Enums;
 
 namespace Defender.RiskGamesService.Tests.Services;
@@ -85,6 +86,8 @@ public class LotteryProcessingServiceCoverageTests
         };
         repo.Setup(x => x.GetLotteryDrawAsync(drawId)).ReturnsAsync(draw);
         repo.Setup(x => x.UpdateLotteryDrawAsync(It.IsAny<UpdateModelRequest<LotteryDraw>>())).ReturnsAsync(draw);
+        tickets.Setup(x => x.GetUserTicketsByDrawNumberAsync(draw.DrawNumber)).ReturnsAsync(
+            [new UserTicket { DrawNumber = draw.DrawNumber, Status = UserTicketStatus.Paid }]);
         tickets.Setup(x => x.CheckWinningsAsync(draw)).Returns(Task.CompletedTask);
         var sut = new LotteryProcessingService(producer.Object, repo.Object, tickets.Object);
 
@@ -93,5 +96,54 @@ public class LotteryProcessingServiceCoverageTests
         tickets.Verify(x => x.CheckWinningsAsync(draw), Times.Once);
         repo.Verify(x => x.UpdateLotteryDrawAsync(It.IsAny<UpdateModelRequest<LotteryDraw>>()), Times.Once);
         Assert.All(draw.Winnings, w => Assert.NotEmpty(w.Tickets));
+    }
+
+    [Fact]
+    public async Task HandleLotteryDraw_WhenNoTicketsPurchased_ReschedulesDrawWithoutProcessingWinnings()
+    {
+        var producer = new Mock<IDefaultKafkaProducer<Guid>>();
+        var repo = new Mock<ILotteryDrawRepository>();
+        var tickets = new Mock<IUserTicketManagementService>();
+        var drawId = Guid.NewGuid();
+        var oldEndDate = DateTime.UtcNow.AddMinutes(-5);
+        var draw = new LotteryDraw
+        {
+            Id = drawId,
+            DrawNumber = 5,
+            StartDate = oldEndDate.AddHours(-1),
+            EndDate = oldEndDate,
+            MinTicketNumber = 1,
+            MaxTicketNumber = 20,
+            IsProcessing = true,
+            IsProcessed = false,
+            PrizeSetup = new TicketsPrizeSetup
+            {
+                Prizes =
+                [
+                    new TicketPrize { TicketsAmount = 1, Coefficient = 200 }
+                ]
+            },
+            Winnings =
+            [
+                new Winning { Coefficient = 200, Tickets = [] }
+            ]
+        };
+
+        repo.Setup(x => x.GetLotteryDrawAsync(drawId)).ReturnsAsync(draw);
+        repo.Setup(x => x.UpdateLotteryDrawAsync(It.IsAny<UpdateModelRequest<LotteryDraw>>())).ReturnsAsync(draw);
+        tickets.Setup(x => x.GetUserTicketsByDrawNumberAsync(draw.DrawNumber)).ReturnsAsync([]);
+
+        var sut = new LotteryProcessingService(producer.Object, repo.Object, tickets.Object);
+
+        await sut.HandleLotteryDraw(drawId);
+
+        tickets.Verify(x => x.GetUserTicketsByDrawNumberAsync(draw.DrawNumber), Times.Once);
+        tickets.Verify(x => x.CheckWinningsAsync(It.IsAny<LotteryDraw>()), Times.Never);
+        repo.Verify(x => x.UpdateLotteryDrawAsync(It.IsAny<UpdateModelRequest<LotteryDraw>>()), Times.Once);
+        Assert.False(draw.IsProcessed);
+        Assert.False(draw.IsProcessing);
+        Assert.Equal(oldEndDate, draw.StartDate);
+        Assert.True(draw.EndDate > oldEndDate);
+        Assert.All(draw.Winnings, w => Assert.Empty(w.Tickets));
     }
 }

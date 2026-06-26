@@ -9,6 +9,7 @@ public interface ILotteryDrawRepository
     Task<PagedResult<LotteryDraw>> GetActiveLotteryDrawsAsync(PaginationRequest request);
     Task<LotteryDraw> GetLotteryDrawAsync(Guid drawId);
     Task<LotteryDraw> GetLotteryDrawAsync(long drawNumber);
+    Task<bool> HasUnprocessedLotteryDrawAsync(Guid lotteryId);
     Task<LotteryDraw> CreateLotteryDrawAsync(LotteryDraw lotteryDraw);
     Task<List<Guid>> GetLotteryDrawsToProcessAsync(
         CancellationToken cancellationToken = default);

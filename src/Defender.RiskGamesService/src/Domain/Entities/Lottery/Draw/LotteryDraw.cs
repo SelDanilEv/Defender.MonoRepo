@@ -63,6 +63,25 @@ public class LotteryDraw : IBaseModel
     public bool IsActive => StartDate < DateTime.UtcNow && DateTime.UtcNow < EndDate;
     public int TicketsAmount => MaxTicketNumber - MinTicketNumber + 1;
 
+    public void Reschedule(DateTime now)
+    {
+        var duration = EndDate - StartDate;
+
+        if (duration <= TimeSpan.Zero)
+        {
+            duration = TimeSpan.FromHours(1);
+        }
+
+        do
+        {
+            StartDate = EndDate;
+            EndDate = EndDate.Add(duration);
+        }
+        while (EndDate <= now);
+
+        IsProcessing = false;
+        IsProcessed = false;
+    }
 
     public static (DateTime, DateTime) GetDrawStartAndEndDate(LotterySchedule schedule)
     {

@@ -38,6 +38,25 @@ public class LotteryProcessingService(
             return;
         }
 
+        var userTickets = await userTicketManagementService
+            .GetUserTicketsByDrawNumberAsync(draw.DrawNumber);
+
+        if (userTickets.Count == 0)
+        {
+            draw.Reschedule(DateTime.UtcNow);
+
+            var rescheduleDrawUpdateRequest = UpdateModelRequest<LotteryDraw>
+                .Init(draw.Id)
+                .Set(x => x.StartDate, draw.StartDate)
+                .Set(x => x.EndDate, draw.EndDate)
+                .Set(x => x.IsProcessing, false)
+                .Set(x => x.IsProcessed, false);
+
+            await lotteryDrawRepository.UpdateLotteryDrawAsync(rescheduleDrawUpdateRequest);
+
+            return;
+        }
+
         var finishDrawUpdateRequest = UpdateModelRequest<LotteryDraw>
             .Init(draw.Id)
             .Set(x => x.IsProcessing, false)

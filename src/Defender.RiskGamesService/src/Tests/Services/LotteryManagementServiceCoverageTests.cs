@@ -121,6 +121,9 @@ public class LotteryManagementServiceCoverageTests
         _lotteryRepository
             .Setup(x => x.GetAllLotteriesToScheduleAsync())
             .ReturnsAsync([lottery]);
+        _drawRepository
+            .Setup(x => x.HasUnprocessedLotteryDrawAsync(lottery.Id))
+            .ReturnsAsync(false);
         _lotteryRepository
             .Setup(x => x.UpdateLotteryAsync(
                 It.IsAny<Defender.Common.DB.Model.UpdateModelRequest<LotteryModel>>(),
@@ -134,6 +137,42 @@ public class LotteryManagementServiceCoverageTests
         await sut.ScheduleDraws();
 
         _drawRepository.Verify(x => x.CreateLotteryDrawAsync(It.IsAny<LotteryDraw>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ScheduleDraws_WhenLotteryHasUnprocessedDraw_DoesNotCreateNewDraw()
+    {
+        var lottery = new LotteryModel
+        {
+            Id = Guid.NewGuid(),
+            IsActive = true,
+            PublicNames = new Dictionary<string, string> { ["en"] = "risk" },
+            Schedule = LotterySchedule.Create(LotteryScheduleType.Daily, 1, DateTime.UtcNow.AddDays(-2)),
+            TicketsSetup = TicketsSetup.Create(
+                ticketsAmount: 10,
+                startTicketNumber: 1,
+                allowedValues: [100],
+                isCustomValueAllowed: false,
+                minValue: 100,
+                maxValue: 100,
+                allowedCurrencies: [Currency.USD],
+                prizes: [new TicketPrize { TicketsAmount = 1, Coefficient = 200 }])
+        };
+
+        _lotteryRepository
+            .Setup(x => x.GetAllLotteriesToScheduleAsync())
+            .ReturnsAsync([lottery]);
+        _drawRepository
+            .Setup(x => x.HasUnprocessedLotteryDrawAsync(lottery.Id))
+            .ReturnsAsync(true);
+        var sut = CreateSut();
+
+        await sut.ScheduleDraws();
+
+        _lotteryRepository.Verify(x => x.UpdateLotteryAsync(
+            It.IsAny<Defender.Common.DB.Model.UpdateModelRequest<LotteryModel>>(),
+            It.IsAny<Defender.Common.DB.Model.FindModelRequest<LotteryModel>>()), Times.Never);
+        _drawRepository.Verify(x => x.CreateLotteryDrawAsync(It.IsAny<LotteryDraw>()), Times.Never);
     }
 
     [Fact]

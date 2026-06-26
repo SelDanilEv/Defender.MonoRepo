@@ -45,5 +45,5 @@
 
 - [x] Run `helm template` for representative services.
 - [x] Install KEDA core and HTTP Add-on in the live K3s cluster if missing.
-- [ ] Apply/sync the updated Argo applications.
-- [ ] Verify KEDA CRDs, ScaledObjects, InterceptorRoutes, and pod scale down/up behavior.
+- [x] Apply/sync the updated Argo applications.
+- [x] Verify KEDA CRDs, ScaledObjects, InterceptorRoutes, and pod scale down/up behavior.
