@@ -3,8 +3,14 @@ kind: Deployment
 metadata:
   name: {{ .Release.Name }}
 {{- $containerPort := .Values.service.targetPort | default .Values.service.port }}
+{{- $autoscaling := .Values.autoscaling | default dict }}
+{{- $httpAutoscaling := $autoscaling.http | default dict }}
+{{- $cronAutoscaling := $autoscaling.cron | default dict }}
+{{- $autoscalingEnabled := or ($httpAutoscaling.enabled | default false) ($cronAutoscaling.enabled | default false) }}
 spec:
+{{- if not $autoscalingEnabled }}
   replicas: {{ .Values.replicaCount }}
+{{- end }}
   selector:
     matchLabels:
       app: {{ .Release.Name }}

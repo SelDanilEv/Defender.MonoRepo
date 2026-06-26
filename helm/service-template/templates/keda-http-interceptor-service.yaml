@@ -1,0 +1,16 @@
+{{- $autoscaling := .Values.autoscaling | default dict }}
+{{- $httpAutoscaling := $autoscaling.http | default dict }}
+{{- $interceptorNamespace := $httpAutoscaling.interceptor.namespace | default .Release.Namespace }}
+{{- if and ($httpAutoscaling.enabled | default false) (ne $interceptorNamespace .Release.Namespace) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-keda-interceptor
+spec:
+  type: ExternalName
+  externalName: {{ $httpAutoscaling.interceptor.serviceName | default "keda-add-ons-http-interceptor-proxy" }}.{{ $interceptorNamespace }}.svc.cluster.local
+  ports:
+    - name: http
+      port: {{ $httpAutoscaling.interceptor.servicePort | default 8080 }}
+      targetPort: {{ $httpAutoscaling.interceptor.servicePort | default 8080 }}
+{{- end }}

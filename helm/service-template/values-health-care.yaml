@@ -10,3 +10,6 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+autoscaling:
+  http:
+    enabled: true

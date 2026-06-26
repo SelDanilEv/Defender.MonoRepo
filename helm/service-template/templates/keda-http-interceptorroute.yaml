@@ -1,0 +1,28 @@
+{{- $autoscaling := .Values.autoscaling | default dict }}
+{{- $httpAutoscaling := $autoscaling.http | default dict }}
+{{- if ($httpAutoscaling.enabled | default false) }}
+apiVersion: http.keda.sh/v1beta1
+kind: InterceptorRoute
+metadata:
+  name: {{ .Release.Name }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  target:
+    service: {{ .Release.Name }}
+    port: {{ .Values.service.port }}
+  rules:
+{{- range .Values.ingress.hosts }}
+    - hosts:
+        - {{ .host | quote }}
+{{- if .paths }}
+      paths:
+{{- range .paths }}
+        - value: {{ .path | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+  scalingMetric:
+    concurrency:
+      targetValue: {{ $httpAutoscaling.concurrency.targetValue | default 20 }}
+{{- end }}

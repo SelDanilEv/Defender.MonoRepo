@@ -1,4 +1,7 @@
 {{- if .Values.ingress.enabled }}
+{{- $autoscaling := .Values.autoscaling | default dict }}
+{{- $httpAutoscaling := $autoscaling.http | default dict }}
+{{- $httpEnabled := $httpAutoscaling.enabled | default false }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -15,9 +18,21 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
+{{- if $httpEnabled }}
+{{- if eq ($httpAutoscaling.interceptor.namespace | default $.Release.Namespace) $.Release.Namespace }}
+                name: {{ $httpAutoscaling.interceptor.serviceName | default "keda-add-ons-http-interceptor-proxy" }}
+{{- else }}
+                name: {{ $.Release.Name }}-keda-interceptor
+{{- end }}
+{{- else }}
                 name: {{ $.Release.Name }}
+{{- end }}
                 port:
+{{- if $httpEnabled }}
+                  number: {{ $httpAutoscaling.interceptor.servicePort | default 8080 }}
+{{- else }}
                   number: {{ $.Values.service.port }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
