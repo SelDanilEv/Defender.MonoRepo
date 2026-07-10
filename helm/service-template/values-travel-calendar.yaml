@@ -15,3 +15,6 @@ autoscaling:
   minReplicaCount: 1
   http:
     enabled: true
+probes:
+  # TravelCalendarService exposes its unauthenticated health endpoint at /health.
+  path: /health
