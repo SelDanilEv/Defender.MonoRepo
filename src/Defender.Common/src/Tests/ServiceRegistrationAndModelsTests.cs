@@ -23,6 +23,7 @@ public class ServiceRegistrationAndModelsTests
     public void DefenderHealthChecks_WhenRegistered_ExposeBuiltInHealthCheckService()
     {
         var services = new ServiceCollection();
+        services.AddLogging();
 
         services.AddDefenderHealthChecks();
 

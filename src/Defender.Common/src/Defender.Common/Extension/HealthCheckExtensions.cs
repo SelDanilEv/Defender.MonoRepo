@@ -13,6 +13,7 @@ public static class HealthCheckExtensions
 {
     public static IServiceCollection AddDefenderHealthChecks(this IServiceCollection services)
     {
+        services.AddOptions();
         services.AddHealthChecks();
 
         return services;
