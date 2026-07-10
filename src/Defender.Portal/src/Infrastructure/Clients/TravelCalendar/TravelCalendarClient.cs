@@ -17,8 +17,7 @@ public class TravelCalendarClient(HttpClient httpClient, IAuthenticationHeaderAc
 
     public async Task<TravelCalendarDto> GetAsync(string? from, string? to, CancellationToken ct = default)
     {
-        var query = $"?from={Uri.EscapeDataString(from ?? string.Empty)}&to={Uri.EscapeDataString(to ?? string.Empty)}";
-        await Authorize(); var response = await httpClient.GetAsync(Url(query), ct); await EnsureSuccess(response, ct);
+        await Authorize(); var response = await httpClient.GetAsync(Url(), ct); await EnsureSuccess(response, ct);
         return (await response.Content.ReadFromJsonAsync<TravelCalendarDto>(JsonOptions, ct))!;
     }
 
