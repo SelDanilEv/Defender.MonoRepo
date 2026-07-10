@@ -9,6 +9,7 @@ import {
   updateUserInfoActionName,
 } from "src/reducers/sessionReducer";
 import { cleanWalletInfoActionName } from "src/reducers/walletReducer";
+import { resetSessionExpiryHandling } from "src/services/SessionExpiryService";
 
 export function login(session: Session) {
   if (!session.isAuthenticated) {
@@ -16,6 +17,7 @@ export function login(session: Session) {
   }
 
   return (dispatch: AppDispatch) => {
+    resetSessionExpiryHandling();
     dispatch({
       type: loginActionName,
       payload: session,
