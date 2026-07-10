@@ -73,28 +73,6 @@ public class TravelEventRepository : BaseMongoRepository<TravelEvent>, ITravelEv
         }
     }
 
-    public async Task AddRangeAsync(IEnumerable<TravelEvent> travelEvents, CancellationToken cancellationToken)
-    {
-        var events = travelEvents.ToArray();
-        if (events.Length == 0)
-        {
-            return;
-        }
-
-        try
-        {
-            await indexes.Value;
-            await _mongoCollection.InsertManyAsync(events, cancellationToken: cancellationToken);
-        }
-        catch (MongoBulkWriteException exception) when (exception.WriteErrors.All(error => error.Category == ServerErrorCategory.DuplicateKey))
-        {
-        }
-        catch (Exception exception)
-        {
-            throw new ServiceException(ErrorCode.CM_DatabaseIssue, exception);
-        }
-    }
-
     public async Task<bool> ReplaceAsync(TravelEvent travelEvent, long expectedVersion, CancellationToken cancellationToken)
     {
         try

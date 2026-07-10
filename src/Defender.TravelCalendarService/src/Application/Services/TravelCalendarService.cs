@@ -1,6 +1,5 @@
 using Defender.TravelCalendarService.Application.Common.Interfaces.Repositories;
 using Defender.TravelCalendarService.Application.Common.Interfaces.Services;
-using Defender.TravelCalendarService.Application.Defaults;
 using Defender.TravelCalendarService.Application.DTOs;
 using Defender.TravelCalendarService.Application.Models.Requests;
 using Defender.TravelCalendarService.Domain.Entities;
@@ -13,7 +12,6 @@ namespace Defender.TravelCalendarService.Application.Services;
 public class TravelCalendarService(
     ITravelCalendarRepository calendarRepository,
     ITravelEventRepository eventRepository,
-    TravelCalendarDefaultsFactory defaultsFactory,
     TimeProvider timeProvider) : ITravelCalendarService
 {
     public async Task<TravelCalendarDto> GetAsync(Guid userId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
@@ -24,7 +22,6 @@ public class TravelCalendarService(
         }
 
         var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
-        await EnsureSeededAsync(calendar, userId, cancellationToken);
         var events = await eventRepository.GetVisibleAsync(userId, cancellationToken);
         var page = events.Where(item => IsVisibleInRange(item, from, to)).ToArray();
         return Map(calendar, page, userId, events);
@@ -36,7 +33,6 @@ public class TravelCalendarService(
     public async Task<TravelCalendarMutationResultDto> AddQueuedTripAsync(Guid userId, CreateQueuedTripRequest request, CancellationToken cancellationToken)
     {
         var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
-        await EnsureSeededAsync(calendar, userId, cancellationToken);
         EnsureCalendarVersion(calendar, request.ExpectedVersion);
 
         var ownedEvents = await eventRepository.GetOwnedAsync(userId, cancellationToken);
@@ -51,7 +47,6 @@ public class TravelCalendarService(
     public async Task<TravelCalendarMutationResultDto> CreateEventFromDateAsync(Guid userId, CreateEventFromDateRequest request, CancellationToken cancellationToken)
     {
         var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
-        await EnsureSeededAsync(calendar, userId, cancellationToken);
 
         var start = request.Date.DayOfWeek == DayOfWeek.Sunday ? request.Date.AddDays(-1) : request.Date;
         var isWeekend = request.Date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
@@ -201,26 +196,6 @@ public class TravelCalendarService(
 
     private DateTimeOffset Now => timeProvider.GetUtcNow();
 
-    private async Task EnsureSeededAsync(TravelCalendar calendar, Guid userId, CancellationToken cancellationToken)
-    {
-        if (calendar.HasSeededEvents)
-        {
-            return;
-        }
-
-        var expectedVersion = calendar.Version;
-        calendar.HasSeededEvents = true;
-        calendar.Version++;
-        calendar.UpdatedAtUtc = Now;
-        if (!await calendarRepository.ReplaceAsync(calendar, expectedVersion, cancellationToken))
-        {
-            return;
-        }
-
-        var seedEvents = defaultsFactory.CreateSeedEvents(userId, Now);
-        await eventRepository.AddRangeAsync(seedEvents, cancellationToken);
-    }
-
     private async Task<TravelCalendarMutationResultDto> MutateCalendarAsync(
         Guid userId,
         long expectedVersion,
@@ -229,8 +204,6 @@ public class TravelCalendarService(
         Guid? affectedItemId = null)
     {
         var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
-        await EnsureSeededAsync(calendar, userId, cancellationToken);
-        calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
         EnsureCalendarVersion(calendar, expectedVersion);
 
         action(calendar);
@@ -251,7 +224,6 @@ public class TravelCalendarService(
         CancellationToken cancellationToken)
     {
         var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
-        await EnsureSeededAsync(calendar, userId, cancellationToken);
         var visibleEvents = await eventRepository.GetVisibleAsync(userId, cancellationToken);
         var travelEvent = visibleEvents.FirstOrDefault(item => item.Id == eventId) ?? throw new TravelCalendarNotFoundException("Event was not found.");
         if (travelEvent.Version != expectedVersion)
