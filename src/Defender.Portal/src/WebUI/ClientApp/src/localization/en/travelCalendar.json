@@ -1,5 +1,6 @@
 {
   "title": "Travel calendar",
+  "subtitleGeneric": "Plan your trips from {{city}}",
   "subtitle": "Summer 2026 · trip planning from {{city}}",
   "retry": "Retry",
   "unavailable": "Travel calendar is unavailable",
@@ -55,6 +56,10 @@
   },
   "monthGrid": {
     "addEvent": "Add event"
+  },
+  "navigation": {
+    "previous": "Show previous month",
+    "next": "Show next month"
   },
   "addPlaceDialog": {
     "title": "Add place",

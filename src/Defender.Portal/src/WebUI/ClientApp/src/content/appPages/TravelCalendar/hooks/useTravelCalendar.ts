@@ -4,14 +4,31 @@ import {
   MutationResult,
   TravelCalendar,
   TravelCalendarUserOption,
+  TravelEvent,
   TravelParticipantStatus,
   UpdateEventRequest,
   travelCalendarApi,
 } from "src/api/travelCalendar";
+import { CalendarMonth, calendarMonths, currentCalendarMonth, monthKey, monthRange } from "../monthNavigation";
 
-export const useTravelCalendar = () => {
+const overlaps = (event: TravelEvent, from: string, to: string) => Boolean(event.startDate && event.endDate && event.startDate <= to && event.endDate >= from);
+
+const mergeCalendarPage = (previous: TravelCalendar | null, page: TravelCalendar, from: string, to: string): TravelCalendar => {
+  if (!previous) {
+    return page;
+  }
+
+  const events = new Map(previous.events.filter((item) => !overlaps(item, from, to)).map((item) => [item.id, item]));
+  page.events.forEach((item) => events.set(item.id, item));
+  return { ...page, events: [...events.values()] };
+};
+
+export const useTravelCalendar = (initialMonthCount: number) => {
   const utils = useUtils();
   const utilsRef = useRef(utils);
+  const loadedMonths = useRef(new Set<string>());
+  const loadingMonths = useRef(new Set<string>());
+  const initialLoadStarted = useRef(false);
   utilsRef.current = utils;
 
   const [calendar, setCalendar] = useState<TravelCalendar | null>(null);
@@ -20,21 +37,58 @@ export const useTravelCalendar = () => {
   const [error, setError] = useState("");
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
 
+  const loadMonth = useCallback(async (month: CalendarMonth) => {
+    const key = monthKey(month);
+    if (loadedMonths.current.has(key) || loadingMonths.current.has(key)) {
+      return;
+    }
+
+    loadingMonths.current.add(key);
+    try {
+      const range = monthRange(month);
+      const page = await travelCalendarApi.get(range.from, range.to, utilsRef.current);
+      loadedMonths.current.add(key);
+      setCalendar((current) => mergeCalendarPage(current, page, range.from, range.to));
+    } finally {
+      loadingMonths.current.delete(key);
+    }
+  }, []);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
+    loadedMonths.current.clear();
+    loadingMonths.current.clear();
     try {
-      setCalendar(await travelCalendarApi.get(utilsRef.current));
+      const initialMonths = calendarMonths(currentCalendarMonth(), initialMonthCount);
+      const first = monthRange(initialMonths[0]);
+      const last = monthRange(initialMonths[initialMonths.length - 1]);
+      const page = await travelCalendarApi.get(first.from, last.to, utilsRef.current);
+      initialMonths.forEach((month) => loadedMonths.current.add(monthKey(month)));
+      setCalendar(page);
     } catch {
       setError(utilsRef.current.t("travelCalendar:errors.loadFailed"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [initialMonthCount]);
 
   useEffect(() => {
-    load();
+    if (!initialLoadStarted.current) {
+      initialLoadStarted.current = true;
+      load();
+    }
   }, [load]);
+
+  const ensureMonths = useCallback(async (months: CalendarMonth[]) => {
+    try {
+      for (const month of months) {
+        await loadMonth(month);
+      }
+    } catch {
+      setError(utilsRef.current.t("travelCalendar:errors.loadFailed"));
+    }
+  }, [loadMonth]);
 
   const run = useCallback(async (operation: (current: TravelCalendar) => Promise<MutationResult>) => {
     if (!calendar || mutating) {
@@ -70,6 +124,7 @@ export const useTravelCalendar = () => {
     activeEvent,
     setActiveEventId,
     retry: load,
+    ensureMonths,
     searchUsers: async (query: string): Promise<TravelCalendarUserOption[]> => {
       if (!query.trim()) {
         return [];

@@ -6,6 +6,6 @@ namespace Defender.Portal.Infrastructure.Clients.TravelCalendar;
 
 public class TravelCalendarWrapper(ITravelCalendarClient client) : BaseSwaggerWrapper, ITravelCalendarWrapper
 {
-    public Task<TravelCalendarDto> GetAsync(CancellationToken ct = default) => ExecuteSafelyAsync(() => client.GetAsync(ct));
+    public Task<TravelCalendarDto> GetAsync(DateOnly? from, DateOnly? to, CancellationToken ct = default) => ExecuteSafelyAsync(() => client.GetAsync(from, to, ct));
     public Task<TravelCalendarMutationResultDto> SendAsync(HttpMethod method, string path, object request, CancellationToken ct = default) => ExecuteSafelyAsync(() => client.SendAsync(method, path, request, ct));
 }

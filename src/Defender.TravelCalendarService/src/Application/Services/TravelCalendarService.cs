@@ -16,12 +16,18 @@ public class TravelCalendarService(
     TravelCalendarDefaultsFactory defaultsFactory,
     TimeProvider timeProvider) : ITravelCalendarService
 {
-    public async Task<TravelCalendarDto> GetAsync(Guid userId, CancellationToken cancellationToken)
+    public async Task<TravelCalendarDto> GetAsync(Guid userId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken)
     {
+        if (from.HasValue && to.HasValue && from > to)
+        {
+            throw new TravelCalendarValidationException("TRAVEL_CALENDAR_INVALID_RANGE", "The start of the requested range must not be after its end.");
+        }
+
         var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
         await EnsureSeededAsync(calendar, userId, cancellationToken);
         var events = await eventRepository.GetVisibleAsync(userId, cancellationToken);
-        return Map(calendar, events, userId);
+        var page = events.Where(item => IsVisibleInRange(item, from, to)).ToArray();
+        return Map(calendar, page, userId, events);
     }
 
     public Task<TravelCalendarMutationResultDto> SetThemeAsync(Guid userId, SetThemeRequest request, CancellationToken cancellationToken)
@@ -38,7 +44,7 @@ public class TravelCalendarService(
         var travelEvent = TravelEvent.Queued(userId, request.Title, queueOrder, Now);
 
         await eventRepository.AddAsync(travelEvent, cancellationToken);
-        var page = await GetAsync(userId, cancellationToken);
+        var page = await GetAsync(userId, null, null, cancellationToken);
         return new(page, travelEvent.Id, null);
     }
 
@@ -64,7 +70,7 @@ public class TravelCalendarService(
         StampNewEvent(travelEvent);
 
         await eventRepository.AddAsync(travelEvent, cancellationToken);
-        var page = await GetAsync(userId, cancellationToken);
+        var page = await GetAsync(userId, null, null, cancellationToken);
         return new(page, travelEvent.Id, null);
     }
 
@@ -254,7 +260,7 @@ public class TravelCalendarService(
         }
 
         var affected = await action(travelEvent, calendar, visibleEvents);
-        var page = await GetAsync(userId, cancellationToken);
+        var page = await GetAsync(userId, null, null, cancellationToken);
         return new(page, affected.EventId, affected.ItemId);
     }
 
@@ -307,7 +313,17 @@ public class TravelCalendarService(
         }
     }
 
-    public static TravelCalendarDto Map(TravelCalendar calendar, IEnumerable<TravelEvent> events, Guid viewerUserId)
+    private static bool IsVisibleInRange(TravelEvent item, DateOnly? from, DateOnly? to)
+    {
+        if (item.StartDate == null || item.EndDate == null || (!from.HasValue && !to.HasValue))
+        {
+            return true;
+        }
+
+        return (!from.HasValue || item.EndDate >= from) && (!to.HasValue || item.StartDate <= to);
+    }
+
+    public static TravelCalendarDto Map(TravelCalendar calendar, IEnumerable<TravelEvent> events, Guid viewerUserId, IEnumerable<TravelEvent>? summaryEvents = null)
     {
         var orderedEvents = events
             .OrderBy(item => item.StartDate == null)
@@ -315,7 +331,12 @@ public class TravelCalendarService(
             .ThenBy(item => item.QueueOrder)
             .ToArray();
 
-        var budget = TravelBudgetCalculator.Calculate(orderedEvents, calendar.Vehicle);
+        var orderedSummaryEvents = (summaryEvents ?? events)
+            .OrderBy(item => item.StartDate == null)
+            .ThenBy(item => item.StartDate)
+            .ThenBy(item => item.QueueOrder)
+            .ToArray();
+        var budget = TravelBudgetCalculator.Calculate(orderedSummaryEvents, calendar.Vehicle);
 
         return new(
             calendar.Id,
@@ -356,7 +377,7 @@ public class TravelCalendarService(
             }).ToArray(),
             calendar.PackingItems.OrderBy(item => item.Order).Select(item => new PackingItemDto(item.Id, item.Text, item.IsChecked, item.Order)).ToArray(),
             new(
-                orderedEvents.Count(item => item.Type == TravelEventType.OvernightTrip && item.StartDate != null),
+                orderedSummaryEvents.Count(item => item.Type == TravelEventType.OvernightTrip && item.StartDate != null),
                 budget.HotelTotalPln,
                 budget.TransportTotalPln,
                 budget.OtherTotalPln,

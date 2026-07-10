@@ -14,7 +14,7 @@ namespace Defender.TravelCalendarService.WebApi.Controllers.V1;
 public class TravelCalendarController(ICurrentAccountAccessor account, ITravelCalendarService service) : ControllerBase
 {
     private Guid UserId => account.GetAccountId();
-    [HttpGet] public Task<TravelCalendarDto> Get(CancellationToken ct) => service.GetAsync(UserId, ct);
+    [HttpGet] public Task<TravelCalendarDto> Get([FromQuery] DateOnly? from, [FromQuery] DateOnly? to, CancellationToken ct) => service.GetAsync(UserId, from, to, ct);
     [HttpPatch("theme")] public Task<TravelCalendarMutationResultDto> SetTheme(SetThemeRequest request, CancellationToken ct) => service.SetThemeAsync(UserId, request, ct);
     [HttpPost("queued-trips")] public async Task<ActionResult<TravelCalendarMutationResultDto>> AddQueuedTrip(CreateQueuedTripRequest request, CancellationToken ct) => StatusCode(201, await service.AddQueuedTripAsync(UserId, request, ct));
     [HttpPost("events/from-date")] public async Task<ActionResult<TravelCalendarMutationResultDto>> CreateFromDate(CreateEventFromDateRequest request, CancellationToken ct) => StatusCode(201, await service.CreateEventFromDateAsync(UserId, request, ct));

@@ -12,7 +12,7 @@ namespace Defender.Portal.WebUI.Controllers.V1;
 
 public class TravelCalendarController(IMediator mediator, IMapper mapper, ITravelCalendarWrapper wrapper, IUserManagementWrapper userManagementWrapper) : BaseApiController(mediator, mapper)
 {
-    [HttpGet, Auth(Roles.User)] public async Task<IActionResult> Get(CancellationToken ct) => Ok(await wrapper.GetAsync(ct));
+    [HttpGet, Auth(Roles.User)] public async Task<IActionResult> Get([FromQuery] DateOnly? from, [FromQuery] DateOnly? to, CancellationToken ct) => Ok(await wrapper.GetAsync(from, to, ct));
     [HttpGet("users"), Auth(Roles.User)] public async Task<IActionResult> SearchUsers([FromQuery] string query, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(query))

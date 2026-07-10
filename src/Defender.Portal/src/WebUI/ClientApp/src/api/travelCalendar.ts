@@ -65,7 +65,7 @@ const call = <T>(path: string, method: string, body: unknown, utils?: IUtils | n
 const version = (expectedVersion: number) => ({ expectedVersion });
 
 export const travelCalendarApi = {
-  get: (utils?: IUtils | null) => call<TravelCalendar>("", "GET", undefined, utils),
+  get: (from: string, to: string, utils?: IUtils | null) => call<TravelCalendar>(`?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`, "GET", undefined, utils),
   searchUsers: (query: string, utils?: IUtils | null) => call<TravelCalendarUserOption[]>(`/users?query=${encodeURIComponent(query)}`, "GET", undefined, utils),
   setTheme: (v: number, theme: CalendarTheme, u?: IUtils | null) => call<MutationResult>("/theme", "PATCH", { expectedVersion: v, theme }, u),
   addQueuedTrip: (v: number, title: string, u?: IUtils | null) => call<MutationResult>("/queued-trips", "POST", { expectedVersion: v, title }, u),

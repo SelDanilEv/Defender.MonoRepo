@@ -56,6 +56,11 @@
   "monthGrid": {
     "addEvent": "Добавить событие"
   },
+  "subtitleGeneric": "Планируйте поездки из {{city}}",
+  "navigation": {
+    "previous": "Показать предыдущий месяц",
+    "next": "Показать следующий месяц"
+  },
   "addPlaceDialog": {
     "title": "Добавить место",
     "label": "Куда хотите поехать?",

@@ -5,7 +5,7 @@ namespace Defender.TravelCalendarService.Application.Common.Interfaces.Services;
 
 public interface ITravelCalendarService
 {
-    Task<TravelCalendarDto> GetAsync(Guid userId, CancellationToken cancellationToken);
+    Task<TravelCalendarDto> GetAsync(Guid userId, DateOnly? from, DateOnly? to, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> SetThemeAsync(Guid userId, SetThemeRequest request, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> AddQueuedTripAsync(Guid userId, CreateQueuedTripRequest request, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> CreateEventFromDateAsync(Guid userId, CreateEventFromDateRequest request, CancellationToken cancellationToken);

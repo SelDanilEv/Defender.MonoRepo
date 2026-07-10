@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { alpha, useTheme } from "@mui/material/styles";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import {
   Alert,
   Box,
@@ -24,10 +25,13 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 
 import { MonthGrid } from "./components/MonthGrid";
 import { EventDrawer } from "./components/EventDrawer";
 import { useTravelCalendar } from "./hooks/useTravelCalendar";
+import { addCalendarMonths, calendarMonths, currentCalendarMonth } from "./monthNavigation";
 
 const Panel = ({ children, ...props }: any) => (
   <Paper
@@ -49,14 +53,31 @@ const Panel = ({ children, ...props }: any) => (
 export default function TravelCalendarPage() {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const laptop = useMediaQuery(theme.breakpoints.up("md"));
   const locale = i18n.language === "ru" ? "ru-RU" : "en-US";
   const formatMoney = (value: number) => value.toLocaleString(locale);
-  const state = useTravelCalendar();
-  const { calendar } = state;
+  const visibleMonthCount = laptop ? 5 : 3;
+  const [firstMonth, setFirstMonth] = useState(currentCalendarMonth);
+  const state = useTravelCalendar(visibleMonthCount);
+  const { calendar, ensureMonths } = state;
   const [tripDialog, setTripDialog] = useState(false);
   const [tripTitle, setTripTitle] = useState("");
   const [packing, setPacking] = useState("");
   const [budgetOpen, setBudgetOpen] = useState(false);
+  const visibleMonths = useMemo(() => calendarMonths(firstMonth, visibleMonthCount), [firstMonth, visibleMonthCount]);
+
+  useEffect(() => {
+    if (calendar) {
+      ensureMonths(visibleMonths);
+    }
+  }, [calendar, ensureMonths, visibleMonths]);
+
+  const moveMonths = (direction: -1 | 1) => {
+    const nextFirstMonth = addCalendarMonths(firstMonth, direction);
+    const enteringMonth = direction > 0 ? addCalendarMonths(firstMonth, visibleMonthCount) : nextFirstMonth;
+    setFirstMonth(nextFirstMonth);
+    ensureMonths([enteringMonth]);
+  };
 
   if (state.loading) {
     return (
@@ -225,7 +246,7 @@ export default function TravelCalendarPage() {
                   {t("travelCalendar:title")}
                 </Typography>
                 <Typography color="var(--tc-muted)">
-                  {t("travelCalendar:subtitle", { city: calendar.baseCity })}
+                {t("travelCalendar:subtitleGeneric", { city: calendar.baseCity })}
                 </Typography>
               </Box>
             </Stack>
@@ -521,11 +542,22 @@ export default function TravelCalendarPage() {
                 gap: 2,
               }}
             >
-              {[6, 7, 8].map((month) => (
+              <Stack direction="row" alignItems="center" justifyContent="space-between" gridColumn="1 / -1">
+                <IconButton aria-label={t("travelCalendar:navigation.previous")} onClick={() => moveMonths(-1)}>
+                  <NavigateBeforeIcon />
+                </IconButton>
+                <Typography fontWeight={800} textTransform="capitalize">
+                  {new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(firstMonth.year, firstMonth.month, 1))}
+                </Typography>
+                <IconButton aria-label={t("travelCalendar:navigation.next")} onClick={() => moveMonths(1)}>
+                  <NavigateNextIcon />
+                </IconButton>
+              </Stack>
+              {visibleMonths.map((month) => (
                 <MonthGrid
-                  key={month}
-                  year={2026}
-                  month={month}
+                  key={`${month.year}-${month.month}`}
+                  year={month.year}
+                  month={month.month}
                   events={scheduled}
                   holidays={calendar.holidays}
                   onDate={state.createFromDate}
