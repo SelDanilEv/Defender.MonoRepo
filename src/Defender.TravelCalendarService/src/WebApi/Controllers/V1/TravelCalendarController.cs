@@ -4,6 +4,7 @@ using Defender.Common.Interfaces;
 using Defender.TravelCalendarService.Application.Common.Interfaces.Services;
 using Defender.TravelCalendarService.Application.DTOs;
 using Defender.TravelCalendarService.Application.Models.Requests;
+using Defender.TravelCalendarService.Domain.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Defender.TravelCalendarService.WebApi.Controllers.V1;
