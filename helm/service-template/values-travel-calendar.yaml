@@ -1,0 +1,17 @@
+image:
+  repository: defendersd/defender.travel-calendar
+  tag: latest
+  pullPolicy: Always
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: argo-travel-calendar
+      paths:
+        - path: /
+          pathType: Prefix
+autoscaling:
+  # Portal calls travel-calendar directly over cluster DNS.
+  minReplicaCount: 1
+  http:
+    enabled: true

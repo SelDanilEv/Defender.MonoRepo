@@ -9,6 +9,7 @@ using Defender.Portal.Application.Common.Interfaces.Wrappers;
 using Defender.Portal.Application.Configuration.Options;
 using Defender.Portal.Infrastructure.Clients.BudgetTracker;
 using Defender.Portal.Infrastructure.Clients.HealthCare;
+using Defender.Portal.Infrastructure.Clients.TravelCalendar;
 using Defender.Portal.Infrastructure.Clients.Identity;
 using Defender.Portal.Infrastructure.Clients.PersonalFoodAdvisor;
 using Defender.Portal.Infrastructure.Clients.RiskGames;
@@ -44,6 +45,7 @@ public static class ConfigureServices
         services.AddTransient<IBudgetTrackerWrapper, BudgetTrackerWrapper>();
         services.AddTransient<IPersonalFoodAdvisorWrapper, PersonalFoodAdvisorWrapper>();
         services.AddTransient<IHealthCareWrapper, HealthCareWrapper>();
+        services.AddTransient<ITravelCalendarWrapper, TravelCalendarWrapper>();
 
         //services.AddHostedService<KeepAliveHostedService>();
 
@@ -98,6 +100,11 @@ public static class ConfigureServices
         services.AddHttpClient<IHealthCareClient, HealthCareClient>((serviceProvider, client) =>
         {
             client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<HealthCareOptions>>().Value.Url.TrimEnd('/') + "/");
+        });
+
+        services.AddHttpClient<ITravelCalendarClient, TravelCalendarClient>((serviceProvider, client) =>
+        {
+            client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<TravelCalendarOptions>>().Value.Url.TrimEnd('/') + "/");
         });
 
         return services;

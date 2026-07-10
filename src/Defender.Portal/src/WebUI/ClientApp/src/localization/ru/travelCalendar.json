@@ -1,0 +1,110 @@
+{
+  "title": "Календарь путешествий",
+  "subtitle": "Лето 2026 · план поездок из {{city}}",
+  "retry": "Повторить",
+  "unavailable": "Календарь путешествий недоступен",
+  "toggleTheme": "Переключить тему",
+  "switchToLightTheme": "Светлая тема",
+  "switchToDarkTheme": "Тёмная тема",
+  "hint": "Нажмите на свободную дату, чтобы создать событие · приглашённые участники видят общий ивент в своих календарях",
+  "hero": {
+    "overnightTrips": "{{count}} поездки с ночёвкой",
+    "queuedTrips": "{{count}} мест в очереди",
+    "pendingInvites": "{{count}} приглашений"
+  },
+  "wishlist": {
+    "title": "Хочу посетить",
+    "subtitle": "Распределите по свободным выходным",
+    "queuePosition": "#{{position}} в очереди",
+    "schedule": "Назначить",
+    "addPlace": "Добавить место"
+  },
+  "budget": {
+    "title": "Бюджет",
+    "hotels": "Отели",
+    "transport": "Транспорт",
+    "other": "Прочее",
+    "showDetails": "Показать детали",
+    "hideDetails": "Скрыть детали"
+  },
+  "packing": {
+    "title": "Собрать с собой",
+    "placeholder": "Новая вещь",
+    "addItem": "Добавить вещь",
+    "removeItem": "Удалить вещь"
+  },
+  "legend": {
+    "title": "Типы событий",
+    "OvernightTrip": { "title": "Поездка с ночёвкой", "note": "выходные и отель" },
+    "DayTrip": { "title": "Поездка на день", "note": "без ночёвки" },
+    "Event": { "title": "Событие", "note": "праздники и встречи" },
+    "Rest": { "title": "Отдых", "note": "спокойный день" },
+    "Family": { "title": "Семейные дела", "note": "важное для близких" }
+  },
+  "types": {
+    "OvernightTrip": "С ночёвкой",
+    "DayTrip": "На день",
+    "Event": "Событие",
+    "Rest": "Отдых",
+    "Family": "Семья"
+  },
+  "statuses": {
+    "Pending": "Ожидает",
+    "Accepted": "Принято",
+    "Declined": "Отклонено"
+  },
+  "monthGrid": {
+    "addEvent": "Добавить событие"
+  },
+  "addPlaceDialog": {
+    "title": "Добавить место",
+    "label": "Куда хотите поехать?",
+    "cancel": "Отмена",
+    "add": "Добавить"
+  },
+  "drawer": {
+    "title": "План поездки",
+    "ownerMode": "Вы владелец события",
+    "sharedMode": "Просмотр общего события",
+    "organizer": "Организатор",
+    "organizerNamed": "Организатор: {{name}}",
+    "organizerFallback": "Пользователь",
+    "statusNamed": "Статус: {{status}}",
+    "fields": {
+      "title": "Название",
+      "startDate": "Начало",
+      "endDate": "Окончание",
+      "notes": "Заметки",
+      "hotelName": "Название отеля",
+      "hotelAddress": "Адрес",
+      "hotelBookingUrl": "Ссылка на бронь",
+      "mainPoint": "Главная точка",
+      "hotelCost": "Отель, PLN",
+      "distanceKm": "Расстояние, км",
+      "otherCost": "Прочее, PLN",
+      "eventCost": "Стоимость, PLN"
+    },
+    "participants": "Участники",
+    "removeParticipant": "Убрать",
+    "addUser": "Добавить пользователя",
+    "searchUser": "Введите имя или email",
+    "invite": "Пригласить",
+    "noUsers": "Пользователи не найдены",
+    "hotel": "Отель",
+    "points": "Места",
+    "removePoint": "Удалить место",
+    "addPoint": "Добавить место",
+    "addPointPlaceholder": "Добавить место",
+    "eventBudget": "Бюджет события",
+    "total": "Итого",
+    "delete": "Удалить",
+    "accept": "Принять",
+    "decline": "Отклонить",
+    "close": "Закрыть",
+    "save": "Сохранить"
+  },
+  "errors": {
+    "loadFailed": "Не удалось загрузить календарь путешествий",
+    "saveFailed": "Изменения не сохранены. Календарь обновлён — повторите действие."
+  }
+}

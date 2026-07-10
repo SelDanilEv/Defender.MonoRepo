@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: travel-calendar
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+  labels:
+    app.kubernetes.io/name: travel-calendar
+    app.kubernetes.io/part-of: defender
+    app.kubernetes.io/instance: travel-calendar
+spec:
+  project: auto-deploy-dev
+  source:
+    repoURL: https://github.com/SelDanilEv/Defender.MonoRepo.git
+    targetRevision: main
+    path: helm/service-template
+    helm:
+      valueFiles:
+        - values-travel-calendar.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: defender
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

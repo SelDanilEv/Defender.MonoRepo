@@ -11,6 +11,8 @@ ingress:
         - path: /
           pathType: Prefix
 autoscaling:
+  # Portal and RiskGames call wallet directly over cluster DNS.
+  minReplicaCount: 1
   http:
     enabled: true
   cron:

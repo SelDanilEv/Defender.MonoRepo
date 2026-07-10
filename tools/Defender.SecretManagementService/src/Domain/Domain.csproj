@@ -1,15 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net10.0</TargetFramework>
         <RootNamespace>Defender.SecretManagementService.Domain</RootNamespace>
         <AssemblyName>Defender.SecretManagementService.Domain</AssemblyName>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MediatR" Version="14.0.0" />
+        <PackageReference Include="MediatR" />
     </ItemGroup>
 
     <ItemGroup>

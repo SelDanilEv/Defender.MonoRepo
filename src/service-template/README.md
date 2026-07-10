@@ -27,6 +27,8 @@ Ports:
 - 47060 - Local Risk Games Service
 - 47061 - Local Budget Tracker Service
 - 47062 - Local Personal Food Advisor
+- 47063 - Local Health Care Service
+- 47064 - Local Travel Calendar Service
 
 2. Dev
 
@@ -43,3 +45,5 @@ Ports:
 - 49060 - Dev Risk Games Service
 - 49061 - Dev Budget Tracker Service
 - 49062 - Dev Personal Food Advisor
+- 49063 - Dev Health Care Service
+- 49064 - Dev Travel Calendar Service

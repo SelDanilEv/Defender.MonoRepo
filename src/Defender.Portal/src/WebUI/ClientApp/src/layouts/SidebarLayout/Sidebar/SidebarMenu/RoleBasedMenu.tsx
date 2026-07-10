@@ -11,6 +11,7 @@ import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import GradingIcon from "@mui/icons-material/Grading";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 
 import MenuItem from "./MenuItem";
 import useUtils from "src/appUtils";
@@ -305,6 +306,11 @@ const RoleBasedMenu = (props: any) => {
                 />
               </List>
             </SubMenuWrapper>
+          </List>
+        );
+        result.push(
+          <List key={"travel_calendar"} component="div" subheader={<ListSubheader component="div" disableSticky>{u.t("sidebar_menu:header_travel_calendar")}</ListSubheader>}>
+            <SubMenuWrapper><List component="div"><MenuItem to="/travel-calendar" icon={<TravelExploreIcon style={{ fontSize: "1.1em" }} />} text={u.t("sidebar_menu:page_travel_calendar")} /></List></SubMenuWrapper>
           </List>
         );
         result.push(

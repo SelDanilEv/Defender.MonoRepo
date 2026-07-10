@@ -51,6 +51,7 @@ graph TB
         RiskGames["RiskGamesService"]
         BudgetTracker["BudgetTracker"]
         FoodAdvisor["PersonalFoodAdvisor"]
+        TravelCalendar["TravelCalendarService"]
     end
 
     subgraph infra [Infrastructure Services]
@@ -74,6 +75,8 @@ graph TB
 
     SPA --> Portal
     Portal --> Identity
+    Portal --> TravelCalendar
+    TravelCalendar --> MongoDB
     Portal --> UserMgmt
     Portal --> Wallet
     Portal --> Notification
@@ -216,6 +219,8 @@ Defender.MonoRepo/
 | **Defender.RiskGamesService** | 47060 | Lottery games, draws, ticket purchasing, prize distribution | Kafka, Wallet |
 | **Defender.BudgetTracker** | 47061 | Personal budget tracking, position management, exchange rates, diagrams | Exchange Rates API |
 | **Defender.PersonalFoodAdvisor** | 47062 | AI-powered menu parsing, dish extraction, personalized food recommendations | Gemini AI, HuggingFace, Kafka |
+| **Defender.HealthCareService** | 47063 | User health timeline and shareable charts | MongoDB |
+| **Defender.TravelCalendarService** | 47064 | Travel planning, event calendar, budgets, POIs and packing list | MongoDB, Portal BFF |
 
 ---
 

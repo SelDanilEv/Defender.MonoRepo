@@ -95,6 +95,7 @@ generate_argocd_app "Defender.BudgetTracker" "budget-tracker" "values-budget-tra
 
 # Health Care service
 generate_argocd_app "Defender.HealthCareService" "health-care" "values-health-care.yaml"
+generate_argocd_app "Defender.TravelCalendarService" "travel-calendar" "values-travel-calendar.yaml"
 
 # Personal Food Advisor service
 generate_argocd_app "Defender.PersonalFoodAdvisor" "personal-food-advisor" "values-personal-food-advisor.yaml"

@@ -21,13 +21,14 @@ public class MakeIdFromGuidToStringMigrator(string connectionString)
     }
     protected override async Task DocumentOperation(BsonDocument document, IMongoCollection<BsonDocument> collection)
     {
-        var guidValue = document["_id"].AsGuid;
+        var originalId = document["_id"].DeepClone();
+        var guidValue = originalId.AsGuid;
         var stringValue = guidValue.ToString();
 
-        var newDocument = document;
+        var newDocument = new BsonDocument(document);
         newDocument["_id"] = stringValue;
 
-        await collection.DeleteOneAsync(new BsonDocument("_id", guidValue));
+        await collection.DeleteOneAsync(Builders<BsonDocument>.Filter.Eq("_id", originalId));
 
         await collection.InsertOneAsync(newDocument);
 

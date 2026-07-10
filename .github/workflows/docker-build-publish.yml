@@ -17,6 +17,7 @@ on:
           - "ALL"
           - "Defender.BudgetTracker"
           - "Defender.HealthCareService"
+          - "Defender.TravelCalendarService"
           - "Defender.IdentityService"
           - "Defender.JobSchedulerService"
           - "Defender.NotificationService"
@@ -152,6 +153,10 @@ jobs:
             dockerfile: "Dockerfile.Service"
             project_type: "WebApi"
             service_dir: "Defender.HealthCareService"
+          - name: "defender.travel-calendar"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.TravelCalendarService"
 
     steps:
       - name: Checkout code
@@ -251,6 +256,10 @@ jobs:
             dockerfile: "Dockerfile.Service"
             project_type: "WebApi"
             service_dir: "Defender.HealthCareService"
+          - name: "defender.travel-calendar"
+            dockerfile: "Dockerfile.Service"
+            project_type: "WebApi"
+            service_dir: "Defender.TravelCalendarService"
 
     steps:
       - name: Checkout code
@@ -423,6 +432,7 @@ jobs:
               "Defender.IdentityService") echo "clean_name=defender.identity" >> $GITHUB_OUTPUT ;;
               "Defender.BudgetTracker") echo "clean_name=defender.budget-tracker" >> $GITHUB_OUTPUT ;;
               "Defender.HealthCareService") echo "clean_name=defender.health-care" >> $GITHUB_OUTPUT ;;
+              "Defender.TravelCalendarService") echo "clean_name=defender.travel-calendar" >> $GITHUB_OUTPUT ;;
               *) echo "clean_name=$SERVICE_NAME" >> $GITHUB_OUTPUT ;;
             esac
           fi

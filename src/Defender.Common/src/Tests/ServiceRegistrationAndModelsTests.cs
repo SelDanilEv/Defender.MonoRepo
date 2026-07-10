@@ -8,14 +8,41 @@ using Defender.Common.Exceptions;
 using Defender.Common.Extension;
 using Defender.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using MongoDB.Driver;
 
 namespace Defender.Common.Tests;
 
 public class ServiceRegistrationAndModelsTests
 {
+    [Fact]
+    public void DefenderHealthChecks_WhenRegistered_ExposeBuiltInHealthCheckService()
+    {
+        var services = new ServiceCollection();
+
+        services.AddDefenderHealthChecks();
+
+        using var provider = services.BuildServiceProvider();
+        Assert.IsAssignableFrom<HealthCheckService>(provider.GetRequiredService<HealthCheckService>());
+    }
+
+    [Fact]
+    public void DefenderHealthChecks_WhenMapped_ExposeOnlyStandardHealthPath()
+    {
+        var builder = WebApplication.CreateSlimBuilder();
+        builder.Services.AddDefenderHealthChecks();
+        var app = builder.Build();
+
+        app.MapDefenderHealthChecks();
+
+        var routeEndpoint = Assert.Single(((IEndpointRouteBuilder)app).DataSources.Single().Endpoints);
+        Assert.Equal("/health", ((RouteEndpoint)routeEndpoint).RoutePattern.RawText);
+    }
+
     [Fact]
     public void AddCommonServices_WhenCalled_RegistersCoreCommonServices()
     {
