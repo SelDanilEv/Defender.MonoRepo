@@ -12,6 +12,7 @@ internal static class Program
         var host = Host.CreateDefaultBuilder(args)
             .ConfigureAppConfiguration((context, config) =>
             {
+                config.SetBasePath(AppContext.BaseDirectory);
                 config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                       .AddEnvironmentVariables();
             })
@@ -31,10 +32,12 @@ internal static class Program
 public class MigratorService : IHostedService
 {
     private readonly MongoMigrator _migrator;
+    private readonly IHostApplicationLifetime _hostApplicationLifetime;
 
-    public MigratorService(MongoMigrator migrator)
+    public MigratorService(MongoMigrator migrator, IHostApplicationLifetime hostApplicationLifetime)
     {
         _migrator = migrator;
+        _hostApplicationLifetime = hostApplicationLifetime;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
@@ -80,6 +83,10 @@ public class MigratorService : IHostedService
 
                         break;
                     case "" or null:
+                        if (Console.IsInputRedirected)
+                        {
+                            command = "exit";
+                        }
                         break;
                     default:
                         Console.WriteLine("Unknown command");
@@ -92,12 +99,16 @@ public class MigratorService : IHostedService
             }
             finally
             {
-                Console.WriteLine("Press any key to continue");
-                Console.ReadKey();
-
-                Console.Clear();
+                if (!Console.IsInputRedirected)
+                {
+                    Console.WriteLine("Press any key to continue");
+                    Console.ReadKey();
+                    Console.Clear();
+                }
             }
         } while (command?.ToLower() != "exit");
+
+        _hostApplicationLifetime.StopApplication();
     }
 
     public Task StopAsync(CancellationToken cancellationToken)

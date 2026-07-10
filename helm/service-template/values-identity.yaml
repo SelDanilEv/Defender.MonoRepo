@@ -11,5 +11,9 @@ ingress:
         - path: /
           pathType: Prefix
 autoscaling:
+  # Portal and other services call identity directly via *.svc.cluster.local.
+  # KEDA HTTP wake-up only covers ingress/interceptor traffic, so this service
+  # must keep one warm replica for synchronous internal calls.
+  minReplicaCount: 1
   http:
     enabled: true

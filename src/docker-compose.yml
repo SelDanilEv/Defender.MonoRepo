@@ -336,6 +336,30 @@ services:
     ports:
       - "47063:8080"
 
+  local-travel-calendar-service:
+    <<: [*service-base, *service-local]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.TravelCalendarService
+    image: local-travel-calendar-service
+    container_name: LocalTravelCalendarService
+    ports:
+      - "47064:8080"
+
+  dev-travel-calendar-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.TravelCalendarService
+    image: local-travel-calendar-service
+    container_name: DevTravelCalendarService
+    ports:
+      - "49064:8080"
+
   mongo_local:
     container_name: "mongo_local"
     image: mongo:7.0

@@ -1,5 +1,16 @@
 # Defender.MonoRepo
 
+Last updated: 2026-07-08
+
+## AI Agent Maintenance Rules
+
+- If you are an AI agent and you are reading this file, first check the `Last updated` date above.
+- If more than 1 month has passed since that date, review all commits made after that date and update this README if the documented behavior, structure, commands, ports, workflows, or dependencies have changed.
+- Keep this file compact and high-signal for future readers and agents.
+- Maximum target size for this README is 2,000 lines.
+- If the file grows beyond that size, compress and reorganize the content, remove repetition, and keep only the most important and most operationally useful information here.
+- Move detailed or narrow topic material into dedicated docs under `docs/` or service/tool specific `README.md` files, and leave links here instead of duplicating long explanations.
+
 A microservices monorepo for the Defender ecosystem: portal, identity, user management, wallet, gaming, budgeting, notifications, and supporting platform services.
 
 ## Table of Contents
@@ -232,6 +243,8 @@ Minimal end-to-end bootstrap for a new local environment:
 | Defender.RiskGamesService | `LocalRiskGamesService` | `http://localhost:47060` | `http://localhost:47060/swagger` |
 | Defender.BudgetTracker | `LocalBudgetTrackerService` | `http://localhost:47061` | `http://localhost:47061/swagger` |
 | Defender.PersonalFoodAdvisor | `LocalPersonalFoodAdvisorService` | `http://localhost:47062` | `http://localhost:47062/swagger` |
+| Defender.HealthCareService | `LocalHealthCareService` | `http://localhost:47063` | `http://localhost:47063/swagger` |
+| Defender.TravelCalendarService | `LocalTravelCalendarService` | `http://localhost:47064` | `http://localhost:47064/swagger` |
 
 #### Local Infrastructure Services
 
@@ -399,6 +412,8 @@ See [README-ARGOCD.md](./docs/README-ARGOCD.md) for details.
 6. Defender.NotificationService - Outbound notifications
 7. Defender.BudgetTracker - Budget tracking and reviews
 8. Defender.PersonalFoodAdvisor - Menu parsing and food recommendations
+9. Defender.HealthCareService - Personal health timeline
+10. Defender.TravelCalendarService - Travel calendar and trip planning
 
 ### Supporting Services
 
