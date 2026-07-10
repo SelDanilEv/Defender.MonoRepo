@@ -27,6 +27,8 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
+import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 
 import { MonthGrid } from "./components/MonthGrid";
 import { EventDrawer } from "./components/EventDrawer";
@@ -72,11 +74,13 @@ export default function TravelCalendarPage() {
     }
   }, [calendar, ensureMonths, visibleMonths]);
 
-  const moveMonths = (direction: -1 | 1) => {
-    const nextFirstMonth = addCalendarMonths(firstMonth, direction);
-    const enteringMonth = direction > 0 ? addCalendarMonths(firstMonth, visibleMonthCount) : nextFirstMonth;
+  const moveMonths = (direction: -1 | 1, count = 1) => {
+    const nextFirstMonth = addCalendarMonths(firstMonth, direction * count);
+    const enteringMonths = direction > 0
+      ? calendarMonths(addCalendarMonths(firstMonth, visibleMonthCount), count)
+      : calendarMonths(nextFirstMonth, count);
     setFirstMonth(nextFirstMonth);
-    ensureMonths([enteringMonth]);
+    ensureMonths(enteringMonths);
   };
 
   if (state.loading) {
@@ -543,15 +547,25 @@ export default function TravelCalendarPage() {
               }}
             >
               <Stack direction="row" alignItems="center" justifyContent="space-between" gridColumn="1 / -1">
-                <IconButton aria-label={t("travelCalendar:navigation.previous")} onClick={() => moveMonths(-1)}>
-                  <NavigateBeforeIcon />
-                </IconButton>
+                <Stack direction="row">
+                  <IconButton aria-label={t("travelCalendar:navigation.previousPage")} onClick={() => moveMonths(-1, visibleMonthCount)}>
+                    <KeyboardDoubleArrowLeftIcon />
+                  </IconButton>
+                  <IconButton aria-label={t("travelCalendar:navigation.previous")} onClick={() => moveMonths(-1)}>
+                    <NavigateBeforeIcon />
+                  </IconButton>
+                </Stack>
                 <Typography fontWeight={800} textTransform="capitalize">
                   {new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(firstMonth.year, firstMonth.month, 1))}
                 </Typography>
-                <IconButton aria-label={t("travelCalendar:navigation.next")} onClick={() => moveMonths(1)}>
-                  <NavigateNextIcon />
-                </IconButton>
+                <Stack direction="row">
+                  <IconButton aria-label={t("travelCalendar:navigation.next")} onClick={() => moveMonths(1)}>
+                    <NavigateNextIcon />
+                  </IconButton>
+                  <IconButton aria-label={t("travelCalendar:navigation.nextPage")} onClick={() => moveMonths(1, visibleMonthCount)}>
+                    <KeyboardDoubleArrowRightIcon />
+                  </IconButton>
+                </Stack>
               </Stack>
               {visibleMonths.map((month) => (
                 <MonthGrid

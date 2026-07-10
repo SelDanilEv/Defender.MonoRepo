@@ -59,7 +59,9 @@
   },
   "navigation": {
     "previous": "Show previous month",
-    "next": "Show next month"
+    "next": "Show next month",
+    "previousPage": "Show previous page",
+    "nextPage": "Show next page"
   },
   "addPlaceDialog": {
     "title": "Add place",
