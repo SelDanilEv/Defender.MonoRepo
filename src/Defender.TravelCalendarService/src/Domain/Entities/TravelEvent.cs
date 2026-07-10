@@ -7,6 +7,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Defender.TravelCalendarService.Domain.Entities;
 
+[BsonIgnoreExtraElements]
 public class TravelEvent : IBaseModel
 {
     [BsonId]
