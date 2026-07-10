@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import useUtils from "src/appUtils";
 import WalletAccountsInfo from "../Shared/WalletAccountsInfo";
 import {
-  Box,
   Card,
   CardActionArea,
   CardContent,
@@ -17,8 +16,15 @@ import LocalActivityIcon from "@mui/icons-material/LocalActivity";
 import SportsEsportsIcon from "@mui/icons-material/SportsEsports";
 import HeadsetMicIcon from "@mui/icons-material/HeadsetMic";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 
 const quickLinks = [
+  {
+    key: "travel_calendar",
+    labelKey: "home:quick_menu_travel_calendar",
+    to: "/travel-calendar",
+    icon: TravelExploreIcon,
+  },
   {
     key: "cloud",
     labelKey: "home:quick_menu_cloud",

@@ -18,6 +18,7 @@ on:
           - "Defender.PersonalFoodAdvisor"
           - "Defender.Portal"
           - "Defender.RiskGamesService"
+          - "Defender.TravelCalendarService"
           - "Defender.UserManagementService"
           - "Defender.WalletService"
       image_tag:

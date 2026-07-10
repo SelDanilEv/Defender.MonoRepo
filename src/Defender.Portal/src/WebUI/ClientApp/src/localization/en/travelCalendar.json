@@ -1,0 +1,110 @@
+{
+  "title": "Travel calendar",
+  "subtitle": "Summer 2026 · trip planning from {{city}}",
+  "retry": "Retry",
+  "unavailable": "Travel calendar is unavailable",
+  "toggleTheme": "Toggle theme",
+  "switchToLightTheme": "Light theme",
+  "switchToDarkTheme": "Dark theme",
+  "hint": "Click a free date to create an event · invited participants see the shared event in their calendars",
+  "hero": {
+    "overnightTrips": "{{count}} overnight trips",
+    "queuedTrips": "{{count}} queued places",
+    "pendingInvites": "{{count}} invites"
+  },
+  "wishlist": {
+    "title": "Want to visit",
+    "subtitle": "Distribute them across free weekends",
+    "queuePosition": "#{{position}} in queue",
+    "schedule": "Schedule",
+    "addPlace": "Add place"
+  },
+  "budget": {
+    "title": "Budget",
+    "hotels": "Hotels",
+    "transport": "Transport",
+    "other": "Other",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details"
+  },
+  "packing": {
+    "title": "Packing list",
+    "placeholder": "New item",
+    "addItem": "Add item",
+    "removeItem": "Remove item"
+  },
+  "legend": {
+    "title": "Event types",
+    "OvernightTrip": { "title": "Overnight trip", "note": "weekend and hotel" },
+    "DayTrip": { "title": "Day trip", "note": "no overnight stay" },
+    "Event": { "title": "Event", "note": "celebrations and meetings" },
+    "Rest": { "title": "Rest", "note": "slow day" },
+    "Family": { "title": "Family", "note": "important for loved ones" }
+  },
+  "types": {
+    "OvernightTrip": "Overnight",
+    "DayTrip": "Day",
+    "Event": "Event",
+    "Rest": "Rest",
+    "Family": "Family"
+  },
+  "statuses": {
+    "Pending": "Pending",
+    "Accepted": "Accepted",
+    "Declined": "Declined"
+  },
+  "monthGrid": {
+    "addEvent": "Add event"
+  },
+  "addPlaceDialog": {
+    "title": "Add place",
+    "label": "Where do you want to go?",
+    "cancel": "Cancel",
+    "add": "Add"
+  },
+  "drawer": {
+    "title": "Trip plan",
+    "ownerMode": "You are the event owner",
+    "sharedMode": "Shared event view",
+    "organizer": "Organizer",
+    "organizerNamed": "Organizer: {{name}}",
+    "organizerFallback": "User",
+    "statusNamed": "Status: {{status}}",
+    "fields": {
+      "title": "Title",
+      "startDate": "Start",
+      "endDate": "End",
+      "notes": "Notes",
+      "hotelName": "Hotel name",
+      "hotelAddress": "Address",
+      "hotelBookingUrl": "Booking link",
+      "mainPoint": "Main point",
+      "hotelCost": "Hotel, PLN",
+      "distanceKm": "Distance, km",
+      "otherCost": "Other, PLN",
+      "eventCost": "Cost, PLN"
+    },
+    "participants": "Participants",
+    "removeParticipant": "Remove",
+    "addUser": "Add user",
+    "searchUser": "Type a name or email",
+    "invite": "Invite",
+    "noUsers": "No matching users",
+    "hotel": "Hotel",
+    "points": "Places",
+    "removePoint": "Remove place",
+    "addPoint": "Add place",
+    "addPointPlaceholder": "Add place",
+    "eventBudget": "Event budget",
+    "total": "Total",
+    "delete": "Delete",
+    "accept": "Accept",
+    "decline": "Decline",
+    "close": "Close",
+    "save": "Save"
+  },
+  "errors": {
+    "loadFailed": "Failed to load travel calendar",
+    "saveFailed": "Changes were not saved. The calendar was refreshed — please try again."
+  }
+}

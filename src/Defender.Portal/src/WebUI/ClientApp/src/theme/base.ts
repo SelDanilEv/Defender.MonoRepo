@@ -2,10 +2,12 @@ import React from 'react';
 import { Theme } from '@mui/material';
 
 import { NebulaFighterTheme } from './schemes/NebulaFighterTheme';
+import { NebulaFighterLightTheme } from './schemes/NebulaFighterLightTheme';
+import { DARK_THEME_NAME, LIGHT_THEME_NAME, normalizeThemeName } from './themeMode';
 
 
 export function themeCreator(theme: string): Theme {
-  return themeMap[theme];
+  return themeMap[normalizeThemeName(theme)];
 }
 
 declare module '@mui/material/styles' {
@@ -250,5 +252,6 @@ declare module '@mui/material/styles' {
 }
 
 const themeMap: { [key: string]: Theme } = {
-  NebulaFighterTheme
+  [DARK_THEME_NAME]: NebulaFighterTheme,
+  [LIGHT_THEME_NAME]: NebulaFighterLightTheme
 };

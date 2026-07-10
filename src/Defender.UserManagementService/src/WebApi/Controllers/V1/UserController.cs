@@ -32,7 +32,7 @@ public class UserController(
         return await ProcessApiCallAsync<GetUserByIdQuery, UserDto>(query);
     }
 
-    [Auth(Roles.Admin)]
+    [Auth(Roles.User)]
     [HttpGet("get-all")]
     [ProducesResponseType(typeof(PagedResult<UserDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]

@@ -101,6 +101,9 @@ const HealthCarePage = Loader(
 const HealthCareSharePage = Loader(
   lazy(() => import("src/content/appPages/HealthCare/Share"))
 );
+const TravelCalendarPage = Loader(
+  lazy(() => import("src/content/appPages/TravelCalendar"))
+);
 
 // Home
 
@@ -305,6 +308,14 @@ const routes: RouteObject[] = [
         path: "*",
         element: <Status404 />,
       },
+    ],
+  },
+  {
+    path: "travel-calendar",
+    element: <SidebarLayout />,
+    children: [
+      { path: "", element: <TravelCalendarPage /> },
+      { path: "*", element: <Status404 /> },
     ],
   },
   {

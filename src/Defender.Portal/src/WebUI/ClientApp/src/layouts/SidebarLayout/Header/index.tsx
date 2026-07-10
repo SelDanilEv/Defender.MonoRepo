@@ -14,6 +14,7 @@ import HeaderButtons from "./Buttons";
 import HeaderUserbox from "./Userbox";
 
 import LanguageSwither from "src/components/LanguageSwitcher";
+import ThemeModeToggle from "src/components/ThemeModeToggle";
 import { SidebarContext } from "src/contexts/SidebarContext";
 import useUtils from "src/appUtils";
 
@@ -64,6 +65,7 @@ function Header() {
       }}
     >
       <Box display="flex" alignItems="center">
+        <ThemeModeToggle />
         <LanguageSwither />
         <HeaderButtons />
         <HeaderUserbox />

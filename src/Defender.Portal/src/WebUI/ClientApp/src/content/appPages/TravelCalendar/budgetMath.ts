@@ -1,0 +1,2 @@
+export const calculateTransport = (distance: number, consumption: number, fuelPrice: number) => Math.round((distance / 100) * consumption * fuelPrice * 100) / 100;
+export const liveTotal = (type: string, hotel: number, distance: number, other: number, consumption: number, fuelPrice: number) => Math.round(((type === "OvernightTrip" ? hotel : 0) + calculateTransport(type === "OvernightTrip" || type === "DayTrip" ? distance : 0, consumption, fuelPrice) + other) * 100) / 100;
