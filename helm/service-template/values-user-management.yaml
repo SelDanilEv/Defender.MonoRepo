@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.user-management
-  tag: sha-1cc8683
+  tag: 6da40a8300db74225a1e841d5eb3ff747f62e3d4
   pullPolicy: Always
 ingress:
   enabled: true
