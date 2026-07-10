@@ -15,9 +15,9 @@ public class TravelCalendarClient(HttpClient httpClient, IAuthenticationHeaderAc
     private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web) { PropertyNameCaseInsensitive = true };
     private string Url(string path = "") => $"{options.Value.Url.TrimEnd('/')}/api/V1/travel-calendar{path}";
 
-    public async Task<TravelCalendarDto> GetAsync(DateOnly? from, DateOnly? to, CancellationToken ct = default)
+    public async Task<TravelCalendarDto> GetAsync(string? from, string? to, CancellationToken ct = default)
     {
-        var query = $"?from={from:yyyy-MM-dd}&to={to:yyyy-MM-dd}";
+        var query = $"?from={Uri.EscapeDataString(from ?? string.Empty)}&to={Uri.EscapeDataString(to ?? string.Empty)}";
         await Authorize(); var response = await httpClient.GetAsync(Url(query), ct); await EnsureSuccess(response, ct);
         return (await response.Content.ReadFromJsonAsync<TravelCalendarDto>(JsonOptions, ct))!;
     }

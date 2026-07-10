@@ -14,7 +14,16 @@ namespace Defender.TravelCalendarService.WebApi.Controllers.V1;
 public class TravelCalendarController(ICurrentAccountAccessor account, ITravelCalendarService service) : ControllerBase
 {
     private Guid UserId => account.GetAccountId();
-    [HttpGet] public Task<TravelCalendarDto> Get([FromQuery] DateOnly? from, [FromQuery] DateOnly? to, CancellationToken ct) => service.GetAsync(UserId, from, to, ct);
+    [HttpGet]
+    public Task<TravelCalendarDto> Get([FromQuery] string? from, [FromQuery] string? to, CancellationToken ct)
+        => service.GetAsync(UserId, ParseDate(from), ParseDate(to), ct);
+
+    private static DateOnly? ParseDate(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return null;
+        if (DateOnly.TryParseExact(value, "yyyy-MM-dd", out var date)) return date;
+        throw new TravelCalendarValidationException("TRAVEL_CALENDAR_INVALID_DATE", "Dates must use the yyyy-MM-dd format.");
+    }
     [HttpPatch("theme")] public Task<TravelCalendarMutationResultDto> SetTheme(SetThemeRequest request, CancellationToken ct) => service.SetThemeAsync(UserId, request, ct);
     [HttpPost("queued-trips")] public async Task<ActionResult<TravelCalendarMutationResultDto>> AddQueuedTrip(CreateQueuedTripRequest request, CancellationToken ct) => StatusCode(201, await service.AddQueuedTripAsync(UserId, request, ct));
     [HttpPost("events/from-date")] public async Task<ActionResult<TravelCalendarMutationResultDto>> CreateFromDate(CreateEventFromDateRequest request, CancellationToken ct) => StatusCode(201, await service.CreateEventFromDateAsync(UserId, request, ct));
