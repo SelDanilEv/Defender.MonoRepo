@@ -5,11 +5,11 @@ import stateLoader from "src/state/StateLoader";
 
 describe("sessionReducer", () => {
   afterEach(() => {
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test("logout_WhenAuthenticated_ClearsTokenAndAuthentication", () => {
-    const saveStateSpy = jest.spyOn(stateLoader, "saveState").mockImplementation(() => {});
+    const saveStateSpy = vi.spyOn(stateLoader, "saveState").mockImplementation(() => {});
     const state = {
       user: {
         id: "1",

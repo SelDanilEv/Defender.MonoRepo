@@ -10,13 +10,13 @@ describe("ErrorBoundary", () => {
   beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
-    jest.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
   afterEach(() => {
     ReactDOM.unmountComponentAtNode(container);
     container.remove();
-    jest.restoreAllMocks();
+    vi.restoreAllMocks();
   });
 
   test("WhenChildThrows_RendersFallback", () => {

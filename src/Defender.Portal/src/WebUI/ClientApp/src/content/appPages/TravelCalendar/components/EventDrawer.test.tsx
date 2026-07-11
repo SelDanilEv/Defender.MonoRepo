@@ -37,16 +37,16 @@ const props = {
   calendar,
   open: true,
   busy: false,
-  onClose: jest.fn(),
-  onSave: jest.fn(),
-  onRemove: jest.fn(),
-  onAddPoint: jest.fn(),
-  onUpdatePoint: jest.fn(),
-  onRemovePoint: jest.fn(),
-  onSearchUsers: jest.fn().mockResolvedValue([]),
-  onAddParticipant: jest.fn(),
-  onRemoveParticipant: jest.fn(),
-  onRespond: jest.fn(),
+  onClose: vi.fn(),
+  onSave: vi.fn(),
+  onRemove: vi.fn(),
+  onAddPoint: vi.fn(),
+  onUpdatePoint: vi.fn(),
+  onRemovePoint: vi.fn(),
+  onSearchUsers: vi.fn().mockResolvedValue([]),
+  onAddParticipant: vi.fn(),
+  onRemoveParticipant: vi.fn(),
+  onRespond: vi.fn(),
 };
 
 describe("EventDrawer", () => {
@@ -62,7 +62,7 @@ describe("EventDrawer", () => {
       ReactDOM.unmountComponentAtNode(container);
     });
     container.remove();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   test("Draft_WhenSameEventRefreshes_PreservesUnsavedFields", () => {

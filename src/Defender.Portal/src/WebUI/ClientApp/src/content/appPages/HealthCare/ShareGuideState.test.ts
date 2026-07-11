@@ -7,12 +7,12 @@ import {
 describe("health care share guide state", () => {
   beforeEach(() => {
     localStorage.clear();
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date("2026-06-22T12:00:00Z"));
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-06-22T12:00:00Z"));
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   test("shouldShowHealthCareShareGuide_WhenNeverDismissed_ReturnsTrue", () => {

@@ -2,7 +2,7 @@ import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 
 describe("APICallWrapper", () => {
   test("WhenCalled_SetsSameOriginCredentialsAndDoesNotSetAuthorizationHeader", async () => {
-    const fetchMock = jest.fn().mockResolvedValue({
+    const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       text: async () => "",

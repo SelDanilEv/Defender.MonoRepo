@@ -116,6 +116,7 @@ public class AuthorizationAndQueriesTests
             {
                 nameof(Secret.JwtSecret) => "0123456789ABCDEF0123456789ABCDEF",
                 nameof(Secret.SecretsEncryptionKey) => "00112233445566778899AABBCCDDEEFF",
+                nameof(Secret.MongoDBConnectionString) => "mongodb://localhost:27017",
                 _ => $"value-{key}"
             });
         SecretsHelper.Initialize(accessor.Object);

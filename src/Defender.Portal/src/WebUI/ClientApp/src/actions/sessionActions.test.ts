@@ -4,9 +4,9 @@ import { cleanWalletInfoActionName } from "src/reducers/walletReducer";
 
 describe("sessionActions.logout", () => {
   test("WhenCalled_CallsServerLogoutAndDispatchesCleanupActions", async () => {
-    const fetchMock = jest.fn().mockResolvedValue({});
+    const fetchMock = vi.fn().mockResolvedValue({});
     (global as any).fetch = fetchMock;
-    const dispatch = jest.fn();
+    const dispatch = vi.fn();
 
     await logout()(dispatch);
 
