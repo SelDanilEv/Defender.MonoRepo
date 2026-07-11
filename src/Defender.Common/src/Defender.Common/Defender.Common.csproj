@@ -11,6 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 		<PackageReference Include="AutoMapper" />
 		<PackageReference Include="FluentValidation" />
 		<PackageReference Include="MediatR" />
