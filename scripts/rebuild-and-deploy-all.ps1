@@ -40,7 +40,8 @@ function Get-WorkflowRuns {
         "--branch", $Ref, `
         "--limit", "100", `
         "--json", "databaseId,headSha,event,createdAt" |
-        ConvertFrom-Json)
+        ConvertFrom-Json |
+        ForEach-Object { $_ })
 }
 
 $existingRunIds = @(

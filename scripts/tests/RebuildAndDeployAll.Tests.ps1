@@ -11,4 +11,8 @@ Describe "rebuild-and-deploy-all" {
         $buildWait | Should BeGreaterThan $buildDispatch
         $promotionDispatch | Should BeGreaterThan $buildWait
     }
+
+    It "enumerates GitHub workflow runs before selecting a build run" {
+        $scriptContent | Should Match 'ConvertFrom-Json\s*\|\s*ForEach-Object\s*\{\s*\$_\s*\}'
+    }
 }
