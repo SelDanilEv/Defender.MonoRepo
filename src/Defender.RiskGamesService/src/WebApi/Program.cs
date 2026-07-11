@@ -26,6 +26,8 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration)
     .AddApplicationServices(builder.Configuration)
     .AddInfrastructureServices(builder.Configuration, builder.Environment);
 
+builder.Services.AddDefenderHealthChecks();
+
 var app = builder.Build();
 
 if (builder.Environment.IsLocalOrDevelopment())
@@ -66,5 +68,6 @@ if (metricsEnabled)
 app.MapControllerRoute(
     name: "default",
     pattern: "api/{controller}/{action=Index}");
+app.MapDefenderHealthChecks();
 
 await app.RunAsync();

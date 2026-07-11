@@ -108,16 +108,6 @@ public class AuthorizationAndQueriesTests
     }
 
     [Fact]
-    public async Task HealthCheckQueryHandler_WhenCalled_ReturnsHealthStatus()
-    {
-        var handler = new HealthCheckQueryHandler();
-
-        var result = await handler.Handle(new HealthCheckQuery(), CancellationToken.None);
-
-        Assert.Equal(new HealthCheckDto("Health"), result);
-    }
-
-    [Fact]
     public async Task GetConfigurationQueryHandler_WhenAdminLevel_ReturnsAllSecrets()
     {
         var accessor = new Mock<IMongoSecretAccessor>();

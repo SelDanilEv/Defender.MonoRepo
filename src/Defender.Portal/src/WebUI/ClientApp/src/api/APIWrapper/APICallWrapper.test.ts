@@ -10,7 +10,7 @@ describe("APICallWrapper", () => {
     (global as any).fetch = fetchMock;
 
     await APICallWrapper({
-      url: "/api/home/health",
+      url: "/health",
       options: {
         method: "GET",
       },

@@ -32,7 +32,7 @@ metrics:
 podAnnotations: {}
 
 probes:
-  path: /api/Home/health
+  path: /health
   startup:
     enabled: true
     failureThreshold: 30

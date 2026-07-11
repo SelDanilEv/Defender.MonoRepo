@@ -571,7 +571,7 @@ namespace Defender.Service.Infrastructure.Clients.IdentityClient
         public virtual async System.Threading.Tasks.Task<object> HealthAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append("api/Home/health");
+            urlBuilder_.Append("health");
 
             var client_ = _httpClient;
             var disposeClient_ = false;

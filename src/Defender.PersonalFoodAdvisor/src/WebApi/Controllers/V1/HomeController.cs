@@ -17,19 +17,6 @@ public partial class HomeController(
         IMapper mapper)
     : BaseApiController(mediator, mapper)
 {
-    [HttpGet("health")]
-    [ProducesResponseType(typeof(HealthCheckDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-    public async Task<HealthCheckDto> HealthCheckAsync()
-    {
-        var query = new HealthCheckQuery();
-
-        return await ProcessApiCallWithoutMappingAsync<
-            HealthCheckQuery,
-            HealthCheckDto>(query);
-    }
-
     [HttpGet("authorization/check")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(AuthCheckDto), StatusCodes.Status200OK)]

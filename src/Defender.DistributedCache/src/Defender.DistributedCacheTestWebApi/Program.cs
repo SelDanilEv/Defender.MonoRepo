@@ -1,4 +1,5 @@
 using Defender.DistributedCache.Postgres.Extensions;
+using Defender.Common.Extension;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddPostgresDistributedCache(options =>
     builder.Configuration.GetSection("DistributedCache").Bind(options));
+builder.Services.AddDefenderHealthChecks();
 
 var app = builder.Build();
 
@@ -26,5 +28,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapDefenderHealthChecks();
 
 await app.RunAsync();

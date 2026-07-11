@@ -17,21 +17,6 @@ public class HomeControllerTests
     }
 
     [Fact]
-    public async Task HealthCheckAsync_WhenCalled_DispatchesHealthCheckQuery()
-    {
-        var expected = new HealthCheckDto("OK");
-        object? sentRequest = null;
-        _mediator.Setup(x => x.Send(It.IsAny<object>(), It.IsAny<CancellationToken>()))
-            .Callback<object, CancellationToken>((request, _) => sentRequest = request)
-            .ReturnsAsync(expected);
-
-        var result = await _controller.HealthCheckAsync();
-
-        Assert.IsType<HealthCheckQuery>(sentRequest);
-        Assert.Same(expected, result);
-    }
-
-    [Fact]
     public async Task AuthorizationCheckAsync_WhenCalled_DispatchesAuthCheckQuery()
     {
         var expected = new AuthCheckDto(Guid.NewGuid(), Role.User);

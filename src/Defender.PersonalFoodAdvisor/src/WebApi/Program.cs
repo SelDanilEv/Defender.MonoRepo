@@ -22,6 +22,8 @@ builder.Services.AddWebUIServices(builder.Environment, builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
+builder.Services.AddDefenderHealthChecks();
+
 var app = builder.Build();
 
 if (builder.Environment.IsLocalOrDevelopment())
@@ -62,5 +64,6 @@ if (metricsEnabled)
 app.MapControllerRoute(
     name: "default",
     pattern: "api/{controller}/{action=Index}");
+app.MapDefenderHealthChecks();
 
 await app.RunAsync();
