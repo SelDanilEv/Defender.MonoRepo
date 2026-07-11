@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.notification
-  tag: sha-5faad6d
+  tag: sha-064dc6d
   pullPolicy: Always
 ingress:
   enabled: true
