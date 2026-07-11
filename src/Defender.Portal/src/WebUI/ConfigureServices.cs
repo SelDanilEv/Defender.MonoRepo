@@ -75,8 +75,9 @@ public static class ConfigureServices
                 {
                     NameClaimType = ClaimTypes.NameIdentifier,
                     ValidateIssuer = true,
-                    ValidateAudience = false,
+                    ValidateAudience = true,
                     ValidIssuer = configuration["JwtTokenIssuer"],
+                    ValidAudience = configuration["JwtTokenAudience"],
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(SecretsHelper.GetSecretSync(Secret.JwtSecret, true))

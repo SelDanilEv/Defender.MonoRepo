@@ -34,7 +34,7 @@ public static class ConfigureServices
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
         {
             options.RequireHttpsMetadata = false; options.SaveToken = true;
-            options.TokenValidationParameters = new() { NameClaimType = ClaimTypes.NameIdentifier, ValidateIssuer = true, ValidateAudience = false, ValidIssuer = configuration["JwtTokenIssuer"], ValidateIssuerSigningKey = true, IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)) };
+            options.TokenValidationParameters = new() { NameClaimType = ClaimTypes.NameIdentifier, ValidateIssuer = true, ValidateAudience = true, ValidIssuer = configuration["JwtTokenIssuer"], ValidAudience = configuration["JwtTokenAudience"], ValidateIssuerSigningKey = true, IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(signingKey)) };
         });
         services.AddAuthorization();
         services.AddControllers().AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull; });

@@ -10,6 +10,8 @@ namespace Defender.Common.Helpers;
 
 public static class InternalJwtHelper
 {
+    private const string JwtAudience = "defender-api";
+
     public static async Task<string> GenerateInternalJWTAsync(string issuer, int expiresMinutes = 1)
     {
         var claims = new List<Claim>
@@ -26,7 +28,7 @@ public static class InternalJwtHelper
 
         var token = new JwtSecurityToken(
             issuer,
-            null,
+            JwtAudience,
             claims,
             expires: DateTime.Now.AddMinutes(expiresMinutes),
             signingCredentials: creds

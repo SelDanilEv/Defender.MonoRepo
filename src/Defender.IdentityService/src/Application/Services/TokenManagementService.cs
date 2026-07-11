@@ -33,7 +33,7 @@ public class TokenManagementService(
 
         var token = new JwtSecurityToken(
             configuration["JwtTokenIssuer"],
-            null,
+            configuration["JwtTokenAudience"],
             claims,
             expires: DateTime.Now.AddDays(30),
             signingCredentials: creds

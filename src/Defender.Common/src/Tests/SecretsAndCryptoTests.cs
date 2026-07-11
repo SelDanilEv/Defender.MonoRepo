@@ -74,4 +74,18 @@ public class SecretsAndCryptoTests
         Assert.Contains(parsed.Claims, x => x.Type == Defender.Common.Consts.ClaimTypes.NameIdentifier);
         Assert.Contains(parsed.Claims, x => x.Type == Defender.Common.Consts.ClaimTypes.Role);
     }
+
+    [Fact]
+    public async Task GenerateInternalJwtAsync_WhenIssuerProvided_AddsSharedAudience()
+    {
+        Environment.SetEnvironmentVariable(
+            "Defender_App_JwtSecret",
+            "0123456789ABCDEF0123456789ABCDEF",
+            EnvironmentVariableTarget.Process);
+
+        var token = await InternalJwtHelper.GenerateInternalJWTAsync("issuer-under-test");
+        var parsed = new JwtSecurityTokenHandler().ReadJwtToken(token);
+
+        Assert.Contains("defender-api", parsed.Audiences);
+    }
 }
