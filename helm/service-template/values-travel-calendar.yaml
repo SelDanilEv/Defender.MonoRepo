@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.travel-calendar
-  tag: f7a8cedb8679172b186fa29b108b612d5dc0f2bc
+  tag: 20260711-181
   pullPolicy: Always
 ingress:
   enabled: true
