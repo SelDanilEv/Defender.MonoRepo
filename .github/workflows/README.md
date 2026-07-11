@@ -9,6 +9,7 @@ This GitHub Action workflow automatically builds and publishes Docker images for
 - **Manual Trigger**: Can build specific services on demand
 - **NuGet Egress Preflight**: Verifies outbound HTTPS to NuGet before `dotnet test`
 - **Caching**: Uses GitHub Actions cache for faster builds
+- **Security gates for pull requests**: Gitleaks secret scanning, NuGet and npm dependency audits, Helm lint/template validation, Trivy configuration scans, and Trivy scans of each built service image. High and critical findings fail the workflow; no baseline exceptions are currently configured.
 - **Security**: Only pushes images on main/develop branches and tags (not on PRs)
 
 ## Services Built
@@ -63,18 +64,20 @@ The workflow automatically creates tags based on the git event:
 ## Deployment Tag Promotion
 
 Building and publishing an image does not update what ArgoCD deploys by itself. ArgoCD renders
-`helm/service-template` and uses the pinned tag from the matching `values-*.yaml` file:
+`helm/service-template` and uses an immutable image reference from the matching `values-*.yaml` file. Set `digest` to render `repository@sha256:...`; omit it only for services still using the existing pinned-tag behavior:
 
 ```yaml
 image:
   repository: defendersd/defender.portal
   tag: 20260620-100
+  digest: sha256:<resolved-manifest-digest>
 ```
 
 After a successful build, run `Promote Image Tag` for every deployable service changed by the PR.
 For example, if a change touches both `Defender.HealthCareService` and `Defender.Portal`, promote
-both services to their newly published build tags. The promote workflow commits the updated
-`helm/service-template/values-*.yaml` file, and ArgoCD deploys that pinned tag from git.
+both services to their newly published build tags. Resolve and commit an image digest when promoting
+a service that requires immutable delivery. The promote workflow commits the updated
+`helm/service-template/values-*.yaml` file, and ArgoCD deploys that pinned reference from git.
 
 ## Usage Examples
 
