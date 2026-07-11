@@ -9,16 +9,41 @@ using Defender.Common.Extension;
 using Defender.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
 namespace Defender.Common.Tests;
 
 public class ServiceRegistrationAndModelsTests
 {
+    [Fact]
+    public void AddDefenderCors_WhenRegistered_OnlyAllowsTrustedOriginsWithoutCredentials()
+    {
+        var services = new ServiceCollection();
+        var environment = new TestWebHostEnvironment { EnvironmentName = "Prod" };
+
+        services.AddLogging();
+        services.AddDefenderCors(environment);
+
+        using var provider = services.BuildServiceProvider();
+        Assert.IsAssignableFrom<ICorsService>(provider.GetRequiredService<ICorsService>());
+
+        var policy = provider.GetRequiredService<IOptions<CorsOptions>>().Value.GetPolicy(CorsExtensions.DefenderCorsPolicy);
+
+        Assert.NotNull(policy);
+        Assert.True(policy.IsOriginAllowed("https://coded-by-danil.dev"));
+        Assert.True(policy.IsOriginAllowed("https://home.coded-by-danil.dev"));
+        Assert.False(policy.IsOriginAllowed("https://attacker.example"));
+        Assert.False(policy.SupportsCredentials);
+    }
+
     [Fact]
     public void DefenderHealthChecks_WhenRegistered_ExposeBuiltInHealthCheckService()
     {
@@ -175,5 +200,15 @@ public class ServiceRegistrationAndModelsTests
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
+    }
+
+    private sealed class TestWebHostEnvironment : IWebHostEnvironment
+    {
+        public string ApplicationName { get; set; } = "Defender.Common.Tests";
+        public IFileProvider WebRootFileProvider { get; set; } = null!;
+        public string WebRootPath { get; set; } = string.Empty;
+        public string EnvironmentName { get; set; } = string.Empty;
+        public string ContentRootPath { get; set; } = string.Empty;
+        public IFileProvider ContentRootFileProvider { get; set; } = null!;
     }
 }

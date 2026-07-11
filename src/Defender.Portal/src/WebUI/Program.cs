@@ -23,6 +23,7 @@ builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices();
 
 builder.Services.AddDefenderHealthChecks();
+builder.Services.AddDefenderCors(builder.Environment);
 
 var app = builder.Build();
 
@@ -45,7 +46,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
-app.UseCors("AllowAll");
+app.UseCors(CorsExtensions.DefenderCorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -30,7 +30,6 @@ public static class ConfigureServices
         }
 
         services.AddHttpContextAccessor();
-        services.AddCors(options => options.AddPolicy("AllowAll", policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()));
         services.AddProblemDetails(options => ConfigureProblems(options, environment));
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
         {

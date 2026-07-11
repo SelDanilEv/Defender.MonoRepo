@@ -13,6 +13,7 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices();
 builder.Services.AddTravelCalendarWebApi(builder.Configuration, builder.Environment);
 builder.Services.AddDefenderHealthChecks();
+builder.Services.AddDefenderCors(builder.Environment);
 
 var app = builder.Build();
 if (app.Environment.IsLocalOrDevelopment())
@@ -20,7 +21,7 @@ if (app.Environment.IsLocalOrDevelopment())
     app.UseDeveloperExceptionPage(); app.UseSwagger(); app.UseSwaggerUI();
 }
 else app.UseHsts();
-app.UseRouting(); app.UseCors("AllowAll"); app.UseAuthentication(); app.UseAuthorization(); app.UseProblemDetails(); app.MapControllers(); app.MapDefenderHealthChecks();
+app.UseRouting(); app.UseCors(CorsExtensions.DefenderCorsPolicy); app.UseAuthentication(); app.UseAuthorization(); app.UseProblemDetails(); app.MapControllers(); app.MapDefenderHealthChecks();
 await app.RunAsync();
 
 public partial class Program;
