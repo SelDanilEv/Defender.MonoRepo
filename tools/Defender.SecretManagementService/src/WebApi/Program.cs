@@ -24,6 +24,7 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 builder.Services.AddWebUIServices(builder.Environment, builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddDefenderCors(builder.Environment);
 
 var app = builder.Build();
 
@@ -53,7 +54,7 @@ app.UseSwaggerUI(options =>
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.UseCors("AllowAll");
+app.UseCors(CorsExtensions.DefenderCorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();

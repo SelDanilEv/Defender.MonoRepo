@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Defender.Common.Extension;
 
@@ -15,7 +16,7 @@ public static class CorsExtensions
             "https://*.coded-by-danil.dev"
         };
 
-        if (environment.IsLocalOrDevelopment())
+        if (environment.IsDevelopment() || environment.IsLocalOrDevelopment())
         {
             origins.Add("http://localhost");
             origins.Add("https://localhost");

@@ -41,7 +41,25 @@ public class ServiceRegistrationAndModelsTests
         Assert.True(policy.IsOriginAllowed("https://coded-by-danil.dev"));
         Assert.True(policy.IsOriginAllowed("https://home.coded-by-danil.dev"));
         Assert.False(policy.IsOriginAllowed("https://attacker.example"));
+        Assert.False(policy.IsOriginAllowed("http://localhost:3000"));
         Assert.False(policy.SupportsCredentials);
+    }
+
+    [Fact]
+    public void AddDefenderCors_WhenRegisteredInDevelopment_AllowsExplicitLocalhostOrigins()
+    {
+        var services = new ServiceCollection();
+        var environment = new TestWebHostEnvironment { EnvironmentName = "Development" };
+
+        services.AddLogging();
+        services.AddDefenderCors(environment);
+
+        using var provider = services.BuildServiceProvider();
+        var policy = provider.GetRequiredService<IOptions<CorsOptions>>().Value.GetPolicy(CorsExtensions.DefenderCorsPolicy);
+
+        Assert.NotNull(policy);
+        Assert.True(policy.IsOriginAllowed("http://localhost:3000"));
+        Assert.True(policy.IsOriginAllowed("https://localhost:3000"));
     }
 
     [Fact]
