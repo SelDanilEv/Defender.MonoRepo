@@ -42,9 +42,12 @@ FROM base AS final
 ARG SERVICE_DIR
 ENV SERVICE_DIR=${SERVICE_DIR}
 WORKDIR /app
-COPY --from=publish /app/publish ./
+RUN addgroup -S -g 10001 appgroup \
+    && adduser -S -D -H -u 10001 -G appgroup appuser
+COPY --from=publish --chown=10001:10001 /app/publish ./
 
 # ⬇️ DEBUG: List final app directory to confirm DLL is copied correctly
 RUN echo "Final image contents:" && ls -Rla /app
 
+USER 10001:10001
 ENTRYPOINT ["sh","-c","dotnet WebUI.dll"]
