@@ -78,14 +78,29 @@ public class SecretsAndCryptoTests
     [Fact]
     public async Task GenerateInternalJwtAsync_WhenIssuerProvided_AddsSharedAudience()
     {
-        Environment.SetEnvironmentVariable(
-            "Defender_App_JwtSecret",
-            "0123456789ABCDEF0123456789ABCDEF",
+        const string jwtSecretEnvironmentVariable = "Defender_App_JwtSecret";
+        var previousJwtSecret = Environment.GetEnvironmentVariable(
+            jwtSecretEnvironmentVariable,
             EnvironmentVariableTarget.Process);
 
-        var token = await InternalJwtHelper.GenerateInternalJWTAsync("issuer-under-test");
-        var parsed = new JwtSecurityTokenHandler().ReadJwtToken(token);
+        try
+        {
+            Environment.SetEnvironmentVariable(
+                jwtSecretEnvironmentVariable,
+                "0123456789ABCDEF0123456789ABCDEF",
+                EnvironmentVariableTarget.Process);
 
-        Assert.Contains("defender-api", parsed.Audiences);
+            var token = await InternalJwtHelper.GenerateInternalJWTAsync("issuer-under-test");
+            var parsed = new JwtSecurityTokenHandler().ReadJwtToken(token);
+
+            Assert.Contains("defender-api", parsed.Audiences);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(
+                jwtSecretEnvironmentVariable,
+                previousJwtSecret,
+                EnvironmentVariableTarget.Process);
+        }
     }
 }
