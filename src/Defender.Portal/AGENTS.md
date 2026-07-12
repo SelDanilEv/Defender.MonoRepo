@@ -44,3 +44,9 @@
 - Run: `dotnet run --project src/WebUI/WebUI.csproj`
 - Build: `dotnet build Defender.Portal.sln`
 - Test: `dotnet test Defender.Portal.sln`
+- Frontend compact check from repo root: `powershell -NoProfile -File scripts/verify-portal.ps1`
+- Frontend check with browser journeys: `powershell -NoProfile -File scripts/verify-portal.ps1 -IncludeE2E`
+- One frontend test: `powershell -NoProfile -File scripts/verify-portal.ps1 -TestPath <ClientApp-relative-test-path>`
+- Portal deployment preview: `powershell -NoProfile -File scripts/deploy-portal.ps1`; add `-Execute` only when deployment is requested.
+
+Keep agent output compact: use wrapper summaries on success and include only the failing step plus bounded log tail on failure.

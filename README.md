@@ -578,6 +578,7 @@ Services involved: Portal (admin views), backend services
 - Development guide: [docs/DEVELOPMENT-GUIDE.md](./docs/DEVELOPMENT-GUIDE.md)
 - Deployment and observability: [docs/OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md)
 - Workflow docs: [.github/workflows/README.md](./.github/workflows/README.md)
+- Compact verification and deployment scripts: [scripts/README.md](./scripts/README.md)
 - Service-specific docs: service-level `README.md` and `AGENTS.md` files
 - API docs: `/swagger` endpoint on each API service
 - Demo environment: https://portal.coded-by-danil.dev/
