@@ -457,3 +457,8 @@ __mismatch__/
 # Superpowers generated plans, specs, and local state
 **/superpowers/
 **/.superpowers/
+
+# Playwright generated state, tests, reports, and configuration
+**/.playwright-cli/
+**/playwright/
+**/*playwright*
