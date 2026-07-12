@@ -16,10 +16,10 @@ const WalletTab = (props: WalletTabProps) => {
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <WalletAccountsInfo walletInfo={walletInfo} />
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <HistoricalTransactions
           targetWalletId={walletInfo.ownerId}
           targetWalletNumber={walletInfo.walletNumber}

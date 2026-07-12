@@ -1,5 +1,5 @@
 import { Card } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
@@ -15,6 +15,7 @@ import ReviewsTable from "./Table";
 
 const ReviewsPage = () => {
   const u = useUtils();
+  const reloadItemsRef = useRef<() => void>(() => undefined);
 
   const [items, setItems] = useState<BudgetReview[]>([]);
 
@@ -39,7 +40,7 @@ const ReviewsPage = () => {
   } as CurrentPagination);
 
   useEffect(() => {
-    reloadItems();
+    reloadItemsRef.current();
   }, [paginationRequest]);
 
   const reloadItems = () => {
@@ -66,6 +67,7 @@ const ReviewsPage = () => {
       showError: true,
     });
   };
+  reloadItemsRef.current = reloadItems;
 
   return (
     <Card>

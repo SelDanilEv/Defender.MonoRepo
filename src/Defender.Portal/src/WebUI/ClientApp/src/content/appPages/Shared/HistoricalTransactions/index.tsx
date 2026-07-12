@@ -1,7 +1,7 @@
 import { Card } from "@mui/material";
 import HistoricalTransactionsTable from "./Table";
 import TransactionHistoryResponse from "src/models/responses/banking/transactions/TransactionHistoryResponse";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
 import { connect } from "react-redux";
@@ -18,6 +18,7 @@ interface HistoricalTransactionsProps {
 
 const HistoricalTransactions = (props: HistoricalTransactionsProps) => {
   const u = useUtils();
+  const reloadTransactionHistoryRef = useRef<() => void>(() => undefined);
 
   const [transactions, setTransaction] = useState<Transaction[]>([]);
 
@@ -42,7 +43,7 @@ const HistoricalTransactions = (props: HistoricalTransactionsProps) => {
   } as CurrentPagination);
 
   useEffect(() => {
-    reloadTransactionHistory();
+    reloadTransactionHistoryRef.current();
   }, [paginationRequest]);
 
   const reloadTransactionHistory = () => {
@@ -70,6 +71,7 @@ const HistoricalTransactions = (props: HistoricalTransactionsProps) => {
       showError: true,
     });
   };
+  reloadTransactionHistoryRef.current = reloadTransactionHistory;
 
   return (
     <Card>

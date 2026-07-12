@@ -11,8 +11,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import { useEffect, useState } from "react";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
+import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -21,6 +21,8 @@ import { foodAdvisorApi, MenuSessionDto } from "src/api/foodAdvisor";
 
 const FoodAdvisorSessionReviewPage = () => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
   const navigate = useNavigate();
   const { sessionId } = useParams<{ sessionId: string }>();
   const [session, setSession] = useState<MenuSessionDto | null>(null);
@@ -34,7 +36,7 @@ const FoodAdvisorSessionReviewPage = () => {
 
   useEffect(() => {
     if (!sessionId) return;
-    foodAdvisorApi.getSession(sessionId, u).then((data) => {
+    foodAdvisorApi.getSession(sessionId, utilsRef.current).then((data) => {
       if (data) {
         setSession(data);
         setItems([...(data.parsedItems || [])]);
@@ -85,9 +87,11 @@ const FoodAdvisorSessionReviewPage = () => {
         </Typography>
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{ maxWidth: 560, mx: "auto" }}
-        >
+          sx={{
+            color: "text.secondary",
+            maxWidth: 560,
+            mx: "auto"
+          }}>
           {items.length === 0
             ? u.t("foodAdvisor:review_no_items_detected")
             : u.t("foodAdvisor:review_edit_hint")}
@@ -100,10 +104,21 @@ const FoodAdvisorSessionReviewPage = () => {
       )}
       <Grid container spacing={2}>
         {items.map((item, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid
+            key={index}
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4
+            }}>
             <Card variant="outlined" sx={{ height: "100%" }}>
               <CardContent sx={{ py: 1, "&:last-child": { pb: 1 } }}>
-                <Box display="flex" alignItems="flex-start" gap={0.5}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 0.5
+                  }}>
                   <TextField
                     size="small"
                     value={item}
@@ -124,10 +139,20 @@ const FoodAdvisorSessionReviewPage = () => {
             </Card>
           </Grid>
         ))}
-        <Grid item xs={12} sm={6} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 4
+          }}>
           <Card variant="outlined" sx={{ height: "100%", borderStyle: "dashed" }}>
             <CardContent sx={{ py: 1, "&:last-child": { pb: 1 } }}>
-              <Box display="flex" gap={0.5} alignItems="center">
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 0.5,
+                  alignItems: "center"
+                }}>
                 <TextField
                   size="small"
                   placeholder={u.t("foodAdvisor:new_item")}
@@ -144,7 +169,7 @@ const FoodAdvisorSessionReviewPage = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <FormControlLabel
             control={
               <Checkbox
@@ -155,8 +180,13 @@ const FoodAdvisorSessionReviewPage = () => {
             label={u.t("foodAdvisor:try_something_new")}
           />
         </Grid>
-        <Grid item xs={12}>
-          <Box display="flex" gap={1} flexWrap="wrap">
+        <Grid size={12}>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              flexWrap: "wrap"
+            }}>
             <Button
               variant="contained"
               onClick={handleConfirm}

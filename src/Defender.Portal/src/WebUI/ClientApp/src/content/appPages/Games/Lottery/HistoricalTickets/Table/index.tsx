@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import {
   Tooltip,
   Divider,
@@ -47,6 +47,8 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
     pagination: pagination,
     refresh: refresh,
   } = props;
+  const applyPaginationRef = useRef(applyPagination);
+  applyPaginationRef.current = applyPagination;
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
@@ -54,7 +56,7 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
   const [selectedTicket, setSelectedTicket] = useState<LotteryTicket>();
 
   React.useEffect(() => {
-    applyPagination(page, limit);
+    applyPaginationRef.current(page, limit);
   }, [page, limit]);
 
   const handlePageChange = (event: any, newPage: number): void => {
@@ -65,7 +67,7 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
     setLimit(parseInt(event.target.value));
   };
 
-  const renderTicketInfo = (ticket: LotteryTicket): JSX.Element => {
+  const renderTicketInfo = (ticket: LotteryTicket): React.ReactElement => {
     {
       return (
         <TableRow hover key={`${ticket.drawNumber}-${ticket.ticketNumber}`}>
@@ -82,6 +84,7 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
           <TableCell align="center">
             <Tooltip title={u.t("lottery:ticket_info_table_action_info")} arrow>
               <IconButton
+                aria-label={u.t("lottery:ticket_info_table_action_info")}
                 sx={{
                   "&:hover": { background: theme.colors.info.lighter },
                   color: theme.palette.info.dark,
@@ -106,17 +109,23 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
     <Card>
       <CardHeader
         action={
-          <LockedButton sx={{ mr: "1em" }} variant="outlined" onClick={refresh}>
+          <LockedButton aria-label="Refresh tickets" sx={{ mr: "1em" }} variant="outlined" onClick={refresh}>
             <CachedIcon />
           </LockedButton>
         }
         title={
-          <Typography fontSize={"1.7em"} fontWeight="bold">
+          <Typography
+            sx={{
+              fontSize: "1.7em",
+              fontWeight: "bold"
+            }}>
             {u.t("lottery:ticket_info_table_title")}
           </Typography>
         }
-        titleTypographyProps={{
-          style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+        slotProps={{
+          title: {
+            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+          }
         }}
       />
       <Divider />
@@ -184,6 +193,8 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
           rowsPerPage={limit}
           rowsPerPageOptions={[10, 15, 30]}
           labelRowsPerPage=""
+          slotProps={{ select: { inputProps: { "aria-label": u.t("table_rows_per_page_label") } } }}
+          getItemAriaLabel={(type) => `${type} page`}
         />
       </Box>
       <CustomDialog

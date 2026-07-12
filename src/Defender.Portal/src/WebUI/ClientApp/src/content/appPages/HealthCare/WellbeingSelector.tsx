@@ -17,10 +17,14 @@ const WellbeingSelector = ({
   onChange,
 }: WellbeingSelectorProps) => (
   <Stack spacing={1}>
-    <Typography variant="caption" color="text.secondary">
+    <Typography variant="caption" sx={{
+      color: "text.secondary"
+    }}>
       {label}
     </Typography>
-    <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+    <Stack direction="row" spacing={1} useFlexGap sx={{
+      flexWrap: "wrap"
+    }}>
       {wellbeingScores.map((value) => (
         <Tooltip
           key={value}

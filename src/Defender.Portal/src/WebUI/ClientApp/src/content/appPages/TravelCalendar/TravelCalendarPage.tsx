@@ -23,7 +23,7 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
@@ -85,14 +85,17 @@ export default function TravelCalendarPage() {
 
   if (state.loading) {
     return (
-      <Box p={4}>
+      <Box sx={{
+        p: 4
+      }}>
         <Skeleton height={130} sx={{ borderRadius: 5 }} />
         <Box
-          display="grid"
-          gridTemplateColumns={{ md: "360px 1fr" }}
-          gap={2}
-          mt={2}
-        >
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { md: "360px 1fr" },
+            gap: 2,
+            mt: 2
+          }}>
           <Skeleton height={500} />
           <Skeleton height={500} />
         </Box>
@@ -102,7 +105,9 @@ export default function TravelCalendarPage() {
 
   if (!calendar) {
     return (
-      <Box p={4}>
+      <Box sx={{
+        p: 4
+      }}>
         <Alert
           severity="error"
           action={<Button onClick={state.retry}>{t("travelCalendar:retry")}</Button>}
@@ -223,14 +228,25 @@ export default function TravelCalendarPage() {
         },
       }}
     >
-      <Box position="relative" zIndex={1}>
+      <Box
+        sx={{
+          position: "relative",
+          zIndex: 1
+        }}>
         <Panel sx={{ p: { xs: 2, md: 3 }, mb: 2.5, borderRadius: "24px" }}>
           <Stack
             direction={{ xs: "column", md: "row" }}
-            alignItems={{ md: "center" }}
-            gap={2}
-          >
-            <Stack direction="row" alignItems="center" spacing={1.5} flex={1}>
+            sx={{
+              alignItems: { md: "center" },
+              gap: 2
+            }}>
+            <Stack
+              direction="row"
+              spacing={1.5}
+              sx={{
+                alignItems: "center",
+                flex: 1
+              }}>
               <Box
                 sx={{
                   width: 54,
@@ -246,15 +262,21 @@ export default function TravelCalendarPage() {
                 <CalendarMonthIcon fontSize="large" />
               </Box>
               <Box>
-                <Typography component="h1" variant="h4" fontWeight={900}>
+                <Typography component="h1" variant="h4" sx={{
+                  fontWeight: 900
+                }}>
                   {t("travelCalendar:title")}
                 </Typography>
-                <Typography color="var(--tc-muted)">
+                <Typography sx={{
+                  color: "var(--tc-muted)"
+                }}>
                 {t("travelCalendar:subtitleGeneric", { city: calendar.baseCity })}
                 </Typography>
               </Box>
             </Stack>
-            <Stack direction="row" spacing={1} flexWrap="wrap">
+            <Stack direction="row" spacing={1} sx={{
+              flexWrap: "wrap"
+            }}>
               <Chip
                 label={t("travelCalendar:hero.overnightTrips", {
                   count: calendar.summary.overnightTripCount,
@@ -299,14 +321,21 @@ export default function TravelCalendarPage() {
             <Panel>
               <Stack
                 direction="row"
-                alignItems="center"
-                justifyContent="space-between"
-              >
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between"
+                }}>
                 <Box>
-                  <Typography component="h3" fontWeight={900}>
+                  <Typography component="h3" sx={{
+                    fontWeight: 900
+                  }}>
                     {t("travelCalendar:wishlist.title")}
                   </Typography>
-                  <Typography fontSize={12} color="var(--tc-muted)">
+                  <Typography
+                    sx={{
+                      fontSize: 12,
+                      color: "var(--tc-muted)"
+                    }}>
                     {t("travelCalendar:wishlist.subtitle")}
                   </Typography>
                 </Box>
@@ -314,9 +343,12 @@ export default function TravelCalendarPage() {
               </Stack>
               <Stack
                 spacing={1}
-                mt={1.5}
-                sx={{ maxHeight: 310, overflow: "auto", pr: 0.5 }}
-              >
+                sx={{
+                  mt: 1.5,
+                  maxHeight: 310,
+                  overflow: "auto",
+                  pr: 0.5
+                }}>
                 {queued.map((item, index) => (
                   <Box
                     key={item.id}
@@ -327,10 +359,20 @@ export default function TravelCalendarPage() {
                       bgcolor: "var(--tc-accent-soft)",
                     }}
                   >
-                    <Stack direction="row" alignItems="center">
-                      <Box flex={1}>
-                        <Typography fontWeight={800}>{item.title}</Typography>
-                        <Typography fontSize={11} color="var(--tc-muted)">
+                    <Stack direction="row" sx={{
+                      alignItems: "center"
+                    }}>
+                      <Box sx={{
+                        flex: 1
+                      }}>
+                        <Typography sx={{
+                          fontWeight: 800
+                        }}>{item.title}</Typography>
+                        <Typography
+                          sx={{
+                            fontSize: 11,
+                            color: "var(--tc-muted)"
+                          }}>
                           {t("travelCalendar:wishlist.queuePosition", {
                             position: index + 1,
                           })}
@@ -358,52 +400,87 @@ export default function TravelCalendarPage() {
             </Panel>
 
             <Panel>
-              <Stack direction="row" justifyContent="space-between">
-                <Typography component="h3" fontWeight={900}>
+              <Stack direction="row" sx={{
+                justifyContent: "space-between"
+              }}>
+                <Typography component="h3" sx={{
+                  fontWeight: 900
+                }}>
                   {t("travelCalendar:budget.title")}
                 </Typography>
-                <Typography fontWeight={900} color="var(--tc-accent)">
+                <Typography
+                  sx={{
+                    fontWeight: 900,
+                    color: "var(--tc-accent)"
+                  }}>
                   {formatMoney(calendar.summary.grandTotalPln)} PLN
                 </Typography>
               </Stack>
-              <Box display="flex" height={8} borderRadius={5} overflow="hidden" my={1.5}>
+              <Box
+                sx={{
+                  display: "flex",
+                  height: 8,
+                  borderRadius: 5,
+                  overflow: "hidden",
+                  my: 1.5
+                }}>
                 <Box
-                  bgcolor={theme.colors.primary.main}
-                  width={`${
-                    calendar.summary.grandTotalPln
-                      ? (calendar.summary.hotelTotalPln /
-                          calendar.summary.grandTotalPln) *
-                        100
-                      : 0
-                  }%`}
-                />
+                  sx={{
+                    bgcolor: theme.colors.primary.main,
+
+                    width: `${
+                      calendar.summary.grandTotalPln
+                        ? (calendar.summary.hotelTotalPln /
+                            calendar.summary.grandTotalPln) *
+                          100
+                        : 0
+                    }%`
+                  }} />
                 <Box
-                  bgcolor={theme.colors.warning.main}
-                  width={`${
-                    calendar.summary.grandTotalPln
-                      ? (calendar.summary.transportTotalPln /
-                          calendar.summary.grandTotalPln) *
-                        100
-                      : 0
-                  }%`}
-                />
-                <Box bgcolor={theme.colors.success.main} flex={1} />
+                  sx={{
+                    bgcolor: theme.colors.warning.main,
+
+                    width: `${
+                      calendar.summary.grandTotalPln
+                        ? (calendar.summary.transportTotalPln /
+                            calendar.summary.grandTotalPln) *
+                          100
+                        : 0
+                    }%`
+                  }} />
+                <Box
+                  sx={{
+                    bgcolor: theme.colors.success.main,
+                    flex: 1
+                  }} />
               </Box>
               <Stack spacing={0.5}>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography color="var(--tc-muted)">
+                <Stack direction="row" sx={{
+                  justifyContent: "space-between"
+                }}>
+                  <Typography sx={{
+                    color: "var(--tc-muted)"
+                  }}>
                     {t("travelCalendar:budget.hotels")}
                   </Typography>
                   <b>{formatMoney(calendar.summary.hotelTotalPln)} PLN</b>
                 </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography color="var(--tc-muted)">
+                <Stack direction="row" sx={{
+                  justifyContent: "space-between"
+                }}>
+                  <Typography sx={{
+                    color: "var(--tc-muted)"
+                  }}>
                     {t("travelCalendar:budget.transport")}
                   </Typography>
                   <b>{formatMoney(calendar.summary.transportTotalPln)} PLN</b>
                 </Stack>
-                <Stack direction="row" justifyContent="space-between">
-                  <Typography color="var(--tc-muted)">
+                <Stack direction="row" sx={{
+                  justifyContent: "space-between"
+                }}>
+                  <Typography sx={{
+                    color: "var(--tc-muted)"
+                  }}>
                     {t("travelCalendar:budget.other")}
                   </Typography>
                   <b>{formatMoney(calendar.summary.otherTotalPln)} PLN</b>
@@ -424,13 +501,23 @@ export default function TravelCalendarPage() {
                   <Stack
                     key={item.eventId}
                     direction="row"
-                    justifyContent="space-between"
-                    py={0.5}
-                  >
-                    <Typography fontSize={12} noWrap maxWidth="70%">
+                    sx={{
+                      justifyContent: "space-between",
+                      py: 0.5
+                    }}>
+                    <Typography
+                      noWrap
+                      sx={{
+                        fontSize: 12,
+                        maxWidth: "70%"
+                      }}>
                       {item.date} · {item.title}
                     </Typography>
-                    <Typography fontSize={12} fontWeight={800}>
+                    <Typography
+                      sx={{
+                        fontSize: 12,
+                        fontWeight: 800
+                      }}>
                       {formatMoney(item.totalPln)} PLN
                     </Typography>
                   </Stack>
@@ -439,12 +526,18 @@ export default function TravelCalendarPage() {
             </Panel>
 
             <Panel>
-              <Typography component="h3" fontWeight={900}>
+              <Typography component="h3" sx={{
+                fontWeight: 900
+              }}>
                 {t("travelCalendar:packing.title")}
               </Typography>
-              <Stack spacing={0.4} my={1}>
+              <Stack spacing={0.4} sx={{
+                my: 1
+              }}>
                 {calendar.packingItems.map((item) => (
-                  <Stack key={item.id} direction="row" alignItems="center">
+                  <Stack key={item.id} direction="row" sx={{
+                    alignItems: "center"
+                  }}>
                     <Checkbox
                       checked={item.isChecked}
                       onChange={(e) =>
@@ -454,12 +547,11 @@ export default function TravelCalendarPage() {
                       }
                     />
                     <Typography
-                      flex={1}
                       sx={{
+                        flex: 1,
                         textDecoration: item.isChecked ? "line-through" : "none",
-                        opacity: item.isChecked ? 0.55 : 1,
-                      }}
-                    >
+                        opacity: item.isChecked ? 0.55 : 1
+                      }}>
                       {item.text}
                     </Typography>
                     <IconButton
@@ -505,18 +597,26 @@ export default function TravelCalendarPage() {
             <Panel>
               <Stack
                 direction={{ xs: "column", sm: "row" }}
-                alignItems={{ sm: "center" }}
-                gap={1}
-              >
-                <Typography component="h3" fontWeight={900} mr="auto">
+                sx={{
+                  alignItems: { sm: "center" },
+                  gap: 1
+                }}>
+                <Typography
+                  component="h3"
+                  sx={{
+                    fontWeight: 900,
+                    mr: "auto"
+                  }}>
                   {t("travelCalendar:legend.title")}
                 </Typography>
                 {eventTypes.map((type) => (
                   <Stack
                     key={type.type}
                     direction="row"
-                    alignItems="center"
                     spacing={0.7}
+                    sx={{
+                      alignItems: "center"
+                    }}
                   >
                     <Box
                       sx={{
@@ -527,10 +627,18 @@ export default function TravelCalendarPage() {
                       }}
                     />
                     <Box>
-                      <Typography fontSize={11} fontWeight={800}>
+                      <Typography
+                        sx={{
+                          fontSize: 11,
+                          fontWeight: 800
+                        }}>
                         {type.icon} {type.title}
                       </Typography>
-                      <Typography fontSize={9} color="var(--tc-muted)">
+                      <Typography
+                        sx={{
+                          fontSize: 9,
+                          color: "var(--tc-muted)"
+                        }}>
                         {type.note}
                       </Typography>
                     </Box>
@@ -546,7 +654,13 @@ export default function TravelCalendarPage() {
                 gap: 2,
               }}
             >
-              <Stack direction="row" alignItems="center" justifyContent="space-between" gridColumn="1 / -1">
+              <Stack
+                direction="row"
+                sx={{
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gridColumn: "1 / -1"
+                }}>
                 <Stack direction="row">
                   <IconButton aria-label={t("travelCalendar:navigation.previousPage")} onClick={() => moveMonths(-1, visibleMonthCount)}>
                     <KeyboardDoubleArrowLeftIcon />
@@ -555,7 +669,11 @@ export default function TravelCalendarPage() {
                     <NavigateBeforeIcon />
                   </IconButton>
                 </Stack>
-                <Typography fontWeight={800} textTransform="capitalize">
+                <Typography
+                  sx={{
+                    fontWeight: 800,
+                    textTransform: "capitalize"
+                  }}>
                   {new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(new Date(firstMonth.year, firstMonth.month, 1))}
                 </Typography>
                 <Stack direction="row">
@@ -579,13 +697,17 @@ export default function TravelCalendarPage() {
                 />
               ))}
             </Box>
-            <Typography textAlign="center" color="var(--tc-muted)" fontSize={12}>
+            <Typography
+              sx={{
+                textAlign: "center",
+                color: "var(--tc-muted)",
+                fontSize: 12
+              }}>
               {t("travelCalendar:hint")}
             </Typography>
           </Stack>
         </Box>
       </Box>
-
       <Dialog open={tripDialog} onClose={() => setTripDialog(false)}>
         <DialogTitle>{t("travelCalendar:addPlaceDialog.title")}</DialogTitle>
         <DialogContent>
@@ -617,7 +739,6 @@ export default function TravelCalendarPage() {
           </Button>
         </DialogActions>
       </Dialog>
-
       <EventDrawer
         event={state.activeEvent}
         calendar={calendar}

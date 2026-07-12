@@ -69,7 +69,7 @@ const HomePage = (props: any) => {
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <WalletAccountsInfo></WalletAccountsInfo>
         </Grid>
 
@@ -77,7 +77,13 @@ const HomePage = (props: any) => {
           const Icon = item.icon;
 
           return (
-            <Grid item xs={12} sm={6} md={2} key={item.key}>
+            <Grid
+              key={item.key}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 2
+              }}>
               <Card sx={{ height: { xs: 84, sm: 92 } }}>
                 <CardActionArea
                   component={item.to ? Link : "a"}

@@ -1,4 +1,4 @@
-import { FC, ReactNode, useEffect } from "react";
+import { FC, ReactNode, useEffect, useRef } from "react";
 import { Box, alpha, lighten } from "@mui/material";
 import { connect } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
@@ -19,6 +19,10 @@ interface SidebarLayoutProps {
 
 const SidebarLayout: FC<SidebarLayoutProps> = (props: any) => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
+  const logoutRef = useRef(props.logout);
+  logoutRef.current = props.logout;
   const theme = u.react.theme;
   const redirectPath = getProtectedRedirectPath(props.session);
 
@@ -32,10 +36,10 @@ const SidebarLayout: FC<SidebarLayoutProps> = (props: any) => {
       options: {
         method: "GET",
       },
-      utils: u,
+      utils: utilsRef.current,
       onFailure: async (response) => {
         if (response.status === 401) {
-          logoutPortal(u, props.logout);
+          logoutPortal(utilsRef.current, logoutRef.current);
         }
       },
     });
@@ -89,10 +93,11 @@ const SidebarLayout: FC<SidebarLayoutProps> = (props: any) => {
           }}
         >
           <Box
-            display="block"
-            p={1}
-            sx={{ fontSize: u.isMobile ? "0.9em" : "0.98em" }}
-          >
+            sx={{
+              display: "block",
+              p: 1,
+              fontSize: u.isMobile ? "0.9em" : "0.98em"
+            }}>
             <Outlet />
           </Box>
         </Box>

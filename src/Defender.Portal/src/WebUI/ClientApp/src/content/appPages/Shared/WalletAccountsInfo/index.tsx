@@ -12,7 +12,7 @@ import { connect } from "react-redux";
 import AddTwoToneIcon from "@mui/icons-material/AddTwoTone";
 
 import useUtils from "src/appUtils";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { WalletInfo } from "src/models/banking/WalletInfo";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
@@ -36,6 +36,9 @@ import CurrencySymbolsMap from "src/consts/CurrencySymbolsMap";
 
 const WalletAccountsInfo = (props: any) => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
+  const updateUIWalletInfoRef = useRef<(walletInfo: WalletInfo) => void>(() => undefined);
 
   useEffect(() => {
     let isMounted = true;
@@ -50,12 +53,12 @@ const WalletAccountsInfo = (props: any) => {
           },
           cache: "default",
         },
-        utils: u,
+        utils: utilsRef.current,
         onSuccess: async (response) => {
           const walletInfo: WalletInfo = await response.json();
           if (isMounted) {
             // Check if the component is still mounted
-            updateUIWalletInfo(walletInfo);
+            updateUIWalletInfoRef.current(walletInfo);
           }
         },
         showError: false,
@@ -101,6 +104,7 @@ const WalletAccountsInfo = (props: any) => {
     props.updateWalletInfo(walletInfo);
     setWallet(walletInfo);
   };
+  updateUIWalletInfoRef.current = updateUIWalletInfo;
 
   const displayAccounts = () => {
     let result = [];
@@ -108,12 +112,31 @@ const WalletAccountsInfo = (props: any) => {
     if (wallet.walletNumber) {
       for (const account of wallet.currencyAccounts) {
         result.push(
-          <Grid item xs={12} sm={6} md={2} key={account.currency}>
+          <Grid
+            key={account.currency}
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 2
+            }}>
             <CardCc>
-              <Box display="flex" alignItems="center">
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center"
+                }}>
                 <CardLogo>{account.currency}</CardLogo>
-                <Box marginLeft={"auto"} marginRight={{ xs: "1em", sm: "1.25em" }}>
-                  <Typography variant="h5" fontWeight="normal" sx={{ whiteSpace: "nowrap" }}>
+                <Box
+                  sx={{
+                    marginLeft: "auto",
+                    marginRight: { xs: "1em", sm: "1.25em" }
+                  }}>
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: "normal",
+                      whiteSpace: "nowrap"
+                    }}>
                     {account.balance / 100 +
                       CurrencySymbolsMap[account.currency]}
                   </Typography>
@@ -126,7 +149,13 @@ const WalletAccountsInfo = (props: any) => {
 
       if (result.length < BankingSupportedCurrencies.length)
         result.push(
-          <Grid item xs={12} sm={6} md={2} key={-1}>
+          <Grid
+            key={-1}
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 2
+            }}>
             <CardAddAction>
               <CardActionArea
                 sx={{
@@ -144,7 +173,12 @@ const WalletAccountsInfo = (props: any) => {
                 }}
                 onClick={createNewAccount}
               >
-                <Box display="flex" alignItems="center" justifyContent="center">
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
                   <AvatarAddWrapper>
                     <AddTwoToneIcon sx={{ fontSize: 18 }} />
                   </AvatarAddWrapper>
@@ -200,9 +234,6 @@ const WalletAccountsInfo = (props: any) => {
     <>
       <Card>
         <CardHeader
-          titleTypographyProps={{
-            style: { fontSize: u.isMobile ? "1.15rem" : "1.35rem" },
-          }}
           title={
             u.t("banking_page__wallet_title") +
             " " +
@@ -210,24 +241,26 @@ const WalletAccountsInfo = (props: any) => {
           }
           action={
             <Box
-              display="flex"
               sx={{
+                display: "flex",
+
                 flexDirection: {
                   xs: "column",
                   sm: "row",
                 },
-                gap: 1,
-              }}
-            >
+
+                gap: 1
+              }}>
               <Box
-                display="flex"
                 sx={{
+                  display: "flex",
+
                   flexDirection: {
                     xs: "row",
                   },
-                  gap: 1,
-                }}
-              >
+
+                  gap: 1
+                }}>
                 {renderNavigationButton()}
                 <LockedButton variant="outlined" onClick={updateWalletInfo}>
                   <CachedIcon />
@@ -243,6 +276,11 @@ const WalletAccountsInfo = (props: any) => {
               </LockedButton>
             </Box>
           }
+          slotProps={{
+            title: {
+              style: { fontSize: u.isMobile ? "1.15rem" : "1.35rem" },
+            }
+          }}
         />
         <Divider />
         <Grid container spacing={0.5}>

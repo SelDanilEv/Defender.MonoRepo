@@ -160,7 +160,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/configuration"
                   icon={<AdminPanelSettingsIcon />}
@@ -182,7 +182,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/admin/users"
                   icon={<TableChartTwoToneIcon />}
@@ -204,7 +204,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/home"
                   icon={<HomeIcon style={{ fontSize: "1.1em" }} />}
@@ -225,7 +225,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/budget-tracker/positions"
                   icon={<AllInboxIcon style={{ fontSize: "1.1em" }} />}
@@ -256,7 +256,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/banking"
                   icon={<AccountBalanceIcon style={{ fontSize: "1.1em" }} />}
@@ -277,7 +277,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/games/lottery"
                   icon={<LocalActivityIcon style={{ fontSize: "1.1em" }} />}
@@ -298,7 +298,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/health-care"
                   icon={<LocalHospitalIcon style={{ fontSize: "1.1em" }} />}
@@ -310,7 +310,7 @@ const RoleBasedMenu = (props: any) => {
         );
         result.push(
           <List key={"travel_calendar"} component="div" subheader={<ListSubheader component="div" disableSticky>{u.t("sidebar_menu:header_travel_calendar")}</ListSubheader>}>
-            <SubMenuWrapper><List component="div"><MenuItem to="/travel-calendar" icon={<TravelExploreIcon style={{ fontSize: "1.1em" }} />} text={u.t("sidebar_menu:page_travel_calendar")} /></List></SubMenuWrapper>
+            <SubMenuWrapper><List component="ul"><MenuItem to="/travel-calendar" icon={<TravelExploreIcon style={{ fontSize: "1.1em" }} />} text={u.t("sidebar_menu:page_travel_calendar")} /></List></SubMenuWrapper>
           </List>
         );
         result.push(
@@ -324,7 +324,7 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="div">
+              <List component="ul">
                 <MenuItem
                   to="/food-advisor"
                   icon={<RestaurantIcon style={{ fontSize: "1.1em" }} />}

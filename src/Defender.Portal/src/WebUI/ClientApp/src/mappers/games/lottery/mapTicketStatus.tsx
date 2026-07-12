@@ -62,7 +62,7 @@ export const mapTicketStatusColor = (
 export const mapTicketStatusLabel = (
   u: IUtils,
   status: TicketStatus
-): JSX.Element => {
+): React.ReactElement => {
   const map = {
     Requested: {
       color: "info",

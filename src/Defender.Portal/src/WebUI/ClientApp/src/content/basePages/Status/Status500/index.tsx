@@ -31,12 +31,15 @@ function Status500() {
       <MainContent>
         <Grid
           container
-          sx={{ height: '100%' }}
-          alignItems="stretch"
           spacing={0}
-        >
+          sx={{
+            alignItems: "stretch",
+            height: '100%'
+          }}>
           <Container maxWidth="sm">
-            <Box textAlign="center">
+            <Box sx={{
+              textAlign: "center"
+            }}>
               <img
                 alt="500"
                 height={260}
@@ -47,10 +50,11 @@ function Status500() {
               </Typography>
               <Typography
                 variant="h4"
-                color="text.secondary"
-                fontWeight="normal"
-                sx={{ mb: 4 }}
-              >
+                sx={{
+                  color: "text.secondary",
+                  fontWeight: "normal",
+                  mb: 4
+                }}>
                 The server encountered an internal error and was not able to
                 complete your request
               </Typography>

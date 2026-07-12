@@ -1,20 +1,21 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
+import { createRoot, Root } from "react-dom/client";
 
 import ErrorBoundary from "./index";
 
 describe("ErrorBoundary", () => {
   let container: HTMLDivElement;
+  let root: Root;
 
   beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
+    root = createRoot(container);
     vi.spyOn(console, "error").mockImplementation(() => undefined);
   });
 
   afterEach(() => {
-    ReactDOM.unmountComponentAtNode(container);
+    act(() => root.unmount());
     container.remove();
     vi.restoreAllMocks();
   });
@@ -25,11 +26,10 @@ describe("ErrorBoundary", () => {
     };
 
     act(() => {
-      ReactDOM.render(
+      root.render(
         <ErrorBoundary>
           <BrokenComponent />
         </ErrorBoundary>,
-        container
       );
     });
 
@@ -51,11 +51,10 @@ describe("ErrorBoundary", () => {
     };
 
     act(() => {
-      ReactDOM.render(
+      root.render(
         <ErrorBoundary>
           <SometimesBrokenComponent />
         </ErrorBoundary>,
-        container
       );
     });
 

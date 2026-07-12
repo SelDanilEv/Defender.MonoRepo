@@ -80,11 +80,11 @@ Infrastructure   -> Repositories, clients, external adapters
 
 #### Frontend Technologies
 
-- React 17.0.2
-- TypeScript 4.7.3
-- Material UI 5.16.7
-- Redux Toolkit 2.2.3
-- React Router 6.3.0
+- React 19.2.7
+- TypeScript 6.0.3
+- Material UI 9.2.0
+- Redux Toolkit 2.12.0
+- React Router 7.18.1
 - i18next
 
 #### Infrastructure and DevOps

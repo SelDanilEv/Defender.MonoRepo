@@ -1,4 +1,4 @@
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import { Provider } from "react-redux";
 import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter } from "react-router-dom";
@@ -14,7 +14,13 @@ import config from "src/config.json";
 
 import "nprogress/nprogress.css";
 
-ReactDOM.render(
+const rootElement = document.getElementById("root");
+
+if (!rootElement) {
+  throw new Error("Root element not found");
+}
+
+createRoot(rootElement).render(
   <Provider store={store}>
     <HelmetProvider>
       <SidebarProvider>
@@ -30,8 +36,7 @@ ReactDOM.render(
         </BrowserRouter>
       </SidebarProvider>
     </HelmetProvider>
-  </Provider>,
-  document.getElementById("root")
+  </Provider>
 );
 
 // If you want your app to work offline and load faster, you can change

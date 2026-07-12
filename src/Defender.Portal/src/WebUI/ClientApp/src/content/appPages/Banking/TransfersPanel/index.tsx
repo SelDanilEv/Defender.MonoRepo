@@ -48,7 +48,7 @@ const TransfersPanel = (props: any) => {
             (wallet) => wallet.currency === transferRequest.currency
           ).balance
     );
-  }, [transferRequest]);
+  }, [transferRequest, props.wallet.currencyAccounts]);
 
   const UpdateRequest = (event) => {
     const { name, value } = event.target;
@@ -83,13 +83,22 @@ const TransfersPanel = (props: any) => {
       <Card>
         <CardHeader
           title={u.t("banking_page__transfer_title")}
-          titleTypographyProps={{
-            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+          slotProps={{
+            title: {
+              style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+            }
           }}
         />
         <Divider />
-        <Grid container spacing={3} p={2}>
-          <Grid item xs={12} sm={4} md={4}>
+        <Grid container spacing={3} sx={{
+          p: 2
+        }}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4,
+              md: 4
+            }}>
             <TextField
               name="walletNumber"
               label={u.t("banking_page__transfer_wallet_number_label")}
@@ -102,7 +111,12 @@ const TransfersPanel = (props: any) => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={8} sm={3} md={3}>
+          <Grid
+            size={{
+              xs: 8,
+              sm: 3,
+              md: 3
+            }}>
             <TextField
               name="amount"
               label={u.t("banking_page__transfer_amount_label")}
@@ -114,7 +128,12 @@ const TransfersPanel = (props: any) => {
               fullWidth
             />
           </Grid>
-          <Grid item xs={4} sm={2} md={2}>
+          <Grid
+            size={{
+              xs: 4,
+              sm: 2,
+              md: 2
+            }}>
             <LockedSelect
               name="currency"
               value={transferRequest.currency}
@@ -131,7 +150,12 @@ const TransfersPanel = (props: any) => {
                 : null}
             </LockedSelect>
           </Grid>
-          <Grid item xs={12} sm={3} md={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 3,
+              md: 3
+            }}>
             <LockedButton
               disabled={!isTransferAllowed}
               onClick={() => setShowTransferDialog(true)}

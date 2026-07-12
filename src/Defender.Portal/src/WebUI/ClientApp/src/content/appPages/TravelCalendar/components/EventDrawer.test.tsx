@@ -1,6 +1,6 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
+import { createRoot, Root } from "react-dom/client";
 
 import "src/localization/i18n";
 import { TravelCalendar, TravelEvent } from "src/api/travelCalendar";
@@ -51,15 +51,17 @@ const props = {
 
 describe("EventDrawer", () => {
   let container: HTMLDivElement;
+  let root: Root;
 
   beforeEach(() => {
     container = document.createElement("div");
     document.body.appendChild(container);
+    root = createRoot(container);
   });
 
   afterEach(() => {
     act(() => {
-      ReactDOM.unmountComponentAtNode(container);
+      root.unmount();
     });
     container.remove();
     vi.clearAllMocks();
@@ -67,7 +69,7 @@ describe("EventDrawer", () => {
 
   test("Draft_WhenSameEventRefreshes_PreservesUnsavedFields", () => {
     act(() => {
-      ReactDOM.render(<EventDrawer {...props} event={event} />, container);
+      root.render(<EventDrawer {...props} event={event} />);
     });
 
     const titleInput = document.querySelector<HTMLInputElement>('input[value="Original title"]');
@@ -80,12 +82,11 @@ describe("EventDrawer", () => {
     });
 
     act(() => {
-      ReactDOM.render(
+      root.render(
         <EventDrawer
           {...props}
           event={{ ...event, version: 2, participants: [{ userId: "33333333-3333-4333-8333-333333333333", displayName: "Guest", status: "Pending" }] }}
-        />,
-        container
+        />
       );
     });
 

@@ -13,7 +13,9 @@ const AppConfiguration = (props: any) => {
       <Helmet>
         <title>Configuration</title>
       </Helmet>
-      <Box pb={2}>
+      <Box sx={{
+        pb: 2
+      }}>
         <Typography variant="h2">{u.t("configuration_page__title")}</Typography>
       </Box>
       <Card>
@@ -21,7 +23,6 @@ const AppConfiguration = (props: any) => {
           <HealthCheck />
         </List>
       </Card>
-
       <Card sx={{ mt: 2 }}>
         <List>
           <Configuration />

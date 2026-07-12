@@ -134,12 +134,6 @@ const EditSensitiveUserInfo = (props: any) => {
 
   // ----- state machine -----
 
-  useEffect(() => {
-    return () => {
-      stateMachine.freeze();
-    };
-  }, []);
-
   const stateNames = {
     Init: "Init",
     ProceedAllowed: "ProceedAllowed",
@@ -195,6 +189,12 @@ const EditSensitiveUserInfo = (props: any) => {
       })
   );
 
+  useEffect(() => {
+    return () => {
+      stateMachine.freeze();
+    };
+  }, [stateMachine]);
+
   const SetState = (newState: string) => {
     stateMachine.updateState(newState);
   };
@@ -225,16 +225,23 @@ const EditSensitiveUserInfo = (props: any) => {
       <>
         <Grid
           container
-          item
-          xs={12}
-          sm={4}
-          md={3}
-          alignContent={"center"}
-          justifyContent={{ xs: "left", sm: "center" }}
-        >
+          sx={{
+            alignContent: "center",
+            justifyContent: { xs: "left", sm: "center" }
+          }}
+          size={{
+            xs: 12,
+            sm: 4,
+            md: 3
+          }}>
           <Grid>{u.t("personal_info_page__verification_code_field")}:</Grid>
         </Grid>
-        <Grid item xs={12} sm={6} md={7}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 7
+          }}>
           <TextField
             id="verification_code"
             type="number"
@@ -254,11 +261,11 @@ const EditSensitiveUserInfo = (props: any) => {
       <>
         <Grid
           container
-          item
-          alignContent={"center"}
-          justifyContent={{ xs: "center", sm: "flex-end" }}
-          gap={2}
-        >
+          sx={{
+            alignContent: "center",
+            justifyContent: { xs: "center", sm: "flex-end" },
+            gap: 2
+          }}>
           {!elements[ElementNames.ProceedButton].hidden && (
             <LockedButton
               fullWidth={u.isMobile}
@@ -304,53 +311,76 @@ const EditSensitiveUserInfo = (props: any) => {
           <Grid container spacing={2} sx={{ fontSize: "1.2em" }}>
             <Grid
               container
-              item
-              xs={12}
-              sm={4}
-              md={3}
-              alignContent={"center"}
-              justifyContent={{ xs: "left", sm: "center" }}
-            >
+              sx={{
+                alignContent: "center",
+                justifyContent: { xs: "left", sm: "center" }
+              }}
+              size={{
+                xs: 12,
+                sm: 4,
+                md: 3
+              }}>
               <Grid>{u.t("personal_info_page__email_field")}:</Grid>
             </Grid>
-            <Grid item xs={12} sm={6} md={7}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 7
+              }}>
               <TextField
                 id="email"
                 sx={{ padding: 0 }}
                 disabled={elements[ElementNames.EmailField].disabled}
-                InputProps={{ style: { fontSize: "1.1em" } }}
                 defaultValue={request.email}
                 onChange={UpdateRequest}
                 variant="standard"
                 fullWidth
+                slotProps={{
+                  input: { style: { fontSize: "1.1em" } }
+                }}
               />
             </Grid>
             <Grid
               container
-              item
-              xs={12}
-              sm={4}
-              md={3}
-              alignContent={"center"}
-              justifyContent={{ xs: "left", sm: "center" }}
-            >
+              sx={{
+                alignContent: "center",
+                justifyContent: { xs: "left", sm: "center" }
+              }}
+              size={{
+                xs: 12,
+                sm: 4,
+                md: 3
+              }}>
               <Grid>{u.t("personal_info_page__password_field")}:</Grid>
             </Grid>
-            <Grid item xs={12} sm={6} md={7}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 7
+              }}>
               <TextField
                 id="password"
                 sx={{ padding: 0 }}
-                InputProps={{ style: { fontSize: "1.1em" } }}
                 disabled={elements[ElementNames.PasswordField].disabled}
                 type="password"
                 placeholder={u.t("personal_info_page__password_placeholder")}
                 onChange={UpdateRequest}
                 variant="standard"
                 fullWidth
+                slotProps={{
+                  input: { style: { fontSize: "1.1em" } }
+                }}
               />
             </Grid>
             {RenderVerificationCodeSection()}
-            <Grid item xs={12} pt={1} pb={1}>
+            <Grid
+              sx={{
+                pt: 1,
+                pb: 1
+              }}
+              size={12}>
               <Divider />
             </Grid>
             {RenderButtons()}

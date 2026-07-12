@@ -17,9 +17,21 @@ const rootReducer = combineReducers({
   budgetTrackerGroups,
 });
 
+const persistedState = stateLoader.loadState();
+const initialState = rootReducer(undefined, { type: "@@INIT" });
+const preloadedState = "session" in persistedState
+  ? {
+      ...persistedState,
+      session: {
+        ...initialState.session,
+        ...persistedState.session,
+      },
+    }
+  : undefined;
+
 const store = configureStore({
   reducer: rootReducer,
-  preloadedState: stateLoader.loadState(),
+  preloadedState,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,

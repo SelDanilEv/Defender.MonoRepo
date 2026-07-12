@@ -105,27 +105,29 @@ const LoginForm = (props: any) => {
             onChange={UpdateLoginRequest}
             label={u.t("welcome:password_label")}
             fullWidth
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label={u.t(
-                      showPassword
-                        ? "welcome:hide_password"
-                        : "welcome:show_password"
-                    )}
-                    edge="end"
-                    sx={{ width: 44, height: 44 }}
-                    onClick={() => setShowPassword((current) => !current)}
-                  >
-                    {showPassword ? (
-                      <VisibilityOffTwoToneIcon />
-                    ) : (
-                      <VisibilityTwoToneIcon />
-                    )}
-                  </IconButton>
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label={u.t(
+                        showPassword
+                          ? "welcome:hide_password"
+                          : "welcome:show_password"
+                      )}
+                      edge="end"
+                      sx={{ width: 44, height: 44 }}
+                      onClick={() => setShowPassword((current) => !current)}
+                    >
+                      {showPassword ? (
+                        <VisibilityOffTwoToneIcon />
+                      ) : (
+                        <VisibilityTwoToneIcon />
+                      )}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }
             }}
           />
           <Link

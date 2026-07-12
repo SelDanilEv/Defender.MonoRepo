@@ -1,5 +1,5 @@
 import { Grid, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useUtils from "src/appUtils";
 import LockedTextField from "src/components/LockedComponents/LockedTextField/LockedTextField";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
@@ -23,6 +23,7 @@ interface TicketSelectionProps {
 
 const TicketSelection = (props: TicketSelectionProps) => {
   const u = useUtils();
+  const reloadAvailableTicketsRef = useRef<(request: SearchLotteryTicketsRequest) => void>(() => undefined);
 
   const mobileAmount = 12;
   const desktopAmount = 25;
@@ -53,6 +54,7 @@ const TicketSelection = (props: TicketSelectionProps) => {
       amountOfTickets: 0,
       targetTicket: 0,
     } as SearchLotteryTicketsRequest);
+  const initialSearchRequestRef = useRef(searchRequest);
 
   const setTargetTicket = (targetTicket: number) => {
     setSearchRequest({
@@ -62,7 +64,7 @@ const TicketSelection = (props: TicketSelectionProps) => {
   };
 
   useEffect(() => {
-    reloadAvailableTickets(searchRequest);
+    reloadAvailableTicketsRef.current(initialSearchRequestRef.current);
   }, []);
 
   const reloadAvailableTickets = (request: SearchLotteryTicketsRequest) => {
@@ -108,6 +110,7 @@ const TicketSelection = (props: TicketSelectionProps) => {
       showError: true,
     });
   };
+  reloadAvailableTicketsRef.current = reloadAvailableTickets;
 
   const checkWalletBalance = () => {
     APICallWrapper({
@@ -179,12 +182,14 @@ const TicketSelection = (props: TicketSelectionProps) => {
       return (
         <Grid
           key={ticket}
-          item
-          xs={6}
-          sm={2.4}
           container
-          justifyContent="center"
-        >
+          sx={{
+            justifyContent: "center"
+          }}
+          size={{
+            xs: 6,
+            sm: 2.4
+          }}>
           <CheckBoxButton
             isChecked={isSelected}
             fullWidth
@@ -205,16 +210,40 @@ const TicketSelection = (props: TicketSelectionProps) => {
 
   return (
     <Grid container spacing={2}>
-      <Grid container item xs={12} sm={12} spacing={1}>
-        <Grid item xs={6} sm={6} container alignItems="center">
+      <Grid
+        container
+        spacing={1}
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
+        <Grid
+          container
+          sx={{
+            alignItems: "center"
+          }}
+          size={{
+            xs: 6,
+            sm: 6
+          }}>
           <Typography
-            paddingLeft={u.isMobile ? 0 : 2}
             variant={u.isMobile ? "h4" : "h6"}
+            sx={{
+              paddingLeft: u.isMobile ? 0 : 2
+            }}
           >
             {u.t("lottery:draw_available_tickets_title")}
           </Typography>
         </Grid>
-        <Grid item xs={6} sm={2} container justifyContent="center">
+        <Grid
+          container
+          sx={{
+            justifyContent: "center"
+          }}
+          size={{
+            xs: 6,
+            sm: 2
+          }}>
           <LockedButton
             disabled={isFull}
             fullWidth
@@ -227,7 +256,11 @@ const TicketSelection = (props: TicketSelectionProps) => {
             {u.t("lottery:draw_available_tickets_random_button")}
           </LockedButton>
         </Grid>
-        <Grid item xs={6} sm={2}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 2
+          }}>
           <LockedTextField
             disabled={isFull}
             label={u.t("lottery:draw_available_tickets_target_number_label")}
@@ -236,7 +269,15 @@ const TicketSelection = (props: TicketSelectionProps) => {
             type="number"
           />
         </Grid>
-        <Grid item xs={6} sm={2} container justifyContent="center">
+        <Grid
+          container
+          sx={{
+            justifyContent: "center"
+          }}
+          size={{
+            xs: 6,
+            sm: 2
+          }}>
           <LockedButton
             disabled={
               isFull || selectedTickets.includes(searchRequest.targetTicket)
@@ -251,22 +292,48 @@ const TicketSelection = (props: TicketSelectionProps) => {
           </LockedButton>
         </Grid>
       </Grid>
-      <Grid container item xs={12} sm={12} rowSpacing={2} columnSpacing={4}>
+      <Grid
+        container
+        rowSpacing={2}
+        columnSpacing={4}
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
         {renderTickets()}
       </Grid>
-      <Grid container item xs={12} sm={12} spacing={1}>
-        <Grid container item xs={12} sm={7} alignItems="center">
+      <Grid
+        container
+        spacing={1}
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
+        <Grid
+          container
+          sx={{
+            alignItems: "center"
+          }}
+          size={{
+            xs: 12,
+            sm: 7
+          }}>
           <Typography
             align={u.isMobile ? "center" : "left"}
-            paddingLeft={u.isMobile ? 0 : 5}
             variant={u.isMobile ? "h4" : "h6"}
-            width="100%"
-          >
+            sx={{
+              paddingLeft: u.isMobile ? 0 : 5,
+              width: "100%"
+            }}>
             {u.t("lottery:draw_available_tickets_total_bet")}
             {totalBet / 100} {CurrencySymbolsMap[currency]}
           </Typography>
         </Grid>
-        <Grid item xs={6} sm={2.5}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 2.5
+          }}>
           <LockedButton
             fullWidth
             variant="outlined"
@@ -275,7 +342,11 @@ const TicketSelection = (props: TicketSelectionProps) => {
             {u.t("lottery:draw_available_tickets_back_button")}
           </LockedButton>
         </Grid>
-        <Grid item xs={6} sm={2.5}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 2.5
+          }}>
           <LockedButton
             fullWidth
             variant="outlined"

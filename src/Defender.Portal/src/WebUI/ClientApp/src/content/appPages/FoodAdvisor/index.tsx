@@ -112,14 +112,20 @@ const FoodAdvisorHomePage = () => {
         </Typography>
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{ maxWidth: 560, mx: "auto" }}
-        >
+          sx={{
+            color: "text.secondary",
+            maxWidth: 560,
+            mx: "auto"
+          }}>
           {u.t("foodAdvisor:home_subtitle")}
         </Typography>
       </Box>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -135,7 +141,9 @@ const FoodAdvisorHomePage = () => {
                     backgroundColor: "background.default",
                   }}
                 >
-                  <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                  <Stack direction="row" spacing={1} useFlexGap sx={{
+                    flexWrap: "wrap"
+                  }}>
                     {likes.map((item) => (
                       <TagChip
                         key={`like-${item}`}
@@ -145,13 +153,20 @@ const FoodAdvisorHomePage = () => {
                       />
                     ))}
                     {likes.length === 0 && (
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{
+                        color: "text.secondary"
+                      }}>
                         {u.t("foodAdvisor:preferences_likes_placeholder")}
                       </Typography>
                     )}
                   </Stack>
                 </Box>
-                <Box display="flex" gap={1} alignItems="center">
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    alignItems: "center"
+                  }}>
                   <TextField
                     placeholder={u.t("foodAdvisor:new_item")}
                     value={likeDraft}
@@ -172,7 +187,11 @@ const FoodAdvisorHomePage = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
               <Typography variant="h6" gutterBottom>
@@ -188,7 +207,9 @@ const FoodAdvisorHomePage = () => {
                     backgroundColor: "background.default",
                   }}
                 >
-                  <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                  <Stack direction="row" spacing={1} useFlexGap sx={{
+                    flexWrap: "wrap"
+                  }}>
                     {dislikes.map((item) => (
                       <TagChip
                         key={`dislike-${item}`}
@@ -197,13 +218,20 @@ const FoodAdvisorHomePage = () => {
                       />
                     ))}
                     {dislikes.length === 0 && (
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{
+                        color: "text.secondary"
+                      }}>
                         {u.t("foodAdvisor:preferences_dislikes_placeholder")}
                       </Typography>
                     )}
                   </Stack>
                 </Box>
-                <Box display="flex" gap={1} alignItems="center">
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    alignItems: "center"
+                  }}>
                   <TextField
                     placeholder={u.t("foodAdvisor:new_item")}
                     value={dislikeDraft}
@@ -224,13 +252,18 @@ const FoodAdvisorHomePage = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           {hasChanges && (
             <Alert severity="info" sx={{ mb: 1.5 }}>
               {u.t("foodAdvisor:preferences_unsaved_changes")}
             </Alert>
           )}
-          <Box display="flex" gap={1} flexWrap="wrap">
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              flexWrap: "wrap"
+            }}>
             <Button
               variant="contained"
               onClick={handleSave}

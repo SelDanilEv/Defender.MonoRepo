@@ -4,7 +4,9 @@ import LanguageSwither from "src/components/LanguageSwitcher";
 import ThemeModeToggle from "src/components/ThemeModeToggle";
 
 const HeaderPreferences = () => (
-  <Stack direction="row" alignItems="center" spacing={1}>
+  <Stack direction="row" spacing={1} sx={{
+    alignItems: "center"
+  }}>
     <ThemeModeToggle />
     <LanguageSwither />
   </Stack>

@@ -23,7 +23,7 @@ const useUtils = (): IUtils => {
       locationState: <T>(element: string): T => state[element] as T,
       theme: theme,
     },
-    t: (key: string, options?: object) => t(key, options),
+    t: (key: string, options?: object) => t(key, options as Record<string, unknown>),
     log: (...values) => {
       console.log(values);
     },

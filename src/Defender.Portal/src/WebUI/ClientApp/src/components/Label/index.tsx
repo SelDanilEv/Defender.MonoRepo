@@ -74,7 +74,7 @@ const Label: FC<LabelProps> = ({
   ...rest
 }) => {
   return (
-    <LabelWrapper fontSize={fontSize} className={"MuiLabel-" + color} {...rest}>
+    <LabelWrapper sx={{ fontSize }} className={"MuiLabel-" + color} {...rest}>
       {children}
     </LabelWrapper>
   );

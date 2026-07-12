@@ -25,17 +25,22 @@ function StatusComingSoon() {
       <MainContent>
         <Container maxWidth="md">
           <Logo />
-          <Box textAlign="center" mb={3}>
+          <Box
+            sx={{
+              textAlign: "center",
+              mb: 3
+            }}>
             <Container maxWidth="xs">
               <Typography variant="h1" sx={{ mt: 4, mb: 2 }}>
                 Coming Soon
               </Typography>
               <Typography
                 variant="h3"
-                color="text.secondary"
-                fontWeight="normal"
-                sx={{ mb: 4 }}
-              >
+                sx={{
+                  color: "text.secondary",
+                  fontWeight: "normal",
+                  mb: 4
+                }}>
                 We're working on implementing the last features before our
                 launch!
               </Typography>

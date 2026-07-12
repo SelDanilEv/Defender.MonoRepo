@@ -1,5 +1,5 @@
 import { Box, Card, Grid, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import RequestParamsBuilder from "src/api/APIWrapper/RequestParamsBuilder";
@@ -16,6 +16,7 @@ interface ActiveDrawsProps {}
 
 const ActiveDraws = (props: ActiveDrawsProps) => {
   const u = useUtils();
+  const reloadActiveDrawsRef = useRef<() => void>(() => undefined);
 
   const [draws, setDraws] = useState<LotteryDraw[]>([]);
 
@@ -27,7 +28,7 @@ const ActiveDraws = (props: ActiveDrawsProps) => {
   );
 
   useEffect(() => {
-    reloadActiveDraws();
+    reloadActiveDrawsRef.current();
   }, [paginationRequest]);
 
   let isReloading = false;
@@ -60,6 +61,7 @@ const ActiveDraws = (props: ActiveDrawsProps) => {
       showError: true,
     });
   };
+  reloadActiveDrawsRef.current = reloadActiveDraws;
 
   const renderDrawCard = (draw: LotteryDraw, index: number) => {
     return <DrawCard draw={draw} reloadActiveDraws={reloadActiveDraws} />;
@@ -78,13 +80,20 @@ const ActiveDraws = (props: ActiveDrawsProps) => {
         <Typography align="center" variant="h3" component="div">
           {u.t("lottery:active_draws_title")}
         </Typography>
-        <LockedButton variant="outlined" onClick={reloadActiveDraws}>
+        <LockedButton aria-label="Refresh active draws" variant="outlined" onClick={reloadActiveDraws}>
           <CachedIcon />
         </LockedButton>
       </Box>
-      <Grid container spacing={2} p={1}>
+      <Grid container spacing={2} sx={{
+        p: 1
+      }}>
         {draws.map((draw, index) => (
-          <Grid key={draw.drawNumber || index} item xs={12} sm={6}>
+          <Grid
+            key={draw.drawNumber || index}
+            size={{
+              xs: 12,
+              sm: 6
+            }}>
             {renderDrawCard(draw, index)}
           </Grid>
         ))}

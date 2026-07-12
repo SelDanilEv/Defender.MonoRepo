@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   Divider,
-  Hidden,
   lighten,
   List,
   ListItemButton,
@@ -62,6 +61,8 @@ const UserBoxDescription = styled(Typography)(
 
 const HeaderUserbox = (props: any) => {
   let u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
 
   const ref = useRef<any>(null);
   const [isOpen, setOpen] = useState<boolean>(false);
@@ -82,7 +83,7 @@ const HeaderUserbox = (props: any) => {
       const userFromSession = UserService.GetUserInfoFromSession(props.session);
 
       setUser(userFromSession);
-      setRoleToDisplay(UserService.RoleToDisplay(u, userFromSession.Role));
+      setRoleToDisplay(UserService.RoleToDisplay(utilsRef.current, userFromSession.Role));
     }
   }, [props.session]);
 
@@ -95,17 +96,17 @@ const HeaderUserbox = (props: any) => {
     <>
       <UserBoxButton color="secondary" ref={ref} onClick={handleOpen}>
         <Avatar variant="rounded" alt={user?.Nickname} src={user?.Avatar} />
-        <Hidden mdDown>
+        <Box sx={{ display: { xs: "none", lg: "block" } }}>
           <UserBoxText>
             <UserBoxLabel variant="body1">{user?.Nickname}</UserBoxLabel>
             <UserBoxDescription variant="body2">
               {roleToDisplay}
             </UserBoxDescription>
           </UserBoxText>
-        </Hidden>
-        <Hidden smDown>
+        </Box>
+        <Box sx={{ display: { xs: "none", md: "block" } }}>
           <ExpandMoreTwoToneIcon sx={{ ml: 1 }} />
-        </Hidden>
+        </Box>
       </UserBoxButton>
       <Popover
         anchorEl={ref.current}
@@ -119,13 +120,15 @@ const HeaderUserbox = (props: any) => {
           vertical: "top",
           horizontal: "right",
         }}
-        PaperProps={{
-          sx: {
-            minWidth: 194,
-          },
+        slotProps={{
+          paper: {
+            sx: {
+              minWidth: 194,
+            },
+          }
         }}
       >
-        <MenuUserBox sx={{ minWidth: 194 }} display="flex">
+        <MenuUserBox sx={{ minWidth: 194, display: "flex" }}>
           <Avatar
             variant="rounded"
             alt={user?.Nickname}
@@ -149,8 +152,10 @@ const HeaderUserbox = (props: any) => {
           >
             <AccountBoxTwoToneIcon fontSize="small" />
             <ListItemText
-              primaryTypographyProps={{ ml: "8px", fontSize: "0.95rem", lineHeight: 1.2 }}
               primary={u.t("sidebar_header__menu_profile")}
+              slotProps={{
+                primary: { sx: { ml: "8px", fontSize: "0.95rem", lineHeight: 1.2 } }
+              }}
             />
           </ListItemButton>
           <Divider sx={{ my: 0.25 }} />
@@ -160,8 +165,10 @@ const HeaderUserbox = (props: any) => {
           >
             <LockOpenTwoToneIcon fontSize="small" />
             <ListItemText
-              primaryTypographyProps={{ ml: "8px", fontSize: "0.95rem", lineHeight: 1.2 }}
               primary={u.t("sidebar_header__menu_logout")}
+              slotProps={{
+                primary: { sx: { ml: "8px", fontSize: "0.95rem", lineHeight: 1.2 } }
+              }}
             />
           </ListItemButton>
         </List>

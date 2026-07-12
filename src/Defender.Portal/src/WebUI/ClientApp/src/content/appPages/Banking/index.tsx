@@ -10,7 +10,12 @@ const BankingPage = (props: any) => {
   const u = useUtils();
 
   return (
-    <Box display="flex" flexDirection="column" gap={1}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 1
+      }}>
       <WalletAccountsInfo />
       <TransfersPanel />
       <TransactionHistory />

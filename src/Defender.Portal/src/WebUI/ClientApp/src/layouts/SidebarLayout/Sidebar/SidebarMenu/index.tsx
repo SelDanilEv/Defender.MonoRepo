@@ -31,7 +31,9 @@ const SidebarMenu = () => {
   return (
     <>
       <MenuWrapper>
-        <Box height={12} />
+        <Box sx={{
+          height: 12
+        }} />
         <RoleBasedMenu />
       </MenuWrapper>
     </>

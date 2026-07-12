@@ -46,13 +46,6 @@ const parseJsonSafe = async <T>(response: Response): Promise<T | null> => {
   }
 };
 
-const withAuth = (options: RequestInit): RequestInit => {
-  return {
-    ...options,
-    credentials: options.credentials ?? "same-origin",
-  };
-};
-
 export const foodAdvisorApi = {
   getPreferences: (utils?: IUtils | null) =>
     new Promise<PreferencesDto | null>((resolve) => {
@@ -185,18 +178,17 @@ export const foodAdvisorApi = {
       const formData = new FormData();
       files.forEach((f) => formData.append("files", f));
       const url = `${apiUrls.foodAdvisor.uploadImages}/${sessionId}/upload`;
-      fetch(url, withAuth({ method: "POST", body: formData }))
-        .then(async (res) => {
-          if (res.ok) {
-            const data = await parseJsonSafe<string[]>(res);
-            resolve(Array.isArray(data) ? data : []);
-          } else {
-            const err = await parseJsonSafe<{ detail?: string }>(res);
-            utils?.e?.(err?.detail);
-            reject();
-          }
-        })
-        .catch(reject);
+      APICallWrapper({
+        url,
+        options: { method: "POST", body: formData },
+        utils,
+        onSuccess: async (res) => {
+          const data = await parseJsonSafe<string[]>(res);
+          resolve(Array.isArray(data) ? data : []);
+        },
+        onFailure: async (failure) => reject(failure),
+        showError: true,
+      });
     }),
 
   confirmMenu: (

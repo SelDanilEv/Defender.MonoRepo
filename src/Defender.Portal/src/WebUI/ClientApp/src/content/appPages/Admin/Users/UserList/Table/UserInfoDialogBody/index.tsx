@@ -8,7 +8,7 @@ import { UserOnlyInfo } from "src/models/UserOnlyInfo";
 
 const HorizontalDivider = () => {
   return (
-    <Grid item xs={12} style={{ paddingTop: 0 }}>
+    <Grid style={{ paddingTop: 0 }} size={12}>
       <Divider />
     </Grid>
   );
@@ -28,14 +28,19 @@ const UserInfoDialogBody = (props: any) => {
     <Grid
       container
       spacing={3}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
       {user.id && (
         <>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             {user.id}
           </Grid>
         </>
@@ -43,10 +48,18 @@ const UserInfoDialogBody = (props: any) => {
       {user.email && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("admin_users_page__user_info_dialog_email_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {user.email}
           </Grid>
         </>
@@ -54,10 +67,18 @@ const UserInfoDialogBody = (props: any) => {
       {user.nickname && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("admin_users_page__user_info_dialog_nickname_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {user.nickname}
           </Grid>
         </>
@@ -65,10 +86,18 @@ const UserInfoDialogBody = (props: any) => {
       {user.phoneNumber && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("admin_users_page__user_info_dialog_phone_number_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {user.phoneNumber}
           </Grid>
         </>
@@ -76,10 +105,18 @@ const UserInfoDialogBody = (props: any) => {
       {user.createdDate && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("admin_users_page__user_info_dialog_created_date_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {format(new Date(user.createdDate), "dd MMMM yyyy  hh:mm", {
               locale: DateLocales[currentLanguage],
             })}

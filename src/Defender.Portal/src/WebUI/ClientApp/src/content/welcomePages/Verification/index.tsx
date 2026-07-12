@@ -14,12 +14,14 @@ import { connect } from "react-redux";
 
 const Verification = (props: any) => {
   const u = useUtils();
+  const intervalRef = React.useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
-  React.useEffect(() => {
-    checkVerification();
-  // Initial verification check runs once; polling handles later checks.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const stopPolling = () => {
+    if (intervalRef.current !== undefined) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = undefined;
+    }
+  };
 
   const checkVerification = () => {
     APICallWrapper({
@@ -37,11 +39,11 @@ const Verification = (props: any) => {
         if (!verificationResponse.isVerified) {
           return;
         }
-        clearInterval(task);
+        stopPolling();
         u.react.navigate("/home");
       },
       onFailure: async (response) => {
-        clearInterval(task);
+        stopPolling();
         props.logout();
         u.react.navigate("/");
       },
@@ -49,6 +51,19 @@ const Verification = (props: any) => {
       doLock: false,
     });
   };
+  const checkVerificationRef = React.useRef(checkVerification);
+  checkVerificationRef.current = checkVerification;
+
+  React.useEffect(() => {
+    checkVerificationRef.current();
+
+    intervalRef.current = setInterval(
+      () => checkVerificationRef.current(),
+      10 * 1000,
+    );
+
+    return () => stopPolling();
+  }, []);
 
   const resendVerification = () => {
     APICallWrapper({
@@ -69,15 +84,15 @@ const Verification = (props: any) => {
     });
   };
 
-  const task = setInterval(checkVerification, 10 * 1000);
-
   return (
     <AuthPageShell
       title={u.t("welcome:verification_title")}
       description={u.t("welcome:verification_description")}
     >
       <Stack spacing={3}>
-      <Typography color="text.secondary">
+      <Typography sx={{
+        color: "text.secondary"
+      }}>
         {u.t("welcome:email_verification_description")}
       </Typography>
       <LockedButton
@@ -88,8 +103,12 @@ const Verification = (props: any) => {
       >
         {u.t("welcome:resend_verification_email")}
       </LockedButton>
-      <Box textAlign="center">
-        <Link component={RouterLink} to="/welcome/login" fontWeight={700} onClick={() => clearInterval(task)}>
+      <Box sx={{
+        textAlign: "center"
+      }}>
+        <Link component={RouterLink} to="/welcome/login" onClick={stopPolling} sx={{
+          fontWeight: 700
+        }}>
           {u.t("welcome:back_to_login_page")}
         </Link>
       </Box>

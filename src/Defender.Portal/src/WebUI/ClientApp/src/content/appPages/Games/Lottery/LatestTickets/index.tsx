@@ -34,7 +34,9 @@ const LatestTickets = (props: LatestTicketsProps) => {
             pr: 0.5,
           }}
         >
-          <Typography variant="h5" color="text.secondary" gutterBottom>
+          <Typography variant="h5" gutterBottom sx={{
+            color: "text.secondary"
+          }}>
             {u.t("lottery:latest_tickets_draw_label")}
             {ticket.drawNumber}
           </Typography>
@@ -71,12 +73,21 @@ const LatestTickets = (props: LatestTicketsProps) => {
 
   return (
     <Card sx={{ p: 0 }}>
-      <Typography margin={1.3} align="center" variant="h4" component="div">
+      <Typography align="center" variant="h4" component="div" sx={{
+        margin: 1.3
+      }}>
         {u.t("lottery:latest_tickets_title")}
       </Typography>
-      <Grid container spacing={1} p={1}>
+      <Grid container spacing={1} sx={{
+        p: 1
+      }}>
         {props.LatestTickets.map((ticket, index) => (
-          <Grid item xs={6} sm={12} key={index}>
+          <Grid
+            key={index}
+            size={{
+              xs: 6,
+              sm: 12
+            }}>
             {renderTicketCard(ticket, index)}
           </Grid>
         ))}

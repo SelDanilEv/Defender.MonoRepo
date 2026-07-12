@@ -51,7 +51,11 @@ const CreateAccountDialogBody = (props: any) => {
 
   return (
     <Box>
-      <Box display="flex" alignItems="center">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center"
+        }}>
         <Typography variant="h6" style={{ marginRight: "1em" }}>
           {u.t("banking_page__wallet_dialog_label_currency")}:
         </Typography>
@@ -70,7 +74,12 @@ const CreateAccountDialogBody = (props: any) => {
             : null}
         </Select>
       </Box>
-      <Box pt={"5px"} display="flex" justifyContent="center">
+      <Box
+        sx={{
+          pt: "5px",
+          display: "flex",
+          justifyContent: "center"
+        }}>
         <LockedButton
           disabled={!currency}
           variant="outlined"

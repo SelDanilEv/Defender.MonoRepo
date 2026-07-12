@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 import React from "react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { connect } from "react-redux";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import RequestParamsBuilder from "src/api/APIWrapper/RequestParamsBuilder";
@@ -14,6 +14,7 @@ import { TargetWalletInfo } from "src/models/responses/banking/transactions/Targ
 
 const StartTransferDialogBody = (props: any) => {
   const u = useUtils();
+  const loadTargetWalletInfoRef = useRef<() => void>(() => undefined);
 
   const request = props.transferRequest as TransferRequest;
 
@@ -21,7 +22,7 @@ const StartTransferDialogBody = (props: any) => {
 
   React.useEffect(() => {
     setTargetWalletInfo(undefined);
-    loadTargetWalletInfo();
+    loadTargetWalletInfoRef.current();
   }, [props.isDialogOpen]);
 
   const closeDialog = () => {
@@ -60,6 +61,7 @@ const StartTransferDialogBody = (props: any) => {
       showError: true,
     });
   };
+  loadTargetWalletInfoRef.current = loadTargetWalletInfo;
 
   const handleTransfer = () => {
     const requestToApi = { ...request };
@@ -87,34 +89,63 @@ const StartTransferDialogBody = (props: any) => {
     <Grid
       container
       spacing={3}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
-      <Grid item xs={12} sm={8}>
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 8
+        }}>
         {u.t("banking_page__transfer_wallet_number_label")}:
       </Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 4
+        }}>
         {request.walletNumber}
       </Grid>
-      <Grid item xs={12} sm={8}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 8
+        }}>
         {u.t("banking_page__transfer_owner_name_label")}:
       </Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 4
+        }}>
         {targetWalletInfo
           ? targetWalletInfo.ownerName.length > 15
             ? `${targetWalletInfo.ownerName.substring(0, 12)}...`
             : targetWalletInfo.ownerName
           : `${u.t("Loading")} ...`}
       </Grid>
-      <Grid item xs={12} sm={8}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 8
+        }}>
         {u.t("banking_page__transfer_amount_label")}:
       </Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 4
+        }}>
         {request.amount} {CurrencySymbolsMap[request.currency]}
       </Grid>
-      <Grid item xs={12} sm={12}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
         <LockedButton
           disabled={!targetWalletInfo}
           onClick={handleTransfer}

@@ -65,11 +65,11 @@ const Verification = (props: any) => {
       showError: true,
     });
   };
+  const checkParametersRef = React.useRef(checkParameters);
 
   React.useEffect(() => {
-    checkParameters();
+    void checkParametersRef.current();
   // Query parameters are consumed once when verification page mounts.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const GetStatus = () => {
@@ -103,10 +103,18 @@ const Verification = (props: any) => {
       title={u.t("welcome:verify_email_title")}
       description={u.t("welcome:verify_email_description")}
     >
-      <Stack spacing={4} alignItems="stretch">
-        <Box textAlign="center">{GetStatus()}</Box>
-        <Box textAlign="center">
-          <Link component={RouterLink} to="/welcome/login" fontWeight={700}>
+      <Stack spacing={4} sx={{
+        alignItems: "stretch"
+      }}>
+        <Box sx={{
+          textAlign: "center"
+        }}>{GetStatus()}</Box>
+        <Box sx={{
+          textAlign: "center"
+        }}>
+          <Link component={RouterLink} to="/welcome/login" sx={{
+            fontWeight: 700
+          }}>
             {u.t("welcome:back_to_login_page")}
           </Link>
         </Box>

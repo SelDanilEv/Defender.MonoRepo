@@ -32,15 +32,14 @@ const SidebarWrapper = styled(Box)(
 const SidebarLogo = () => {
   return (
     <Box
-      mx={1.5}
       sx={{
+        mx: 1.5,
         width: "calc(100% - 24px)",
         minHeight: 52,
         display: "flex",
         alignItems: "center",
-        gap: 1.8,
-      }}
-    >
+        gap: 1.8
+      }}>
       <Logo compact height={46} width={46} />
       <Typography
         variant="body2"
@@ -64,7 +63,9 @@ const SideScrollbar = () => {
 
   return (
     <Scrollbar>
-      <Box mt={2}>
+      <Box sx={{
+        mt: 2
+      }}>
         <SidebarLogo />
       </Box>
       <Divider

@@ -8,7 +8,7 @@ import LotteryTicket from "src/models/games/lottery/LotteryTicket";
 
 const HorizontalDivider = () => {
   return (
-    <Grid item xs={12} style={{ paddingTop: 0 }}>
+    <Grid style={{ paddingTop: 0 }} size={12}>
       <Divider />
     </Grid>
   );
@@ -28,17 +28,26 @@ const TicketInfoDialogBody = (props: any) => {
     <Grid
       container
       spacing={3}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
       {ticket.drawNumber >= 0 && (
         <>
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("lottery:ticket_info_dialog_draw_id_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {ticket.drawNumber}
           </Grid>
         </>
@@ -46,10 +55,18 @@ const TicketInfoDialogBody = (props: any) => {
       {ticket.ticketNumber && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("lottery:ticket_info_dialog_ticket_number_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {ticket.ticketNumber}
           </Grid>
         </>
@@ -57,10 +74,18 @@ const TicketInfoDialogBody = (props: any) => {
       {ticket.amount && ticket.currency && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("lottery:ticket_info_dialog_amount_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {ticket.amount / 100} {CurrencySymbolsMap[ticket.currency]}
           </Grid>
         </>
@@ -68,10 +93,18 @@ const TicketInfoDialogBody = (props: any) => {
       {ticket.paymentTransactionId && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("lottery:ticket_info_dialog_payment_trans_id_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {ticket.paymentTransactionId}
           </Grid>
         </>
@@ -79,10 +112,18 @@ const TicketInfoDialogBody = (props: any) => {
       {ticket.prizeTransactionId && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("lottery:ticket_info_dialog_prize_trans_id_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {ticket.prizeTransactionId}
           </Grid>
         </>
@@ -90,10 +131,18 @@ const TicketInfoDialogBody = (props: any) => {
       {ticket.prizePaidAmount > 0 && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("lottery:ticket_info_dialog_prize_amount_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {ticket.prizePaidAmount / 100} {CurrencySymbolsMap[ticket.currency]}
           </Grid>
         </>
@@ -101,10 +150,18 @@ const TicketInfoDialogBody = (props: any) => {
       {ticket.status && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("lottery:ticket_info_dialog_status_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {mapTicketStatus(u, ticket.status)}
           </Grid>
           {HorizontalDivider()}

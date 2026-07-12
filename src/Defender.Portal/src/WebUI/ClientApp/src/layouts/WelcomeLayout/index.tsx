@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { FC } from "react";
 import PropTypes from "prop-types";
 import { Outlet, useLocation } from "react-router-dom";
@@ -43,30 +43,32 @@ const WelcomeLayout: FC = (props: any) => {
   const session = props.session as Session;
 
   const u = useUtils();
+  const sessionRef = useRef(session);
+  const utilsRef = useRef(u);
+  const logoutRef = useRef(props.logout);
   const location = useLocation();
   const isModernAuthPage = modernAuthRoutes.includes(location.pathname);
 
   // Session validation is intentionally performed once when the welcome layout mounts.
   useEffect(() => {
-    if (session.isAuthenticated) {
+    if (sessionRef.current.isAuthenticated) {
       APICallWrapper({
         url: apiUrls.home.authcheck,
         options: {
           method: "GET",
         },
-        utils: u,
+        utils: utilsRef.current,
         onSuccess: async (response) => {
-          AuthorizationService.HandleLoginAttempt(u, session);
+          AuthorizationService.HandleLoginAttempt(utilsRef.current, sessionRef.current);
         },
         onFailure: async (response) => {
           if (response.status == 401) {
-            logoutPortal(u, props.logout);
+            logoutPortal(utilsRef.current, logoutRef.current);
           }
         },
         showError: false,
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (isModernAuthPage) {
@@ -101,7 +103,12 @@ const WelcomeLayout: FC = (props: any) => {
             </Box>
           </Box>
 
-          <Box display="flex" justifyContent="center" alignItems="center">
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center"
+            }}>
             <Card
               sx={{
                 py: 4,
@@ -111,7 +118,11 @@ const WelcomeLayout: FC = (props: any) => {
                 borderRadius: 5,
               }}
             >
-              <Box maxWidth="lg" sx={{ textAlign: "center" }}>
+              <Box
+                sx={{
+                  maxWidth: "lg",
+                  textAlign: "center"
+                }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -120,7 +131,12 @@ const WelcomeLayout: FC = (props: any) => {
                     width: "auto",
                   }}
                 >
-                  <Box display="flex" flexDirection="column" gap="5px">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px"
+                    }}>
                     {u.t("welcome:welcome_to")}
                     <TypographyH1 sx={{ mb: 2 }} variant="h1">
                       {u.t("welcome:name_of_app")}

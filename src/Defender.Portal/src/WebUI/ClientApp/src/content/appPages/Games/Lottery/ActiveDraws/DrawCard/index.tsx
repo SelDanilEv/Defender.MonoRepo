@@ -1,12 +1,15 @@
 import { Card, Box, Typography, Grid } from "@mui/material";
 import { reloadResources } from "i18next";
-import moment from "moment";
-import { useState, useEffect } from "react";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import { useState, useEffect, useRef } from "react";
 import { connect } from "react-redux";
 import useUtils from "src/appUtils";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
 import CurrencySymbolsMap from "src/consts/CurrencySymbolsMap";
 import LotteryDraw, { getDrawName } from "src/models/games/lottery/LotteryDraw";
+
+dayjs.extend(duration);
 
 interface DrawCardProps {
   draw: LotteryDraw;
@@ -20,6 +23,10 @@ const DrawCard: React.FC<DrawCardProps> = ({
   currentLanguage,
 }) => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
+  const reloadActiveDrawsRef = useRef(reloadActiveDraws);
+  reloadActiveDrawsRef.current = reloadActiveDraws;
 
   const [timeLeft, setTimeLeft] = useState<string>("");
 
@@ -32,33 +39,23 @@ const DrawCard: React.FC<DrawCardProps> = ({
 
   useEffect(() => {
     const timer = setInterval(() => {
-      const daysLeft = moment(draw.endDate).diff(moment(), "days");
+      const remainingMilliseconds = dayjs(draw.endDate).diff(dayjs());
+      const daysLeft = dayjs(draw.endDate).diff(dayjs(), "days");
       const timeLeft =
         daysLeft > 0
-          ? `${daysLeft} ${u.t("lottery:active_draws_days_left")}`
+          ? `${daysLeft} ${utilsRef.current.t("lottery:active_draws_days_left")}`
           : "";
-      const hoursMinutesSecondsLeft = moment
-        .utc(moment(draw.endDate).diff(moment()))
+      const hoursMinutesSecondsLeft = dayjs
+        .duration(Math.max(remainingMilliseconds, 0))
         .format("HH:mm:ss");
 
-      if (
+      setAllowedToPlay(
         daysLeft > 0 ||
-        (!allowedToPlay &&
-          getSeconds(hoursMinutesSecondsLeft) > getSeconds("00:05:00"))
-      ) {
-        setAllowedToPlay(true);
-      }
-
-      if (
-        allowedToPlay &&
-        daysLeft <= 0 &&
-        getSeconds(hoursMinutesSecondsLeft) <= getSeconds("00:05:00")
-      ) {
-        setAllowedToPlay(false);
-      }
+          getSeconds(hoursMinutesSecondsLeft) > getSeconds("00:05:00")
+      );
 
       if (daysLeft <= 0 && hoursMinutesSecondsLeft === "00:00:00") {
-        reloadActiveDraws();
+        reloadActiveDrawsRef.current();
       }
 
       setTimeLeft(timeLeft + hoursMinutesSecondsLeft);
@@ -81,18 +78,28 @@ const DrawCard: React.FC<DrawCardProps> = ({
       }}
     >
       <Box
-        width="95%"
-        display="flex"
-        flexDirection={"row"}
-        justifyContent="space-between"
-      >
+        sx={{
+          width: "95%",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between"
+        }}>
         <Card sx={{ width: "fit-content" }}>
-          <Typography p={0.7}>{timeLeft}</Typography>
+          <Typography sx={{
+            p: 0.7
+          }}>{timeLeft}</Typography>
         </Card>
         <Card sx={{ width: "fit-content" }}>
-          <Typography p={0.7}>{`#${draw.drawNumber}`}</Typography>
+          <Typography sx={{
+            p: 0.7
+          }}>{`#${draw.drawNumber}`}</Typography>
         </Card>
-        <Box display="flex" flexDirection={"row"} sx={{ gap: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            gap: 1
+          }}>
           {draw.allowedCurrencies.map((currency) => (
             <Card key={currency} sx={{ px: 1, height: "1.5em" }}>
               {CurrencySymbolsMap[currency]}

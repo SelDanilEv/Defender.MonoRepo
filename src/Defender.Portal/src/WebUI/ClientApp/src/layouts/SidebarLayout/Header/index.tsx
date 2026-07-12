@@ -44,10 +44,10 @@ function Header() {
 
   return (
     <HeaderWrapper
-      display="flex"
-      flexDirection="row-reverse"
-      alignItems="right"
       sx={{
+        display: "flex",
+        flexDirection: "row-reverse",
+        alignItems: "right",
         boxShadow:
           theme.palette.mode === "dark"
             ? `0 1px 0 ${alpha(
@@ -63,7 +63,11 @@ function Header() {
               )}`,
       }}
     >
-      <Box display="flex" alignItems="center">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center"
+        }}>
         <HeaderPreferences />
         <HeaderButtons />
         <HeaderUserbox />

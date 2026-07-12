@@ -76,8 +76,16 @@ const UpdateAccount = (props: UpdateAccountInfoProps) => {
 
   return (
     <>
-      <Grid item xs={6} sm={3}>
-        <Box display="flex" justifyContent="center">
+      <Grid
+        size={{
+          xs: 6,
+          sm: 3
+        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center"
+          }}>
           <FormControlLabel
             labelPlacement="start"
             control={
@@ -93,8 +101,16 @@ const UpdateAccount = (props: UpdateAccountInfoProps) => {
           />
         </Box>
       </Grid>
-      <Grid item xs={6} sm={3}>
-        <Box display="flex" justifyContent="center">
+      <Grid
+        size={{
+          xs: 6,
+          sm: 3
+        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center"
+          }}>
           <FormControlLabel
             labelPlacement="start"
             control={
@@ -110,8 +126,16 @@ const UpdateAccount = (props: UpdateAccountInfoProps) => {
           />
         </Box>
       </Grid>
-      <Grid item xs={6} sm={3}>
-        <Box display="flex" justifyContent="center">
+      <Grid
+        size={{
+          xs: 6,
+          sm: 3
+        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center"
+          }}>
           <FormControlLabel
             labelPlacement="start"
             control={
@@ -127,8 +151,16 @@ const UpdateAccount = (props: UpdateAccountInfoProps) => {
           />
         </Box>
       </Grid>
-      <Grid item xs={6} sm={3}>
-        <Box display="flex" justifyContent="center">
+      <Grid
+        size={{
+          xs: 6,
+          sm: 3
+        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center"
+          }}>
           <LockedSelect
             disabled={!isSuperAdmin}
             name={updateParams.role}

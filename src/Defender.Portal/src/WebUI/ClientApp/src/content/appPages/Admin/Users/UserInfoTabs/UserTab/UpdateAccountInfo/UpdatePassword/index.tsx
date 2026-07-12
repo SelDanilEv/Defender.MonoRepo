@@ -79,21 +79,31 @@ const UpdatePassword = (props: UpdatePasswordProps) => {
 
   return (
     <>
-      <Grid item xs={12} sm={8}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 8
+        }}>
         <TextField
           type="password"
           name={updateParams.newPassword}
           label={u.t(
             "admin_users_page__info_user_tab_account_info_new_password_label"
           )}
-          InputProps={{ style: { fontSize: "1.5em" } }}
           value={updateRequest.newPassword}
           onChange={handleUpdatePasswordField}
           variant="outlined"
           fullWidth
+          slotProps={{
+            input: { style: { fontSize: "1.5em" } }
+          }}
         />
       </Grid>
-      <Grid item xs={12} sm={4}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 4
+        }}>
         <LockedButton
           disabled={!isUpdateAllowed}
           onClick={handleUpdate}

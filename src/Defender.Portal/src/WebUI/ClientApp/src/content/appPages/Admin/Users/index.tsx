@@ -45,7 +45,12 @@ const AdminUsersPage = (props: any) => {
   };
 
   return (
-    <Box display="flex" flexDirection="column" gap={1}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: 1
+      }}>
       <UserList searchFullUserInfo={searchFullUserInfo} />
       <SearchUserPannel searchFullUserInfo={searchFullUserInfo} />
       <UserInfoTabs

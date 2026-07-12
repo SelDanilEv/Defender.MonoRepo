@@ -61,9 +61,12 @@ const LockedChipList = ({
       {label && (
         <Typography
           variant="caption"
-          color="text.secondary"
-          sx={{ display: "block", mb: 0.75, textTransform: "none" }}
-        >
+          sx={{
+            color: "text.secondary",
+            display: "block",
+            mb: 0.75,
+            textTransform: "none"
+          }}>
           {label}
         </Typography>
       )}
@@ -118,7 +121,12 @@ const LockedChipList = ({
         />
       </Box>
       {helperText && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.75 }}>
+        <Typography
+          variant="caption"
+          sx={{
+            color: "text.secondary",
+            mt: 0.75
+          }}>
           {helperText}
         </Typography>
       )}

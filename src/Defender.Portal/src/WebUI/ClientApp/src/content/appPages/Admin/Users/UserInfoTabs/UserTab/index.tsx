@@ -19,13 +19,13 @@ const UserTab = (props: UserTabProps) => {
 
   return (
     <Grid container spacing={1}>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <BasicInfo userInfo={userInfo} />
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <UpdateUserInfo userInfo={userInfo} />
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={12}>
         <UpdateAccountInfo accountInfo={userInfo} />
       </Grid>
     </Grid>

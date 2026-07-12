@@ -16,28 +16,35 @@ const Login = () => {
       title={u.t("welcome:login_welcome_back")}
       description={u.t("welcome:login_continue_description")}
     >
-          <LoginByGoogle fullWidth />
-          <LineWithText
-            margin_x="18px"
-            height="1px"
-            width_lg="100%"
-            width_md="100%"
-            width_xs="100%"
-            text={u.t("welcome:or")}
-            gap="12px"
-          />
-          <LoginForm />
-          <Typography color="text.secondary" textAlign="center" sx={{ mt: 3 }}>
-            {u.t("welcome:login_new_here")} {" "}
-            <Link
-              component={RouterLink}
-              to="/welcome/create"
-              fontWeight={700}
-              underline="hover"
-            >
-              {u.t("welcome:login_create_account")}
-            </Link>
-          </Typography>
+      <LoginByGoogle fullWidth />
+      <LineWithText
+        margin_x="18px"
+        height="1px"
+        width_lg="100%"
+        width_md="100%"
+        width_xs="100%"
+        text={u.t("welcome:or")}
+        gap="12px"
+      />
+      <LoginForm />
+      <Typography
+        sx={{
+          color: "text.secondary",
+          textAlign: "center",
+          mt: 3
+        }}>
+        {u.t("welcome:login_new_here")} {" "}
+        <Link
+          component={RouterLink}
+          to="/welcome/create"
+          underline="hover"
+          sx={{
+            fontWeight: 700
+          }}
+        >
+          {u.t("welcome:login_create_account")}
+        </Link>
+      </Typography>
     </AuthPageShell>
   );
 };

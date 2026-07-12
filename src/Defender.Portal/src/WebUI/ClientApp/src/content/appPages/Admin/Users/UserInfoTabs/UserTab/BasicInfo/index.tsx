@@ -19,11 +19,13 @@ const BasicInfo = (props: BasicInfoProps) => {
 
   return (
     <Box
-      sx={{ fontSize: "1.3em", py: "1em" }}
-      display={"flex"}
-      flexDirection={u.isMobile ? "column" : "row"}
-      justifyContent={"space-evenly"}
-    >
+      sx={{
+        display: "flex",
+        flexDirection: u.isMobile ? "column" : "row",
+        justifyContent: "space-evenly",
+        fontSize: "1.3em",
+        py: "1em"
+      }}>
       <Typography align="center">
         {u.t("admin_users_page__info_user_tab_user_id")}: {userInfo.id}
       </Typography>

@@ -87,7 +87,11 @@ const UserInfoTabs = (props: UserInfoTabsProps) => {
     <>
       <Card>
         <CardContent>
-          <Box display="flex" flexDirection={"row"}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row"
+            }}>
             <Box sx={{ maxWidth: "60%", overflow: "hidden" }}>
               <Tabs
                 variant="standard"

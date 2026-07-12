@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import { ThemeProvider } from "@mui/material";
-import { StylesProvider } from "@mui/styles";
 
 import { themeCreator } from "./base";
 import {
@@ -16,7 +15,7 @@ export const ThemeContext = React.createContext({
   toggleTheme: (): void => {},
 });
 
-const ThemeProviderWrapper: React.FC = (props) => {
+const ThemeProviderWrapper = (props: PropsWithChildren) => {
   const curThemeName = normalizeThemeName(
     localStorage.getItem(APP_THEME_STORAGE_KEY)
   );
@@ -32,11 +31,9 @@ const ThemeProviderWrapper: React.FC = (props) => {
   };
 
   return (
-    <StylesProvider injectFirst>
-      <ThemeContext.Provider value={{ themeName, setThemeName, toggleTheme }}>
-        <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
-      </ThemeContext.Provider>
-    </StylesProvider>
+    <ThemeContext.Provider value={{ themeName, setThemeName, toggleTheme }}>
+      <ThemeProvider theme={theme}>{props.children}</ThemeProvider>
+    </ThemeContext.Provider>
   );
 };
 

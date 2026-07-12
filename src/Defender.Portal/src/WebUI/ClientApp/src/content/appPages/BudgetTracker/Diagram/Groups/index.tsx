@@ -1,5 +1,5 @@
 import { Card } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
@@ -21,6 +21,7 @@ interface GroupsSubPageProps {
 
 const GroupsSubPage = (props: GroupsSubPageProps) => {
   const u = useUtils();
+  const reloadItemsRef = useRef<() => void>(() => undefined);
 
   const [items, setItems] = useState<BudgetDiagramGroup[]>([]);
 
@@ -45,7 +46,7 @@ const GroupsSubPage = (props: GroupsSubPageProps) => {
   } as CurrentPagination);
 
   useEffect(() => {
-    reloadItems();
+    reloadItemsRef.current();
   }, [paginationRequest]);
 
   const reloadItems = () => {
@@ -73,6 +74,7 @@ const GroupsSubPage = (props: GroupsSubPageProps) => {
       showError: true,
     });
   };
+  reloadItemsRef.current = reloadItems;
 
   return (
     <Card>

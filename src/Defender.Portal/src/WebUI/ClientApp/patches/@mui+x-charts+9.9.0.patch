@@ -1,0 +1,54 @@
+diff --git a/node_modules/@mui/x-charts/internals/Flatbush.d.mts b/node_modules/@mui/x-charts/internals/Flatbush.d.mts
+index c1fbdb6..336ae8b 100644
+--- a/node_modules/@mui/x-charts/internals/Flatbush.d.mts
++++ b/node_modules/@mui/x-charts/internals/Flatbush.d.mts
+@@ -1,3 +1,10 @@
++interface FlatQueue<T> {
++  readonly length: number;
++  push(item: T, value: number): void;
++  pop(): T | undefined;
++  peek(): T | undefined;
++  peekValue(): number | undefined;
++}
+ type TypedArrayConstructor = Int8ArrayConstructor | Uint8ArrayConstructor | Uint8ClampedArrayConstructor | Int16ArrayConstructor | Uint16ArrayConstructor | Int32ArrayConstructor | Uint32ArrayConstructor | Float32ArrayConstructor | Float64ArrayConstructor;
+ export declare class Flatbush {
+   _queue: FlatQueue<number>;
+diff --git a/node_modules/@mui/x-charts/internals/plugins/featurePlugins/useChartCartesianAxis/useChartCartesianAxis.types.d.mts b/node_modules/@mui/x-charts/internals/plugins/featurePlugins/useChartCartesianAxis/useChartCartesianAxis.types.d.mts
+index bf4506a..39ef1cc 100644
+--- a/node_modules/@mui/x-charts/internals/plugins/featurePlugins/useChartCartesianAxis/useChartCartesianAxis.types.d.mts
++++ b/node_modules/@mui/x-charts/internals/plugins/featurePlugins/useChartCartesianAxis/useChartCartesianAxis.types.d.mts
+@@ -11,8 +11,8 @@ import type { SamplingState } from "./sampling.types.mjs";
+  * The axes' configuration after computing.
+  * An axis in this state already contains a scale function and all the necessary properties to be rendered.
+  */
+-export type ComputedAxisConfig<AxisProps extends ChartsAxisProps> = {
+-  [axisId: AxisId]: ComputedAxis<ScaleName, any, AxisProps>;
++export type ComputedAxisConfig<AxisProps> = {
++  [axisId: AxisId]: AxisProps extends ChartsAxisProps ? ComputedAxis<ScaleName, any, AxisProps> : AxisProps;
+ };
+ export interface UseChartCartesianAxisParameters<S extends ScaleName = ScaleName> {
+   /**
+diff --git a/node_modules/@mui/x-charts/models/axis.d.mts b/node_modules/@mui/x-charts/models/axis.d.mts
+index 48b693a..443722e 100644
+--- a/node_modules/@mui/x-charts/models/axis.d.mts
++++ b/node_modules/@mui/x-charts/models/axis.d.mts
+@@ -626,7 +626,7 @@ export interface ChartsAxisData {
+   /**
+    * The mapping of series ids to their value for this particular axis index.
+    */
+-  seriesValues: Record<string, HasProperty<ChartsTypeFeatureFlags, 'seriesValueOverride'> extends true ? ChartsTypeFeatureFlags['seriesValuesOverride'] : number | null | undefined>;
++  seriesValues: Record<string, ChartsTypeFeatureFlags extends { seriesValuesOverride: infer Value } ? Value : number | null | undefined>;
+ }
+ export type CartesianDirection = 'x' | 'y';
+ export type PolarDirection = 'rotation' | 'radius';
+diff --git a/node_modules/@mui/x-charts/models/seriesType/composition.d.mts b/node_modules/@mui/x-charts/models/seriesType/composition.d.mts
+index b679c78..3586d42 100644
+--- a/node_modules/@mui/x-charts/models/seriesType/composition.d.mts
++++ b/node_modules/@mui/x-charts/models/seriesType/composition.d.mts
+@@ -1,5 +1,5 @@
+ import type { ChartSeriesType, ChartsSeriesConfig } from "./config.mjs";
+-export type ComposableCartesianChartSeriesType = 'bar' | 'line' | 'scatter' | (ChartsSeriesConfig['rangeBar'] extends undefined ? never : 'rangeBar') | (ChartsSeriesConfig['ohlc'] extends undefined ? never : 'ohlc');
++export type ComposableCartesianChartSeriesType = 'bar' | 'line' | 'scatter' | (ChartsSeriesConfig extends { rangeBar: unknown } ? 'rangeBar' : never) | (ChartsSeriesConfig extends { ohlc: unknown } ? 'ohlc' : never);
+ export declare const composableCartesianSeriesTypes: Set<ComposableCartesianChartSeriesType>;
+ export type ComposableRadialChartSeriesType = 'radialLine' | 'radialBar';
+ export declare const composableRadialSeriesTypes: Set<ComposableRadialChartSeriesType>;

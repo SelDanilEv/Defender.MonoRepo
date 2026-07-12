@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
   Divider,
   Box,
@@ -46,6 +46,8 @@ const UserListTable = (props: UserListTableProps) => {
     refresh: refresh,
     selectUser: selectUser,
   } = props;
+  const applyPaginationRef = useRef(applyPagination);
+  applyPaginationRef.current = applyPagination;
 
   const [tablePagination, setTablePagination] = useState<PaginationRequest>({
     page: 0,
@@ -55,7 +57,7 @@ const UserListTable = (props: UserListTableProps) => {
   const [showInfoDialog, setShowInfoDialog] = useState<boolean>(false);
 
   useEffect(() => {
-    applyPagination(tablePagination.page, tablePagination.pageSize);
+    applyPaginationRef.current(tablePagination.page, tablePagination.pageSize);
   }, [tablePagination]);
 
   const handlePageChange = (event: any, newPage: number): void => {
@@ -66,7 +68,7 @@ const UserListTable = (props: UserListTableProps) => {
     setTablePagination({ page: 0, pageSize: parseInt(event.target.value) });
   };
 
-  const renderUserInfo = (userInfo: UserOnlyInfo): JSX.Element => {
+  const renderUserInfo = (userInfo: UserOnlyInfo): React.ReactElement => {
     {
       return (
         <TableRow
@@ -78,11 +80,12 @@ const UserListTable = (props: UserListTableProps) => {
             <TableCell align="center">
               <Typography
                 variant="body1"
-                fontWeight="bold"
-                color="text.primary"
                 gutterBottom
                 noWrap
-              >
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary"
+                }}>
                 {userInfo.id}
               </Typography>
             </TableCell>
@@ -90,22 +93,24 @@ const UserListTable = (props: UserListTableProps) => {
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
-              color="text.primary"
               gutterBottom
               noWrap
-            >
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary"
+              }}>
               {userInfo.email}
             </Typography>
           </TableCell>
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
-              color="text.primary"
               gutterBottom
               noWrap
-            >
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary"
+              }}>
               {userInfo.nickname}
             </Typography>
           </TableCell>
@@ -113,11 +118,12 @@ const UserListTable = (props: UserListTableProps) => {
             <TableCell align="center">
               <Typography
                 variant="body1"
-                fontWeight="bold"
-                color="text.primary"
                 gutterBottom
                 noWrap
-              >
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary"
+                }}>
                 {userInfo.phoneNumber}
               </Typography>
             </TableCell>
@@ -153,12 +159,18 @@ const UserListTable = (props: UserListTableProps) => {
           </LockedButton>
         }
         title={
-          <Typography fontSize={"1.7em"} fontWeight="bold">
+          <Typography
+            sx={{
+              fontSize: "1.7em",
+              fontWeight: "bold"
+            }}>
             {u.t("admin_users_page__user_table_title")}
           </Typography>
         }
-        titleTypographyProps={{
-          style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+        slotProps={{
+          title: {
+            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+          }
         }}
       />
       <Divider />

@@ -88,11 +88,12 @@ function HeaderNotifications() {
         }}
       >
         <Box
-          sx={{ p: 2 }}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-        >
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            p: 2
+          }}>
           <Typography variant="h5">
             {u.t("sidebar_header__menu_title_notification")}
           </Typography>

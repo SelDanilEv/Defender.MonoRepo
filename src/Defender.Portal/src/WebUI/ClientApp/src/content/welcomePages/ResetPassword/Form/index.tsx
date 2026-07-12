@@ -56,14 +56,6 @@ const ResetPasswordForm = (props: any) => {
 
   // start state machine
 
-  useEffect(() => {
-    return () => {
-      stateMachine.freeze();
-    };
-  // State machine teardown runs only when this form unmounts.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const stateNames = {
     Init: "Init",
     SendCodeAllowed: "SendCodeAllowed",
@@ -132,6 +124,12 @@ const ResetPasswordForm = (props: any) => {
         setElements(elementManager?.getElements());
       })
   );
+
+  useEffect(() => {
+    return () => {
+      stateMachine.freeze();
+    };
+  }, [stateMachine]);
 
   useEffect(() => {
     setElements(elementManager?.getElements());
@@ -215,9 +213,15 @@ const ResetPasswordForm = (props: any) => {
     }
 
     stateMachine.updateState(newState);
-  // State transition evaluation is driven only by request data changes.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sendCodeRequest, resetRequest]);
+  }, [
+    resetRequest,
+    sendCodeRequest,
+    stateMachine,
+    stateNames.Init,
+    stateNames.SendCodeAllowed,
+    stateNames.VerifyCodeAllowed,
+    stateNames.WaitingCodeInput,
+  ]);
 
   //end update fields
 
@@ -347,20 +351,21 @@ const ResetPasswordForm = (props: any) => {
           />
         )}
         <Box
-          display="flex"
-          flexDirection={u.isMobile ? "column" : "row"}
-          justifyContent="space-between"
-          gap={u.isMobile ? 1 : 0}
-          maxWidth="100%"
-        >
+          sx={{
+            display: "flex",
+            flexDirection: u.isMobile ? "column" : "row",
+            justifyContent: "space-between",
+            gap: u.isMobile ? 1 : 0,
+            maxWidth: "100%"
+          }}>
           <Box
-            width={
-              u.isMobile
+            sx={{
+              width: u.isMobile
                 ? "auto"
                 : elements[ElementNames.BackButton].hidden
                 ? "0%"
                 : "48%"
-            }
+            }}
           >
             {!elements[ElementNames.BackButton].hidden && (
               <LockedButton
@@ -375,13 +380,13 @@ const ResetPasswordForm = (props: any) => {
             )}
           </Box>
           <Box
-            width={
-              u.isMobile
+            sx={{
+              width: u.isMobile
                 ? "auto"
                 : elements[ElementNames.BackButton].hidden
                 ? "100%"
                 : "48%"
-            }
+            }}
           >
             <LockedButton
               sx={{ minHeight: 48, fontSize: "1rem", fontWeight: 700 }}

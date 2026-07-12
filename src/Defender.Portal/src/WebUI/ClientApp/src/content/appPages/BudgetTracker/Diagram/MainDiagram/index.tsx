@@ -1,4 +1,4 @@
-import { memo, useEffect, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { Box } from "@mui/material";
 import { connect } from "react-redux";
@@ -35,6 +35,8 @@ interface MainDiagramProps {
 
 const MainDiagram = (props: MainDiagramProps) => {
   const u = useUtils();
+  const startRefreshRef = useRef<() => Promise<void>>(async () => undefined);
+  const applyGroupsAndSetupsRef = useRef<(history: BudgetHistory) => void>(() => undefined);
 
   const { diagramConfig, budgetDiagramGroups: groups } = props;
 
@@ -51,12 +53,12 @@ const MainDiagram = (props: MainDiagramProps) => {
       return;
     }
 
-    startRefresh();
+    void startRefreshRef.current();
   }, [diagramConfig]);
 
   useEffect(() => {
     if (groups.areGroupsValid && budgetHistory.history) {
-      applyGroupsAndSetups(budgetHistory);
+      applyGroupsAndSetupsRef.current(budgetHistory);
     }
   }, [groups, budgetHistory]);
 
@@ -84,6 +86,7 @@ const MainDiagram = (props: MainDiagramProps) => {
 
     setDataset(dataset);
   };
+  applyGroupsAndSetupsRef.current = applyGroupsAndSetups;
 
   const startRefresh = async () => {
     const request = {
@@ -116,6 +119,7 @@ const MainDiagram = (props: MainDiagramProps) => {
       doLock: false,
     });
   };
+  startRefreshRef.current = startRefresh;
 
   const reloadHistory = (budgetHistory: BudgetHistory) => {
     const { endDate } = diagramConfig;
@@ -154,7 +158,11 @@ const MainDiagram = (props: MainDiagramProps) => {
   };
 
   return (
-    <Box sx={{ width: "100%" }} paddingBottom={3}>
+    <Box
+      sx={{
+        paddingBottom: 3,
+        width: "100%"
+      }}>
       <LineChart
         margin={{
           top: 10,
@@ -180,8 +188,8 @@ const MainDiagram = (props: MainDiagramProps) => {
         grid={{ horizontal: true }}
         slotProps={{
           legend: {
-            direction: "row",
-            position: { vertical: "bottom", horizontal: "middle" },
+            direction: "horizontal",
+            position: { vertical: "bottom", horizontal: "center" },
           },
         }}
       />

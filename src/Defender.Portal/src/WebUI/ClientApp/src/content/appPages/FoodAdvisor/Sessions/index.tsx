@@ -235,13 +235,21 @@ export const FoodAdvisorSessionsPage = () => {
         </Typography>
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{ maxWidth: 560, mx: "auto" }}
-        >
+          sx={{
+            color: "text.secondary",
+            maxWidth: 560,
+            mx: "auto"
+          }}>
           {u.t("foodAdvisor:sessions_subtitle")}
         </Typography>
       </Box>
-      <Box display="flex" gap={1} flexWrap="wrap" sx={{ mb: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 1,
+          flexWrap: "wrap",
+          mb: 2
+        }}>
         {showHeaderNewSessionButton && (
           <Button variant="contained" onClick={() => navigate("/food-advisor/session/new")}>
             {u.t("foodAdvisor:new_session")}
@@ -254,7 +262,7 @@ export const FoodAdvisorSessionsPage = () => {
       {loading && <LinearProgress sx={{ mb: 2 }} />}
       <Grid container spacing={2}>
         {!loading && sessions.length === 0 && (
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Card variant="outlined">
               <CardContent>
                 <Typography variant="body1" gutterBottom>
@@ -273,21 +281,28 @@ export const FoodAdvisorSessionsPage = () => {
           const detailsExpanded = expandedSessionIds.includes(session.id);
 
           return (
-            <Grid item xs={12} key={session.id}>
+            <Grid key={session.id} size={12}>
               <Card variant="outlined">
                 <CardContent>
                   <Stack
                     direction={{ xs: "column", md: "row" }}
                     spacing={2}
-                    justifyContent="space-between"
-                    sx={{ mb: 2 }}
-                  >
+                    sx={{
+                      justifyContent: "space-between",
+                      mb: 2
+                    }}>
                     <Box>
                       <Typography variant="h6">
                         {u.t("foodAdvisor:sessions_session_label")}
                       </Typography>
                     </Box>
-                    <Box display="flex" gap={1} flexWrap="wrap" alignItems="flex-start">
+                    <Box
+                      sx={{
+                        display: "flex",
+                        gap: 1,
+                        flexWrap: "wrap",
+                        alignItems: "flex-start"
+                      }}>
                       <TagChip label={u.t(sessionStatusKey)} />
                       <Button
                         variant="outlined"
@@ -322,20 +337,41 @@ export const FoodAdvisorSessionsPage = () => {
                   </Stack>
 
                   <Grid container spacing={2} sx={{ mb: 2 }}>
-                    <Grid item xs={12} sm={6} md={4}>
-                      <Typography variant="caption" color="text.secondary">
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                        md: 4
+                      }}>
+                      <Typography variant="caption" sx={{
+                        color: "text.secondary"
+                      }}>
                         {u.t("foodAdvisor:sessions_created")}
                       </Typography>
                       <Typography variant="body2">{formatDate(session.createdAtUtc)}</Typography>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={4}>
-                      <Typography variant="caption" color="text.secondary">
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                        md: 4
+                      }}>
+                      <Typography variant="caption" sx={{
+                        color: "text.secondary"
+                      }}>
                         {u.t("foodAdvisor:sessions_updated")}
                       </Typography>
                       <Typography variant="body2">{formatDate(session.updatedAtUtc)}</Typography>
                     </Grid>
-                    <Grid item xs={12} sm={6} md={4}>
-                      <Typography variant="caption" color="text.secondary">
+                    <Grid
+                      size={{
+                        xs: 12,
+                        sm: 6,
+                        md: 4
+                      }}>
+                      <Typography variant="caption" sx={{
+                        color: "text.secondary"
+                      }}>
                         {u.t("foodAdvisor:try_something_new")}
                       </Typography>
                       <Typography variant="body2">
@@ -350,25 +386,31 @@ export const FoodAdvisorSessionsPage = () => {
 
                   <Collapse in={detailsExpanded} timeout="auto" unmountOnExit>
                     <Grid container spacing={2}>
-                      <Grid item xs={12}>
+                      <Grid size={12}>
                         <Typography variant="subtitle2" sx={{ mb: 1 }}>
                           {u.t("foodAdvisor:sessions_items")}
                         </Typography>
-                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                        <Stack direction="row" spacing={1} useFlexGap sx={{
+                          flexWrap: "wrap"
+                        }}>
                           {session.confirmedItems.length > 0 ? session.confirmedItems.map((item) => (
                             <TagChip key={`${session.id}-confirmed-${item}`} tone="positive" label={item} />
                           )) : (
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography variant="body2" sx={{
+                              color: "text.secondary"
+                            }}>
                               {u.t("foodAdvisor:sessions_no_items")}
                             </Typography>
                           )}
                         </Stack>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid size={12}>
                         <Typography variant="subtitle2" sx={{ mb: 1 }}>
                           {u.t("foodAdvisor:sessions_ranked")}
                         </Typography>
-                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                        <Stack direction="row" spacing={1} useFlexGap sx={{
+                          flexWrap: "wrap"
+                        }}>
                           {session.rankedItems.length > 0 ? session.rankedItems
                             .map((item) => item.trim())
                             .filter(Boolean)
@@ -379,13 +421,15 @@ export const FoodAdvisorSessionsPage = () => {
                                 label={`${index + 1}. ${item}`}
                               />
                             )) : (
-                              <Typography variant="body2" color="text.secondary">
+                              <Typography variant="body2" sx={{
+                                color: "text.secondary"
+                              }}>
                                 {u.t("foodAdvisor:sessions_no_items")}
                               </Typography>
                             )}
                         </Stack>
                       </Grid>
-                      <Grid item xs={12}>
+                      <Grid size={12}>
                         <Typography variant="subtitle2" sx={{ mb: 1 }}>
                           {u.t("foodAdvisor:sessions_dish_ratings")}
                         </Typography>
@@ -397,28 +441,35 @@ export const FoodAdvisorSessionsPage = () => {
                               return (
                                 <Box
                                   key={`${session.id}-rating-${dishName}`}
-                                  display="flex"
-                                  justifyContent="space-between"
-                                  gap={2}
-                                  alignItems={{ xs: "flex-start", md: "center" }}
-                                  flexDirection={{ xs: "column", md: "row" }}
                                   sx={{
+                                    display: "flex",
+                                    justifyContent: "space-between",
+                                    gap: 2,
+                                    alignItems: { xs: "flex-start", md: "center" },
+                                    flexDirection: { xs: "column", md: "row" },
                                     p: 1.5,
                                     border: (theme) => `1px solid ${theme.palette.divider}`,
-                                    borderRadius: 2,
-                                  }}
-                                >
+                                    borderRadius: 2
+                                  }}>
                                   <Box>
                                     <Typography variant="body1" sx={{ fontWeight: 600 }}>
                                       {dishName}
                                     </Typography>
-                                    <Typography variant="body2" color="text.secondary">
+                                    <Typography variant="body2" sx={{
+                                      color: "text.secondary"
+                                    }}>
                                       {rating
                                         ? `${u.t("foodAdvisor:sessions_current_rating")}: ${rating.rating}/5`
                                         : u.t("foodAdvisor:sessions_not_rated")}
                                     </Typography>
                                   </Box>
-                                  <Box display="flex" gap={1} alignItems="center" flexWrap="wrap">
+                                  <Box
+                                    sx={{
+                                      display: "flex",
+                                      gap: 1,
+                                      alignItems: "center",
+                                      flexWrap: "wrap"
+                                    }}>
                                     {rating && (
                                       <TagChip
                                         label={`${rating.rating}/5`}
@@ -440,7 +491,9 @@ export const FoodAdvisorSessionsPage = () => {
                             })}
                           </Stack>
                         ) : (
-                          <Typography variant="body2" color="text.secondary">
+                          <Typography variant="body2" sx={{
+                            color: "text.secondary"
+                          }}>
                             {u.t("foodAdvisor:sessions_no_items")}
                           </Typography>
                         )}
@@ -488,7 +541,6 @@ export const FoodAdvisorSessionsPage = () => {
           />
         </Box>
       )}
-
       <DishRatingDialog
         open={!!ratingTarget}
         dishName={ratingTarget?.dishName ?? null}
@@ -505,7 +557,6 @@ export const FoodAdvisorSessionsPage = () => {
         onClose={() => setRatingTarget(null)}
         onSubmit={handleSubmitRating}
       />
-
       <CustomDialog
         title={u.t("foodAdvisor:sessions_delete_title")}
         open={!!deleteTarget}
@@ -519,10 +570,17 @@ export const FoodAdvisorSessionsPage = () => {
           <Typography variant="subtitle1">
             {u.t("foodAdvisor:sessions_delete_confirm")}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             {u.t("foodAdvisor:sessions_delete_warning")}
           </Typography>
-          <Box display="flex" gap={1} justifyContent="flex-end">
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+              justifyContent: "flex-end"
+            }}>
             <Button
               onClick={() => setDeleteTarget(null)}
               disabled={!!deletingSessionId}

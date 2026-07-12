@@ -20,6 +20,7 @@ const LanguageSwitcher = (props: any) => {
   return (
     <LockedSelect
       variant="outlined"
+      inputProps={{ "aria-label": "Language" }}
       value={currentLanguage}
       onChange={(event) => {
         handleUpdateLanguage(event.target.value as string);

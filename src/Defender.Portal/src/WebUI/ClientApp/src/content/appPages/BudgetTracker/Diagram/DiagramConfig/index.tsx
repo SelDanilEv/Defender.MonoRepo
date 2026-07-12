@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { connect } from "react-redux";
 import { Grid, MenuItem } from "@mui/material";
@@ -29,6 +29,10 @@ interface DiagramConfigProps {
 
 const DiagramConfig = (props: DiagramConfigProps) => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
+  const setDiagramConfigRef = useRef(props.setDiagramConfig);
+  setDiagramConfigRef.current = props.setDiagramConfig;
 
   const [updateSetupRequest, setUpdateSetupRequest] =
     useState<MainDiagramSetup>(props.diagramConfig);
@@ -42,7 +46,7 @@ const DiagramConfig = (props: DiagramConfigProps) => {
           "Content-Type": "application/json",
         },
       },
-      utils: u,
+      utils: utilsRef.current,
       onSuccess: async (response) => {
         const setup: MainDiagramSetup = await response.json();
 
@@ -52,7 +56,7 @@ const DiagramConfig = (props: DiagramConfigProps) => {
 
         setup.endDate = new Date(setup.endDate);
 
-        props.setDiagramConfig(setup);
+        setDiagramConfigRef.current(setup);
         setUpdateSetupRequest(setup);
       },
       onFailure: async (response) => {},
@@ -134,8 +138,14 @@ const DiagramConfig = (props: DiagramConfigProps) => {
   };
 
   return (
-    <Grid container spacing={2} p={3}>
-      <Grid item xs={6} sm={2}>
+    <Grid container spacing={2} sx={{
+      p: 3
+    }}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <LockedDatePicker
           label={u.t("budgetTracker:diagram_config_start_date_label")}
           value={updateSetupRequest.startDate}
@@ -145,7 +155,11 @@ const DiagramConfig = (props: DiagramConfigProps) => {
             .toDate()}
         />
       </Grid>
-      <Grid item xs={6} sm={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <LockedDatePicker
           label={u.t("budgetTracker:diagram_config_end_date_label")}
           value={updateSetupRequest.endDate}
@@ -154,8 +168,15 @@ const DiagramConfig = (props: DiagramConfigProps) => {
           maxDate={dayjs().add(5, "year").toDate()}
         />
       </Grid>
-      {!u.isMobile && <Grid item sm={4}></Grid>}
-      <Grid item xs={6} sm={2}>
+      {!u.isMobile && <Grid
+        size={{
+          sm: 4
+        }}></Grid>}
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <LockedTextField
           label={u.t("budgetTracker:diagram_config_last_months_label")}
           name={updateSetupParams.lastMonths}
@@ -165,7 +186,11 @@ const DiagramConfig = (props: DiagramConfigProps) => {
           fullWidth
         />
       </Grid>
-      <Grid item xs={6} sm={2}>
+      <Grid
+        size={{
+          xs: 6,
+          sm: 2
+        }}>
         <LockedSelect
           variant="outlined"
           name={updateSetupParams.mainCurrency}

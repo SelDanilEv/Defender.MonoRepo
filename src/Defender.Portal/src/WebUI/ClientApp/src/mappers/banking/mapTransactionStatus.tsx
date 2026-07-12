@@ -35,7 +35,7 @@ const mapTransactionStatus = (u: IUtils, status: TransactionStatus) => {
 export const mapTransactionStatusLabel = (
   u: IUtils,
   status: TransactionStatus
-): JSX.Element => {
+): React.ReactElement => {
   const map = {
     Unknown: {
       color: "info",

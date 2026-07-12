@@ -20,51 +20,79 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
     Family: "#ef719c",
   };
 
-  return <Paper elevation={0} sx={{ p: 2, borderRadius: "20px", background: "var(--tc-panel)", border: "1px solid var(--tc-border)", backdropFilter: "blur(18px)" }}>
-    <Typography component="h2" variant="h5" fontWeight={800} textTransform="capitalize" mb={1.5}>{monthName} <Box component="span" sx={{ opacity: .45, fontWeight: 500 }}>{year}</Box></Typography>
-    <Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0,1fr))", gap: .6 }}>
-      {week.map((day) => <Typography key={day} textAlign="center" fontSize={11} fontWeight={800} color="var(--tc-muted)">{day}</Typography>)}
-      {buildMonthDays(year, month).map((date, index) => {
-        if (!date) {
-          return <Box key={`empty-${index}`} />;
-        }
+  return (
+    <Paper elevation={0} sx={{ p: 2, borderRadius: "20px", background: "var(--tc-panel)", border: "1px solid var(--tc-border)", backdropFilter: "blur(18px)" }}>
+      <Typography
+        component="h2"
+        variant="h5"
+        sx={{
+          fontWeight: 800,
+          textTransform: "capitalize",
+          mb: 1.5
+        }}>{monthName} <Box component="span" sx={{ opacity: .45, fontWeight: 500 }}>{year}</Box></Typography>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0,1fr))", gap: .6 }}>
+        {week.map((day) => <Typography
+          key={day}
+          sx={{
+            textAlign: "center",
+            fontSize: 11,
+            fontWeight: 800,
+            color: "var(--tc-muted)"
+          }}>{day}</Typography>)}
+        {buildMonthDays(year, month).map((date, index) => {
+          if (!date) {
+            return <Box key={`empty-${index}`} />;
+          }
 
-        const event = eventForDate(events, date);
-        const holiday = holidays.find((item) => item.date === date);
-        const day = Number(date.slice(-2));
-        const weekend = index % 7 > 4;
-        const label = `${date}${event ? `, ${event.title}, ${event.type}` : ""}${holiday ? `, ${holiday.flag}` : ""}`;
+          const event = eventForDate(events, date);
+          const holiday = holidays.find((item) => item.date === date);
+          const day = Number(date.slice(-2));
+          const weekend = index % 7 > 4;
+          const label = `${date}${event ? `, ${event.title}, ${event.type}` : ""}${holiday ? `, ${holiday.flag}` : ""}`;
 
-        return <Tooltip key={date} title={event?.title ?? (holiday ? holiday.flag : t("travelCalendar:monthGrid.addEvent"))}>
-          <Box
-            component="button"
-            type="button"
-            aria-label={label}
-            onClick={() => event ? onEvent(event.id) : onDate(date)}
-            sx={{
-              minWidth: 0,
-              minHeight: 52,
-              border: event ? `1px solid ${alpha(colors[event.type], 0.5)}` : "1px solid transparent",
-              borderRadius: "10px",
-              background: event ? alpha(colors[event.type], 0.12) : weekend ? "var(--tc-weekend)" : "transparent",
-              color: "inherit",
-              cursor: "pointer",
-              position: "relative",
-              p: .6,
-              textAlign: "left",
-              transition: ".2s",
-              "&:hover,&:focus-visible": { transform: "translateY(-1px)", borderColor: event ? colors[event.type] : "var(--tc-accent)", outline: "none" },
-            }}
-          >
-            <Typography component="span" fontSize={12} fontWeight={event ? 800 : 600}>{day}</Typography>
-            {holiday && <Typography component="span" fontSize={12} ml={.4}>{holiday.flag}</Typography>}
-            {event && <>
-              <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: colors[event.type], position: "absolute", top: 7, right: 7 }} />
-              <Typography sx={{ display: { xs: "none", sm: "-webkit-box" }, WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", fontSize: 9.5, lineHeight: 1.15, mt: .25 }}>{event.title}</Typography>
-            </>}
-          </Box>
-        </Tooltip>;
-      })}
-    </Box>
-  </Paper>;
+          return (
+            <Tooltip key={date} title={event?.title ?? (holiday ? holiday.flag : t("travelCalendar:monthGrid.addEvent"))}>
+              <Box
+                component="button"
+                type="button"
+                aria-label={label}
+                onClick={() => event ? onEvent(event.id) : onDate(date)}
+                sx={{
+                  minWidth: 0,
+                  minHeight: 52,
+                  border: event ? `1px solid ${alpha(colors[event.type], 0.5)}` : "1px solid transparent",
+                  borderRadius: "10px",
+                  background: event ? alpha(colors[event.type], 0.12) : weekend ? "var(--tc-weekend)" : "transparent",
+                  color: "inherit",
+                  cursor: "pointer",
+                  position: "relative",
+                  p: .6,
+                  textAlign: "left",
+                  transition: ".2s",
+                  "&:hover,&:focus-visible": { transform: "translateY(-1px)", borderColor: event ? colors[event.type] : "var(--tc-accent)", outline: "none" },
+                }}
+              >
+                <Typography
+                  component="span"
+                  sx={{
+                    fontSize: 12,
+                    fontWeight: event ? 800 : 600
+                  }}>{day}</Typography>
+                {holiday && <Typography
+                  component="span"
+                  sx={{
+                    fontSize: 12,
+                    ml: .4
+                  }}>{holiday.flag}</Typography>}
+                {event && <>
+                  <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: colors[event.type], position: "absolute", top: 7, right: 7 }} />
+                  <Typography sx={{ display: { xs: "none", sm: "-webkit-box" }, WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", fontSize: 9.5, lineHeight: 1.15, mt: .25 }}>{event.title}</Typography>
+                </>}
+              </Box>
+            </Tooltip>
+          );
+        })}
+      </Box>
+    </Paper>
+  );
 };

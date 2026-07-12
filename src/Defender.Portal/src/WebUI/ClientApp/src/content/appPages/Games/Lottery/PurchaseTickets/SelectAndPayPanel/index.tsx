@@ -71,13 +71,15 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
       return (
         <Grid
           key={betValue}
-          item
-          xs={3}
-          sm={2}
-          md={2}
           container
-          justifyContent="center"
-        >
+          sx={{
+            justifyContent: "center"
+          }}
+          size={{
+            xs: 3,
+            sm: 2,
+            md: 2
+          }}>
           <LockedButton
             style={{ minWidth: 10 }}
             variant={"contained"}
@@ -99,11 +101,32 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
   return (
     <Card sx={{ m: 1, p: 1 }}>
       <Grid container spacing={2}>
-        <Grid container item xs={0} sm={1}></Grid>
-        <Grid container item xs={6} sm={5} gap={1}>
+        <Grid
+          container
+          size={{
+            xs: 0,
+            sm: 1
+          }}></Grid>
+        <Grid
+          container
+          sx={{
+            gap: 1
+          }}
+          size={{
+            xs: 6,
+            sm: 5
+          }}>
           {renderPossibleBets()}
         </Grid>
-        <Grid container item xs={2.8} sm={4} justifyContent="right">
+        <Grid
+          container
+          sx={{
+            justifyContent: "right"
+          }}
+          size={{
+            xs: 2.8,
+            sm: 4
+          }}>
           <LockedTextField
             name={purchaseParams.amount}
             value={purchaseTicketsRequest.amount || ""}
@@ -111,7 +134,15 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
             type="number"
           />
         </Grid>
-        <Grid container item xs={3.2} sm={2} justifyContent="right">
+        <Grid
+          container
+          sx={{
+            justifyContent: "right"
+          }}
+          size={{
+            xs: 3.2,
+            sm: 2
+          }}>
           <LockedSelect
             name={purchaseParams.currency}
             value={purchaseTicketsRequest.currency}
@@ -125,10 +156,23 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
             ))}
           </LockedSelect>
         </Grid>
-        <Grid item xs={12} sm={12}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
           <Divider />
         </Grid>
-        <Grid container item xs={12} sm={12} spacing={1} marginLeft={0.5}>
+        <Grid
+          container
+          spacing={1}
+          sx={{
+            marginLeft: 0.5
+          }}
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
           <TicketSelection
             drawNumber={draw.drawNumber}
             selectedTickets={selectedTickets}

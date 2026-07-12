@@ -35,7 +35,7 @@ const LogoInnerStyled = styled(Box)(
 
 const LogoInner = ({ height, width, children, sx }) => {
   return (
-    <LogoInnerStyled height={height} width={width} sx={sx}>
+    <LogoInnerStyled sx={{ width, height, ...sx }}>
       {children}
     </LogoInnerStyled>
   );
@@ -49,6 +49,8 @@ const Logo = (props: any) => {
       <Badge
         sx={{
           ".MuiBadge-badge": {
+            backgroundColor: "#276b10",
+            color: "#ffffff",
             fontSize: props.height / 6 || 20,
             padding: props.height / 70 || 1.3,
             right: 3,

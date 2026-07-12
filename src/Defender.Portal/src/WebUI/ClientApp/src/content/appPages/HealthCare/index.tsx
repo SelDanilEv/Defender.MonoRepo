@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import {
   Autocomplete,
@@ -77,6 +77,8 @@ const emptyMedicationOptions: MedicationOptions = {
 
 const HealthCarePage = () => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
   const currentLanguage = useAppSelector((state) => state.session.language);
 
   const [events, setEvents] = useState<HealthEvent[]>([]);
@@ -100,15 +102,14 @@ const HealthCarePage = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const refresh = () => healthCareApi.getEvents(undefined, undefined, u).then(setEvents);
-  const refreshMedicationOptions = () => healthCareApi.getMedicationOptions(u).then(setMedicationOptions);
-  const refreshShare = () => healthCareApi.getCurrentShare(u).then(setShare);
+  const refresh = () => healthCareApi.getEvents(undefined, undefined, utilsRef.current).then(setEvents);
+  const refreshMedicationOptions = () => healthCareApi.getMedicationOptions(utilsRef.current).then(setMedicationOptions);
+  const refreshShare = () => healthCareApi.getCurrentShare(utilsRef.current).then(setShare);
+  const initialRefreshRef = useRef(() => Promise.all([refresh(), refreshMedicationOptions(), refreshShare()]));
 
   useEffect(() => {
-    refresh();
-    refreshMedicationOptions();
-    refreshShare();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    void initialRefreshRef.current();
+  }, []);
 
   const chartData = useMemo(
     () => buildHealthCareChartData(events, chartTimeRange),
@@ -283,11 +284,24 @@ const HealthCarePage = () => {
   ];
 
   return (
-    <Box p={1}>
-      <Stack direction="row" alignItems="center" gap={1} mb={2}>
+    <Box sx={{
+      p: 1
+    }}>
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: "center",
+          gap: 1,
+          mb: 2
+        }}>
         <LocalHospitalIcon color="primary" />
         <Typography variant="h3">{u.t("healthCare:page_title")}</Typography>
-        <Stack direction="row" gap={1} flexWrap="wrap">
+        <Stack
+          direction="row"
+          sx={{
+            gap: 1,
+            flexWrap: "wrap"
+          }}>
           {!share && (
             <Button variant="outlined" size="small" onClick={shareChart} disabled={chartData.chartEvents.length === 0}>
               {u.t("healthCare:share_chart")}
@@ -306,7 +320,11 @@ const HealthCarePage = () => {
           )}
         </Stack>
       </Stack>
-      <Typography color="text.secondary" mb={2}>
+      <Typography
+        sx={{
+          color: "text.secondary",
+          mb: 2
+        }}>
         {u.t("healthCare:page_description")}
       </Typography>
       {share && (
@@ -315,32 +333,39 @@ const HealthCarePage = () => {
           label={u.t("healthCare:share_link")}
           value={shareLink}
           helperText={shareHelperText}
-          InputProps={{
-            readOnly: true,
-            endAdornment: (
-              <InputAdornment position="end">
-                <Tooltip title={u.t("healthCare:copy_share_link")}>
-                  <IconButton
-                    aria-label={u.t("healthCare:copy_share_link")}
-                    edge="end"
-                    onClick={copyShareLink}
-                    size="small"
-                  >
-                    <ContentCopyIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              </InputAdornment>
-            ),
-          }}
           size="small"
           sx={{ mb: 2 }}
+          slotProps={{
+            input: {
+              readOnly: true,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <Tooltip title={u.t("healthCare:copy_share_link")}>
+                    <IconButton
+                      aria-label={u.t("healthCare:copy_share_link")}
+                      edge="end"
+                      onClick={copyShareLink}
+                      size="small"
+                    >
+                      <ContentCopyIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+                </InputAdornment>
+              ),
+            }
+          }}
         />
       )}
-
       <Grid container spacing={2}>
-        <Grid item xs={12} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 4
+          }}>
           <Card><CardContent>
-            <Stack gap={2}>
+            <Stack sx={{
+              gap: 2
+            }}>
               <TextField select label={u.t("healthCare:event_type")} value={type} onChange={(e) => setType(e.target.value as HealthEventType)} size="small">
                 <MenuItem value="Temperature">{u.t("healthCare:event_temperature")}</MenuItem>
                 <MenuItem value="Medication">{u.t("healthCare:event_medication")}</MenuItem>
@@ -439,7 +464,9 @@ const HealthCarePage = () => {
                 </>
               )}
               <TextField label={u.t("healthCare:notes")} value={notes} onChange={(e) => setNotes(e.target.value)} size="small" multiline minRows={2} />
-              <Stack direction="row" gap={1}>
+              <Stack direction="row" sx={{
+                gap: 1
+              }}>
                 <Button variant="contained" onClick={saveEvent}>
                   {editingEventId ? u.t("healthCare:save") : u.t("healthCare:add")}
                 </Button>
@@ -451,9 +478,20 @@ const HealthCarePage = () => {
           </CardContent></Card>
         </Grid>
 
-        <Grid item xs={12} md={8}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 8
+          }}>
           <Card><CardContent>
-            <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={1}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              sx={{
+                alignItems: { xs: "stretch", sm: "center" },
+                justifyContent: "space-between",
+                gap: 1,
+                mb: 1
+              }}>
               <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
               <TextField
                 select
@@ -477,7 +515,12 @@ const HealthCarePage = () => {
               language={currentLanguage}
             />
             <HealthCareChart events={events} timeRange={chartTimeRange} language={currentLanguage} />
-            <Typography variant="h4" mt={3} mb={1}>{u.t("healthCare:events_grid")}</Typography>
+            <Typography
+              variant="h4"
+              sx={{
+                mt: 3,
+                mb: 1
+              }}>{u.t("healthCare:events_grid")}</Typography>
             <TableContainer>
               <Table size="small">
                 <TableHead>
@@ -515,7 +558,9 @@ const HealthCarePage = () => {
                   {events.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={5}>
-                        <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
+                        <Typography sx={{
+                          color: "text.secondary"
+                        }}>{u.t("healthCare:no_events_to_display")}</Typography>
                       </TableCell>
                     </TableRow>
                   )}

@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { format } from "date-fns";
 import {
   Tooltip,
@@ -56,6 +56,8 @@ const HistoricalTransactionsTable = (
     currentLanguage: currentLanguage,
     walletNumber: userWalletNumber,
   } = props;
+  const applyPaginationRef = useRef(applyPagination);
+  applyPaginationRef.current = applyPagination;
 
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(5);
@@ -63,7 +65,7 @@ const HistoricalTransactionsTable = (
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction>();
 
   React.useEffect(() => {
-    applyPagination(page, limit);
+    applyPaginationRef.current(page, limit);
   }, [page, limit]);
 
   const handlePageChange = (event: any, newPage: number): void => {
@@ -74,7 +76,7 @@ const HistoricalTransactionsTable = (
     setLimit(parseInt(event.target.value));
   };
 
-  const renderTransactionInfo = (transaction: Transaction): JSX.Element => {
+  const renderTransactionInfo = (transaction: Transaction): React.ReactElement => {
     {
       const walletNumber = props.targetWalletNumber ?? userWalletNumber;
       const isCredit = transaction.fromWallet === walletNumber;
@@ -87,7 +89,7 @@ const HistoricalTransactionsTable = (
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
+              sx={{ fontWeight: "bold" }}
               color="text.primary"
               gutterBottom
               noWrap
@@ -105,7 +107,7 @@ const HistoricalTransactionsTable = (
             <TableCell align="center">
               <Typography
                 variant="body1"
-                fontWeight="bold"
+                sx={{ fontWeight: "bold" }}
                 color="text.primary"
                 gutterBottom
                 noWrap
@@ -117,7 +119,7 @@ const HistoricalTransactionsTable = (
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
+              sx={{ fontWeight: "bold" }}
               color={
                 amount[0] == "+"
                   ? theme.colors.success.dark
@@ -167,12 +169,14 @@ const HistoricalTransactionsTable = (
           </LockedButton>
         }
         title={
-          <Typography fontSize={"1.7em"} fontWeight="bold">
+          <Typography sx={{ fontSize: "1.7em", fontWeight: "bold" }}>
             {u.t("banking_page__trans_info_table_title")}
           </Typography>
         }
-        titleTypographyProps={{
-          style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+        slotProps={{
+          title: {
+            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+          }
         }}
       />
       <Divider />

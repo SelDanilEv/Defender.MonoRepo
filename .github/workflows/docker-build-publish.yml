@@ -36,6 +36,7 @@ env:
   DOCKER_REGISTRY: docker.io
   DOTNET_VERSION: 8.0
   TEST_DOTNET_VERSION: 10.0.x
+  NODE_VERSION: 24
 
 jobs:
   security-gate:
@@ -88,7 +89,7 @@ jobs:
       - name: Set up Node.js for dependency audit
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 22
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Audit Portal npm dependencies
         shell: bash
@@ -121,6 +122,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       src-changed: ${{ steps.filter.outputs.src-changed }}
+      portal-changed: ${{ steps.portal-filter.outputs.portal-changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -181,6 +183,38 @@ jobs:
                 echo "No changes in src folder"
               fi
             fi
+          fi
+
+      - name: Check for Portal build inputs
+        id: portal-filter
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            case "${{ github.event.inputs.service }}" in
+              ""|"ALL"|"Defender.Portal") echo "portal-changed=true" >> "$GITHUB_OUTPUT" ;;
+              *) echo "portal-changed=false" >> "$GITHUB_OUTPUT" ;;
+            esac
+            exit 0
+          fi
+
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "portal-changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+          fi
+          HEAD_SHA="${{ github.sha }}"
+
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "portal-changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -Eq '^(src/Defender\.Portal/|src/Dockerfile\.Portal$|src/Directory\.(Build\.(props|targets)|Packages\.props)$)'; then
+            echo "portal-changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "portal-changed=false" >> "$GITHUB_OUTPUT"
           fi
 
   test-services:
@@ -287,8 +321,66 @@ jobs:
             echo "Unit tests passed for ${{ matrix.service.service_dir }}."
           fi
 
-  build-and-publish:
+  portal-frontend-quality:
     needs: check-changes
+    if: needs.check-changes.outputs.src-changed == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Defender.Portal/src/WebUI/ClientApp
+
+    steps:
+      - name: Skip unchanged Portal frontend
+        if: needs.check-changes.outputs.portal-changed != 'true'
+        working-directory: .
+        run: echo "Portal build inputs unchanged; frontend quality gate not required."
+
+      - name: Checkout code
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: src/Defender.Portal/src/WebUI/ClientApp/package-lock.json
+
+      - name: Install locked dependencies
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npm ci
+
+      - name: Audit dependencies
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npm audit --audit-level=high
+
+      - name: Type-check
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npm run typecheck
+
+      - name: Lint with zero warnings
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npm run lint -- --max-warnings=0
+
+      - name: Run tests
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npm test
+
+      - name: Build production bundle
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npm run build
+
+      - name: Install Playwright Chromium
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Run browser smoke tests
+        if: needs.check-changes.outputs.portal-changed == 'true'
+        run: npm run test:e2e
+
+  build-and-publish:
+    needs: [check-changes, portal-frontend-quality]
     if: (github.event_name == 'pull_request' || needs.check-changes.outputs.src-changed == 'true') && (github.event_name != 'workflow_dispatch' || github.event.inputs.service == '' || github.event.inputs.service == 'ALL')
     runs-on: ubuntu-latest
 
@@ -474,7 +566,7 @@ jobs:
 
   # Additional job for building specific service when workflow_dispatch is used
   build-specific-service:
-    needs: check-changes
+    needs: [check-changes, portal-frontend-quality]
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != '' && github.event.inputs.service != 'ALL' && needs.check-changes.outputs.src-changed == 'true'
     runs-on: ubuntu-latest
 

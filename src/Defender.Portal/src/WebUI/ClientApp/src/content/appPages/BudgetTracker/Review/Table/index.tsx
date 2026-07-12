@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
   Divider,
   Box,
@@ -86,6 +86,8 @@ const ReviewsTable = (props: ReviewsTableProps) => {
     pagination: pagination,
     refresh: refresh,
   } = props;
+  const applyPaginationRef = useRef(applyPagination);
+  applyPaginationRef.current = applyPagination;
 
   const [tablePagination, setTablePagination] = useState<PaginationRequest>({
     page: DefaultTableConsts.DefaultPage,
@@ -96,7 +98,7 @@ const ReviewsTable = (props: ReviewsTableProps) => {
   const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Hide);
 
   useEffect(() => {
-    applyPagination(tablePagination.page, tablePagination.pageSize);
+    applyPaginationRef.current(tablePagination.page, tablePagination.pageSize);
   }, [tablePagination]);
 
   const handlePageChange = (event: any, newPage: number): void => {
@@ -132,29 +134,31 @@ const ReviewsTable = (props: ReviewsTableProps) => {
     });
   };
 
-  const renderRowInfo = (model: BudgetReview): JSX.Element => {
+  const renderRowInfo = (model: BudgetReview): React.ReactElement => {
     {
       return (
         <TableRow hover key={model.id}>
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
-              color="text.primary"
               gutterBottom
               noWrap
-            >
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary"
+              }}>
               {model.date && format(new Date(model.date), "MM.dd.yyyy")}
             </Typography>
           </TableCell>
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
-              color="text.primary"
               gutterBottom
               noWrap
-            >
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary"
+              }}>
               {renderCurrencyChips(model.positions)}
             </Typography>
           </TableCell>
@@ -162,10 +166,11 @@ const ReviewsTable = (props: ReviewsTableProps) => {
             <TableCell align="center">
               <Typography
                 variant="body1"
-                fontWeight="bold"
-                color="text.primary"
                 gutterBottom
-              >
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary"
+                }}>
                 {model.positions.length}
               </Typography>
             </TableCell>
@@ -230,12 +235,18 @@ const ReviewsTable = (props: ReviewsTableProps) => {
           </>
         }
         title={
-          <Typography fontSize={"1.7em"} fontWeight="bold">
+          <Typography
+            sx={{
+              fontSize: "1.7em",
+              fontWeight: "bold"
+            }}>
             {u.t("budgetTracker:reviews_table_title")}
           </Typography>
         }
-        titleTypographyProps={{
-          style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+        slotProps={{
+          title: {
+            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+          }
         }}
       />
       <Divider />

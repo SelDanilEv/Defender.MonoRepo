@@ -8,7 +8,8 @@ describe("Portal Vite build configuration", () => {
 
     expect(config.build?.outDir).toBe("build");
     expect(config.server?.port).toBe(47054);
-    expect(config.server?.proxy?.["/api"]?.target).toBe("http://localhost:47053");
+    const apiProxy = config.server?.proxy?.["/api"];
+    expect(typeof apiProxy === "string" ? apiProxy : apiProxy?.target).toBe("http://localhost:47053");
     expect(config.resolve?.alias).toEqual({ src: expect.any(String) });
   });
 });

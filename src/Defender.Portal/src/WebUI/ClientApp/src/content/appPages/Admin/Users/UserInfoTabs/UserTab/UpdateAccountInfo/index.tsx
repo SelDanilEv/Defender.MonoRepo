@@ -24,10 +24,11 @@ const UpdateAccountInfo = (props: UpdateAccountInfoProps) => {
         <Grid
           container
           spacing={2}
-          p={1.5}
-          alignItems="center"
-          justifyContent={"center"}
-        >
+          sx={{
+            p: 1.5,
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
           <UpdateAccount accountInfo={accountInfo} />
           <UpdatePassword userId={accountInfo.id} />
         </Grid>

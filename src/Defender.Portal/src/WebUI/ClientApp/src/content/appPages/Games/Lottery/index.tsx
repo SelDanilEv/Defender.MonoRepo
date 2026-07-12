@@ -21,19 +21,24 @@ const LotteryHomePage = (props: any) => {
         <Grid
           container
           spacing={1}
-          item
-          xs={12}
-          sm={8}
           sx={{ order: { xs: 2, sm: 1 } }}
-        >
-          <Grid item xs={12}>
+          size={{
+            xs: 12,
+            sm: 8
+          }}>
+          <Grid size={12}>
             <ActiveDraws />
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <HistoricalTickets SetLatestTickets={SetLatestTickets} />
           </Grid>
         </Grid>
-        <Grid item xs={12} sm={4} sx={{ order: { xs: 1, sm: 2 } }}>
+        <Grid
+          sx={{ order: { xs: 1, sm: 2 } }}
+          size={{
+            xs: 12,
+            sm: 4
+          }}>
           <LatestTickets LatestTickets={latestTickets} />
         </Grid>
       </Grid>

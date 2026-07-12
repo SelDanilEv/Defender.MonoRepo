@@ -1,6 +1,6 @@
 import { Card } from "@mui/material";
 import UserListTable from "./Table";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
 import { connect } from "react-redux";
@@ -18,6 +18,7 @@ interface UserListProps {
 
 const UserList = (props: UserListProps) => {
   const u = useUtils();
+  const reloadUserListRef = useRef<() => void>(() => undefined);
 
   const { searchFullUserInfo: searchFullUserInfo } = props;
 
@@ -44,7 +45,7 @@ const UserList = (props: UserListProps) => {
   } as CurrentPagination);
 
   useEffect(() => {
-    reloadUserList();
+    reloadUserListRef.current();
   }, [paginationRequest]);
 
   const reloadUserList = () => {
@@ -71,6 +72,7 @@ const UserList = (props: UserListProps) => {
       showError: true,
     });
   };
+  reloadUserListRef.current = reloadUserList;
 
   const selectUser = (userId: string) => {
     searchFullUserInfo({ userId: userId } as AdminSearchUserRequest);

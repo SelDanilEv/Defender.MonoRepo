@@ -1,6 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate } from "react-router-dom";
-import { RouteObject } from "react-router";
+import { Navigate, type RouteObject } from "react-router-dom";
 
 import SidebarLayout from "src/layouts/SidebarLayout";
 import EmptyLayout from "src/layouts/EmptyLayout";

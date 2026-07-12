@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
   Divider,
   Box,
@@ -59,6 +59,8 @@ const PositionsTable = (props: PositionsTableProps) => {
     pagination: pagination,
     refresh: refresh,
   } = props;
+  const applyPaginationRef = useRef(applyPagination);
+  applyPaginationRef.current = applyPagination;
 
   const [tablePagination, setTablePagination] = useState<PaginationRequest>({
     page: DefaultTableConsts.DefaultPage,
@@ -69,7 +71,7 @@ const PositionsTable = (props: PositionsTableProps) => {
   const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Hide);
 
   useEffect(() => {
-    applyPagination(tablePagination.page, tablePagination.pageSize);
+    applyPaginationRef.current(tablePagination.page, tablePagination.pageSize);
   }, [tablePagination]);
 
   const handlePageChange = (event: any, newPage: number): void => {
@@ -80,7 +82,7 @@ const PositionsTable = (props: PositionsTableProps) => {
     setTablePagination({ page: 0, pageSize: parseInt(event.target.value) });
   };
 
-  const generateTags = (tags: string[]): JSX.Element => {
+  const generateTags = (tags: string[]): React.ReactElement => {
     return (
       <>
         {tags.map((tag, index) => (
@@ -90,18 +92,19 @@ const PositionsTable = (props: PositionsTableProps) => {
     );
   };
 
-  const renderRowInfo = (model: BudgetPosition): JSX.Element => {
+  const renderRowInfo = (model: BudgetPosition): React.ReactElement => {
     {
       return (
         <TableRow hover key={model.id}>
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
-              color="text.primary"
               gutterBottom
               noWrap
-            >
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary"
+              }}>
               {model.name}
             </Typography>
           </TableCell>
@@ -109,10 +112,11 @@ const PositionsTable = (props: PositionsTableProps) => {
             <TableCell align="center">
               <Typography
                 variant="body1"
-                fontWeight="bold"
-                color="text.primary"
                 gutterBottom
-              >
+                sx={{
+                  fontWeight: "bold",
+                  color: "text.primary"
+                }}>
                 {generateTags(model.tags)}
               </Typography>
             </TableCell>
@@ -120,11 +124,12 @@ const PositionsTable = (props: PositionsTableProps) => {
           <TableCell align="center">
             <Typography
               variant="body1"
-              fontWeight="bold"
-              color="text.primary"
               gutterBottom
               noWrap
-            >
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary"
+              }}>
               {model.currency}
             </Typography>
           </TableCell>
@@ -171,6 +176,7 @@ const PositionsTable = (props: PositionsTableProps) => {
         action={
           <>
             <LockedButton
+              aria-label={u.t("budgetTracker:positions_dialog_title")}
               sx={{ mr: "1em" }}
               variant="outlined"
               color="success"
@@ -182,6 +188,7 @@ const PositionsTable = (props: PositionsTableProps) => {
               <AddIcon />
             </LockedButton>
             <LockedButton
+              aria-label="Refresh positions"
               sx={{ mr: "1em" }}
               variant="outlined"
               onClick={refresh}
@@ -191,12 +198,18 @@ const PositionsTable = (props: PositionsTableProps) => {
           </>
         }
         title={
-          <Typography fontSize={"1.7em"} fontWeight="bold">
+          <Typography
+            sx={{
+              fontSize: "1.7em",
+              fontWeight: "bold"
+            }}>
             {u.t("budgetTracker:positions_table_title")}
           </Typography>
         }
-        titleTypographyProps={{
-          style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+        slotProps={{
+          title: {
+            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+          }
         }}
       />
       <Divider />
@@ -261,6 +274,8 @@ const PositionsTable = (props: PositionsTableProps) => {
           rowsPerPage={tablePagination.pageSize}
           rowsPerPageOptions={[10, 25, 50, 100]}
           labelRowsPerPage=""
+          slotProps={{ select: { inputProps: { "aria-label": u.t("table_rows_per_page_label") } } }}
+          getItemAriaLabel={(type) => `${type} page`}
         />
       </Box>
       <CustomDialog

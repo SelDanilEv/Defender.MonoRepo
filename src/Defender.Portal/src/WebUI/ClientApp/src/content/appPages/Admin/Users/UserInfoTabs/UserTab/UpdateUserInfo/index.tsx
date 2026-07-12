@@ -147,47 +147,71 @@ const UpdateUserInfo = (props: UpdateUserInfoProps) => {
         <CardHeader
           title={u.t("admin_users_page__info_user_tab_user_info_title")}
         />
-        <Grid container spacing={2} p={1.5}>
-          <Grid item xs={12} sm={8}>
+        <Grid container spacing={2} sx={{
+          p: 1.5
+        }}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 8
+            }}>
             <TextField
               name={updateParams.nickname}
               label={u.t(
                 "admin_users_page__info_user_tab_user_info_nickname_label"
               )}
-              InputProps={{ style: { fontSize: "1.5em" } }}
               value={updateRequest.nickname}
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
+              slotProps={{
+                input: { style: { fontSize: "1.5em" } }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <TextField
               name={updateParams.phoneNumber}
               label={u.t(
                 "admin_users_page__info_user_tab_user_info_phone_label"
               )}
-              InputProps={{ style: { fontSize: "1.5em" } }}
               value={updateRequest.phoneNumber}
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
+              slotProps={{
+                input: { style: { fontSize: "1.5em" } }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 8
+            }}>
             <TextField
               name={updateParams.email}
               label={u.t(
                 "admin_users_page__info_user_tab_user_info_email_label"
               )}
-              InputProps={{ style: { fontSize: "1.5em" } }}
               value={updateRequest.email}
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
+              slotProps={{
+                input: { style: { fontSize: "1.5em" } }
+              }}
             />
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 4
+            }}>
             <LockedButton
               disabled={!isUpdateAllowed}
               onClick={handleUpdate}

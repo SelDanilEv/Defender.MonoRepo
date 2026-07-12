@@ -51,18 +51,36 @@ const WalletAccountsInfo = (props: WalletAccountsInfoProps) => {
     if (walletInfo.walletNumber) {
       for (const account of walletInfo.currencyAccounts) {
         result.push(
-          <Grid item xs={12} sm={6} md={4} key={account.currency}>
+          <Grid
+            key={account.currency}
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4
+            }}>
             <CardCc>
-              <Box display="flex" alignItems="center">
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center"
+                }}>
                 <CardLogo>{account.currency}</CardLogo>
-                <Box marginLeft={"auto"} marginRight={"2em"}>
-                  <Typography variant="h3" fontWeight="normal">
+                <Box
+                  sx={{
+                    marginLeft: "auto",
+                    marginRight: "2em"
+                  }}>
+                  <Typography variant="h3" sx={{
+                    fontWeight: "normal"
+                  }}>
                     {account.balance / 100 +
                       CurrencySymbolsMap[account.currency]}
                   </Typography>
                 </Box>
                 {isSuperAdmin && (
-                  <Box marginRight={"2em"}>
+                  <Box sx={{
+                    marginRight: "2em"
+                  }}>
                     <LockedButton
                       onClick={() => startRecharge(account.currency)}
                       color="success"
@@ -91,14 +109,16 @@ const WalletAccountsInfo = (props: WalletAccountsInfoProps) => {
     <>
       <Card>
         <CardHeader
-          titleTypographyProps={{
-            style: { fontSize: u.isMobile ? "1.5em" : "2em" },
-          }}
           title={
             u.t("banking_page__wallet_title") +
             " " +
             (walletInfo.walletNumber ?? "******")
           }
+          slotProps={{
+            title: {
+              style: { fontSize: u.isMobile ? "1.5em" : "2em" },
+            }
+          }}
         />
         <Divider />
         <Grid container spacing={1}>

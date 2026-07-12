@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
   Divider,
   Box,
@@ -65,6 +65,8 @@ const GroupsTable = (props: GroupsTableProps) => {
     pagination: pagination,
     refresh: refresh,
   } = props;
+  const applyPaginationRef = useRef(applyPagination);
+  applyPaginationRef.current = applyPagination;
 
   const [tablePagination, setTablePagination] = useState<PaginationRequest>({
     page: DefaultTableConsts.DefaultPage,
@@ -75,7 +77,7 @@ const GroupsTable = (props: GroupsTableProps) => {
   const [dialogMode, setDialogMode] = useState<DialogMode>(DialogMode.Hide);
 
   useEffect(() => {
-    applyPagination(tablePagination.page, tablePagination.pageSize);
+    applyPaginationRef.current(tablePagination.page, tablePagination.pageSize);
   }, [tablePagination]);
 
   const handlePageChange = (event: any, newPage: number): void => {
@@ -89,7 +91,7 @@ const GroupsTable = (props: GroupsTableProps) => {
     });
   };
 
-  const generateTags = (tags: string[]): JSX.Element => {
+  const generateTags = (tags: string[]): React.ReactElement => {
     return (
       <Box
         sx={{
@@ -117,17 +119,18 @@ const GroupsTable = (props: GroupsTableProps) => {
     );
   };
 
-  const renderRowInfo = (model: BudgetDiagramGroup): JSX.Element => {
+  const renderRowInfo = (model: BudgetDiagramGroup): React.ReactElement => {
     {
       return (
         <TableRow hover key={model.id}>
           <TableCell align="center">
             <Typography
               variant="body2"
-              fontWeight="bold"
-              color="text.primary"
               noWrap
-            >
+              sx={{
+                fontWeight: "bold",
+                color: "text.primary"
+              }}>
               {model.name}
             </Typography>
           </TableCell>
@@ -170,7 +173,9 @@ const GroupsTable = (props: GroupsTableProps) => {
             )}
           </TableCell>
           <TableCell align="center">
-            <Stack direction="row" spacing={0.25} justifyContent="center">
+            <Stack direction="row" spacing={0.25} sx={{
+              justifyContent: "center"
+            }}>
               {model.isActive ? (
                 <LockedIconButton
                   sx={{
@@ -298,14 +303,20 @@ const GroupsTable = (props: GroupsTableProps) => {
           </>
         }
         title={
-          <Typography fontSize={"1.7em"} fontWeight="bold">
+          <Typography
+            sx={{
+              fontSize: "1.7em",
+              fontWeight: "bold"
+            }}>
             {u.t("budgetTracker:groups_table_title")}
           </Typography>
         }
-        titleTypographyProps={{
-          style: { fontSize: u.isMobile ? "1.3em" : "1.65em" },
-        }}
         sx={{ py: 1.25, px: 2 }}
+        slotProps={{
+          title: {
+            style: { fontSize: u.isMobile ? "1.3em" : "1.65em" },
+          }
+        }}
       />
       <Divider />
       <TableContainer

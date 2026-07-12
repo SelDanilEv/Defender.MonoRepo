@@ -1,6 +1,6 @@
 import { Card } from "@mui/material";
 import HistoricalTicketsTable from "./Table";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
 import { connect } from "react-redux";
@@ -17,6 +17,7 @@ interface HistoricalTicketsProps {
 
 const HistoricalTickets = (props: HistoricalTicketsProps) => {
   const u = useUtils();
+  const reloadTicketHistoryRef = useRef<() => void>(() => undefined);
 
   const [tickets, setTickets] = useState<LotteryTicket[]>([]);
 
@@ -41,7 +42,7 @@ const HistoricalTickets = (props: HistoricalTicketsProps) => {
   } as CurrentPagination);
 
   useEffect(() => {
-    reloadTicketHistory();
+    reloadTicketHistoryRef.current();
   }, [paginationRequest]);
 
   const reloadTicketHistory = () => {
@@ -69,6 +70,7 @@ const HistoricalTickets = (props: HistoricalTicketsProps) => {
       showError: true,
     });
   };
+  reloadTicketHistoryRef.current = reloadTicketHistory;
 
   return (
     <Card>

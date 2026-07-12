@@ -15,8 +15,14 @@ const ResetPassword = () => {
       description={u.t("welcome:reset_password_description")}
     >
       <ResetPasswordForm />
-      <Typography textAlign="center" sx={{ mt: 3 }}>
-        <Link component={RouterLink} to="/welcome/login" fontWeight={700}>
+      <Typography
+        sx={{
+          textAlign: "center",
+          mt: 3
+        }}>
+        <Link component={RouterLink} to="/welcome/login" sx={{
+          fontWeight: 700
+        }}>
           {u.t("welcome:back_button")}
         </Link>
       </Typography>

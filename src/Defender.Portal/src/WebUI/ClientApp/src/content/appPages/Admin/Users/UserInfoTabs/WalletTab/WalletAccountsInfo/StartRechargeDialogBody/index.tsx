@@ -73,34 +73,47 @@ const StartRechargeDialogBody = (props: StartRechargeDialogBodyProps) => {
     <Grid
       container
       spacing={3}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
-      <Grid item xs={10} sm={11}>
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
+      <Grid
+        size={{
+          xs: 10,
+          sm: 11
+        }}>
         <TextField
           name={requestParams.amount}
           label={u.t(
             "admin_users_page__info_wallet_tab_recharge_dialog_amount_label"
           )}
-          InputProps={{ style: { fontSize: "1.5em" } }}
           value={request.amount ? request.amount : ""}
           onChange={handleUpdateAmount}
           variant="outlined"
           fullWidth
+          slotProps={{
+            input: { style: { fontSize: "1.5em" } }
+          }}
         />
       </Grid>
       <Grid
-        item
-        xs={1}
-        sm={1}
-        alignContent={"center"}
-        fontSize={u.isMobile ? "1.7em" : "2em"}
-      >
+        sx={{
+          alignContent: "center",
+          fontSize: u.isMobile ? "1.7em" : "2em"
+        }}
+        size={{
+          xs: 1,
+          sm: 1
+        }}>
         {CurrencySymbolsMap[request.currency]}
       </Grid>
-      <Grid item xs={12} sm={12}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12
+        }}>
         <LockedButton
           disabled={request.amount <= 0}
           onClick={handleRecharge}

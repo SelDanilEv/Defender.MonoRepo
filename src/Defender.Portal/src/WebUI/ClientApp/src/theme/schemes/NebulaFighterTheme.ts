@@ -482,11 +482,11 @@ export const NebulaFighterTheme = createTheme({
           display: "flex",
           alignItems: "center",
         },
-        iconOutlined: {
-          color: colors.alpha.black[50],
-        },
         icon: {
           top: "calc(50% - 14px)",
+          "&.MuiSelect-iconOutlined": {
+            color: colors.alpha.black[50],
+          },
         },
       },
     },
@@ -636,7 +636,7 @@ export const NebulaFighterTheme = createTheme({
           fontWeight: "bold",
           transition: "all .2s",
         },
-        textPrimary: {
+        root: {
           "&.Mui-selected": {
             boxShadow: colors.shadows.primary,
           },
@@ -666,22 +666,25 @@ export const NebulaFighterTheme = createTheme({
           ".MuiSvgIcon-root": {
             transition: "all .2s",
           },
+          "&.MuiButton-containedSecondary": {
+            backgroundColor: colors.secondary.main,
+            color: colors.alpha.white[100],
+            border: "1px solid " + colors.alpha.black[30],
+          },
+          "&.MuiButton-outlinedSecondary": {
+            backgroundColor: colors.alpha.white[100],
+
+            "&:hover, &.MuiSelected": {
+              backgroundColor: colors.alpha.black[5],
+              color: colors.alpha.black[100],
+            },
+          },
+          "&.MuiButton-textSizeSmall": { padding: "4px 8px" },
+          "&.MuiButton-textSizeMedium": { padding: "6px 10px" },
+          "&.MuiButton-textSizeLarge": { padding: "8px 12px" },
         },
         endIcon: {
           marginRight: -8,
-        },
-        containedSecondary: {
-          backgroundColor: colors.secondary.main,
-          color: colors.alpha.white[100],
-          border: "1px solid " + colors.alpha.black[30],
-        },
-        outlinedSecondary: {
-          backgroundColor: colors.alpha.white[100],
-
-          "&:hover, &.MuiSelected": {
-            backgroundColor: colors.alpha.black[5],
-            color: colors.alpha.black[100],
-          },
         },
         sizeSmall: {
           padding: "4px 12px",
@@ -692,15 +695,6 @@ export const NebulaFighterTheme = createTheme({
         },
         sizeLarge: {
           padding: "9px 18px",
-        },
-        textSizeSmall: {
-          padding: "4px 8px",
-        },
-        textSizeMedium: {
-          padding: "6px 10px",
-        },
-        textSizeLarge: {
-          padding: "8px 12px",
         },
       },
     },
@@ -1021,8 +1015,10 @@ export const NebulaFighterTheme = createTheme({
     },
     MuiTablePagination: {
       defaultProps: {
-        SelectProps: {
-          size: "small",
+        slotProps: {
+          select: {
+            size: "small",
+          }
         },
       },
       styleOverrides: {
@@ -1108,8 +1104,10 @@ export const NebulaFighterTheme = createTheme({
           lineHeight: 1.5,
           fontSize: 13,
         },
-        standardInfo: {
-          color: colors.info.main,
+        root: {
+          "&.MuiAlert-standardInfo": {
+            color: colors.info.main,
+          },
         },
         action: {
           color: colors.alpha.black[70],
@@ -1136,10 +1134,10 @@ export const NebulaFighterTheme = createTheme({
         input: {
           paddingTop: 10,
           paddingBottom: 10,
-        },
-        inputSizeSmall: {
-          paddingTop: 8,
-          paddingBottom: 8,
+          "&.MuiInputBase-inputSizeSmall": {
+            paddingTop: 8,
+            paddingBottom: 8,
+          },
         },
       },
     },
@@ -1241,9 +1239,11 @@ export const NebulaFighterTheme = createTheme({
         gutterBottom: {
           marginBottom: 4,
         },
-        paragraph: {
-          fontSize: 17,
-          lineHeight: 1.7,
+        root: {
+          "&.MuiTypography-paragraph": {
+            fontSize: 17,
+            lineHeight: 1.7,
+          },
         },
       },
     },

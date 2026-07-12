@@ -198,9 +198,11 @@ const FoodAdvisorSessionRecommendationsPage = () => {
         {!!session && (
           <Typography
             variant="body2"
-            color="text.secondary"
-            sx={{ maxWidth: 560, mx: "auto" }}
-          >
+            sx={{
+              color: "text.secondary",
+              maxWidth: 560,
+              mx: "auto"
+            }}>
             {u.t("foodAdvisor:session_status")}: {getStatusLabel(session.status)}
           </Typography>
         )}
@@ -210,10 +212,12 @@ const FoodAdvisorSessionRecommendationsPage = () => {
       )}
       <Grid container spacing={2}>
         {recommendations.length === 0 ? (
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Card>
               <CardContent>
-                <Typography color="text.secondary">
+                <Typography sx={{
+                  color: "text.secondary"
+                }}>
                   {!sessionId
                     ? u.t("foodAdvisor:recommendations_empty")
                     : manualRefreshWarning
@@ -247,7 +251,13 @@ const FoodAdvisorSessionRecommendationsPage = () => {
           </Grid>
         ) : (
           recommendations.slice(0, TOP_RECOMMENDATIONS).map((dish, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid
+              key={index}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 4
+              }}>
               <Card
                 sx={{
                   height: "100%",
@@ -281,10 +291,12 @@ const FoodAdvisorSessionRecommendationsPage = () => {
           ))
         )}
         {recommendations.length > TOP_RECOMMENDATIONS && (
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Card variant="outlined">
               <CardContent>
-                <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                <Typography variant="subtitle2" gutterBottom sx={{
+                  color: "text.secondary"
+                }}>
                   {u.t("foodAdvisor:recommendations_more")}
                 </Typography>
                 <Typography variant="body2">
@@ -294,13 +306,12 @@ const FoodAdvisorSessionRecommendationsPage = () => {
             </Card>
           </Grid>
         )}
-        <Grid item xs={12}>
+        <Grid size={12}>
           <Button variant="outlined" onClick={() => navigate("/food-advisor")}>
             {u.t("foodAdvisor:back")}
           </Button>
         </Grid>
       </Grid>
-
       <DishRatingDialog
         open={!!ratingDish}
         dishName={ratingDish}

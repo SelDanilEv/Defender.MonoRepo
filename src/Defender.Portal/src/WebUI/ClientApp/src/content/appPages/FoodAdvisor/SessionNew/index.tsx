@@ -15,7 +15,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import UploadRoundedIcon from "@mui/icons-material/UploadRounded";
 import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
@@ -254,14 +254,20 @@ const FoodAdvisorSessionNewPage = () => {
         </Typography>
         <Typography
           variant="body2"
-          color="text.secondary"
-          sx={{ maxWidth: 560, mx: "auto" }}
-        >
+          sx={{
+            color: "text.secondary",
+            maxWidth: 560,
+            mx: "auto"
+          }}>
           {u.t("foodAdvisor:session_new_hint")}
         </Typography>
       </Box>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={7}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 7
+          }}>
           <Card>
             <CardContent>
               <Stack spacing={1.5}>
@@ -288,7 +294,9 @@ const FoodAdvisorSessionNewPage = () => {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
-                  <Stack spacing={1.5} alignItems={{ xs: "stretch", sm: "flex-start" }}>
+                  <Stack spacing={1.5} sx={{
+                    alignItems: { xs: "stretch", sm: "flex-start" }
+                  }}>
                     <Box
                       sx={(theme) => ({
                         width: 38,
@@ -309,7 +317,9 @@ const FoodAdvisorSessionNewPage = () => {
                           ? u.t("foodAdvisor:session_drop_title")
                           : u.t("foodAdvisor:session_picker_title")}
                       </Typography>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{
+                        color: "text.secondary"
+                      }}>
                         {isDragActive
                           ? u.t("foodAdvisor:session_drop_hint")
                           : u.t("foodAdvisor:session_picker_hint")}
@@ -318,7 +328,9 @@ const FoodAdvisorSessionNewPage = () => {
                     <Stack
                       direction={{ xs: "column", sm: "row" }}
                       spacing={1}
-                      alignItems={{ xs: "stretch", sm: "center" }}
+                      sx={{
+                        alignItems: { xs: "stretch", sm: "center" }
+                      }}
                     >
                       <Button
                         component="label"
@@ -339,7 +351,9 @@ const FoodAdvisorSessionNewPage = () => {
                           disabled={isBusy}
                         />
                       </Button>
-                      <Typography variant="body2" color="text.secondary">
+                      <Typography variant="body2" sx={{
+                        color: "text.secondary"
+                      }}>
                         {u.t("foodAdvisor:session_selected_files")}: {files.length}
                       </Typography>
                     </Stack>
@@ -374,7 +388,12 @@ const FoodAdvisorSessionNewPage = () => {
                         >
                           <ListItemText
                             primary={
-                              <Box display="flex" alignItems="center" gap={1}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 1
+                                }}>
                                 <ImageOutlinedIcon fontSize="inherit" />
                                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                                   {file.name}
@@ -388,14 +407,23 @@ const FoodAdvisorSessionNewPage = () => {
                       ))}
                     </List>
                     {files.length > 5 && (
-                      <Typography variant="caption" color="text.secondary">
+                      <Typography variant="caption" sx={{
+                        color: "text.secondary"
+                      }}>
                         {u.t("foodAdvisor:session_more_files_hint")}: {files.length - 5}
                       </Typography>
                     )}
                   </Box>
                 )}
               </Stack>
-              <Box display="flex" gap={1} flexWrap="wrap" alignItems="center" sx={{ mt: 1.5 }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  mt: 1.5
+                }}>
                 <Button
                   variant="outlined"
                   onClick={() => navigate("/food-advisor")}
@@ -422,12 +450,16 @@ const FoodAdvisorSessionNewPage = () => {
                     : u.t("foodAdvisor:recommendations_refresh")}
                 </Button>
                 {creatingSession && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     {u.t("foodAdvisor:session_creating")}
                   </Typography>
                 )}
                 {!creatingSession && parsing && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={{
+                    color: "text.secondary"
+                  }}>
                     {u.t("foodAdvisor:status_parsing")}
                   </Typography>
                 )}
@@ -445,10 +477,16 @@ const FoodAdvisorSessionNewPage = () => {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} sm={5}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 5
+          }}>
           <Card sx={{ height: "100%" }}>
             <CardContent>
-              <Typography variant="subtitle2" color="text.secondary">
+              <Typography variant="subtitle2" sx={{
+                color: "text.secondary"
+              }}>
                 {u.t("foodAdvisor:session_status")}
               </Typography>
               <Typography variant="body1" sx={{ mt: 1 }}>
@@ -458,7 +496,12 @@ const FoodAdvisorSessionNewPage = () => {
               </Typography>
               {!!session?.id && (
                 <>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      mt: 1
+                    }}>
                     {session.id}
                   </Typography>
                   <Divider sx={{ my: 1 }} />
@@ -466,7 +509,12 @@ const FoodAdvisorSessionNewPage = () => {
               )}
               {files.length > 0 && (
                 <>
-                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: "text.secondary",
+                      mt: 1
+                    }}>
                     {u.t("foodAdvisor:session_selected_files")}: {files.length}
                   </Typography>
                   <Divider sx={{ my: 1 }} />

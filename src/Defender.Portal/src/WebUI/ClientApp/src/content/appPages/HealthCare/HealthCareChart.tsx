@@ -38,11 +38,19 @@ const HealthCareChart = ({
   const medicationLineWidth = u.isMobile ? 14 : 10;
 
   if (chartData.chartEvents.length === 0) {
-    return <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>;
+    return (
+      <Typography sx={{
+        color: "text.secondary"
+      }}>{u.t("healthCare:no_events_to_display")}</Typography>
+    );
   }
 
   return (
-    <Box position="relative" height={height}>
+    <Box
+      sx={{
+        position: "relative",
+        height: height
+      }}>
       {chartData.temperatureEvents.length > 0 ? (
         <LineChart
           height={height}
@@ -65,28 +73,30 @@ const HealthCareChart = ({
               connectNulls: true,
             },
           ]}
-          slotProps={{
-            legend: {
-              hidden: true,
-            },
-          }}
+          hideLegend
         />
       ) : (
-        <Box height={height} display="flex" alignItems="center" justifyContent="center">
-          <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
+        <Box
+          sx={{
+            height: height,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+          <Typography sx={{
+            color: "text.secondary"
+          }}>{u.t("healthCare:no_events_to_display")}</Typography>
         </Box>
       )}
-
       <Box
-        position="absolute"
         sx={{
+          position: "absolute",
           left: margin.left,
           right: margin.right,
           top: margin.top,
           bottom: margin.bottom,
-          pointerEvents: "none",
-        }}
-      >
+          pointerEvents: "none"
+        }}>
         {sleepEvents.map((event) => {
           const start = new Date(event.startedAt).getTime();
           const end = new Date(event.endedAt || event.startedAt).getTime();
@@ -103,10 +113,10 @@ const HealthCareChart = ({
               })}
             >
               <Box
-                position="absolute"
-                top="12%"
-                bottom="12%"
                 sx={{
+                  position: "absolute",
+                  top: "12%",
+                  bottom: "12%",
                   left: `${Math.min(left, right)}%`,
                   width: `${Math.max(Math.abs(right - left), 1)}%`,
                   minWidth: 6,
@@ -115,9 +125,8 @@ const HealthCareChart = ({
                   border: 1,
                   borderColor: "info.main",
                   borderRadius: 1,
-                  pointerEvents: "auto",
-                }}
-              />
+                  pointerEvents: "auto"
+                }} />
             </Tooltip>
           );
         })}
@@ -137,10 +146,10 @@ const HealthCareChart = ({
               title={medicationLabel(event, u.t("healthCare:medication_fallback"))}
             >
               <Box
-                position="absolute"
-                top={0}
-                bottom={0}
                 sx={{
+                  position: "absolute",
+                  top: 0,
+                  bottom: 0,
                   left: `${left}%`,
                   width: medicationLineWidth,
                   transform: "translateX(-50%)",
@@ -148,9 +157,8 @@ const HealthCareChart = ({
                   border: "1px solid rgba(15, 23, 42, 0.2)",
                   boxShadow: "0 1px 4px rgba(15, 23, 42, 0.18)",
                   borderRadius: 999,
-                  pointerEvents: "auto",
-                }}
-              />
+                  pointerEvents: "auto"
+                }} />
             </Tooltip>
           );
         })}

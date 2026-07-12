@@ -16,7 +16,7 @@ import { CreatePosition, DeletePosition, UpdatePosition } from "./actions";
 
 const HorizontalDivider = () => {
   return (
-    <Grid item xs={12} style={{ paddingTop: 5 }}>
+    <Grid style={{ paddingTop: 5 }} size={12}>
       <Divider />
     </Grid>
   );
@@ -118,14 +118,20 @@ const PositionDialogBody = (props: PositionDialogBodyProps) => {
     <Grid
       container
       spacing={2}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
       {model && (
         <>
-          <Grid item xs={12} sm={7} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 12,
+              sm: 7
+            }}>
             <LockedTextField
               fullWidth
               label={u.t("budgetTracker:positions_table_name_column")}
@@ -136,7 +142,12 @@ const PositionDialogBody = (props: PositionDialogBodyProps) => {
             />
           </Grid>
 
-          <Grid item xs={6} sm={3} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <LockedSelect
               name={modelParams.currency}
               value={model.currency}
@@ -150,7 +161,11 @@ const PositionDialogBody = (props: PositionDialogBodyProps) => {
             </LockedSelect>
           </Grid>
 
-          <Grid item xs={6} sm={2}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 2
+            }}>
             <LockedTextField
               fullWidth
               label={u.t("budgetTracker:positions_dialog_priority_label")}
@@ -164,7 +179,11 @@ const PositionDialogBody = (props: PositionDialogBodyProps) => {
 
           {HorizontalDivider()}
 
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <LockedChipList
               fullWidth
               label={u.t("budgetTracker:positions_dialog_tags_label")}
@@ -176,7 +195,12 @@ const PositionDialogBody = (props: PositionDialogBodyProps) => {
 
           {HorizontalDivider()}
 
-          <Grid item xs={12} sm={12} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             {renderActionButton()}
           </Grid>
         </>

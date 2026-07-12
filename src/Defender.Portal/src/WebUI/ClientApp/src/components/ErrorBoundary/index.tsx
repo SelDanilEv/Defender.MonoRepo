@@ -50,27 +50,30 @@ const ErrorBoundaryFallback = ({
 
   return (
     <Box
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      minHeight="50vh"
-      px={2}
-      py={4}
-    >
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: "50vh",
+        px: 2,
+        py: 4
+      }}>
       <Card sx={{ maxWidth: 560, width: "100%" }}>
         <CardContent>
           <Stack spacing={2}>
             <Typography variant="h4">{title}</Typography>
-            <Typography color="text.secondary">
+            <Typography sx={{
+              color: "text.secondary"
+            }}>
               {description}
             </Typography>
-            <Alert severity="error">
+            <Alert severity="error" sx={{ backgroundColor: "#7f1d1d", color: "#ffffff" }}>
               The page hit an unexpected client-side error.
             </Alert>
           </Stack>
         </CardContent>
         <CardActions sx={{ px: 2, pb: 2 }}>
-          <Button variant="contained" onClick={onRetry}>
+          <Button variant="contained" onClick={onRetry} sx={{ backgroundColor: "primary.dark" }}>
             Try again
           </Button>
           <Button variant="outlined" onClick={handleReload}>

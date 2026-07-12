@@ -25,17 +25,20 @@ function StatusMaintenance() {
       <MainContent>
         <Container maxWidth="md">
           <Logo />
-          <Box textAlign="center">
+          <Box sx={{
+            textAlign: "center"
+          }}>
             <Container maxWidth="xs">
               <Typography variant="h2" sx={{ mt: 4, mb: 2 }}>
                 The site is currently down for maintenance
               </Typography>
               <Typography
                 variant="h3"
-                color="text.secondary"
-                fontWeight="normal"
-                sx={{ mb: 4 }}
-              >
+                sx={{
+                  color: "text.secondary",
+                  fontWeight: "normal",
+                  mb: 4
+                }}>
                 We apologize for any inconveniences caused
               </Typography>
             </Container>

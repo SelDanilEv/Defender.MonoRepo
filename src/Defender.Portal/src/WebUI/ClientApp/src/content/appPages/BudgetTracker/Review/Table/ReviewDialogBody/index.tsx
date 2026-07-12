@@ -34,14 +34,24 @@ import { PublishReview, DeleteReview } from "./actions";
 
 const HorizontalDivider = () => {
   return (
-    <Grid item xs={12} py={1}>
+    <Grid
+      sx={{
+        py: 1
+      }}
+      size={12}>
       <Divider />
     </Grid>
   );
 };
 
 const GapGrid = () => {
-  return <Grid item xs={12} py={0.5}></Grid>;
+  return (
+    <Grid
+      sx={{
+        py: 0.5
+      }}
+      size={12}></Grid>
+  );
 };
 
 const gridItem = {
@@ -114,8 +124,12 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
 
   const renderPositions = () => {
     return model.positions?.map((position, index) => (
-      <Grid item xs={12} container key={index}>
-        <Grid item xs={12} sm={12}>
+      <Grid container key={index} size={12}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
           <LockedTextField
             fullWidth
             disabled={dialogMode === DialogMode.Delete || !isAdvancedMode}
@@ -130,7 +144,11 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
 
         <GapGrid />
 
-        <Grid item xs={9} sm={9}>
+        <Grid
+          size={{
+            xs: 9,
+            sm: 9
+          }}>
           <LockedTextField
             disabled={dialogMode === DialogMode.Delete}
             label={u.t("budgetTracker:review_dialog_position_amount_label")}
@@ -159,7 +177,12 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
           />
         </Grid>
 
-        <Grid item xs={3} sm={3} style={gridItem}>
+        <Grid
+          style={gridItem}
+          size={{
+            xs: 3,
+            sm: 3
+          }}>
           <LockedSelect
             disabled={dialogMode === DialogMode.Delete || !isAdvancedMode}
             value={position.currency}
@@ -179,7 +202,11 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
           <>
             <GapGrid />
 
-            <Grid item xs={10} sm={10}>
+            <Grid
+              size={{
+                xs: 10,
+                sm: 10
+              }}>
               <LockedChipList
                 disabled={dialogMode === DialogMode.Delete}
                 fullWidth
@@ -190,7 +217,12 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
               />
             </Grid>
 
-            <Grid item xs={2} sm={2} style={gridItem}>
+            <Grid
+              style={gridItem}
+              size={{
+                xs: 2,
+                sm: 2
+              }}>
               <Tooltip title={u.t("double_click_tooltip")}>
                 <LockedButton
                   color="error"
@@ -249,14 +281,20 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
     <Grid
       container
       spacing={2}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
       {model && (
         <>
-          <Grid item xs={7} sm={7} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 7,
+              sm: 7
+            }}>
             <LockedDatePicker
               disabled={dialogMode === DialogMode.Delete}
               label={u.t("budgetTracker:reviews_table_date_column")}
@@ -266,7 +304,12 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
             />
           </Grid>
 
-          <Grid item xs={5} sm={5} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 5,
+              sm: 5
+            }}>
             <FormControlLabel
               control={
                 <Checkbox
@@ -279,15 +322,15 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
             />
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={12}>
             {HorizontalDivider()}
           </Grid>
 
-          <Grid item container xs={12}>
+          <Grid container size={12}>
             {renderPositions()}
             {isAdvancedMode && (
               <>
-                <Grid item xs={12} style={gridItem}>
+                <Grid style={gridItem} size={12}>
                   <LockedButton
                     disabled={dialogMode === DialogMode.Delete}
                     color="success"
@@ -315,22 +358,22 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
                   </LockedButton>
                 </Grid>
 
-                <Grid item xs={12}>
+                <Grid size={12}>
                   {HorizontalDivider()}
                 </Grid>
               </>
             )}
           </Grid>
 
-          <Grid item container spacing={1}>
-            <Grid item xs={12} style={gridItem}>
+          <Grid container spacing={1}>
+            <Grid style={gridItem} size={12}>
               <Typography variant="h6" gutterBottom>
                 {u.t("budgetTracker:reviews_dialog_rates_to_label")}
                 {model.baseCurrency}
               </Typography>
             </Grid>
             {inputModel.date !== model.date && (
-              <Grid item xs={12} style={gridItem}>
+              <Grid style={gridItem} size={12}>
                 <WarningStatusLabel>
                   {u.t("budgetTracker:reviews_dialog_not_valid_rates_label")}
                   {inputModel.date &&
@@ -341,7 +384,13 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
             {GetEntities(model.rates)
               .filter(([currency]) => currency !== model.baseCurrency)
               .map(([currency, rate]) => (
-                <Grid item xs={12} sm={6} md={4} key={currency}>
+                <Grid
+                  key={currency}
+                  size={{
+                    xs: 12,
+                    sm: 6,
+                    md: 4
+                  }}>
                   <Paper style={{ padding: "16px" }}>
                     <Typography variant="body1">
                       {currency}: {rate.toFixed(4)}
@@ -351,11 +400,16 @@ const ReviewDialogBody = (props: ReviewDialogBodyProps) => {
               ))}
           </Grid>
 
-          <Grid item xs={12}>
+          <Grid size={12}>
             {HorizontalDivider()}
           </Grid>
 
-          <Grid item xs={12} sm={12} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             {renderActionButton()}
           </Grid>
         </>

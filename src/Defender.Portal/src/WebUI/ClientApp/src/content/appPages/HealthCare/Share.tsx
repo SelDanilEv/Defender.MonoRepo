@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import {
   Box,
@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import { useParams } from "react-router";
+import { useParams } from "react-router-dom";
 import { healthCareApi, HealthChartShare, HealthEvent } from "src/api/healthCare";
 import useUtils from "src/appUtils";
 import LanguageSwitcher from "src/components/LanguageSwitcher";
@@ -47,6 +47,8 @@ const publicShareRefreshIntervalMs = 10000;
 
 const HealthCareSharePage = () => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
   const currentLanguage = useAppSelector((state) => state.session.language);
   const { token } = useParams();
   const [share, setShare] = useState<HealthChartShare | null>(null);
@@ -81,7 +83,7 @@ const HealthCareSharePage = () => {
     }
 
     return healthCareApi
-      .getPublicShare(token, u)
+      .getPublicShare(token, utilsRef.current)
       .then((fetchedShare) => {
         setShare((currentShare) =>
           getNextDisplayedShare(currentShare, fetchedShare, showLoading)
@@ -92,7 +94,7 @@ const HealthCareSharePage = () => {
           setIsLoading(false);
         }
       });
-  }, [token]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token]);
 
   useEffect(() => {
     refreshShare(true);
@@ -140,7 +142,9 @@ const HealthCareSharePage = () => {
   const content = isLoading ? (
     <LinearProgress />
   ) : !share ? (
-    <Typography color="text.secondary">
+    <Typography sx={{
+      color: "text.secondary"
+    }}>
       {u.t("healthCare:share_unavailable")}
     </Typography>
   ) : (
@@ -175,7 +179,14 @@ const HealthCareSharePage = () => {
           </IconButton>
         </Box>
       )}
-      <Stack direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between" gap={1} mb={{ xs: 0.5, sm: 1 }}>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        sx={{
+          alignItems: { xs: "stretch", sm: "center" },
+          justifyContent: "space-between",
+          gap: 1,
+          mb: { xs: 0.5, sm: 1 }
+        }}>
         <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
         <TextField
           select
@@ -199,7 +210,12 @@ const HealthCareSharePage = () => {
         language={currentLanguage}
       />
       <HealthCareChart events={visibleEvents} timeRange="all" language={currentLanguage} height={u.isMobile ? 250 : 300} />
-      <Typography variant="h4" mt={{ xs: 2, sm: 3 }} mb={1}>{u.t("healthCare:events_grid")}</Typography>
+      <Typography
+        variant="h4"
+        sx={{
+          mt: { xs: 2, sm: 3 },
+          mb: 1
+        }}>{u.t("healthCare:events_grid")}</Typography>
       <TableContainer>
         <Table size="small">
           <TableHead>
@@ -224,7 +240,9 @@ const HealthCareSharePage = () => {
             {visibleEvents.length === 0 && (
               <TableRow>
                 <TableCell colSpan={4}>
-                  <Typography color="text.secondary">{u.t("healthCare:no_events_to_display")}</Typography>
+                  <Typography sx={{
+                    color: "text.secondary"
+                  }}>{u.t("healthCare:no_events_to_display")}</Typography>
                 </TableCell>
               </TableRow>
             )}
@@ -269,9 +287,23 @@ const HealthCareSharePage = () => {
   );
 
   return (
-    <Box p={{ xs: 1, sm: 2 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" gap={1} mb={{ xs: 1, sm: 2 }}>
-        <Stack direction="row" alignItems="center" gap={1}>
+    <Box sx={{
+      p: { xs: 1, sm: 2 }
+    }}>
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 1,
+          mb: { xs: 1, sm: 2 }
+        }}>
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: "center",
+            gap: 1
+          }}>
           <LocalHospitalIcon color="primary" />
           <Typography variant="h3" sx={{ fontSize: { xs: "1.25rem", sm: "1.75rem" } }}>
             {u.t("healthCare:share_page_title")}

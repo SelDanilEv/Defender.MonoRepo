@@ -22,7 +22,7 @@ const LineWithText = (props: any) => {
           margin: `0 ${props.gap}`,
         }}
       />
-      <Box sx={{ color: `${u.react.theme.colors.primary.dark}` }}>
+      <Box sx={{ color: "text.secondary" }}>
         {props.text}
       </Box>
       <Box

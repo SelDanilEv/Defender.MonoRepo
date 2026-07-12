@@ -38,11 +38,15 @@ const DishRatingDialog = ({
           <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
             {dishName}
           </Typography>
-          <Typography variant="body2" color="text.secondary">
+          <Typography variant="body2" sx={{
+            color: "text.secondary"
+          }}>
             {lowHint} | {highHint}
           </Typography>
         </Box>
-        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+        <Stack direction="row" spacing={1} useFlexGap sx={{
+          flexWrap: "wrap"
+        }}>
           {[1, 2, 3, 4, 5].map((value) => (
             <Button
               key={value}
@@ -55,7 +59,12 @@ const DishRatingDialog = ({
             </Button>
           ))}
         </Stack>
-        <Box display="flex" gap={1} justifyContent="flex-end">
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            justifyContent: "flex-end"
+          }}>
           <Button onClick={onClose}>{cancelLabel}</Button>
           <Button variant="contained" onClick={onSubmit} disabled={submitting}>
             {submitLabel}

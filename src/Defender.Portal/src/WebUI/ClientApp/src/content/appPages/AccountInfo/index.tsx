@@ -42,7 +42,11 @@ const UpdateUserPage = (props: any) => {
       <Helmet>
         <title>Account</title>
       </Helmet>
-      <Box display="flex" mb={3}>
+      <Box
+        sx={{
+          display: "flex",
+          mb: 3
+        }}>
         <Tooltip arrow placement="top" title="Go back">
           <IconButton
             onClick={() => u.react.navigate("/home")}
@@ -52,21 +56,23 @@ const UpdateUserPage = (props: any) => {
             <ArrowBackTwoToneIcon />
           </IconButton>
         </Tooltip>
-        <Grid container alignContent={"center"}>
+        <Grid container sx={{
+          alignContent: "center"
+        }}>
           <Typography variant="h3" component="h3">
             {u.t("personal_info_page__title")}{" "}
             <i>{GetUserNicknameForHeader()}</i>
           </Typography>
         </Grid>
       </Box>
-
       <Card sx={{ mb: "15px" }}>
         <Box
-          p={3}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-        >
+          sx={{
+            p: 3,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}>
           <Box>
             <Typography variant="h3">
               {u.t("personal_info_page__account_info")}
@@ -78,11 +84,12 @@ const UpdateUserPage = (props: any) => {
       </Card>
       <Card>
         <Box
-          p={3}
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-        >
+          sx={{
+            p: 3,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between"
+          }}>
           <Box>
             <Typography variant="h3">
               {u.t("personal_info_page__sensitive_account_info")}

@@ -12,7 +12,7 @@ import Transaction from "src/models/banking/Transaction";
 
 const HorizontalDivider = () => {
   return (
-    <Grid item xs={12} style={{ paddingTop: 0 }}>
+    <Grid style={{ paddingTop: 0 }} size={12}>
       <Divider />
     </Grid>
   );
@@ -37,14 +37,19 @@ const TransactionInfoDialogBody = (props: any) => {
     <Grid
       container
       spacing={3}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
       {transaction.transactionId && (
         <>
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             {transaction.transactionId}
           </Grid>
         </>
@@ -52,7 +57,11 @@ const TransactionInfoDialogBody = (props: any) => {
       {transactionPurpose && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             {transactionPurpose}
           </Grid>
           {HorizontalDivider()}
@@ -61,10 +70,18 @@ const TransactionInfoDialogBody = (props: any) => {
       {transaction.transactionType && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("banking_page__trans_info_dialog_type_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {mapTransactionType(u, transaction.transactionType)}
           </Grid>
         </>
@@ -72,10 +89,18 @@ const TransactionInfoDialogBody = (props: any) => {
       {transaction.transactionStatus && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("banking_page__trans_info_dialog_status_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {mapTransactionStatus(u, transaction.transactionStatus)}
           </Grid>
         </>
@@ -83,10 +108,18 @@ const TransactionInfoDialogBody = (props: any) => {
       {transaction.fromWallet > 0 && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("banking_page__trans_info_dialog_from_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {transaction.fromWallet}
           </Grid>
         </>
@@ -94,10 +127,18 @@ const TransactionInfoDialogBody = (props: any) => {
       {transaction.toWallet > 0 && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("banking_page__trans_info_dialog_to_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {transaction.toWallet}
           </Grid>
         </>
@@ -105,10 +146,18 @@ const TransactionInfoDialogBody = (props: any) => {
       {transaction.amount && transaction.currency && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("banking_page__trans_info_dialog_amount_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {transaction.amount / 100}{" "}
             {CurrencySymbolsMap[transaction.currency]}
           </Grid>
@@ -117,10 +166,18 @@ const TransactionInfoDialogBody = (props: any) => {
       {transaction.utcTransactionDate && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={6} sm={5}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 5
+            }}>
             {u.t("banking_page__trans_info_dialog_date_label")}:
           </Grid>
-          <Grid item xs={6} sm={7}>
+          <Grid
+            size={{
+              xs: 6,
+              sm: 7
+            }}>
             {format(
               new Date(transaction.utcTransactionDate),
               "dd MMMM yyyy  hh:mm",
@@ -135,7 +192,11 @@ const TransactionInfoDialogBody = (props: any) => {
       {transaction.comment && (
         <>
           {HorizontalDivider()}
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             {u.t("banking_page__trans_info_dialog_comment_label")}:
             {"  " + transaction.comment}
           </Grid>

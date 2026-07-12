@@ -1,7 +1,6 @@
-import { Divider, Grid, MenuItem } from "@mui/material";
+import { Divider, Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { ColorPicker } from "material-ui-color";
 
 import useUtils from "src/appUtils";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
@@ -16,7 +15,7 @@ import { CreateGroup, DeleteGroup, UpdateGroup } from "./actions";
 
 const HorizontalDivider = () => {
   return (
-    <Grid item xs={12} style={{ paddingTop: 5 }}>
+    <Grid style={{ paddingTop: 5 }} size={12}>
       <Divider />
     </Grid>
   );
@@ -118,14 +117,20 @@ const GroupDialogBody = (props: GroupDialogBodyProps) => {
     <Grid
       container
       spacing={2}
-      p={2}
-      justifyContent={"center"}
-      alignContent={"center"}
-      fontSize={"1.3em"}
-    >
+      sx={{
+        p: 2,
+        justifyContent: "center",
+        alignContent: "center",
+        fontSize: "1.3em"
+      }}>
       {model && (
         <>
-          <Grid item xs={12} sm={12} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <LockedTextField
               fullWidth
               disabled={dialogMode === DialogMode.Delete}
@@ -137,27 +142,45 @@ const GroupDialogBody = (props: GroupDialogBodyProps) => {
             />
           </Grid>
 
-          <Grid item xs={6} sm={3} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             {u.t("budgetTracker:groups_dialog_color_label")}
           </Grid>
-          <Grid item xs={6} sm={3} style={gridItem}>
-            <ColorPicker
-              hideTextfield
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
+            <input
+              type="color"
               value={model.mainColor}
-              disableTextfield
-              disableAlpha
-              deferred={true}
               onChange={(event) => {
                 setModel((model) => {
-                  return { ...model, mainColor: event.css.backgroundColor };
+                  return { ...model, mainColor: event.target.value };
                 });
               }}
+              disabled={dialogMode === DialogMode.Delete}
             />
           </Grid>
-          <Grid item xs={6} sm={3} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             {u.t("budgetTracker:groups_dialog_trend_line_label")}
           </Grid>
-          <Grid item xs={6} sm={3} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 6,
+              sm: 3
+            }}>
             <LockedCheckbox
               disabled={dialogMode === DialogMode.Delete}
               checked={model.showTrendLine}
@@ -167,26 +190,27 @@ const GroupDialogBody = (props: GroupDialogBodyProps) => {
                 });
               }}
             />
-            <ColorPicker
-              disablePlainColor={true}
-              hideTextfield
+            <input
+              type="color"
               value={model.trendLineColor}
-              disableTextfield
-              disableAlpha
-              deferred={true}
               onChange={(newColor) => {
                 setModel((model) => {
                   return {
                     ...model,
-                    trendLineColor: newColor.css.backgroundColor,
+                    trendLineColor: newColor.target.value,
                   };
                 });
               }}
+              disabled={dialogMode === DialogMode.Delete}
             />
           </Grid>
           {HorizontalDivider()}
 
-          <Grid item xs={12} sm={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             <LockedChipList
               disabled={dialogMode === DialogMode.Delete}
               fullWidth
@@ -199,7 +223,12 @@ const GroupDialogBody = (props: GroupDialogBodyProps) => {
 
           {HorizontalDivider()}
 
-          <Grid item xs={12} sm={12} style={gridItem}>
+          <Grid
+            style={gridItem}
+            size={{
+              xs: 12,
+              sm: 12
+            }}>
             {renderActionButton()}
           </Grid>
         </>

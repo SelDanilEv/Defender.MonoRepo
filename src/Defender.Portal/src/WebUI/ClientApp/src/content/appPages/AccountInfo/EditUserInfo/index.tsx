@@ -28,8 +28,8 @@ const EditUserInfo = (props: any) => {
   const [isSaveActionDisabled, setSaveActionDisabled] = useState<boolean>(true);
 
   useEffect(() => {
-    DisableButtonIfDataNotChanged();
-  }, [sessionUser]);
+    setSaveActionDisabled(sessionUser?.nickname == user?.nickname);
+  }, [sessionUser, user]);
 
   const handleUpdateUserInfo = () => {
     setSaveActionDisabled(true);
@@ -74,46 +74,69 @@ const EditUserInfo = (props: any) => {
           <Grid container spacing={2} sx={{ fontSize: "1.2em" }}>
             <Grid
               container
-              item
-              xs={12}
-              sm={4}
-              md={3}
-              alignContent={"center"}
-              justifyContent={{ xs: "left", sm: "center" }}
-            >
+              sx={{
+                alignContent: "center",
+                justifyContent: { xs: "left", sm: "center" }
+              }}
+              size={{
+                xs: 12,
+                sm: 4,
+                md: 3
+              }}>
               <Grid>{u.t("personal_info_page__name_field")}:</Grid>
             </Grid>
-            <Grid item xs={12} sm={6} md={7}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 7
+              }}>
               <TextField
                 id="nickname"
                 sx={{ padding: 0 }}
-                InputProps={{ style: { fontSize: "1.1em" } }}
                 defaultValue={user.nickname}
                 onChange={UpdateRequest}
                 variant="standard"
                 fullWidth
+                slotProps={{
+                  input: { style: { fontSize: "1.1em" } }
+                }}
               />
             </Grid>
             <Grid
               container
-              item
-              xs={12}
-              sm={4}
-              md={3}
-              alignContent={"center"}
-              justifyContent={{ xs: "left", sm: "center" }}
-            >
+              sx={{
+                alignContent: "center",
+                justifyContent: { xs: "left", sm: "center" }
+              }}
+              size={{
+                xs: 12,
+                sm: 4,
+                md: 3
+              }}>
               <Grid>{u.t("personal_info_page__created_date_field")}:</Grid>
             </Grid>
-            <Grid item xs={12} sm={8} md={9}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 8,
+                md: 9
+              }}>
               <Text color="black">
                 {UserService.GetAccountCreatedUTCDate(sessionUser)}
               </Text>
             </Grid>
-            <Grid item xs={12} pt={1} pb={1}>
+            <Grid
+              sx={{
+                pt: 1,
+                pb: 1
+              }}
+              size={12}>
               <Divider />
             </Grid>
-            <Grid container justifyContent="flex-end">
+            <Grid container sx={{
+              justifyContent: "flex-end"
+            }}>
               <Button
                 disabled={isSaveActionDisabled}
                 onClick={() => handleUpdateUserInfo()}

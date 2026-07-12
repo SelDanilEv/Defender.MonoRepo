@@ -38,7 +38,9 @@ export default function CustomDialog({
       open={open}
       keepMounted
       onClose={disableBackdropClick ? undefined : onClose}
-      TransitionComponent={Transition}
+      slots={{
+        transition: Transition
+      }}
     >
       <AppBar sx={{ position: "relative", px: "1em", py: "0.5em" }}>
         <Toolbar>

@@ -6,8 +6,16 @@ import {
 const Notification = (props: any) => {
   return (
     <>
-      <Box flex="1" pb={1}>
-        <Box display="flex" justifyContent="space-between">
+      <Box
+        sx={{
+          flex: "1",
+          pb: 1
+        }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between"
+          }}>
           <Typography sx={{ fontWeight: 'bold' }}>
             {props.topic}
           </Typography>
@@ -15,7 +23,9 @@ const Notification = (props: any) => {
         <Typography
           component="span"
           variant="body2"
-          color="text.secondary"
+          sx={{
+            color: "text.secondary"
+          }}
         >
           {' '}
           {props.body}

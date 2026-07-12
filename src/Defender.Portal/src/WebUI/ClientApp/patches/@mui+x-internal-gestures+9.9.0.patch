@@ -1,0 +1,217 @@
+diff --git a/node_modules/@mui/x-internal-gestures/core/Gesture.d.mts b/node_modules/@mui/x-internal-gestures/core/Gesture.d.mts
+index 5ea1dd4..d00d0de 100644
+--- a/node_modules/@mui/x-internal-gestures/core/Gesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/Gesture.d.mts
+@@ -190,15 +190,15 @@ export declare abstract class Gesture<GestureName extends string> {
+   /** Stores the active gesture state */
+   protected abstract state: GestureState;
+   /** @internal For types. If false enables phases (xStart, x, xEnd) */
+-  protected abstract readonly isSinglePhase: boolean;
++  readonly isSinglePhase: boolean;
+   /** @internal For types. The event type this gesture is associated with */
+-  protected abstract readonly eventType: CustomEvent;
++  readonly eventType: CustomEvent;
+   /** @internal For types. The options type for this gesture */
+   protected abstract readonly optionsType: GestureOptions<GestureName>;
+   /** @internal For types. The options that can be changed at runtime */
+-  protected abstract readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+   /** @internal For types. The state that can be changed at runtime */
+-  protected abstract readonly mutableStateType: Partial<typeof this.state>;
++  readonly mutableStateType: Partial<typeof this.state>;
+   /**
+    * Create a new gesture instance with the specified options
+    *
+diff --git a/node_modules/@mui/x-internal-gestures/core/PointerGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/PointerGesture.d.mts
+index f84f511..d8f9f85 100644
+--- a/node_modules/@mui/x-internal-gestures/core/PointerGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/PointerGesture.d.mts
+@@ -73,7 +73,7 @@ export declare abstract class PointerGesture<GestureName extends string> extends
+   /** The original target element when the gesture began, used to prevent limbo state if target is removed */
+   protected originalTarget: TargetElement | null;
+   protected abstract readonly optionsType: PointerGestureOptions<GestureName>;
+-  protected abstract readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+   /**
+    * Minimum number of simultaneous pointers required to activate the gesture.
+    * The gesture will not start until at least this many pointers are active.
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/MoveGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/MoveGesture.d.mts
+index 00299cc..17ab231 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/MoveGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/MoveGesture.d.mts
+@@ -62,11 +62,11 @@ export type MoveGestureState = GestureState & {
+  */
+ export declare class MoveGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: MoveGestureState;
+-  protected readonly isSinglePhase: false;
+-  protected readonly eventType: MoveEvent;
++  readonly isSinglePhase: false;
++  readonly eventType: MoveEvent;
+   protected readonly optionsType: MoveGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: never;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: never;
+   /**
+    * Movement threshold in pixels that must be exceeded before the gesture activates.
+    * Higher values reduce false positive gesture detection for small movements.
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/PanGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/PanGesture.d.mts
+index 1b96ffd..eb1bce2 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/PanGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/PanGesture.d.mts
+@@ -110,11 +110,11 @@ export type PanGestureState = GestureState & {
+  */
+ export declare class PanGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: PanGestureState;
+-  protected readonly isSinglePhase: false;
+-  protected readonly eventType: PanEvent;
++  readonly isSinglePhase: false;
++  readonly eventType: PanEvent;
+   protected readonly optionsType: PanGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: Omit<Partial<typeof this.state>, 'startPointers' | 'startCentroid' | 'lastCentroid' | 'movementThresholdReached' | 'lastDirection'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: Omit<Partial<typeof this.state>, 'startPointers' | 'startCentroid' | 'lastCentroid' | 'movementThresholdReached' | 'lastDirection'>;
+   /**
+    * Movement threshold in pixels that must be exceeded before the gesture activates.
+    * Higher values reduce false positive gesture detection for small movements.
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/PinchGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/PinchGesture.d.mts
+index 9b8e60d..a6ab89f 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/PinchGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/PinchGesture.d.mts
+@@ -83,11 +83,11 @@ export type PinchGestureState = GestureState & {
+  */
+ export declare class PinchGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: PinchGestureState;
+-  protected readonly isSinglePhase: false;
+-  protected readonly eventType: PinchEvent;
++  readonly isSinglePhase: false;
++  readonly eventType: PinchEvent;
+   protected readonly optionsType: PinchGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: Omit<Partial<typeof this.state>, 'startDistance' | 'lastDistance' | 'lastScale' | 'lastTime' | 'velocity'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: Omit<Partial<typeof this.state>, 'startDistance' | 'lastDistance' | 'lastScale' | 'lastTime' | 'velocity'>;
+   /**
+    * Movement threshold in pixels that must be exceeded before the gesture activates.
+    * Higher values reduce false positive gesture detection for small movements.
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/PressAndDragGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/PressAndDragGesture.d.mts
+index a7dcde1..a14e4f2 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/PressAndDragGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/PressAndDragGesture.d.mts
+@@ -84,11 +84,11 @@ export type PressAndDragGestureState = GestureState & {
+  */
+ export declare class PressAndDragGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: PressAndDragGestureState;
+-  protected readonly isSinglePhase: false;
+-  protected readonly eventType: PressAndDragEvent;
++  readonly isSinglePhase: false;
++  readonly eventType: PressAndDragEvent;
+   protected readonly optionsType: PressAndDragGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: Omit<Partial<typeof this.state>, 'phase' | 'dragTimeoutId'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: Omit<Partial<typeof this.state>, 'phase' | 'dragTimeoutId'>;
+   /**
+    * Duration required for press recognition
+    */
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/PressGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/PressGesture.d.mts
+index fb90f02..d434f7c 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/PressGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/PressGesture.d.mts
+@@ -75,11 +75,11 @@ export type PressGestureState = GestureState & {
+  */
+ export declare class PressGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: PressGestureState;
+-  protected readonly isSinglePhase: false;
+-  protected readonly eventType: PressEvent;
++  readonly isSinglePhase: false;
++  readonly eventType: PressEvent;
+   protected readonly optionsType: PressGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: Omit<Partial<typeof this.state>, 'startCentroid' | 'lastPosition' | 'timerId' | 'startTime' | 'pressThresholdReached'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: Omit<Partial<typeof this.state>, 'startCentroid' | 'lastPosition' | 'timerId' | 'startTime' | 'pressThresholdReached'>;
+   /**
+    * Duration in milliseconds required to hold before the press gesture is recognized
+    */
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/RotateGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/RotateGesture.d.mts
+index 4346907..7d32732 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/RotateGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/RotateGesture.d.mts
+@@ -59,11 +59,11 @@ export type RotateGestureState = GestureState & {
+  */
+ export declare class RotateGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: RotateGestureState;
+-  protected readonly isSinglePhase: false;
+-  protected readonly eventType: RotateEvent;
++  readonly isSinglePhase: false;
++  readonly eventType: RotateEvent;
+   protected readonly optionsType: RotateGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: Omit<Partial<typeof this.state>, 'startAngle' | 'lastAngle' | 'lastTime' | 'velocity' | 'lastDelta'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: Omit<Partial<typeof this.state>, 'startAngle' | 'lastAngle' | 'lastTime' | 'velocity' | 'lastDelta'>;
+   constructor(options: RotateGestureOptions<GestureName>);
+   clone(overrides?: Record<string, unknown>): RotateGesture<GestureName>;
+   destroy(): void;
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/TapAndDragGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/TapAndDragGesture.d.mts
+index 5a2f853..2a547d2 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/TapAndDragGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/TapAndDragGesture.d.mts
+@@ -77,11 +77,11 @@ export type TapAndDragGestureState = GestureState & {
+  */
+ export declare class TapAndDragGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: TapAndDragGestureState;
+-  protected readonly isSinglePhase: false;
+-  protected readonly eventType: TapAndDragEvent;
++  readonly isSinglePhase: false;
++  readonly eventType: TapAndDragEvent;
+   protected readonly optionsType: TapAndDragGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: Omit<Partial<typeof this.state>, 'phase' | 'dragTimeoutId'>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: Omit<Partial<typeof this.state>, 'phase' | 'dragTimeoutId'>;
+   /**
+    * Maximum distance a pointer can move during tap for it to still be considered a tap
+    * (Following TapGesture pattern)
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/TapGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/TapGesture.d.mts
+index f474c7c..5bd0f8a 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/TapGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/TapGesture.d.mts
+@@ -69,11 +69,11 @@ export type TapGestureState = GestureState & {
+  */
+ export declare class TapGesture<GestureName extends string> extends PointerGesture<GestureName> {
+   protected state: TapGestureState;
+-  protected readonly isSinglePhase: true;
+-  protected readonly eventType: TapEvent;
++  readonly isSinglePhase: true;
++  readonly eventType: TapEvent;
+   protected readonly optionsType: TapGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
+-  protected readonly mutableStateType: never;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name'>;
++  readonly mutableStateType: never;
+   /**
+    * Maximum distance a pointer can move for a gesture to still be considered a tap
+    */
+diff --git a/node_modules/@mui/x-internal-gestures/core/gestures/TurnWheelGesture.d.mts b/node_modules/@mui/x-internal-gestures/core/gestures/TurnWheelGesture.d.mts
+index 1fe3341..8c840cb 100644
+--- a/node_modules/@mui/x-internal-gestures/core/gestures/TurnWheelGesture.d.mts
++++ b/node_modules/@mui/x-internal-gestures/core/gestures/TurnWheelGesture.d.mts
+@@ -118,11 +118,11 @@ export type TurnWheelGestureState = GestureState & {
+  */
+ export declare class TurnWheelGesture<GestureName extends string> extends Gesture<GestureName> {
+   protected state: TurnWheelGestureState;
+-  protected readonly isSinglePhase: true;
+-  protected readonly eventType: TurnWheelEvent;
++  readonly isSinglePhase: true;
++  readonly eventType: TurnWheelEvent;
+   protected readonly optionsType: TurnWheelGestureOptions<GestureName>;
+-  protected readonly mutableOptionsType: Omit<typeof this.optionsType, 'name' | 'pointerMode' | 'pointerOptions' | 'passive'>;
+-  protected readonly mutableStateType: Partial<typeof this.state>;
++  readonly mutableOptionsType: Omit<typeof this.optionsType, 'name' | 'pointerMode' | 'pointerOptions' | 'passive'>;
++  readonly mutableStateType: Partial<typeof this.state>;
+   /**
+    * Scaling factor for delta values
+    * Values > 1 increase sensitivity, values < 1 decrease sensitivity

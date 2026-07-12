@@ -8,6 +8,7 @@ This GitHub Action workflow automatically builds and publishes Docker images for
 - **Smart Tagging**: Automatically creates appropriate tags based on git events
 - **Manual Trigger**: Can build specific services on demand
 - **NuGet Egress Preflight**: Verifies outbound HTTPS to NuGet before `dotnet test`
+- **Portal frontend quality gate**: For Portal, Portal Dockerfile, and shared build-input changes, uses Node.js 24 and the committed npm lockfile to run `npm ci`, dependency audit, TypeScript checks, ESLint with zero warnings, Vitest, the production Vite build, and Playwright Chromium smoke tests. Unrelated backend-only manual releases bypass this gate.
 - **Caching**: Uses GitHub Actions cache for faster builds
 - **Security gates for pull requests**: Gitleaks secret scanning, NuGet and npm dependency audits, Helm lint/template validation, Trivy configuration scans, and Trivy scans of each built service image. High and critical findings fail the workflow; no baseline exceptions are currently configured.
 - **Security**: Only pushes images on main/develop branches and tags (not on PRs)

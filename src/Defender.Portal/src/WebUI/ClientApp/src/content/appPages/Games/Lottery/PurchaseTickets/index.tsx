@@ -15,21 +15,43 @@ const PurchaseTickets = (props: PurchaseTicketsProps) => {
 
   return (
     <Card>
-      <Grid container spacing={2} alignItems="center" pt={2}>
-        <Grid item xs={6} sm={4}>
-          <Typography variant="h3" align="center" p="5px">
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          alignItems: "center",
+          pt: 2
+        }}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 4
+          }}>
+          <Typography variant="h3" align="center" sx={{
+            p: "5px"
+          }}>
             {getDrawName(draw, props.currentLanguage)}
             {` (${draw.drawNumber})`}
           </Typography>
         </Grid>
-        <Grid item xs={6} sm={8}>
-          <Typography variant="h4" align="center" justifyContent={"center"}>
+        <Grid
+          size={{
+            xs: 6,
+            sm: 8
+          }}>
+          <Typography variant="h4" align="center" sx={{
+            justifyContent: "center"
+          }}>
             {u.t("lottery:draw_common_description")}
             {" x" + Math.max(...draw.coefficients) / 100}
           </Typography>
         </Grid>
 
-        <Grid item xs={12} sm={12}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
           <SelectAndPayPanel draw={draw} />
         </Grid>
       </Grid>
