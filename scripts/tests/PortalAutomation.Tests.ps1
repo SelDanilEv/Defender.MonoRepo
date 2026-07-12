@@ -23,6 +23,13 @@ Describe "Portal token-efficient automation" {
         $content | Should Match 'portal-live-status\.py'
     }
 
+    It "does not treat successful native stderr as a deployment failure" {
+        $content = Get-Content -Raw $deployPath
+        $content | Should Match 'function Invoke-SilentNative'
+        $content | Should Match 'Invoke-SilentNative \{ & git push origin \$Ref \}'
+        $content | Should Match '\$ErrorActionPreference = "Continue"'
+    }
+
     It "keeps live credentials out of command output" {
         (Test-Path $statusPath) | Should Be $true
         $content = Get-Content -Raw $statusPath

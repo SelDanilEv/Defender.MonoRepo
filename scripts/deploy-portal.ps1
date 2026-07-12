@@ -18,6 +18,17 @@ function Require-Command([string]$Name) {
     }
 }
 
+function Invoke-SilentNative([scriptblock]$Command) {
+    $previousPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        & $Command *> $null
+        return $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previousPreference
+    }
+}
+
 function Get-Runs([string]$Workflow) {
     @(& gh run list --repo $Repo --workflow $Workflow --branch $Ref --limit 30 --json databaseId,headSha,event,createdAt,status,conclusion | ConvertFrom-Json)
 }
@@ -38,8 +49,15 @@ function Wait-NewRun {
 
 function Watch-Run([long]$RunId, [string]$Label) {
     $log = Join-Path ([System.IO.Path]::GetTempPath()) ("portal-deploy-{0}-{1}.log" -f $Label, [guid]::NewGuid())
-    & gh run watch "$RunId" --repo $Repo --exit-status --interval 10 *> $log
-    if ($LASTEXITCODE -ne 0) {
+    $previousPreference = $ErrorActionPreference
+    try {
+        $ErrorActionPreference = "Continue"
+        & gh run watch "$RunId" --repo $Repo --exit-status --interval 10 *> $log
+        $exitCode = $LASTEXITCODE
+    } finally {
+        $ErrorActionPreference = $previousPreference
+    }
+    if ($exitCode -ne 0) {
         Write-Host "PORTAL_DEPLOY FAIL step=$Label run=$RunId" -ForegroundColor Red
         Get-Content -LiteralPath $log -Tail 100
         Remove-Item -LiteralPath $log -Force -ErrorAction SilentlyContinue
@@ -69,23 +87,23 @@ try {
     if ($branch -ne $Ref) { throw "Current branch '$branch' must match ref '$Ref'." }
     if (& git status --porcelain) { throw "Worktree must be clean before deployment." }
 
-    & gh auth status *> $null
-    if ($LASTEXITCODE -ne 0) { throw "GitHub CLI authentication failed." }
+    if ((Invoke-SilentNative { & gh auth status }) -ne 0) { throw "GitHub CLI authentication failed." }
 
-    & git push origin $Ref *> $null
-    if ($LASTEXITCODE -ne 0) { throw "git push failed." }
+    if ((Invoke-SilentNative { & git push origin $Ref }) -ne 0) { throw "git push failed." }
 
     $buildWorkflow = "docker-build-publish.yml"
     $existingBuildIds = @(Get-Runs $buildWorkflow | ForEach-Object { [long]$_.databaseId })
-    & gh workflow run $buildWorkflow --repo $Repo --ref $Ref -f service=Defender.Portal -f force_build=true *> $null
-    if ($LASTEXITCODE -ne 0) { throw "Portal build dispatch failed." }
+    if ((Invoke-SilentNative { & gh workflow run $buildWorkflow --repo $Repo --ref $Ref -f service=Defender.Portal -f force_build=true }) -ne 0) {
+        throw "Portal build dispatch failed."
+    }
     $buildRun = Wait-NewRun $buildWorkflow $headSha $existingBuildIds
     Watch-Run $buildRun.databaseId "build"
 
     $promoteWorkflow = "promote-image-tag.yml"
     $existingPromoteIds = @(Get-Runs $promoteWorkflow | ForEach-Object { [long]$_.databaseId })
-    & gh workflow run $promoteWorkflow --repo $Repo --ref $Ref -f service=Defender.Portal -f "image_tag=$imageTag" *> $null
-    if ($LASTEXITCODE -ne 0) { throw "Portal promotion dispatch failed." }
+    if ((Invoke-SilentNative { & gh workflow run $promoteWorkflow --repo $Repo --ref $Ref -f service=Defender.Portal -f "image_tag=$imageTag" }) -ne 0) {
+        throw "Portal promotion dispatch failed."
+    }
     $promoteRun = Wait-NewRun $promoteWorkflow $headSha $existingPromoteIds
     Watch-Run $promoteRun.databaseId "promote"
 
