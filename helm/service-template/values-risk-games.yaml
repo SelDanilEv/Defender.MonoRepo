@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.risk-games
-  tag: sha-fc52fda
+  tag: sha-8aed419
   pullPolicy: Always
 ingress:
   enabled: true

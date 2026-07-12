@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.travel-calendar
-  tag: sha-fc52fda
+  tag: sha-8aed419
   # Docker Hub latest manifest, resolved 2026-07-11.
   digest: sha256:4386e5a3a5144b4361fd8b37aedb847721f61636d735f93ea96194fc8c079da5
   pullPolicy: Always

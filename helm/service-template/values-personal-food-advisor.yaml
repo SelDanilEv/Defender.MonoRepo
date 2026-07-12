@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.personal-food-advisor
-  tag: sha-fc52fda
+  tag: sha-8aed419
   pullPolicy: Always
 ingress:
   enabled: true
