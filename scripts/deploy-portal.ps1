@@ -30,7 +30,10 @@ function Invoke-SilentNative([scriptblock]$Command) {
 }
 
 function Get-Runs([string]$Workflow) {
-    @(& gh run list --repo $Repo --workflow $Workflow --branch $Ref --limit 30 --json databaseId,headSha,event,createdAt,status,conclusion | ConvertFrom-Json)
+    $runs = & gh run list --repo $Repo --workflow $Workflow --branch $Ref --limit 30 --json databaseId,headSha,event,createdAt,status,conclusion | ConvertFrom-Json
+    foreach ($run in $runs) {
+        $run
+    }
 }
 
 function Wait-NewRun {

@@ -30,6 +30,11 @@ Describe "Portal token-efficient automation" {
         $content | Should Match '\$ErrorActionPreference = "Continue"'
     }
 
+    It "enumerates workflow run arrays on Windows PowerShell" {
+        $content = Get-Content -Raw $deployPath
+        $content | Should Match 'foreach \(\$run in \$runs\)'
+    }
+
     It "keeps live credentials out of command output" {
         (Test-Path $statusPath) | Should Be $true
         $content = Get-Content -Raw $statusPath
