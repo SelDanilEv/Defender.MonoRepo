@@ -35,6 +35,13 @@ Describe "Portal token-efficient automation" {
         $content | Should Match 'foreach \(\$run in \$runs\)'
     }
 
+    It "promotes the tag published by CI" {
+        $content = Get-Content -Raw $deployPath
+        $content | Should Match 'function Get-PublishedImageTag'
+        $content | Should Match '\$imageTag = Get-PublishedImageTag \$buildRun\.databaseId'
+        $content | Should Match '\(\?<tag>\\d\{8\}-\\d\+\)'
+    }
+
     It "keeps live credentials out of command output" {
         (Test-Path $statusPath) | Should Be $true
         $content = Get-Content -Raw $statusPath

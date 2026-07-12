@@ -36,6 +36,14 @@ function Get-Runs([string]$Workflow) {
     }
 }
 
+function Get-PublishedImageTag([long]$RunId) {
+    $log = & gh run view "$RunId" --repo $Repo --log
+    if ($LASTEXITCODE -ne 0) { throw "Could not read build run '$RunId' output." }
+    $match = [regex]::Match(($log -join "`n"), 'defender\.portal:(?<tag>\d{8}-\d+)')
+    if (-not $match.Success) { throw "No Portal release tag found in build run '$RunId'." }
+    return $match.Groups["tag"].Value
+}
+
 function Wait-NewRun {
     param([string]$Workflow, [string]$HeadSha, [long[]]$ExistingIds)
     $deadline = (Get-Date).AddMinutes($TimeoutMinutes)
@@ -77,7 +85,7 @@ try {
     $branch = (& git branch --show-current).Trim()
     $headSha = (& git rev-parse HEAD).Trim()
     $shortSha = $headSha.Substring(0, 7)
-    $imageTag = "sha-$shortSha"
+    $imageTag = "CI-published-release-tag"
 
     if (-not $Execute) {
         Write-Host "PORTAL_DEPLOY PREVIEW"
@@ -101,6 +109,7 @@ try {
     }
     $buildRun = Wait-NewRun $buildWorkflow $headSha $existingBuildIds
     Watch-Run $buildRun.databaseId "build"
+    $imageTag = Get-PublishedImageTag $buildRun.databaseId
 
     $promoteWorkflow = "promote-image-tag.yml"
     $existingPromoteIds = @(Get-Runs $promoteWorkflow | ForEach-Object { [long]$_.databaseId })
