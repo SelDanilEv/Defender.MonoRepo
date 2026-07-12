@@ -9,8 +9,7 @@ import { styled } from "@mui/material/styles";
 
 import useUtils from "src/appUtils";
 import Logo from "src/components/LogoSign";
-import LanguageSwither from "src/components/LanguageSwitcher";
-import ThemeModeToggle from "src/components/ThemeModeToggle";
+import HeaderPreferences from "src/components/HeaderPreferences";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
 import { logout } from "src/actions/sessionActions";
@@ -88,10 +87,8 @@ const WelcomeLayout: FC = (props: any) => {
               display="flex"
               justifyContent="flex-end"
               alignItems="center"
-              gap={1}
             >
-              <ThemeModeToggle />
-              <LanguageSwither />
+              <HeaderPreferences />
             </Box>
           </Box>
 
