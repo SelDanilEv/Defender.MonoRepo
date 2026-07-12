@@ -1,5 +1,7 @@
 export type CalendarMonth = { year: number; month: number };
 
+export const visibleCalendarMonthCount = (desktop: boolean) => desktop ? 4 : 3;
+
 export const currentCalendarMonth = (): CalendarMonth => {
   const now = new Date();
   return { year: now.getFullYear(), month: now.getMonth() };

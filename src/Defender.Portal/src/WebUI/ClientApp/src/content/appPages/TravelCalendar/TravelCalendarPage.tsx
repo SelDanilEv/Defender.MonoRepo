@@ -33,7 +33,7 @@ import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArro
 import { MonthGrid } from "./components/MonthGrid";
 import { EventDrawer } from "./components/EventDrawer";
 import { useTravelCalendar } from "./hooks/useTravelCalendar";
-import { addCalendarMonths, calendarMonths, currentCalendarMonth } from "./monthNavigation";
+import { addCalendarMonths, calendarMonths, currentCalendarMonth, visibleCalendarMonthCount } from "./monthNavigation";
 
 const Panel = ({ children, ...props }: any) => (
   <Paper
@@ -58,7 +58,7 @@ export default function TravelCalendarPage() {
   const laptop = useMediaQuery(theme.breakpoints.up("md"));
   const locale = i18n.language === "ru" ? "ru-RU" : "en-US";
   const formatMoney = (value: number) => value.toLocaleString(locale);
-  const visibleMonthCount = laptop ? 5 : 3;
+  const visibleMonthCount = visibleCalendarMonthCount(laptop);
   const [firstMonth, setFirstMonth] = useState(currentCalendarMonth);
   const state = useTravelCalendar(visibleMonthCount);
   const { calendar, ensureMonths } = state;
