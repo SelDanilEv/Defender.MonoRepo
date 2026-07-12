@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.portal
-  tag: 20260712-200
+  tag: sha-0e8f44f
   pullPolicy: Always
 ingress:
   enabled: true
