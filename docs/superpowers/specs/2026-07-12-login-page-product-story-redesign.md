@@ -25,4 +25,3 @@ Replace the legacy centered login card with approved Concept A: a branded produc
 - Add English and Russian copy.
 - Verify component/layout tests, full frontend suite, build, keyboard semantics, console, and local visual layouts at 1440x900, 1024x768, 723x898, and 390x844.
 - Commit, push, and deploy only after local visual result matches approved concept.
-
