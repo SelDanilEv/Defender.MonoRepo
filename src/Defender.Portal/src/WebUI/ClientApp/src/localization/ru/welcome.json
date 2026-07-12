@@ -29,5 +29,15 @@
   "form_password_label": "Новый пароль",
   "form_code_label": "Код подтверждения",
   "form_back_button": "Назад",
-  "form_continue_button": "Продолжить"
+  "form_continue_button": "Продолжить",
+  "login_story_title": "Ваша цифровая жизнь. В одном безопасном месте.",
+  "login_story_description": "Финансы, здоровье, путешествия и повседневные инструменты — всё связано вокруг вас.",
+  "login_story_footer": "Конфиденциальность по умолчанию · Создано Данилом",
+  "login_welcome_back": "С возвращением",
+  "login_continue_description": "Войдите, чтобы продолжить работу в портале",
+  "continue_with_google": "Продолжить с Google",
+  "login_new_here": "Впервые здесь?",
+  "login_create_account": "Создать аккаунт",
+  "show_password": "Показать пароль",
+  "hide_password": "Скрыть пароль"
 }

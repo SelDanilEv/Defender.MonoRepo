@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { FC } from "react";
 import PropTypes from "prop-types";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { connect } from "react-redux";
 import { Box, Card, Container, Typography } from "@mui/material";
 import { Helmet } from "react-helmet-async";
@@ -42,7 +42,10 @@ const WelcomeLayout: FC = (props: any) => {
   const session = props.session as Session;
 
   const u = useUtils();
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/welcome/login";
 
+  // Session validation is intentionally performed once when the welcome layout mounts.
   useEffect(() => {
     if (session.isAuthenticated) {
       APICallWrapper({
@@ -62,7 +65,19 @@ const WelcomeLayout: FC = (props: any) => {
         showError: false,
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (isLoginPage) {
+    return (
+      <Box sx={{ minHeight: "100dvh", width: "100%" }}>
+        <Helmet>
+          <title>{u.t("welcome:name_of_app")}</title>
+        </Helmet>
+        <Outlet />
+      </Box>
+    );
+  }
 
   return (
     <Box

@@ -29,5 +29,15 @@
   "form_password_label": "New Password",
   "form_code_label": "Verification Code",
   "form_back_button": "Back",
-  "form_continue_button": "Continue"
+  "form_continue_button": "Continue",
+  "login_story_title": "Your digital life. One secure place.",
+  "login_story_description": "Money, health, travel and everyday tools—connected around you.",
+  "login_story_footer": "Private by design · Built by Danil",
+  "login_welcome_back": "Welcome back",
+  "login_continue_description": "Sign in to continue to your portal",
+  "continue_with_google": "Continue with Google",
+  "login_new_here": "New here?",
+  "login_create_account": "Create account",
+  "show_password": "Show password",
+  "hide_password": "Hide password"
 }

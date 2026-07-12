@@ -1,4 +1,14 @@
-import { Box, FormControl, Link, TextField } from "@mui/material";
+import {
+  Box,
+  FormControl,
+  IconButton,
+  InputAdornment,
+  Link,
+  TextField,
+} from "@mui/material";
+import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
+import VisibilityOffTwoToneIcon from "@mui/icons-material/VisibilityOffTwoTone";
+import { Link as RouterLink } from "react-router-dom";
 import { connect } from "react-redux";
 import { useState } from "react";
 
@@ -10,17 +20,23 @@ import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 import { Session } from "src/models/Session";
 import AuthorizationService from "src/services/AuthorizationService";
+import {
+  loginFormLayout,
+  loginInputAutoComplete,
+} from "../loginFormLayout";
 
 const LoginForm = (props: any) => {
   const [loginRequest, setLoginRequest]: any = useState({
     login: "",
     password: "",
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   const UpdateLoginRequest = (event) => {
-    let requst = loginRequest;
-    requst[event.target.id] = event.target.value;
-    setLoginRequest(requst);
+    setLoginRequest((current) => ({
+      ...current,
+      [event.target.id]: event.target.value,
+    }));
   };
 
   const u = useUtils();
@@ -71,42 +87,60 @@ const LoginForm = (props: any) => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItem: "center",
-        margin: "5px auto",
-        width: "min(60vw, 300px)",
-      }}
-    >
-      <FormControl sx={{ gap: "15px" }} variant="outlined">
+    <Box sx={loginFormLayout}>
+      <FormControl sx={{ gap: 2 }} variant="outlined">
         <TextField
           id="login"
           type="text"
+          autoComplete={loginInputAutoComplete.login}
           onChange={UpdateLoginRequest}
           label={u.t("welcome:login_label")}
+          fullWidth
         />
         <Box sx={{ display: "flex", flexDirection: "column" }}>
           <TextField
             id="password"
-            type="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete={loginInputAutoComplete.password}
             onChange={UpdateLoginRequest}
             label={u.t("welcome:password_label")}
             fullWidth
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label={u.t(
+                      showPassword
+                        ? "welcome:hide_password"
+                        : "welcome:show_password"
+                    )}
+                    edge="end"
+                    sx={{ width: 44, height: 44 }}
+                    onClick={() => setShowPassword((current) => !current)}
+                  >
+                    {showPassword ? (
+                      <VisibilityOffTwoToneIcon />
+                    ) : (
+                      <VisibilityTwoToneIcon />
+                    )}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
           />
           <Link
-            href="password/reset"
-            sx={{ ml: "auto", mr: "4px", fontSize: "0.8em" }}
+            component={RouterLink}
+            to="/welcome/password/reset"
+            sx={{ ml: "auto", mt: 0.75, fontSize: "0.875rem" }}
           >
             {u.t("welcome:reset_password_link")}
           </Link>
         </Box>
 
         <LockedButton
-          sx={{ fontSize: "1em" }}
-          variant="outlined"
+          sx={{ minHeight: 48, fontSize: "1rem", fontWeight: 700 }}
+          variant="contained"
+          fullWidth
           onClick={() => login()}
         >
           {u.t("welcome:sign_in")}

@@ -9,11 +9,13 @@ import { login } from "src/actions/sessionActions";
 import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 import AuthorizationService from "src/services/AuthorizationService";
+import { googleLoginButtonLayout } from "../Login/loginFormLayout";
 
 const LoginByGoogle = (props: any) => {
   let googleResponseTimeout;
 
   const u = useUtils();
+  const fullWidth = !!props.fullWidth;
 
   const loginGoogle = useGoogleLogin({
     onSuccess: (tokenResponse) => googleResponse(tokenResponse),
@@ -69,17 +71,22 @@ const LoginByGoogle = (props: any) => {
   };
 
   return (
-    <Box>
+    <Box sx={{ width: fullWidth ? "100%" : "auto" }}>
       <LockedButton
         variant="outlined"
-        size="small"
-        sx={{
-          minWidth: 34,
-          width: 34,
-          height: 28,
-          minHeight: 28,
-          p: 0.25,
-        }}
+        size={fullWidth ? "large" : "small"}
+        sx={
+          fullWidth
+            ? googleLoginButtonLayout
+            : {
+                minWidth: 34,
+                width: 34,
+                height: 28,
+                minHeight: 28,
+                p: 0.25,
+              }
+        }
+        fullWidth={fullWidth}
         onClick={() => login()}
       >
         <Avatar
@@ -90,6 +97,7 @@ const LoginByGoogle = (props: any) => {
           src="/static/images/logo/google.svg"
           alt=""
         />
+        {fullWidth && u.t("welcome:continue_with_google")}
       </LockedButton>
     </Box>
   );
