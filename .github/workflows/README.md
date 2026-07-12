@@ -119,6 +119,8 @@ docker.io/myusername/Defender.Portal:latest
 docker.io/myusername/Defender.UserManagementService:v1.0.0
 ```
 
+Portal release tags use `YYYYMMDD-build_version`, for example `20260712-208_1.3.0`. The version is read from `src/Defender.Portal/src/WebUI/ClientApp/package.json` and is intended for promotion to production.
+
 ## Build Context
 
 The workflow uses the `./src` directory as the build context, which contains:

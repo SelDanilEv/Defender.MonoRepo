@@ -39,7 +39,7 @@ function Get-Runs([string]$Workflow) {
 function Get-PublishedImageTag([long]$RunId) {
     $log = & gh run view "$RunId" --repo $Repo --log
     if ($LASTEXITCODE -ne 0) { throw "Could not read build run '$RunId' output." }
-    $match = [regex]::Match(($log -join "`n"), 'defender\.portal:(?<tag>\d{8}-\d+)')
+    $match = [regex]::Match(($log -join "`n"), 'defender\.portal:(?<tag>\d{8}-\d+_\d+\.\d+\.\d+)')
     if (-not $match.Success) { throw "No Portal release tag found in build run '$RunId'." }
     return $match.Groups["tag"].Value
 }

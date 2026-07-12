@@ -450,10 +450,20 @@ jobs:
       - name: Get build info
         id: build-info
         run: |
-          echo "build_date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          build_date=$(date +'%Y%m%d')
+          build_number="${{ github.run_number }}"
+          echo "build_date=$build_date" >> $GITHUB_OUTPUT
           echo "build_time=$(date +'%H%M%S')" >> $GITHUB_OUTPUT
-          echo "build_number=${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "build_number=$build_number" >> $GITHUB_OUTPUT
           echo "short_sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+          if [[ "${{ matrix.service.name }}" == "defender.portal" ]]; then
+            portal_version=$(node -p "require('./src/Defender.Portal/src/WebUI/ClientApp/package.json').version")
+            echo "portal_version=$portal_version" >> $GITHUB_OUTPUT
+            echo "portal_release_tag=${build_date}-${build_number}_${portal_version}" >> $GITHUB_OUTPUT
+          else
+            echo "portal_version=not-portal" >> $GITHUB_OUTPUT
+            echo "portal_release_tag=not-portal" >> $GITHUB_OUTPUT
+          fi
 
       - name: Extract metadata
         id: meta
@@ -468,6 +478,7 @@ jobs:
             type=sha,prefix=sha-
             type=raw,value=latest,enable={{is_default_branch}}
             type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_number }}
+            type=raw,value=${{ steps.build-info.outputs.portal_release_tag }},enable=${{ matrix.service.name == 'defender.portal' }}
             type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_time }}-${{ steps.build-info.outputs.short_sha }}
 
       - name: Print image tag
@@ -588,10 +599,20 @@ jobs:
       - name: Get build info
         id: build-info
         run: |
-          echo "build_date=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+          build_date=$(date +'%Y%m%d')
+          build_number="${{ github.run_number }}"
+          echo "build_date=$build_date" >> $GITHUB_OUTPUT
           echo "build_time=$(date +'%H%M%S')" >> $GITHUB_OUTPUT
-          echo "build_number=${{ github.run_number }}" >> $GITHUB_OUTPUT
+          echo "build_number=$build_number" >> $GITHUB_OUTPUT
           echo "short_sha=$(echo ${{ github.sha }} | cut -c1-7)" >> $GITHUB_OUTPUT
+          if [[ "${{ github.event.inputs.service }}" == "Defender.Portal" ]]; then
+            portal_version=$(node -p "require('./src/Defender.Portal/src/WebUI/ClientApp/package.json').version")
+            echo "portal_version=$portal_version" >> $GITHUB_OUTPUT
+            echo "portal_release_tag=${build_date}-${build_number}_${portal_version}" >> $GITHUB_OUTPUT
+          else
+            echo "portal_version=not-portal" >> $GITHUB_OUTPUT
+            echo "portal_release_tag=not-portal" >> $GITHUB_OUTPUT
+          fi
 
       - name: Determine service configuration
         id: service-config
@@ -628,6 +649,7 @@ jobs:
             type=raw,value=latest
             type=raw,value=${{ github.sha }}
             type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_number }}
+            type=raw,value=${{ steps.build-info.outputs.portal_release_tag }},enable=${{ github.event.inputs.service == 'Defender.Portal' }}
             type=raw,value=${{ steps.build-info.outputs.build_date }}-${{ steps.build-info.outputs.build_time }}-${{ steps.build-info.outputs.short_sha }}
 
       - name: Print image tag
