@@ -453,3 +453,7 @@ __mismatch__/
 # Local .NET CLI and NuGet caches
 .dotnet/
 .nuget/
+
+# Superpowers generated plans, specs, and local state
+**/superpowers/
+**/.superpowers/
