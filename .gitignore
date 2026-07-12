@@ -458,7 +458,6 @@ __mismatch__/
 **/superpowers/
 **/.superpowers/
 
-# Playwright generated state, tests, reports, and configuration
+# Playwright MCP/CLI local state
 **/.playwright-cli/
-**/playwright/
-**/*playwright*
+**/.playwright-mcp/
