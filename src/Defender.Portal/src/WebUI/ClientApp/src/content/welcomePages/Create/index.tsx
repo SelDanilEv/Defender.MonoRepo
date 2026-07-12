@@ -1,39 +1,39 @@
-import { Box } from "@mui/material";
+import { Link, Typography } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 
 import useUtils from "src/appUtils";
 
 import LineWithText from "../Components/LineWithText";
+import AuthPageShell from "../Components/AuthPageShell";
 import CreateForm from "./Form";
 import LoginByGoogle from "../Components/LoginByGoogle";
-import WelcomeMenuButton from "../Components/WelcomeMenuButton";
 
-const CreateAccount = (props: any) => {
+const CreateAccount = () => {
   const u = useUtils();
 
   return (
-    <Box>
-      <Box>
-        {" "}
-        <CreateForm />
+    <AuthPageShell
+      title={u.t("welcome:create_account_title")}
+      description={u.t("welcome:create_account_description")}
+    >
+        <LoginByGoogle fullWidth />
         <LineWithText
-          margin_x="5px"
-          height="2px"
-          width_lg="45%"
-          width_md="40%"
-          width_xs="70%"
+          margin_x="18px"
+          height="1px"
+          width_lg="100%"
+          width_md="100%"
+          width_xs="100%"
           text={u.t("welcome:or")}
-          gap="10px"
+          gap="12px"
         />
-      </Box>
-      <Box sx={{ display: "flex", gap: "10px", justifyContent: "center" }}>
-        <LoginByGoogle />
-        <WelcomeMenuButton
-          compact
-          text={u.t("welcome:back_to_login_page")}
-          path="/welcome/login"
-        />
-      </Box>
-    </Box>
+        <CreateForm />
+        <Typography color="text.secondary" textAlign="center" sx={{ mt: 3 }}>
+          {u.t("welcome:already_have_account")} {" "}
+          <Link component={RouterLink} to="/welcome/login" fontWeight={700}>
+            {u.t("welcome:sign_in")}
+          </Link>
+        </Typography>
+    </AuthPageShell>
   );
 };
 

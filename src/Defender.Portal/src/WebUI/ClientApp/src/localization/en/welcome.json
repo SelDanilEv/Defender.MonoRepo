@@ -39,5 +39,14 @@
   "login_new_here": "New here?",
   "login_create_account": "Create account",
   "show_password": "Show password",
-  "hide_password": "Hide password"
+  "hide_password": "Hide password",
+  "create_account_title": "Create your account",
+  "create_account_description": "One account for every Defender tool",
+  "already_have_account": "Already have an account?",
+  "reset_password_title": "Reset your password",
+  "reset_password_description": "Enter your email to receive a verification code",
+  "verification_title": "Verify your email",
+  "verification_description": "Finish securing your Defender account",
+  "verify_email_title": "Email verification",
+  "verify_email_description": "Checking your verification link"
 }

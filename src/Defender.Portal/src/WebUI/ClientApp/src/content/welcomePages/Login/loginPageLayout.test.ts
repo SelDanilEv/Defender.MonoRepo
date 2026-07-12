@@ -1,4 +1,5 @@
 import {
+  AUTH_MOBILE_LOGO_SIZE,
   loginFormPanelLayout,
   loginPageLayout,
   loginStoryPanelLayout,
@@ -15,5 +16,6 @@ describe("loginPageLayout", () => {
     expect(mobileLoginBrandLayout.display).toEqual({ xs: "flex", md: "none" });
     expect(loginFormPanelLayout.minHeight).toEqual({ xs: "100dvh", md: "100vh" });
     expect(loginFormPanelLayout.px).toEqual({ xs: 2.5, sm: 5, lg: 10 });
+    expect(AUTH_MOBILE_LOGO_SIZE).toBe("80px");
   });
 });

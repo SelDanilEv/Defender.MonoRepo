@@ -22,6 +22,7 @@ import {
   welcomeLogoLayout,
   welcomePreferencesLayout,
 } from "./welcomeHeaderLayout";
+import { modernAuthRoutes } from "./modernAuthRoutes";
 
 const OverviewWrapper = styled(Box)(
   () => `
@@ -43,7 +44,7 @@ const WelcomeLayout: FC = (props: any) => {
 
   const u = useUtils();
   const location = useLocation();
-  const isLoginPage = location.pathname === "/welcome/login";
+  const isModernAuthPage = modernAuthRoutes.includes(location.pathname);
 
   // Session validation is intentionally performed once when the welcome layout mounts.
   useEffect(() => {
@@ -68,7 +69,7 @@ const WelcomeLayout: FC = (props: any) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  if (isLoginPage) {
+  if (isModernAuthPage) {
     return (
       <Box sx={{ minHeight: "100dvh", width: "100%" }}>
         <Helmet>

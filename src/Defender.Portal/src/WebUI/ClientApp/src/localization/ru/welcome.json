@@ -39,5 +39,14 @@
   "login_new_here": "Впервые здесь?",
   "login_create_account": "Создать аккаунт",
   "show_password": "Показать пароль",
-  "hide_password": "Скрыть пароль"
+  "hide_password": "Скрыть пароль",
+  "create_account_title": "Создайте аккаунт",
+  "create_account_description": "Один аккаунт для всех инструментов Defender",
+  "already_have_account": "Уже есть аккаунт?",
+  "reset_password_title": "Сброс пароля",
+  "reset_password_description": "Введите email, чтобы получить код подтверждения",
+  "verification_title": "Подтвердите email",
+  "verification_description": "Завершите защиту аккаунта Defender",
+  "verify_email_title": "Подтверждение email",
+  "verify_email_description": "Проверяем ссылку подтверждения"
 }

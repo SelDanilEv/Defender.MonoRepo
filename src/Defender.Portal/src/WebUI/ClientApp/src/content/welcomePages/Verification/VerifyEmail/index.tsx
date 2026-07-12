@@ -1,11 +1,12 @@
-import { Box } from "@mui/material";
+import { Box, Link, Stack } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import React, { useState } from "react";
 
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 
-import WelcomeMenuButton from "../../Components/WelcomeMenuButton";
+import AuthPageShell from "../../Components/AuthPageShell";
 import ErrorStatusLabel from "src/components/Label/StatusLabels/Error";
 import SuccessStatusLabel from "src/components/Label/StatusLabels/Success";
 import PendingStatusLabel from "src/components/Label/StatusLabels/Pending";
@@ -67,6 +68,8 @@ const Verification = (props: any) => {
 
   React.useEffect(() => {
     checkParameters();
+  // Query parameters are consumed once when verification page mounts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const GetStatus = () => {
@@ -96,23 +99,19 @@ const Verification = (props: any) => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItem: "center",
-        margin: "5px auto",
-        width: "min(50vw, 300px)",
-        gap: "50px",
-      }}
+    <AuthPageShell
+      title={u.t("welcome:verify_email_title")}
+      description={u.t("welcome:verify_email_description")}
     >
-      <Box>{GetStatus()}</Box>
-      <WelcomeMenuButton
-        text={u.t("welcome:back_to_login_page")}
-        path="/welcome/login"
-      />
-    </Box>
+      <Stack spacing={4} alignItems="stretch">
+        <Box textAlign="center">{GetStatus()}</Box>
+        <Box textAlign="center">
+          <Link component={RouterLink} to="/welcome/login" fontWeight={700}>
+            {u.t("welcome:back_to_login_page")}
+          </Link>
+        </Box>
+      </Stack>
+    </AuthPageShell>
   );
 };
 

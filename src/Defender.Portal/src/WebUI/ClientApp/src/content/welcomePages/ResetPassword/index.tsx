@@ -1,29 +1,26 @@
 import useUtils from "src/appUtils";
 
-import LineWithText from "../Components/LineWithText";
-import ResetPasswordForm from "./Form";
-import WelcomeMenuButton from "../Components/WelcomeMenuButton";
+import { Link, Typography } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 
-const ResetPassword = (props: any) => {
+import AuthPageShell from "../Components/AuthPageShell";
+import ResetPasswordForm from "./Form";
+
+const ResetPassword = () => {
   const u = useUtils();
 
   return (
-    <>
+    <AuthPageShell
+      title={u.t("welcome:reset_password_title")}
+      description={u.t("welcome:reset_password_description")}
+    >
       <ResetPasswordForm />
-      <LineWithText
-        margin_x="5px"
-        height="2px"
-        width_lg="45%"
-        width_md="40%"
-        width_xs="70%"
-        text={u.t("welcome:or")}
-        gap="10px"
-      />
-      <WelcomeMenuButton
-        text={u.t("welcome:back_button")}
-        path="/welcome/login"
-      />
-    </>
+      <Typography textAlign="center" sx={{ mt: 3 }}>
+        <Link component={RouterLink} to="/welcome/login" fontWeight={700}>
+          {u.t("welcome:back_button")}
+        </Link>
+      </Typography>
+    </AuthPageShell>
   );
 };
 

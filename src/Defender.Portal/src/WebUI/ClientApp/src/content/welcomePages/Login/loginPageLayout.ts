@@ -1,3 +1,5 @@
+export const AUTH_MOBILE_LOGO_SIZE = "80px";
+
 export const loginPageLayout = {
   display: "grid",
   gridTemplateColumns: { xs: "1fr", md: "52% 48%" },

@@ -23,6 +23,7 @@ import apiUrls from "src/api/apiUrls";
 import RequestParamsBuilder from "src/api/APIWrapper/RequestParamsBuilder";
 import WarningToast from "src/components/Toast/WarningToast";
 import LockedTextField from "src/components/LockedComponents/LockedTextField/LockedTextField";
+import { loginFormLayout } from "../../Login/loginFormLayout";
 
 const ResetPasswordForm = (props: any) => {
   const u = useUtils();
@@ -59,6 +60,8 @@ const ResetPasswordForm = (props: any) => {
     return () => {
       stateMachine.freeze();
     };
+  // State machine teardown runs only when this form unmounts.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const stateNames = {
@@ -212,6 +215,8 @@ const ResetPasswordForm = (props: any) => {
     }
 
     stateMachine.updateState(newState);
+  // State transition evaluation is driven only by request data changes.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sendCodeRequest, resetRequest]);
 
   //end update fields
@@ -306,23 +311,15 @@ const ResetPasswordForm = (props: any) => {
   // end button handlers
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItem: "center",
-        margin: "5px auto",
-        width: "min(60vw, 350px)",
-      }}
-    >
-      <FormControl sx={{ gap: "15px" }} variant="outlined">
+    <Box sx={loginFormLayout}>
+      <FormControl sx={{ gap: 2 }} variant="outlined">
         <LockedTextField
           name={ElementNames.EmailField}
           disabled={elements[ElementNames.EmailField].disabled}
           value={sendCodeRequest.email}
           onChange={handleUpdate}
           type="text"
+          autoComplete="email"
           label={u.t("welcome:form_email_label")}
           fullWidth
         />
@@ -332,6 +329,7 @@ const ResetPasswordForm = (props: any) => {
             disabled={elements[ElementNames.PasswordField].disabled}
             value={resetRequest.newPassword}
             type="password"
+            autoComplete="new-password"
             onChange={handleUpdate}
             label={u.t("welcome:form_password_label")}
             fullWidth
@@ -386,9 +384,9 @@ const ResetPasswordForm = (props: any) => {
             }
           >
             <LockedButton
-              sx={{ fontSize: "1em" }}
+              sx={{ minHeight: 48, fontSize: "1rem", fontWeight: 700 }}
               disabled={elements[ElementNames.ContinueButton].disabled}
-              variant="outlined"
+              variant="contained"
               fullWidth
               onClick={handleContinue}
             >

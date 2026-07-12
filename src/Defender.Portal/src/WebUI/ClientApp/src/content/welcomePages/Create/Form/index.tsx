@@ -8,7 +8,6 @@ import {
   TextField,
 } from "@mui/material";
 import { connect } from "react-redux";
-import { styled } from "@mui/material/styles";
 import { useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 
@@ -20,17 +19,7 @@ import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 import APIRequestValidator from "src/validators/APIRequestValidator";
 import AuthorizationService from "src/services/AuthorizationService";
-
-const sizeOfLoginButtonText = 15;
-
-const LoginButton = styled(LockedButton)(
-  ({ theme }) => `
-   display: 'flex';
-   justifyContent: 'center';
-   alignItems: 'center';
-   font-size: ${theme.typography.pxToRem(sizeOfLoginButtonText)};
-`
-);
+import { loginFormLayout } from "../../Login/loginFormLayout";
 
 const CreateForm = (props: any) => {
   const [createRequest, setCreateRequest]: any = useState({
@@ -51,9 +40,10 @@ const CreateForm = (props: any) => {
   };
 
   const UpdateLoginRequest = (event) => {
-    let requst = createRequest;
-    requst[event.target.id] = event.target.value;
-    setCreateRequest(requst);
+    setCreateRequest((current) => ({
+      ...current,
+      [event.target.id]: event.target.value,
+    }));
   };
 
   const u = useUtils();
@@ -99,35 +89,32 @@ const CreateForm = (props: any) => {
   };
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItem: "center",
-        margin: "5px auto",
-        width: "min(60vw, 300px)",
-      }}
-    >
-      <FormControl sx={{ gap: "15px" }} variant="outlined">
+    <Box sx={loginFormLayout}>
+      <FormControl sx={{ gap: 2 }} variant="outlined">
         <TextField
           id="email"
           type="email"
+          autoComplete="email"
           onChange={UpdateLoginRequest}
           label={u.t("welcome:email_label")}
+          fullWidth
         />
         <TextField
           id="nickname"
           type="text"
+          autoComplete="nickname"
           onChange={UpdateLoginRequest}
           label={u.t("welcome:nickname_label")}
+          fullWidth
         />
         <TextField
           id="phoneNumber"
           type="tel"
+          autoComplete="tel"
           placeholder="+(48)726101290"
           onChange={UpdateLoginRequest}
           label={u.t("welcome:phone_label")}
+          fullWidth
         />
         <FormControl variant="outlined">
           <InputLabel htmlFor="password">
@@ -136,13 +123,20 @@ const CreateForm = (props: any) => {
           <OutlinedInput
             id="password"
             type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
             onChange={UpdateLoginRequest}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
+                  aria-label={u.t(
+                    showPassword
+                      ? "welcome:hide_password"
+                      : "welcome:show_password"
+                  )}
                   onClick={handleClickShowPassword}
                   onMouseDown={handleMouseDownPassword}
                   edge="end"
+                  sx={{ width: 44, height: 44 }}
                 >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
@@ -151,13 +145,14 @@ const CreateForm = (props: any) => {
             label={u.t("welcome:password_label")}
           />
         </FormControl>
-        <LoginButton
-          sx={{ fontSize: "1em" }}
-          variant="outlined"
+        <LockedButton
+          sx={{ minHeight: 48, fontSize: "1rem", fontWeight: 700 }}
+          variant="contained"
+          fullWidth
           onClick={() => Create()}
         >
           {u.t("welcome:create")}
-        </LoginButton>
+        </LockedButton>
       </FormControl>
     </Box>
   );

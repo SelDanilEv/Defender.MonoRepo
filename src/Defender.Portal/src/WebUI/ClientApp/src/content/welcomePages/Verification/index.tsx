@@ -1,11 +1,12 @@
-import { Box } from "@mui/material";
+import { Box, Link, Stack, Typography } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import React from "react";
 
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 
-import WelcomeMenuButton from "../Components/WelcomeMenuButton";
+import AuthPageShell from "../Components/AuthPageShell";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 import { logout } from "src/actions/sessionActions";
@@ -16,6 +17,8 @@ const Verification = (props: any) => {
 
   React.useEffect(() => {
     checkVerification();
+  // Initial verification check runs once; polling handles later checks.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const checkVerification = () => {
@@ -69,33 +72,29 @@ const Verification = (props: any) => {
   const task = setInterval(checkVerification, 10 * 1000);
 
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItem: "center",
-        margin: "5px auto",
-        width: "min(50vw, 300px)",
-        gap: "40px",
-      }}
+    <AuthPageShell
+      title={u.t("welcome:verification_title")}
+      description={u.t("welcome:verification_description")}
     >
-      <Box sx={{ fontSize: "1.2em" }}>
+      <Stack spacing={3}>
+      <Typography color="text.secondary">
         {u.t("welcome:email_verification_description")}
-      </Box>
+      </Typography>
       <LockedButton
-        sx={{ fontSize: "1em" }}
-        variant="outlined"
+        sx={{ minHeight: 48, fontSize: "1rem", fontWeight: 700 }}
+        variant="contained"
+        fullWidth
         onClick={resendVerification}
       >
         {u.t("welcome:resend_verification_email")}
       </LockedButton>
-      <WelcomeMenuButton
-        onClick={() => clearInterval(task)}
-        text={u.t("welcome:back_to_login_page")}
-        path="/welcome/login"
-      />
-    </Box>
+      <Box textAlign="center">
+        <Link component={RouterLink} to="/welcome/login" fontWeight={700} onClick={() => clearInterval(task)}>
+          {u.t("welcome:back_to_login_page")}
+        </Link>
+      </Box>
+      </Stack>
+    </AuthPageShell>
   );
 };
 
