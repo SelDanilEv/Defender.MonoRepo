@@ -457,7 +457,7 @@ Manual workflow that updates `helm/service-template/values-*.yaml` with a specif
 
 ### Service Template
 
-`src/service-template/` provides a scaffold for creating new services with the standard four-layer architecture, pre-configured DI, JWT auth, Swagger, ProblemDetails, and MongoDB repository patterns. See `docs/CREATE-NEW-SERVICE.md`.
+`src/service-template/` provides a scaffold for creating new services with the standard four-layer architecture, pre-configured DI, JWT auth, Swagger, ProblemDetails, and MongoDB repository patterns. See [`DEVELOPMENT-GUIDE.md`](./DEVELOPMENT-GUIDE.md).
 
 ### Scripts
 
@@ -476,3 +476,122 @@ Manual workflow that updates `helm/service-template/values-*.yaml` with a specif
 - **SecretManagementService** -- Standalone service for managing MongoDB-stored encrypted secrets.
 - **SimpleMongoMigrator** -- Database migration tool for MongoDB schema changes.
 - **GeneralTestingService** -- End-to-end regression suite that exercises login, wallet, and transfer flows against the full stack.
+
+---
+
+## Domain Workflows
+
+### Personal Food Advisor
+
+Portal acts as BFF for Personal Food Advisor. User preferences, sessions, parsed menu items,
+recommendations, and ratings live in Personal Food Advisor storage.
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Portal
+  participant PFA as Personal Food Advisor
+  participant Kafka
+  participant Worker
+  participant HF as HuggingFace
+  User->>Portal: Create session and upload 1-10 images
+  Portal->>PFA: Create, upload, request parsing
+  PFA->>Kafka: MenuParsingRequested
+  Worker->>HF: Extract dish names
+  Worker->>PFA: ParsedItems, Status=Review
+  Portal->>PFA: Poll session every 2 seconds
+  User->>Portal: Confirm edited menu
+  Portal->>PFA: Confirm and request recommendations
+  PFA->>Kafka: RecommendationsRequested
+  Worker->>HF: Rank dishes
+  Worker->>PFA: RankedItems
+  Portal->>PFA: Poll every 5 seconds, at most 36 times
+  User->>Portal: Submit rating
+```
+
+Portal routes under `/api/foodAdvisor` proxy authenticated calls to PFA `/api/V1` endpoints for
+preferences, session creation/read, upload, confirmation, parsing requests, recommendation
+requests/results, and ratings. Kafka topics are
+`personal-food-advisor_menu-parsing-requested` and
+`personal-food-advisor_recommendations-requested`; consumer groups end in `-parsing` and
+`-recommendations`. Consumers start after a five-second delay.
+
+Session states: `Uploaded`, `Parsing`, `Review`, `Failed`, and `Confirmed`. New-session polling stops
+at `Review` or `Failed`. Recommendation polling stops when results arrive or after about three
+minutes. Required configuration includes Kafka, MongoDB, HuggingFace options, JWT secret, MongoDB
+connection string, and HuggingFace API key. Without API key, parsing may yield an empty list and
+recommendations fall back to confirmed dish order.
+
+### Travel Calendar
+
+`Defender.TravelCalendarService` owns events, must-visit queue, POIs, shared participants, vehicle
+settings, calculated budget, page theme, and packing list. Portal is BFF only.
+
+Mongo databases follow `{Environment}_Defender_TravelCalendarService`; collections are
+`TravelCalendars` and `TravelEvents`. `ux_user_id` enforces one calendar shell per user. Shared
+events are canonical roots with owner and participant indexes. Calendar mutations use calendar
+`expectedVersion`; shared-event changes use event `expectedVersion`. Stale requests return
+`409 TRAVEL_CALENDAR_VERSION_CONFLICT`.
+
+Transport cost is server-derived as `distanceKm / 100 * 12 L * 6.60 PLN`, rounded to two decimals.
+All event types include other costs; overnight trips also include hotel. Client calculations are
+editor previews only.
+
+Authenticated `User` routes under `/api/V1/travel-calendar` load the snapshot and mutate theme,
+queued trips, events, auto-scheduling, POIs, participants, participation state, and packing items.
+Only `GET /health` is public. Validation returns `422`; missing nested resources `404`; overlaps,
+no free slot, and stale versions `409`, with stable codes in ProblemDetails `extensions.code`.
+
+Local endpoints: service `http://localhost:47064`, Swagger `/swagger`, Portal page
+`http://localhost:47053/travel-calendar`. CI publishes
+`defendersd/defender.travel-calendar`; ArgoCD Application `travel-calendar` uses
+`values-travel-calendar.yaml`. Deploy service before Portal. Image tags can roll back independently;
+schema changes are additive/versioned.
+
+---
+
+## Architecture Risk Register
+
+Snapshot originally reviewed 2026-03-08. Revalidate each item against current code before acting.
+
+### Critical
+
+1. **Missing endpoint authorization.** Intended role attributes were commented out in job
+   management, general testing, and secret-management controllers. Restore Admin/SuperAdmin
+   policies and protect them with controller tests; use environment policy wiring for local bypasses.
+2. **Cross-platform admin token minting.** Shared symmetric JWTs, disabled audience validation, and
+   internal tokens containing human admin roles allow broad privilege escalation. Separate user and
+   service identity, use narrow audiences/scopes, and prefer asymmetric service credentials.
+
+### High
+
+1. Identity startup used `.Result` for secret retrieval. Keep startup async or use established sync
+   helper consistently.
+2. Kafka request-response creates producer/consumer pairs per request and can race on shared reply
+   topics/groups. Reuse clients and dispatch correlated replies through isolated subscriptions.
+3. Observability lacked centralized logs, traces, and metrics at review time. Metrics/logging rollout
+   now exists; distributed tracing and live coverage still require verification.
+4. Thirty-day JWTs had no server-side revocation; logout cleared only browser cookie. Use short
+   access tokens, rotated refresh tokens, and session revocation.
+5. Portal returned JWTs to browser JavaScript despite cookie auth. Stop normal SPA token exposure;
+   use one-time exchange codes for popup SSO.
+
+### Medium
+
+1. Redux migration mixes typed hooks with legacy `connect` plumbing.
+2. Portal remains on React 17, Create React App, and TypeScript 4.7-era tooling.
+3. Widespread frontend `any` weakens refactor safety.
+4. Many service solutions omit their test projects.
+5. No shared API integration, contract, or cross-service smoke-test harness was identified.
+6. `BaseMongoRepository` read task results through `.Result` after `Task.WhenAll`; keep flow fully
+   awaited.
+
+### Low
+
+1. Shared frontend fetch wrapper lacks `AbortSignal` support.
+2. BudgetTracker infrastructure contains obsolete commented registrations.
+3. Some WebApi services still name registration methods `AddWebUIServices`.
+4. Portal config contains deploy-specific values in checked-in JSON.
+5. `BaseMongoRepository` constructor uses redundant null-coalescing assignment.
+6. `LocalSecretsHelper` remains duplicated across services; move common behavior to
+   `Defender.Common` while retaining service-specific secret enums.

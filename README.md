@@ -366,7 +366,7 @@ docker ps --filter "name=Local" --format "table {{.Names}}\t{{.Status}}\t{{.Port
 - Argo project and RBAC configuration: `helm/argocd-config/`
 - Image-tag promotion workflow: `.github/workflows/promote-image-tag.yml` (manual dispatch)
 
-See [README-ARGOCD.md](./docs/README-ARGOCD.md) for details.
+See [OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md) for details.
 
 #### Deployment Environments
 
@@ -574,8 +574,9 @@ Services involved: Portal (admin views), backend services
 
 ## Additional Resources
 
-- ArgoCD docs: [docs/README-ARGOCD.md](./docs/README-ARGOCD.md)
-- Observability setup: [docs/OBSERVABILITY-SETUP.md](./docs/OBSERVABILITY-SETUP.md)
+- Project and domain overview: [docs/PROJECT-OVERVIEW.md](./docs/PROJECT-OVERVIEW.md)
+- Development guide: [docs/DEVELOPMENT-GUIDE.md](./docs/DEVELOPMENT-GUIDE.md)
+- Deployment and observability: [docs/OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md)
 - Workflow docs: [.github/workflows/README.md](./.github/workflows/README.md)
 - Service-specific docs: service-level `README.md` and `AGENTS.md` files
 - API docs: `/swagger` endpoint on each API service
