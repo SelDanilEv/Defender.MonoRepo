@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.identity
-  tag: sha-6cb25b4
+  tag: sha-d689d29
   pullPolicy: Always
 ingress:
   enabled: true
