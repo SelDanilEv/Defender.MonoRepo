@@ -17,6 +17,11 @@ import { Session } from "src/models/Session";
 import AuthorizationService from "src/services/AuthorizationService";
 
 import { logoutPortal } from "../sharedActions";
+import {
+  welcomeHeaderLayout,
+  welcomeLogoLayout,
+  welcomePreferencesLayout,
+} from "./welcomeHeaderLayout";
 
 const OverviewWrapper = styled(Box)(
   () => `
@@ -71,23 +76,11 @@ const WelcomeLayout: FC = (props: any) => {
           <title>{u.t("welcome:name_of_app")}</title>
         </Helmet>
         <Container maxWidth="lg">
-          <Box
-            display="flex"
-            justifyContent="center"
-            pt={5}
-            alignItems="center"
-            flexDirection="row"
-          >
-            <Box display="flex" justifyContent="center" alignItems="center">
+          <Box sx={welcomeHeaderLayout}>
+            <Box sx={welcomeLogoLayout}>
               <Logo width="100px" height="100px" />
             </Box>
-            <Box
-              position="absolute"
-              right={u.isMobile ? 45 : "30%"}
-              display="flex"
-              justifyContent="flex-end"
-              alignItems="center"
-            >
+            <Box sx={welcomePreferencesLayout}>
               <HeaderPreferences />
             </Box>
           </Box>
