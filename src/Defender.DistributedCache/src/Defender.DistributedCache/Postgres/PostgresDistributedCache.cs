@@ -12,6 +12,7 @@ namespace Defender.DistributedCache.Postgres
     {
         private readonly DistributedCacheOptions _options;
         private readonly ILogger<PostgresDistributedCache> _logger;
+        private readonly Func<string, object, Task<string?>>? _queryOverride;
 
         private bool IsConnectionEstablished { get; set; } = false;
 
@@ -27,6 +28,17 @@ namespace Defender.DistributedCache.Postgres
             _logger = logger;
 
             Task.Run(Init);
+        }
+
+        internal PostgresDistributedCache(
+            IOptions<DistributedCacheOptions> options,
+            ILogger<PostgresDistributedCache> logger,
+            Func<string, object, Task<string?>> queryOverride)
+        {
+            _options = options.Value;
+            _logger = logger;
+            _queryOverride = queryOverride;
+            IsConnectionEstablished = true;
         }
 
         private async Task Init()
@@ -75,7 +87,7 @@ namespace Defender.DistributedCache.Postgres
         {
             if (!CheckIfConnectionEstablished()) return;
 
-            ttl ??= TimeSpan.FromMinutes(_options.TtlForCacheEntriesSeconds);
+            ttl ??= _options.ResolveDefaultTtl();
 
             var json = JsonSerializer.Serialize(value);
             var expiration = DateTime.UtcNow.Add(ttl.Value);
@@ -103,7 +115,7 @@ namespace Defender.DistributedCache.Postgres
             if (!CheckIfConnectionEstablished())
                 return fetchValue is null ? default : await fetchValue();
 
-            var query = $"SELECT value FROM {_options.CacheTableName} WHERE key = @Key";
+            var query = $"SELECT value FROM {_options.CacheTableName} WHERE key = @Key AND expiration > NOW()";
             var result = await ExecuteQueryAsync<string>(query, new { Key = key });
 
             if (result != null)
@@ -136,7 +148,8 @@ namespace Defender.DistributedCache.Postgres
             var query = $@"
                 SELECT value
                 FROM {_options.CacheTableName}
-                WHERE {string.Join(" AND ", conditions)}";
+                WHERE expiration > NOW()
+                  AND {string.Join(" AND ", conditions)}";
 
             var result = await ExecuteQueryAsync<string>(query, parameters);
 
@@ -183,6 +196,12 @@ namespace Defender.DistributedCache.Postgres
 
         private async Task<T?> ExecuteQueryAsync<T>(string query, object parameters)
         {
+            if (_queryOverride is not null)
+            {
+                var value = await _queryOverride(query, parameters);
+                return value is null ? default : (T)(object)value;
+            }
+
             try
             {
                 using var connection = CreateConnection();

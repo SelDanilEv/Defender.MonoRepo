@@ -10,6 +10,25 @@ namespace Defender.DistributedCache.Tests;
 public class DistributedCacheExtensionsTests
 {
     [Fact]
+    public void DistributedCacheOptions_WhenNotConfigured_UsesThirtyHourDefaultTtl()
+    {
+        var options = new DistributedCacheOptions();
+
+        Assert.Equal(TimeSpan.FromHours(30), options.ResolveDefaultTtl());
+    }
+
+    [Fact]
+    public void DistributedCacheOptions_WhenLegacySecondsConfigured_UsesSecondsWithoutChangingUnits()
+    {
+        var options = new DistributedCacheOptions
+        {
+            TtlForCacheEntriesSeconds = 3_600
+        };
+
+        Assert.Equal(TimeSpan.FromHours(1), options.ResolveDefaultTtl());
+    }
+
+    [Fact]
     public void AddPostgresDistributedCache_WhenCalled_RegistersServicesAndOptions()
     {
         var services = new ServiceCollection();

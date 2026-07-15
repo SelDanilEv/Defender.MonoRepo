@@ -164,6 +164,28 @@ public class PostgresDistributedCacheUnitTests
     }
 
     [Fact]
+    public async Task GetByKey_WhenQueryExecuted_AddsExpirationFilterWithoutExtraQuery()
+    {
+        var executedQueryCount = 0;
+        var capturedQuery = string.Empty;
+        var sut = new PostgresDistributedCache(
+            Microsoft.Extensions.Options.Options.Create(Options),
+            new Mock<ILogger<PostgresDistributedCache>>().Object,
+            (query, _) =>
+            {
+                executedQueryCount++;
+                capturedQuery = query;
+                return Task.FromResult<string?>(null);
+            });
+
+        var result = await sut.Get<TestModel>("missing-key");
+
+        Assert.Null(result);
+        Assert.Contains("expiration > NOW()", capturedQuery, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(1, executedQueryCount);
+    }
+
+    [Fact]
     public void CheckIfConnectionEstablished_WhenFlagIsTrue_ReturnsTrue()
     {
         var sut = CreateSut();

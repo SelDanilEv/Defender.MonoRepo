@@ -402,5 +402,27 @@ namespace Defender.DistributedCache.Tests
             var cachedValue = await _distributedCache.Get<TestModel>(idProvider(model), null);
             Assert.Null(cachedValue);
         }
+
+        [Fact]
+        public async Task Get_WhenEntryExpired_ReturnsFallbackAndReplacesExpiredValue()
+        {
+            if (!_cacheAvailable)
+            {
+                return;
+            }
+
+            var key = $"expired:{Guid.NewGuid():N}";
+            var stale = new TestModel { Name = "stale", Age = 1 };
+            var fresh = new TestModel { Name = "fresh", Age = 2 };
+
+            await _distributedCache.Add(_ => key, stale, TimeSpan.FromMilliseconds(50));
+            await Task.Delay(100);
+
+            var result = await _distributedCache.Get(key, () => Task.FromResult(fresh), TimeSpan.FromHours(30));
+
+            Assert.NotNull(result);
+            Assert.Equal("fresh", result.Name);
+            Assert.Equal(2, result.Age);
+        }
     }
 }
