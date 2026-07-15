@@ -25,6 +25,7 @@ builder.Services.AddWebUIServices(builder.Environment, builder.Configuration);
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddDefenderCors(builder.Environment);
+builder.Services.AddDefenderHealthChecks();
 
 var app = builder.Build();
 
@@ -64,5 +65,6 @@ app.UseProblemDetails();
 app.MapControllerRoute(
     name: "default",
     pattern: "api/{controller}/{action=Index}");
+app.MapDefenderHealthChecks();
 
 await app.RunAsync();
