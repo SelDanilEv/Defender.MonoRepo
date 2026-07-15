@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.job-scheduler
-  tag: sha-d689d29
+  tag: 20260715-211
   pullPolicy: Always
 ingress:
   enabled: true
