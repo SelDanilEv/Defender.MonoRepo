@@ -45,6 +45,9 @@ public class KafkaRequestResponseService : IKafkaRequestResponseService
         TimeSpan timeout,
         CancellationToken cancellationToken = default)
     {
+        var stopwatch = Stopwatch.StartNew();
+        var maxConsumeWait = TimeSpan.FromMilliseconds(250);
+        var responseConsumerGroupId = $"{_kafkaEnvPrefixer.AddEnvPrefix(groupId)}-{correlatedKafkaRequest.CorrelationId}";
         var producerConfig = new ProducerConfig
         {
             BootstrapServers = _kafkaOptions.Value.BootstrapServers
@@ -53,7 +56,7 @@ public class KafkaRequestResponseService : IKafkaRequestResponseService
         var consumerConfig = new ConsumerConfig
         {
             BootstrapServers = _kafkaOptions.Value.BootstrapServers,
-            GroupId = _kafkaEnvPrefixer.AddEnvPrefix(groupId),
+            GroupId = responseConsumerGroupId,
             AutoOffsetReset = AutoOffsetReset.Latest,
             EnableAutoCommit = false
         };
@@ -65,6 +68,20 @@ public class KafkaRequestResponseService : IKafkaRequestResponseService
         responseTopic = _kafkaEnvPrefixer.AddEnvPrefix(responseTopic);
         consumer.Subscribe(responseTopic);
 
+        while (consumer.Assignment?.Count is not > 0)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var remaining = timeout - stopwatch.Elapsed;
+            if (remaining <= TimeSpan.Zero)
+            {
+                throw new TimeoutException("Request timed out while waiting for the response consumer assignment.");
+            }
+
+            var consumeTimeout = remaining < maxConsumeWait ? remaining : maxConsumeWait;
+            consumer.Consume(consumeTimeout);
+        }
+
         var message = new Message<string, string>
         {
             Key = correlatedKafkaRequest.CorrelationId,
@@ -72,9 +89,6 @@ public class KafkaRequestResponseService : IKafkaRequestResponseService
         };
 
         await producer.ProduceAsync(requestTopic, message, cancellationToken);
-
-        var stopwatch = Stopwatch.StartNew();
-        var maxConsumeWait = TimeSpan.FromMilliseconds(250);
 
         while (stopwatch.Elapsed < timeout)
         {

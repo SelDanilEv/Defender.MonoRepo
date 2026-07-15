@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Text.Json;
 using Confluent.Kafka;
 using Defender.Kafka.Configuration.Options;
@@ -211,6 +212,7 @@ public class KafkaRuntimeComponentsTests
             .Setup(x => x.ProduceAsync(It.IsAny<string>(), It.IsAny<Message<string, string>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new DeliveryResult<string, string>());
         var consumer = new Mock<IConsumer<string, string>>();
+        consumer.SetupGet(x => x.Assignment).Returns([new TopicPartition("env-response-topic", new Partition(0))]);
         var request = new CorrelatedKafkaRequest<string> { CorrelationId = "corr-1", Message = "input" };
         var response = new CorrelatedKafkaResponse<int> { CorrelationId = "corr-1", Message = 42 };
         consumer.SetupSequence(x => x.Consume(It.IsAny<TimeSpan>()))
@@ -236,7 +238,7 @@ public class KafkaRuntimeComponentsTests
             CancellationToken.None);
 
         Assert.Equal(42, result);
-        Assert.Equal("env-group", capturedConsumerConfig!.GroupId);
+        Assert.Equal("env-group-corr-1", capturedConsumerConfig!.GroupId);
         consumer.Verify(x => x.Subscribe("env-response-topic"), Times.Once);
         producer.Verify(
             x => x.ProduceAsync(
@@ -244,6 +246,89 @@ public class KafkaRuntimeComponentsTests
                 It.Is<Message<string, string>>(m => m.Key == "corr-1"),
                 It.IsAny<CancellationToken>()),
             Times.Once);
+    }
+
+    [Fact]
+    public async Task KafkaRequestResponseServiceSendAsync_WhenConsumerAssignmentTimesOut_DoesNotPublishRequest()
+    {
+        var options = Options.Create(new KafkaOptions { BootstrapServers = "localhost:9092" });
+        var prefixer = new Mock<IKafkaEnvPrefixer>();
+        prefixer.Setup(x => x.AddEnvPrefix("group")).Returns("env-group");
+        prefixer.Setup(x => x.AddEnvPrefix("request-topic")).Returns("env-request-topic");
+        prefixer.Setup(x => x.AddEnvPrefix("response-topic")).Returns("env-response-topic");
+        var producer = new Mock<IProducer<string, string>>();
+        var consumer = new Mock<IConsumer<string, string>>();
+        consumer.SetupGet(x => x.Assignment).Returns([]);
+        consumer.Setup(x => x.Consume(It.IsAny<TimeSpan>())).Returns((ConsumeResult<string, string>)null!);
+        var sut = new KafkaRequestResponseService(
+            prefixer.Object,
+            options,
+            _ => producer.Object,
+            _ => consumer.Object);
+
+        await Assert.ThrowsAsync<TimeoutException>(() => sut.SendAsync<string, int>(
+            "request-topic",
+            "response-topic",
+            "group",
+            new CorrelatedKafkaRequest<string> { CorrelationId = "corr-unassigned", Message = "payload" },
+            TimeSpan.FromMilliseconds(25),
+            CancellationToken.None));
+
+        producer.Verify(
+            x => x.ProduceAsync(It.IsAny<string>(), It.IsAny<Message<string, string>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task KafkaRequestResponseServiceSendAsync_WhenRequestsShareBaseGroup_UsesIsolatedConsumerGroups()
+    {
+        var options = Options.Create(new KafkaOptions { BootstrapServers = "localhost:9092" });
+        var prefixer = new Mock<IKafkaEnvPrefixer>();
+        prefixer.Setup(x => x.AddEnvPrefix("group")).Returns("env-group");
+        prefixer.Setup(x => x.AddEnvPrefix("request-topic")).Returns("env-request-topic");
+        prefixer.Setup(x => x.AddEnvPrefix("response-topic")).Returns("env-response-topic");
+        var producer = new Mock<IProducer<string, string>>();
+        producer
+            .Setup(x => x.ProduceAsync(It.IsAny<string>(), It.IsAny<Message<string, string>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new DeliveryResult<string, string>());
+        var consumerOne = new Mock<IConsumer<string, string>>();
+        consumerOne.SetupGet(x => x.Assignment).Returns([new TopicPartition("env-response-topic", new Partition(0))]);
+        consumerOne.Setup(x => x.Consume(It.IsAny<TimeSpan>())).Returns(new ConsumeResult<string, string>
+        {
+            Message = new Message<string, string>
+            {
+                Key = "corr-one",
+                Value = JsonSerializer.Serialize(new CorrelatedKafkaResponse<int> { CorrelationId = "corr-one", Message = 1 })
+            }
+        });
+        var consumerTwo = new Mock<IConsumer<string, string>>();
+        consumerTwo.SetupGet(x => x.Assignment).Returns([new TopicPartition("env-response-topic", new Partition(0))]);
+        consumerTwo.Setup(x => x.Consume(It.IsAny<TimeSpan>())).Returns(new ConsumeResult<string, string>
+        {
+            Message = new Message<string, string>
+            {
+                Key = "corr-two",
+                Value = JsonSerializer.Serialize(new CorrelatedKafkaResponse<int> { CorrelationId = "corr-two", Message = 2 })
+            }
+        });
+        var consumers = new ConcurrentQueue<IConsumer<string, string>>([consumerOne.Object, consumerTwo.Object]);
+        var groupIds = new ConcurrentBag<string>();
+        var sut = new KafkaRequestResponseService(
+            prefixer.Object,
+            options,
+            _ => producer.Object,
+            config =>
+            {
+                groupIds.Add(config.GroupId!);
+                return consumers.TryDequeue(out var consumer) ? consumer : throw new InvalidOperationException("Unexpected consumer");
+            });
+
+        var results = await Task.WhenAll(
+            sut.SendAsync<string, int>("request-topic", "response-topic", "group", new CorrelatedKafkaRequest<string> { CorrelationId = "corr-one", Message = "one" }, TimeSpan.FromSeconds(1)),
+            sut.SendAsync<string, int>("request-topic", "response-topic", "group", new CorrelatedKafkaRequest<string> { CorrelationId = "corr-two", Message = "two" }, TimeSpan.FromSeconds(1)));
+
+        Assert.Equal([1, 2], results);
+        Assert.Equal(["env-group-corr-one", "env-group-corr-two"], groupIds.Order());
     }
 
     [Fact]
