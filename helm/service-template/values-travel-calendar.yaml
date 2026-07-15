@@ -1,8 +1,6 @@
 image:
   repository: defendersd/defender.travel-calendar
   tag: 20260715-211
-  # CI manifest for tag 20260715-211, resolved 2026-07-15.
-  digest: sha256:be8c8fcf9114c354544f36ecd49ff59c5991952226cef18f01a2091fb24156bf
   pullPolicy: Always
 ingress:
   enabled: true
@@ -17,6 +15,3 @@ autoscaling:
   minReplicaCount: 1
   http:
     enabled: true
-probes:
-  # TravelCalendarService exposes its unauthenticated health endpoint at /health.
-  path: /health
