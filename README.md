@@ -426,6 +426,12 @@ See [OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md) for details.
 2. Defender.Kafka - Kafka integration abstractions
 3. Defender.DistributedCache - Distributed cache support
 
+Shared-library operational guarantees:
+
+- Distributed cache defaults to a 30-hour TTL; expired entries are excluded by the existing read query, without adding cleanup workers.
+- Secret encryption writes versioned AES-GCM payloads and can still decrypt legacy ciphertexts.
+- Kafka request/response uses a short-lived consumer per active request, waits for its assignment before publishing, and creates no idle background consumer.
+
 ---
 
 ## Business Context
