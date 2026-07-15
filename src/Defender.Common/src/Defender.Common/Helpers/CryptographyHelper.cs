@@ -1,4 +1,4 @@
-﻿using Defender.Common.Enums;
+using Defender.Common.Enums;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -6,61 +6,114 @@ namespace Defender.Common.Helpers;
 
 public static class CryptographyHelper
 {
+    private const string V2Prefix = "v2";
+    private const int NonceSize = 12;
+    private const int TagSize = 16;
+
     public static async Task<string> EncryptStringAsync(string plainText, string salt = "")
     {
-        using var aesAlg = Aes.Create();
-        aesAlg.Key = HexStringToByteArray(
-            await SecretsHelper.GetSecretAsync(Secret.SecretsEncryptionKey));
-        aesAlg.IV = GenerateIV(Encoding.UTF8.GetBytes(salt));
+        ArgumentNullException.ThrowIfNull(plainText);
 
-        ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+        var key = await GetEncryptionKeyAsync();
+        var nonce = RandomNumberGenerator.GetBytes(NonceSize);
+        var plaintextBytes = Encoding.UTF8.GetBytes(plainText);
+        var cipherText = new byte[plaintextBytes.Length];
+        var tag = new byte[TagSize];
 
-        using MemoryStream msEncrypt = new();
-        using (CryptoStream csEncrypt = new(msEncrypt, encryptor, CryptoStreamMode.Write))
-        {
-            using StreamWriter swEncrypt = new(csEncrypt);
-            swEncrypt.Write(plainText);
-        }
+        using var aes = new AesGcm(key, TagSize);
+        aes.Encrypt(nonce, plaintextBytes, cipherText, tag, Encoding.UTF8.GetBytes(salt));
 
-        return Convert.ToBase64String(msEncrypt.ToArray());
+        return string.Join(
+            '.',
+            V2Prefix,
+            Convert.ToBase64String(nonce),
+            Convert.ToBase64String(tag),
+            Convert.ToBase64String(cipherText));
     }
 
     public static async Task<string> DecryptStringAsync(string cipherText, string salt = "")
     {
-        using Aes aesAlg = Aes.Create();
-        aesAlg.Key = HexStringToByteArray(
-            await SecretsHelper.GetSecretAsync(Secret.SecretsEncryptionKey));
-        aesAlg.IV = GenerateIV(Encoding.UTF8.GetBytes(salt));
+        ArgumentNullException.ThrowIfNull(cipherText);
 
-        ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+        var key = await GetEncryptionKeyAsync();
 
-        using MemoryStream msDecrypt = new(Convert.FromBase64String(cipherText));
-        using CryptoStream csDecrypt = new(msDecrypt, decryptor, CryptoStreamMode.Read);
-        using StreamReader srDecrypt = new(csDecrypt);
-
-        return srDecrypt.ReadToEnd();
+        return cipherText.StartsWith($"{V2Prefix}.", StringComparison.Ordinal)
+            ? DecryptV2(cipherText, key, salt)
+            : DecryptLegacy(cipherText, key, salt);
     }
 
-    static byte[] GenerateIV(byte[] salt)
+    private static string DecryptV2(string cipherText, byte[] key, string salt)
     {
-        byte[] keyBytes = new byte[16];
-
-        for (int i = 0; i < keyBytes.Length; i++)
+        var parts = cipherText.Split('.', StringSplitOptions.None);
+        if (parts.Length != 4 || parts[0] != V2Prefix)
         {
-            keyBytes[i] = (byte)(salt[i % salt.Length]);
+            throw new CryptographicException("Invalid encrypted payload format.");
         }
 
-        return keyBytes;
+        var nonce = Convert.FromBase64String(parts[1]);
+        var tag = Convert.FromBase64String(parts[2]);
+        var encryptedBytes = Convert.FromBase64String(parts[3]);
+
+        if (nonce.Length != NonceSize || tag.Length != TagSize)
+        {
+            throw new CryptographicException("Invalid encrypted payload format.");
+        }
+
+        var plaintextBytes = new byte[encryptedBytes.Length];
+
+        using var aes = new AesGcm(key, TagSize);
+        aes.Decrypt(nonce, encryptedBytes, tag, plaintextBytes, Encoding.UTF8.GetBytes(salt));
+
+        return Encoding.UTF8.GetString(plaintextBytes);
     }
 
-    static byte[] HexStringToByteArray(string hex)
+    private static string DecryptLegacy(string cipherText, byte[] key, string salt)
     {
-        int numberChars = hex.Length;
-        byte[] bytes = new byte[numberChars / 2];
-        for (int i = 0; i < numberChars; i += 2)
+        using var aes = Aes.Create();
+        aes.Key = key;
+        aes.IV = GenerateLegacyIv(Encoding.UTF8.GetBytes(salt));
+
+        using var memoryStream = new MemoryStream(Convert.FromBase64String(cipherText));
+        using var cryptoStream = new CryptoStream(memoryStream, aes.CreateDecryptor(), CryptoStreamMode.Read);
+        using var streamReader = new StreamReader(cryptoStream);
+
+        return streamReader.ReadToEnd();
+    }
+
+    private static async Task<byte[]> GetEncryptionKeyAsync()
+    {
+        var secret = await SecretsHelper.GetSecretAsync(Secret.SecretsEncryptionKey);
+
+        try
         {
-            bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            var key = Convert.FromHexString(secret);
+            if (key.Length is not (16 or 24 or 32))
+            {
+                throw new CryptographicException("Encryption key must be 128, 192, or 256 bits.");
+            }
+
+            return key;
         }
-        return bytes;
+        catch (FormatException exception)
+        {
+            throw new CryptographicException("Encryption key must be a hexadecimal value.", exception);
+        }
+    }
+
+    private static byte[] GenerateLegacyIv(byte[] salt)
+    {
+        var iv = new byte[16];
+
+        if (salt.Length == 0)
+        {
+            return iv;
+        }
+
+        for (var i = 0; i < iv.Length; i++)
+        {
+            iv[i] = salt[i % salt.Length];
+        }
+
+        return iv;
     }
 }

@@ -1,4 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Cryptography;
+using System.Text;
 using Defender.Common.Entities.Secrets;
 using Defender.Common.Enums;
 using Defender.Common.Helpers;
@@ -8,6 +10,53 @@ namespace Defender.Common.Tests;
 
 public class SecretsAndCryptoTests
 {
+    [Fact]
+    public async Task EncryptStringAsync_WhenCalledTwice_UsesDifferentVersionedPayloads()
+    {
+        Environment.SetEnvironmentVariable(
+            "Defender_App_SecretsEncryptionKey",
+            "00112233445566778899AABBCCDDEEFF",
+            EnvironmentVariableTarget.Process);
+
+        var first = await CryptographyHelper.EncryptStringAsync("secret-payload", "secret-name");
+        var second = await CryptographyHelper.EncryptStringAsync("secret-payload", "secret-name");
+
+        Assert.StartsWith("v2.", first);
+        Assert.StartsWith("v2.", second);
+        Assert.NotEqual(first, second);
+    }
+
+    [Fact]
+    public async Task DecryptStringAsync_WhenV2PayloadWasModified_ThrowsCryptographicException()
+    {
+        Environment.SetEnvironmentVariable(
+            "Defender_App_SecretsEncryptionKey",
+            "00112233445566778899AABBCCDDEEFF",
+            EnvironmentVariableTarget.Process);
+        var encrypted = await CryptographyHelper.EncryptStringAsync("secret-payload", "secret-name");
+        var parts = encrypted.Split('.');
+        var cipherText = Convert.FromBase64String(parts[3]);
+        cipherText[0] ^= 0x01;
+        parts[3] = Convert.ToBase64String(cipherText);
+
+        await Assert.ThrowsAnyAsync<CryptographicException>(() =>
+            CryptographyHelper.DecryptStringAsync(string.Join('.', parts), "secret-name"));
+    }
+
+    [Fact]
+    public async Task DecryptStringAsync_WhenLegacyPayloadProvided_ReturnsPlainText()
+    {
+        Environment.SetEnvironmentVariable(
+            "Defender_App_SecretsEncryptionKey",
+            "00112233445566778899AABBCCDDEEFF",
+            EnvironmentVariableTarget.Process);
+        var legacy = EncryptLegacyForTest("secret-payload", "secret-name");
+
+        var result = await CryptographyHelper.DecryptStringAsync(legacy, "secret-name");
+
+        Assert.Equal("secret-payload", result);
+    }
+
     [Fact]
     public async Task GetSecretAsync_WhenKeyIsEmpty_ReturnsEmptyString()
     {
@@ -102,5 +151,24 @@ public class SecretsAndCryptoTests
                 previousJwtSecret,
                 EnvironmentVariableTarget.Process);
         }
+    }
+
+    private static string EncryptLegacyForTest(string plainText, string salt)
+    {
+        using var aes = Aes.Create();
+        aes.Key = Convert.FromHexString("00112233445566778899AABBCCDDEEFF");
+        var saltBytes = Encoding.UTF8.GetBytes(salt);
+        aes.IV = Enumerable.Range(0, 16)
+            .Select(index => saltBytes[index % saltBytes.Length])
+            .ToArray();
+
+        using var memoryStream = new MemoryStream();
+        using (var cryptoStream = new CryptoStream(memoryStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
+        using (var streamWriter = new StreamWriter(cryptoStream))
+        {
+            streamWriter.Write(plainText);
+        }
+
+        return Convert.ToBase64String(memoryStream.ToArray());
     }
 }
