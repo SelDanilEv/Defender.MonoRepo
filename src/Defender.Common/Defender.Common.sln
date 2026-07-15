@@ -5,6 +5,8 @@ VisualStudioVersion = 17.1.32414.318
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Defender.Common", "src\Defender.Common\Defender.Common.csproj", "{E642B22F-F969-4574-A3C0-45F8509458FE}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Defender.Common.Tests", "src\Tests\Defender.Common.Tests.csproj", "{6FC3E9FB-1A9B-4FD4-BE32-3B60D56B4A51}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{A5B21AD2-5A77-487A-922C-CE8267A74754}"
 	ProjectSection(SolutionItems) = preProject
 		..\Directory.Build.props = ..\Directory.Build.props
@@ -21,6 +23,10 @@ Global
 		{E642B22F-F969-4574-A3C0-45F8509458FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E642B22F-F969-4574-A3C0-45F8509458FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E642B22F-F969-4574-A3C0-45F8509458FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FC3E9FB-1A9B-4FD4-BE32-3B60D56B4A51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FC3E9FB-1A9B-4FD4-BE32-3B60D56B4A51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FC3E9FB-1A9B-4FD4-BE32-3B60D56B4A51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FC3E9FB-1A9B-4FD4-BE32-3B60D56B4A51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

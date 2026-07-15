@@ -217,6 +217,33 @@ jobs:
             echo "portal-changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+  test-shared-libraries:
+    needs: check-changes
+    if: needs.check-changes.outputs.src-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.TEST_DOTNET_VERSION }}
+
+      - name: Validate NuGet egress
+        shell: bash
+        run: |
+          chmod +x scripts/check-nuget-egress.sh
+          ./scripts/check-nuget-egress.sh
+
+      - name: Run shared library tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          dotnet test src/Defender.Common/src/Tests/Defender.Common.Tests.csproj --configuration Release --nologo
+          dotnet test src/Defender.Kafka/src/Tests/Defender.Kafka.Tests.csproj --configuration Release --nologo
+          dotnet test src/Defender.DistributedCache/src/Tests/Defender.DistributedCache.Tests.csproj --configuration Release --nologo
+
   test-services:
     needs: check-changes
     if: needs.check-changes.outputs.src-changed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.service == '' || github.event.inputs.service == 'ALL')
