@@ -3,7 +3,7 @@ using Defender.Common.Helpers;
 
 namespace Defender.SecretManagementService.Application.Helpers.LocalSecretHelper;
 
-public class LocalSecretsHelper
+public static class LocalSecretsHelper
 {
     public static async Task<string> GetSecretAsync(Secret secret)
     {

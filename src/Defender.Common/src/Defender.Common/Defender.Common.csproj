@@ -15,7 +15,6 @@
 		<PackageReference Include="AutoMapper" />
 		<PackageReference Include="FluentValidation" />
 		<PackageReference Include="MediatR" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
 		<PackageReference Include="MongoDB.Driver" />
 		<PackageReference Include="Newtonsoft.Json" />

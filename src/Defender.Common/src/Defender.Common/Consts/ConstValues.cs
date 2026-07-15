@@ -1,6 +1,6 @@
 ﻿namespace Defender.Common.Consts;
 
-internal class ConstValues
+internal static class ConstValues
 {
     public const string SharedDatabaseName = "Shared";
 

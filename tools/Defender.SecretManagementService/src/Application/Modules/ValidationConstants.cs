@@ -1,6 +1,6 @@
 ﻿namespace Defender.SecretManagementService.Application.Modules;
 
-public class ValidationConstants
+public static class ValidationConstants
 {
     public const int Valid1 = 1;
 }
