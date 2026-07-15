@@ -1,8 +1,8 @@
 image:
   repository: defendersd/defender.travel-calendar
   tag: 20260715-211
-  # Docker Hub latest manifest, resolved 2026-07-11.
-  digest: sha256:4386e5a3a5144b4361fd8b37aedb847721f61636d735f93ea96194fc8c079da5
+  # CI manifest for tag 20260715-211, resolved 2026-07-15.
+  digest: sha256:be8c8fcf9114c354544f36ecd49ff59c5991952226cef18f01a2091fb24156bf
   pullPolicy: Always
 ingress:
   enabled: true
