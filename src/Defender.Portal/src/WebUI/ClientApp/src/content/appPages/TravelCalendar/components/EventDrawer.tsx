@@ -13,6 +13,7 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Typography,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
@@ -21,6 +22,7 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useTranslation } from "react-i18next";
 import { TravelCalendar, TravelCalendarUserOption, TravelEvent, TravelParticipantStatus, TravelEventType, UpdateEventRequest } from "src/api/travelCalendar";
 import { liveTotal } from "../budgetMath";
+import { getEventDrawerPaperSx } from "./eventDrawerStyles";
 
 const participantColor = (status?: TravelParticipantStatus) => {
   switch (status) {
@@ -65,6 +67,7 @@ export const EventDrawer = ({
   onRespond: (status: TravelParticipantStatus) => Promise<any>;
 }) => {
   const { t, i18n } = useTranslation();
+  const theme = useTheme();
   const locale = i18n.language === "ru" ? "ru-RU" : "en-US";
   const formatMoney = (value: number) => value.toLocaleString(locale);
   const types: { value: TravelEventType; label: string; icon: string }[] = [
@@ -146,7 +149,7 @@ export const EventDrawer = ({
 
   return (
     <Drawer anchor="right" open={open} onClose={onClose} slotProps={{
-      paper: { sx: { width: 480, maxWidth: "100vw", p: { xs: 2, sm: 3 }, background: "var(--tc-drawer)", color: "var(--tc-text)", backgroundImage: "none" } }
+      paper: { sx: getEventDrawerPaperSx(theme) }
     }}>
       <Stack
         direction="row"
