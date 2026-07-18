@@ -246,6 +246,13 @@ export const NebulaFighterTheme = createTheme({
     boxShadow: "0px 1px 0px #272C48",
     textColor: colors.secondary.main,
   },
+  auth: {
+    storyPanelBackground:
+      "radial-gradient(circle at 24% 28%, rgba(126, 104, 255, 0.48), transparent 34%), linear-gradient(145deg, #17124a 0%, #080d2b 68%)",
+    storyTextPrimary: themeColors.trueWhite,
+    storyTextSecondary: "rgba(255,255,255,0.76)",
+    formPanelBackground: colors.layout.general.bodyBg,
+  },
   spacing: 8,
   palette: {
     common: {

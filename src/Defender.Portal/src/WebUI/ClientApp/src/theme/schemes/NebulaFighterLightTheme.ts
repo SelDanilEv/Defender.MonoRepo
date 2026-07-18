@@ -31,6 +31,13 @@ export const NebulaFighterLightTheme = createTheme(NebulaFighterTheme, {
     boxShadow: `0px 1px 0px ${alpha(textPrimary, 0.08)}`,
     textColor: alpha(textPrimary, 0.72),
   },
+  auth: {
+    storyPanelBackground:
+      "radial-gradient(circle at 24% 28%, rgba(140, 124, 240, 0.32), transparent 34%), linear-gradient(145deg, #EEF0FF 0%, #D7E0FF 68%)",
+    storyTextPrimary: textPrimary,
+    storyTextSecondary: alpha(textPrimary, 0.78),
+    formPanelBackground: backgroundDefault,
+  },
   colors: {
     ...NebulaFighterTheme.colors,
     secondary: {
