@@ -31,6 +31,15 @@ const AuthorizationService = {
         console.error("No parent window found. Cannot send token.");
       }
     } else {
+      const returnUrl = u.searchParams.get("returnUrl");
+      if (
+        returnUrl &&
+        (returnUrl === "/oauth/authorize" || returnUrl.startsWith("/oauth/authorize?"))
+      ) {
+        window.location.assign(returnUrl);
+        return;
+      }
+
       u.react.navigate("/home");
     }
   },

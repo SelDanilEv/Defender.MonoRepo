@@ -1,4 +1,6 @@
 using Defender.Common.Configuration.Options;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using OpenIddict.Abstractions;
@@ -24,12 +26,23 @@ public static class PortalOAuthServiceCollectionExtensions
         services
             .AddOpenIddict()
             .AddCore(options => options.UseMongoDb())
-            .AddServer(options => options.UseAspNetCore())
+            .AddServer(options => options.UseAspNetCore().EnableAuthorizationEndpointPassthrough())
             .AddValidation(options => options.UseLocalServer());
 
         services.AddAuthorizationBuilder()
             .AddPolicy(PortalOAuthScopes.Read, policy =>
                 policy.RequireClaim(OpenIddictConstants.Claims.Scope, PortalOAuthScopes.Read));
+
+        services.AddRateLimiter(options => options.AddPolicy(
+            "oauth-registration",
+            context => RateLimitPartition.GetFixedWindowLimiter(
+                context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10,
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                })));
 
         return services;
     }
