@@ -149,7 +149,9 @@ namespace Defender.DistributedCache.Postgres
                 SELECT value
                 FROM {_options.CacheTableName}
                 WHERE expiration > NOW()
-                  AND {string.Join(" AND ", conditions)}";
+                  AND {string.Join(" AND ", conditions)}
+                ORDER BY expiration DESC
+                LIMIT 1;";
 
             var result = await ExecuteQueryAsync<string>(query, parameters);
 

@@ -186,6 +186,25 @@ public class PostgresDistributedCacheUnitTests
     }
 
     [Fact]
+    public async Task GetByExpressions_WhenQueryExecuted_OrdersByLatestExpirationAndLimitsToOne()
+    {
+        var capturedQuery = string.Empty;
+        var sut = new PostgresDistributedCache(
+            Microsoft.Extensions.Options.Options.Create(Options),
+            new Mock<ILogger<PostgresDistributedCache>>().Object,
+            (query, _) =>
+            {
+                capturedQuery = query;
+                return Task.FromResult<string?>(null);
+            });
+
+        await sut.Get<TestModel>([model => model.Name == "same"]);
+
+        Assert.Contains("ORDER BY expiration DESC", capturedQuery, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("LIMIT 1", capturedQuery, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void CheckIfConnectionEstablished_WhenFlagIsTrue_ReturnsTrue()
     {
         var sut = CreateSut();
