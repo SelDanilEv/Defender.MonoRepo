@@ -465,6 +465,9 @@ __mismatch__/
 **/superpowers/
 **/.superpowers/
 
+# Agent feature worktrees
+.worktrees/
+
 # Playwright MCP/CLI local state
 **/.playwright-cli/
 **/.playwright-mcp/
