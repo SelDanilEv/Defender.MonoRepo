@@ -476,7 +476,7 @@ namespace Defender.DistributedCache.Tests
                     await Task.Delay(300);
                 }
 
-                var actualExpiration = await connection.QuerySingleAsync<DateTimeOffset>(
+                var actualExpiration = await connection.QuerySingleAsync<DateTime>(
                     $"SELECT expiration FROM {tableName} WHERE key = 'legacy'");
                 var indexNames = (await connection.QueryAsync<string>(
                     "SELECT indexname FROM pg_indexes " +
@@ -484,7 +484,7 @@ namespace Defender.DistributedCache.Tests
                     new { TableName = tableName })).ToList();
 
                 Assert.Equal("timestamp with time zone", dataType);
-                Assert.Equal(expectedExpiration, actualExpiration);
+                Assert.Equal(expectedExpiration, new DateTimeOffset(actualExpiration, TimeSpan.Zero));
                 Assert.Contains($"{tableName}_expiration_idx", indexNames);
                 Assert.Contains($"{tableName}_value_gin_idx", indexNames);
             }
