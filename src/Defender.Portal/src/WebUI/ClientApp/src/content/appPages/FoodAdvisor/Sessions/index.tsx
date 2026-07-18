@@ -251,15 +251,23 @@ export const FoodAdvisorSessionsPage = () => {
           mb: 2
         }}>
         {showHeaderNewSessionButton && (
-          <Button variant="contained" onClick={() => navigate("/food-advisor/session/new")}>
+          <Button
+            variant="contained"
+            onClick={() => navigate("/food-advisor/session/new")}
+            sx={{ "--variant-containedBg": "primary.dark" }}
+          >
             {u.t("foodAdvisor:new_session")}
           </Button>
         )}
-        <Button variant="outlined" onClick={() => navigate("/food-advisor")}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate("/food-advisor")}
+        >
           {u.t("foodAdvisor:back")}
         </Button>
       </Box>
-      {loading && <LinearProgress sx={{ mb: 2 }} />}
+      {loading && <LinearProgress aria-label={u.t("foodAdvisor:polling")} sx={{ mb: 2 }} />}
       <Grid container spacing={2}>
         {!loading && sessions.length === 0 && (
           <Grid size={12}>
@@ -268,7 +276,11 @@ export const FoodAdvisorSessionsPage = () => {
                 <Typography variant="body1" gutterBottom>
                   {u.t("foodAdvisor:sessions_empty")}
                 </Typography>
-                <Button variant="contained" onClick={() => navigate("/food-advisor/session/new")}>
+                <Button
+                  variant="contained"
+                  onClick={() => navigate("/food-advisor/session/new")}
+                  sx={{ "--variant-containedBg": "primary.dark" }}
+                >
                   {u.t("foodAdvisor:new_session")}
                 </Button>
               </CardContent>

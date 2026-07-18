@@ -31,6 +31,7 @@
   "_" : "Banking page",
   "banking_page__wallet_title": "Цифровой кошелек",
   "banking_page__wallet_button_create_account": "Создать аккаунт",
+  "banking_page__wallet_button_refresh": "Обновить кошелек",
   "banking_page__wallet_button_open_banking": "Банкинг",
   "banking_page__wallet_button_home": "Домой",
   "banking_page__wallet_button_recharge_or_refund": "Пополнение/Возврат",

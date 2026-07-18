@@ -262,7 +262,11 @@ const WalletAccountsInfo = (props: any) => {
                   gap: 1
                 }}>
                 {renderNavigationButton()}
-                <LockedButton variant="outlined" onClick={updateWalletInfo}>
+                <LockedButton
+                  variant="outlined"
+                  aria-label={u.t("banking_page__wallet_button_refresh")}
+                  onClick={updateWalletInfo}
+                >
                   <CachedIcon />
                 </LockedButton>
               </Box>

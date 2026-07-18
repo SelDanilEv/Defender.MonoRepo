@@ -31,6 +31,7 @@
   "_" : "Banking page",
   "banking_page__wallet_title": "Digital wallet",
   "banking_page__wallet_button_create_account": "Create account",
+  "banking_page__wallet_button_refresh": "Refresh wallet",
   "banking_page__wallet_button_open_banking": "Open Banking",
   "banking_page__wallet_button_home": "Home",
   "banking_page__wallet_button_recharge_or_refund": "Recharge/Refund",

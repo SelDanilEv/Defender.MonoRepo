@@ -250,6 +250,9 @@ const EditSensitiveUserInfo = (props: any) => {
             onChange={UpdateRequest}
             variant="standard"
             fullWidth
+            slotProps={{
+              htmlInput: { "aria-label": u.t("personal_info_page__verification_code_field") },
+            }}
           />
         </Grid>
       </>
@@ -337,7 +340,8 @@ const EditSensitiveUserInfo = (props: any) => {
                 variant="standard"
                 fullWidth
                 slotProps={{
-                  input: { style: { fontSize: "1.1em" } }
+                  input: { style: { fontSize: "1.1em" } },
+                  htmlInput: { "aria-label": u.t("personal_info_page__email_field") },
                 }}
               />
             </Grid>
@@ -370,7 +374,8 @@ const EditSensitiveUserInfo = (props: any) => {
                 variant="standard"
                 fullWidth
                 slotProps={{
-                  input: { style: { fontSize: "1.1em" } }
+                  input: { style: { fontSize: "1.1em" } },
+                  htmlInput: { "aria-label": u.t("personal_info_page__password_field") },
                 }}
               />
             </Grid>

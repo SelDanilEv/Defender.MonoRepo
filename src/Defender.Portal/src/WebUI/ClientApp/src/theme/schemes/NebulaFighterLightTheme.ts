@@ -2,7 +2,7 @@ import { alpha, createTheme, darken } from "@mui/material";
 
 import { NebulaFighterTheme } from "./NebulaFighterTheme";
 
-const primary = "#8C7CF0";
+const primary = "#6B5ACA";
 const textPrimary = "#1A2440";
 const textSecondary = "#66708F";
 const backgroundDefault = "#F4F5FF";
@@ -353,6 +353,17 @@ export const NebulaFighterLightTheme = createTheme(NebulaFighterTheme, {
           },
         },
       },
+    },
+  },
+  typography: {
+    ...NebulaFighterTheme.typography,
+    h3: {
+      ...NebulaFighterTheme.typography.h3,
+      color: textPrimary,
+    },
+    subtitle2: {
+      ...NebulaFighterTheme.typography.subtitle2,
+      color: alpha(textPrimary, 0.7),
     },
   },
 });

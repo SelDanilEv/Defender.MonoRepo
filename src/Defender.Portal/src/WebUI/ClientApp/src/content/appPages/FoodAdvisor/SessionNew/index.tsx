@@ -274,7 +274,7 @@ const FoodAdvisorSessionNewPage = () => {
                 <Typography variant="subtitle1">
                   {u.t("foodAdvisor:upload_images")}
                 </Typography>
-                {isBusy && <LinearProgress />}
+                {isBusy && <LinearProgress aria-label={u.t("foodAdvisor:polling")} />}
                 <Box
                   sx={(theme) => ({
                     border: `1px dashed ${alpha(theme.palette.primary.main, 0.45)}`,

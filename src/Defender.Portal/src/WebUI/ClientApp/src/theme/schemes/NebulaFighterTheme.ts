@@ -264,6 +264,7 @@ export const NebulaFighterTheme = createTheme({
       light: colors.primary.light,
       main: colors.primary.main,
       dark: colors.primary.dark,
+      contrastText: themeColors.trueWhite,
     },
     secondary: {
       light: colors.secondary.light,
@@ -348,6 +349,7 @@ export const NebulaFighterTheme = createTheme({
           marginRight: 6,
           fontWeight: "bold",
           fontSize: 12,
+          color: colors.alpha.trueWhite[70],
         },
       },
     },
@@ -672,6 +674,10 @@ export const NebulaFighterTheme = createTheme({
 
           ".MuiSvgIcon-root": {
             transition: "all .2s",
+          },
+          "&.MuiButton-containedPrimary": {
+            "--variant-containedBg": colors.primary.dark,
+            "--variant-containedColor": themeColors.trueWhite,
           },
           "&.MuiButton-containedSecondary": {
             backgroundColor: colors.secondary.main,
@@ -1308,7 +1314,7 @@ export const NebulaFighterTheme = createTheme({
     subtitle2: {
       fontWeight: 400,
       fontSize: 13,
-      color: colors.alpha.black[50],
+      color: colors.alpha.black[70],
     },
     overline: {
       fontSize: 12,

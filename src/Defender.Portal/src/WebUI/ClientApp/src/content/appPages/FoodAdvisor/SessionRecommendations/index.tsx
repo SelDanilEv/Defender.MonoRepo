@@ -208,7 +208,7 @@ const FoodAdvisorSessionRecommendationsPage = () => {
         )}
       </Box>
       {loadingRecommendations && recommendations.length === 0 && (
-        <LinearProgress sx={{ mb: 2 }} />
+        <LinearProgress aria-label={u.t("foodAdvisor:polling")} sx={{ mb: 2 }} />
       )}
       <Grid container spacing={2}>
         {recommendations.length === 0 ? (

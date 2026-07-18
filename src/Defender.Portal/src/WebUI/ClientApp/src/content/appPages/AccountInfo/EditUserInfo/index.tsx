@@ -99,7 +99,8 @@ const EditUserInfo = (props: any) => {
                 variant="standard"
                 fullWidth
                 slotProps={{
-                  input: { style: { fontSize: "1.1em" } }
+                  input: { style: { fontSize: "1.1em" } },
+                  htmlInput: { "aria-label": u.t("personal_info_page__name_field") },
                 }}
               />
             </Grid>

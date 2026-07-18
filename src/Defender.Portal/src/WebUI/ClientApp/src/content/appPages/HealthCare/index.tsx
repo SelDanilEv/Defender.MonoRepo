@@ -467,7 +467,11 @@ const HealthCarePage = () => {
               <Stack direction="row" sx={{
                 gap: 1
               }}>
-                <Button variant="contained" onClick={saveEvent}>
+                <Button
+                  variant="contained"
+                  onClick={saveEvent}
+                  sx={{ "--variant-containedBg": "primary.dark" }}
+                >
                   {editingEventId ? u.t("healthCare:save") : u.t("healthCare:add")}
                 </Button>
                 {editingEventId && (
