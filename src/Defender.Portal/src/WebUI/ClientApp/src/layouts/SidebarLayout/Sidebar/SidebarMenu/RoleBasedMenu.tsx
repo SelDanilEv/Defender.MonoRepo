@@ -1,4 +1,4 @@
-import { ListSubheader, alpha, Box, List, styled } from "@mui/material";
+import { ListSubheader, Box, List, styled } from "@mui/material";
 import { connect } from "react-redux";
 
 import TableChartTwoToneIcon from "@mui/icons-material/TableChartTwoTone";
@@ -40,7 +40,7 @@ const SubMenuWrapper = styled(Box)(
     
         .MuiButton-root {
           display: flex;
-          color: ${theme.colors.alpha.trueWhite[70]};
+          color: ${theme.sidebar.menuItemColor};
           background-color: transparent;
           width: 100%;
           justify-content: flex-start;
@@ -58,13 +58,13 @@ const SubMenuWrapper = styled(Box)(
           }
 
           .MuiButton-startIcon {
-            color: ${theme.colors.alpha.trueWhite[30]};
+            color: ${theme.sidebar.menuItemIconColor};
             font-size: ${theme.typography.pxToRem(16)};
             margin-right: ${theme.spacing(0.75)};
           }
           
           .MuiButton-endIcon {
-            color: ${theme.colors.alpha.trueWhite[50]};
+            color: ${theme.sidebar.menuItemIconColor};
             margin-left: auto;
             opacity: .8;
             font-size: ${theme.typography.pxToRem(16)};
@@ -72,12 +72,12 @@ const SubMenuWrapper = styled(Box)(
 
           &.active,
           &:hover {
-            background-color: ${alpha(theme.colors.alpha.trueWhite[100], 0.06)};
-            color: ${theme.colors.alpha.trueWhite[100]};
+            background-color: ${theme.sidebar.menuItemBgActive};
+            color: ${theme.sidebar.menuItemColorActive};
 
             .MuiButton-startIcon,
             .MuiButton-endIcon {
-              color: ${theme.colors.alpha.trueWhite[100]};
+              color: ${theme.sidebar.menuItemIconColorActive};
             }
           }
         }
@@ -111,7 +111,7 @@ const SubMenuWrapper = styled(Box)(
 
               &:before {
                 content: ' ';
-                background: ${theme.colors.alpha.trueWhite[100]};
+                background: ${theme.sidebar.menuItemColorActive};
                 opacity: 0;
                 transition: ${theme.transitions.create([
                   "transform",

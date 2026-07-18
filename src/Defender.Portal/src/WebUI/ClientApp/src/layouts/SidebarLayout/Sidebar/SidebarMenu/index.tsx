@@ -20,7 +20,7 @@ const MenuWrapper = styled(Box)(
       text-transform: uppercase;
       font-weight: bold;
       font-size: ${theme.typography.pxToRem(12)};
-      color: ${theme.colors.alpha.trueWhite[50]};
+      color: ${theme.sidebar.menuItemHeadingColor};
       padding: ${theme.spacing(0, 1.75)};
       line-height: 1.4;
     }

@@ -7,6 +7,7 @@ import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 import CachedIcon from "@mui/icons-material/Cached";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
+import { compactRefreshButtonLayout } from "../refreshButtonLayout";
 import { PaginationRequest } from "src/models/base/PaginationRequest";
 import LotteryDraw from "src/models/games/lottery/LotteryDraw";
 import ActiveLotteryDrawsResponse from "src/models/responses/games/lottery/ActiveLotteryDrawsResponse";
@@ -80,7 +81,12 @@ const ActiveDraws = (props: ActiveDrawsProps) => {
         <Typography align="center" variant="h3" component="div">
           {u.t("lottery:active_draws_title")}
         </Typography>
-        <LockedButton aria-label="Refresh active draws" variant="outlined" onClick={reloadActiveDraws}>
+        <LockedButton
+          aria-label="Refresh active draws"
+          variant="outlined"
+          onClick={reloadActiveDraws}
+          sx={compactRefreshButtonLayout}
+        >
           <CachedIcon />
         </LockedButton>
       </Box>

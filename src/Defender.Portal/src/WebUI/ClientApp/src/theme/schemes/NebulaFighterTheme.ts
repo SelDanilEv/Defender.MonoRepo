@@ -61,7 +61,7 @@ const colors = {
       menuItemBgActive: "rgba(43, 48, 77, .6)",
       menuItemIconColor: "#444A6B",
       menuItemIconColorActive: "#ffffff",
-      menuItemHeadingColor: darken(themeColors.secondary, 0.3),
+      menuItemHeadingColor: themeColors.secondary,
     },
   },
   alpha: {

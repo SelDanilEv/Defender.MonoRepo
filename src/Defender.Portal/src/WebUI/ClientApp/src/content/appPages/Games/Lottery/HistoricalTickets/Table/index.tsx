@@ -25,6 +25,7 @@ import useUtils from "src/appUtils";
 import TicketInfoDialogBody from "./TicketInfoDialogBody";
 import CustomDialog from "src/components/Dialog";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
+import { compactRefreshButtonLayout } from "../../refreshButtonLayout";
 import CachedIcon from "@mui/icons-material/Cached";
 import LotteryTicket from "src/models/games/lottery/LotteryTicket";
 import CurrencySymbolsMap from "src/consts/CurrencySymbolsMap";
@@ -109,7 +110,12 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
     <Card>
       <CardHeader
         action={
-          <LockedButton aria-label="Refresh tickets" sx={{ mr: "1em" }} variant="outlined" onClick={refresh}>
+          <LockedButton
+            aria-label="Refresh tickets"
+            sx={{ ...compactRefreshButtonLayout, mr: "1em" }}
+            variant="outlined"
+            onClick={refresh}
+          >
             <CachedIcon />
           </LockedButton>
         }
