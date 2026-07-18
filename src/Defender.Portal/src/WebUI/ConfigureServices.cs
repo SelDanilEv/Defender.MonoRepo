@@ -7,6 +7,7 @@ using Defender.Common.Extension;
 using Defender.Common.Helpers;
 using Defender.Portal.Application.Configuration.Extension;
 using Defender.Portal.WebUI.ErrorMapping;
+using Defender.Portal.WebUI.OAuth;
 using FluentValidation.AspNetCore;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -35,6 +36,8 @@ public static class ConfigureServices
         services.AddProblemDetails(options => ConfigureProblemDetails(options, environment));
 
         services.AddJwtAuthentication(configuration);
+
+        services.AddPortalOAuth(configuration);
 
         services.AddSwagger();
 

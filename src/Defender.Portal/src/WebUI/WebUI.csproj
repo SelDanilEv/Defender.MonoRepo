@@ -16,6 +16,9 @@
         <PackageReference Include="Hellang.Middleware.ProblemDetails" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
         <PackageReference Include="Microsoft.OpenApi" />
+        <PackageReference Include="OpenIddict.AspNetCore" />
+        <PackageReference Include="OpenIddict.MongoDb" />
+        <PackageReference Include="OpenIddict.Server.AspNetCore" />
         <PackageReference Include="prometheus-net.AspNetCore" />
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" >
           <TreatAsUsed>true</TreatAsUsed>
