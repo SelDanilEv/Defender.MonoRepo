@@ -6,6 +6,7 @@ using Defender.Common.Interfaces;
 using Defender.Common.Wrapper.Internal;
 using Defender.Portal.Application.Configuration.Options;
 using Defender.Portal.Application.DTOs.TravelCalendar;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 
 namespace Defender.Portal.Infrastructure.Clients.TravelCalendar;
@@ -17,7 +18,18 @@ public class TravelCalendarClient(HttpClient httpClient, IAuthenticationHeaderAc
 
     public async Task<TravelCalendarDto> GetAsync(string? from, string? to, CancellationToken ct = default)
     {
-        await Authorize(); var response = await httpClient.GetAsync(Url(), ct); await EnsureSuccess(response, ct);
+        var query = new Dictionary<string, string?>();
+        if (!string.IsNullOrWhiteSpace(from))
+        {
+            query["from"] = from;
+        }
+
+        if (!string.IsNullOrWhiteSpace(to))
+        {
+            query["to"] = to;
+        }
+
+        await Authorize(); var response = await httpClient.GetAsync(QueryHelpers.AddQueryString(Url(), query), ct); await EnsureSuccess(response, ct);
         return (await response.Content.ReadFromJsonAsync<TravelCalendarDto>(JsonOptions, ct))!;
     }
 

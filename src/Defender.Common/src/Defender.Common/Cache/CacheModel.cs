@@ -4,4 +4,5 @@ public enum CacheModel
 {
     Wallet,
     Positions,
+    TravelCalendar,
 }
