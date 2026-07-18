@@ -54,7 +54,8 @@
     "Declined": "Отклонено"
   },
   "monthGrid": {
-    "addEvent": "Добавить событие"
+    "addEvent": "Добавить событие",
+    "today": "Сегодня"
   },
   "subtitleGeneric": "Планируйте поездки из {{city}}",
   "navigation": {

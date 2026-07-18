@@ -9,6 +9,7 @@ public interface ITravelCalendarService
     Task<TravelCalendarMutationResultDto> SetThemeAsync(Guid userId, SetThemeRequest request, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> AddQueuedTripAsync(Guid userId, CreateQueuedTripRequest request, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> CreateEventFromDateAsync(Guid userId, CreateEventFromDateRequest request, CancellationToken cancellationToken);
+    Task<TravelCalendarMutationResultDto> CreateEventAsync(Guid userId, CreateTravelEventRequest request, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> UpdateEventAsync(Guid userId, Guid eventId, UpdateTravelEventRequest request, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> RemoveEventAsync(Guid userId, Guid eventId, VersionedRequest request, CancellationToken cancellationToken);
     Task<TravelCalendarMutationResultDto> AutoScheduleAsync(Guid userId, Guid eventId, VersionedRequest request, CancellationToken cancellationToken);

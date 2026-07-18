@@ -70,6 +70,7 @@ export const travelCalendarApi = {
   setTheme: (v: number, theme: CalendarTheme, u?: IUtils | null) => call<MutationResult>("/theme", "PATCH", { expectedVersion: v, theme }, u),
   addQueuedTrip: (v: number, title: string, u?: IUtils | null) => call<MutationResult>("/queued-trips", "POST", { expectedVersion: v, title }, u),
   createFromDate: (v: number, date: string, u?: IUtils | null) => call<MutationResult>("/events/from-date", "POST", { expectedVersion: v, date }, u),
+  createEvent: (v: number, request: UpdateEventRequest, u?: IUtils | null) => call<MutationResult>("/events", "POST", { expectedVersion: v, ...request }, u),
   updateEvent: (v: number, id: string, request: UpdateEventRequest, u?: IUtils | null) => call<MutationResult>(`/events/${id}`, "PUT", { expectedVersion: v, ...request }, u),
   removeEvent: (v: number, id: string, u?: IUtils | null) => call<MutationResult>(`/events/${id}`, "DELETE", version(v), u),
   autoSchedule: (v: number, id: string, u?: IUtils | null) => call<MutationResult>(`/events/${id}/auto-schedule`, "POST", version(v), u),

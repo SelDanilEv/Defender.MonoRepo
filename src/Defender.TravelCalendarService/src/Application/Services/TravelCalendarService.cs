@@ -69,6 +69,44 @@ public class TravelCalendarService(
         return new(page, travelEvent.Id, null);
     }
 
+    public async Task<TravelCalendarMutationResultDto> CreateEventAsync(Guid userId, CreateTravelEventRequest request, CancellationToken cancellationToken)
+    {
+        var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
+        EnsureCalendarVersion(calendar, request.ExpectedVersion);
+
+        var (start, end) = request.EndDate < request.StartDate
+            ? (request.EndDate, request.StartDate)
+            : (request.StartDate, request.EndDate);
+        EnsureSeason(calendar, start, end);
+        var visibleEvents = await eventRepository.GetVisibleAsync(userId, cancellationToken);
+        EnsureAvailable(visibleEvents, start, end, null);
+
+        var travelEvent = TravelEvent.Scheduled(userId, request.Title, request.Type, start, end);
+        travelEvent.UpdateSharedDetails(
+            userId,
+            request.Title,
+            request.Type,
+            start,
+            end,
+            request.Notes,
+            new HotelDetails
+            {
+                IsBooked = request.HotelBooked,
+                Name = request.HotelName,
+                Address = request.HotelAddress,
+                BookingUrl = request.HotelBookingUrl,
+                CostPln = request.HotelCostPln,
+            },
+            request.DistanceKm,
+            request.MainPoint,
+            request.OtherCostPln,
+            Now);
+
+        await eventRepository.AddAsync(travelEvent, cancellationToken);
+        var page = await GetAsync(userId, null, null, cancellationToken);
+        return new(page, travelEvent.Id, null);
+    }
+
     public Task<TravelCalendarMutationResultDto> UpdateEventAsync(Guid userId, Guid eventId, UpdateTravelEventRequest request, CancellationToken cancellationToken)
         => MutateEventAsync(userId, eventId, request.ExpectedVersion, async (travelEvent, calendar, visibleEvents) =>
         {

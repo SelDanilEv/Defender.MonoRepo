@@ -10,6 +10,7 @@ import {
   travelCalendarApi,
 } from "src/api/travelCalendar";
 import { CalendarMonth, calendarMonths, currentCalendarMonth, monthKey, monthRange } from "../monthNavigation";
+import { createDraftEvent } from "../draftEvent";
 
 const overlaps = (event: TravelEvent, from: string, to: string) => Boolean(event.startDate && event.endDate && event.startDate <= to && event.endDate >= from);
 
@@ -36,6 +37,7 @@ export const useTravelCalendar = (initialMonthCount: number) => {
   const [mutating, setMutating] = useState(false);
   const [error, setError] = useState("");
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
+  const [draftEvent, setDraftEvent] = useState<TravelEvent | null>(null);
 
   const loadMonth = useCallback(async (month: CalendarMonth) => {
     const key = monthKey(month);
@@ -114,7 +116,15 @@ export const useTravelCalendar = (initialMonthCount: number) => {
   }, [calendar, mutating, load]);
 
   const getEventVersion = useCallback((eventId: string) => calendar?.events.find((item) => item.id === eventId)?.version, [calendar]);
-  const activeEvent = calendar?.events.find((item) => item.id === activeEventId) ?? null;
+  const activeEvent = draftEvent ?? calendar?.events.find((item) => item.id === activeEventId) ?? null;
+  const closeActiveEvent = () => {
+    setDraftEvent(null);
+    setActiveEventId(null);
+  };
+  const openEvent = (eventId: string) => {
+    setDraftEvent(null);
+    setActiveEventId(eventId);
+  };
 
   return {
     calendar,
@@ -122,7 +132,9 @@ export const useTravelCalendar = (initialMonthCount: number) => {
     mutating,
     error,
     activeEvent,
-    setActiveEventId,
+    draftEvent,
+    openEvent,
+    closeActiveEvent,
     retry: load,
     ensureMonths,
     searchUsers: async (query: string): Promise<TravelCalendarUserOption[]> => {
@@ -137,11 +149,17 @@ export const useTravelCalendar = (initialMonthCount: number) => {
       }
     },
     addTrip: (title: string) => run((current) => travelCalendarApi.addQueuedTrip(current.version, title, utilsRef.current)),
-    createFromDate: async (date: string) => {
-      const result = await run((current) => travelCalendarApi.createFromDate(current.version, date, utilsRef.current));
-      if (result?.affectedEventId) {
-        setActiveEventId(result.affectedEventId);
+    createDraft: (date: string) => {
+      setActiveEventId(null);
+      setDraftEvent(createDraftEvent(date));
+    },
+    saveDraft: async (request: UpdateEventRequest) => {
+      const result = await run((current) => travelCalendarApi.createEvent(current.version, request, utilsRef.current));
+      if (result) {
+        setDraftEvent(null);
       }
+
+      return result;
     },
     saveEvent: (id: string, request: UpdateEventRequest) => {
       const version = getEventVersion(id);
@@ -151,7 +169,7 @@ export const useTravelCalendar = (initialMonthCount: number) => {
       const version = getEventVersion(id);
       const result = version == null ? null : await run(() => travelCalendarApi.removeEvent(version, id, utilsRef.current));
       if (result) {
-        setActiveEventId(null);
+        closeActiveEvent();
       }
     },
     autoSchedule: async (id: string) => {

@@ -40,6 +40,7 @@ export const EventDrawer = ({
   calendar,
   open,
   busy,
+  isDraft,
   onClose,
   onSave,
   onRemove,
@@ -55,6 +56,7 @@ export const EventDrawer = ({
   calendar: TravelCalendar;
   open: boolean;
   busy: boolean;
+  isDraft: boolean;
   onClose: () => void;
   onSave: (request: UpdateEventRequest) => Promise<any>;
   onRemove: () => void;
@@ -197,7 +199,7 @@ export const EventDrawer = ({
         </Stack>
         <TextField label={t("travelCalendar:drawer.fields.notes")} value={draft.notes} disabled={!event.canEdit} onChange={(e) => set("notes", e.target.value)} multiline minRows={2} />
 
-        <Box sx={{ p: 2, border: "1px solid var(--tc-border)", borderRadius: 3 }}>
+        {!isDraft && <Box sx={{ p: 2, border: "1px solid var(--tc-border)", borderRadius: 3 }}>
           <Stack
             direction="row"
             spacing={1}
@@ -252,7 +254,7 @@ export const EventDrawer = ({
           >
             {t("travelCalendar:drawer.invite")}
           </Button>}
-        </Box>
+        </Box>}
 
         {overnight && <Box sx={{ p: 2, border: "1px solid var(--tc-border)", borderRadius: 3 }}>
           <Typography sx={{
@@ -267,7 +269,7 @@ export const EventDrawer = ({
           </Stack>
         </Box>}
 
-        {isTrip && <Box sx={{ p: 2, border: "1px solid var(--tc-border)", borderRadius: 3 }}>
+        {isTrip && !isDraft && <Box sx={{ p: 2, border: "1px solid var(--tc-border)", borderRadius: 3 }}>
           <Typography
             sx={{
               fontWeight: 800,
@@ -317,7 +319,7 @@ export const EventDrawer = ({
         <Stack direction="row" spacing={1} sx={{
           flexWrap: "wrap"
         }}>
-          {event.canEdit && <Button color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={onRemove}>{t("travelCalendar:drawer.delete")}</Button>}
+          {event.canEdit && !isDraft && <Button color="error" variant="outlined" startIcon={<DeleteOutlineIcon />} onClick={onRemove}>{t("travelCalendar:drawer.delete")}</Button>}
           {!event.canEdit && event.canRespond && <>
             <Button variant="contained" color="success" onClick={() => onRespond("Accepted")}>{t("travelCalendar:drawer.accept")}</Button>
             <Button variant="outlined" color="warning" onClick={() => onRespond("Declined")}>{t("travelCalendar:drawer.decline")}</Button>

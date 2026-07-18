@@ -55,7 +55,8 @@
     "Declined": "Declined"
   },
   "monthGrid": {
-    "addEvent": "Add event"
+    "addEvent": "Add event",
+    "today": "Today"
   },
   "navigation": {
     "previous": "Show previous month",

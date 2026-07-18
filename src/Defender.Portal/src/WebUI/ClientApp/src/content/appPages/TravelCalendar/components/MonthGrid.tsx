@@ -2,7 +2,7 @@ import { Box, Paper, Tooltip, Typography } from "@mui/material";
 import { alpha, useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import { TravelEvent } from "src/api/travelCalendar";
-import { buildMonthDays, eventForDate } from "../calendarMath";
+import { buildMonthDays, eventForDate, isToday } from "../calendarMath";
 
 const capitalize = (value: string) => value.length > 0 ? value[0].toLocaleUpperCase() + value.slice(1) : value;
 
@@ -46,9 +46,10 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
 
           const event = eventForDate(events, date);
           const holiday = holidays.find((item) => item.date === date);
+          const today = isToday(date);
           const day = Number(date.slice(-2));
           const weekend = index % 7 > 4;
-          const label = `${date}${event ? `, ${event.title}, ${event.type}` : ""}${holiday ? `, ${holiday.flag}` : ""}`;
+          const label = `${date}${today ? `, ${t("travelCalendar:monthGrid.today")}` : ""}${event ? `, ${event.title}, ${event.type}` : ""}${holiday ? `, ${holiday.flag}` : ""}`;
 
           return (
             <Tooltip key={date} title={event?.title ?? (holiday ? holiday.flag : t("travelCalendar:monthGrid.addEvent"))}>
@@ -60,7 +61,7 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
                 sx={{
                   minWidth: 0,
                   minHeight: 52,
-                  border: event ? `1px solid ${alpha(colors[event.type], 0.5)}` : "1px solid transparent",
+                  border: today ? `2px solid ${theme.colors.primary.main}` : event ? `1px solid ${alpha(colors[event.type], 0.5)}` : "1px solid transparent",
                   borderRadius: "10px",
                   background: event ? alpha(colors[event.type], 0.12) : weekend ? "var(--tc-weekend)" : "transparent",
                   color: "inherit",
@@ -69,7 +70,7 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
                   p: .6,
                   textAlign: "left",
                   transition: ".2s",
-                  "&:hover,&:focus-visible": { transform: "translateY(-1px)", borderColor: event ? colors[event.type] : "var(--tc-accent)", outline: "none" },
+                  "&:hover,&:focus-visible": { transform: "translateY(-1px)", borderColor: today ? theme.colors.primary.main : event ? colors[event.type] : "var(--tc-accent)", outline: "none" },
                 }}
               >
                 <Typography
@@ -78,6 +79,7 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
                     fontSize: 12,
                     fontWeight: event ? 800 : 600
                   }}>{day}</Typography>
+                {today && <Typography component="span" sx={{ display: "block", color: theme.colors.primary.main, fontSize: 8, fontWeight: 800, lineHeight: 1 }}>{t("travelCalendar:monthGrid.today")}</Typography>}
                 {holiday && <Typography
                   component="span"
                   sx={{

@@ -692,8 +692,8 @@ export default function TravelCalendarPage() {
                   month={month.month}
                   events={scheduled}
                   holidays={calendar.holidays}
-                  onDate={state.createFromDate}
-                  onEvent={state.setActiveEventId}
+                  onDate={state.createDraft}
+                  onEvent={state.openEvent}
                 />
               ))}
             </Box>
@@ -744,8 +744,9 @@ export default function TravelCalendarPage() {
         calendar={calendar}
         open={!!state.activeEvent}
         busy={state.mutating}
-        onClose={() => state.setActiveEventId(null)}
-        onSave={(request) => state.saveEvent(state.activeEvent!.id, request)}
+        isDraft={!!state.draftEvent}
+        onClose={state.closeActiveEvent}
+        onSave={(request) => state.draftEvent ? state.saveDraft(request) : state.saveEvent(state.activeEvent!.id, request)}
         onRemove={() => state.removeEvent(state.activeEvent!.id)}
         onAddPoint={(text) => state.addPoint(state.activeEvent!.id, text)}
         onUpdatePoint={(id, patch) =>

@@ -1,5 +1,7 @@
 export const toLocalDate = (date: Date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
+export const isToday = (date: string, now = new Date()) => date === toLocalDate(now);
+
 export const buildMonthDays = (year: number, month: number): (string | null)[] => {
   const first = new Date(year, month, 1);
   const mondayOffset = (first.getDay() + 6) % 7;

@@ -1,4 +1,5 @@
 import { buildMonthDays, eventForDate, normalizeClickedRange } from "./calendarMath";
+import { createDraftEvent } from "./draftEvent";
 
 describe("travel calendar math", () => {
   it("builds a Monday-first July 2026 grid", () => {
@@ -14,5 +15,16 @@ describe("travel calendar math", () => {
 
   it("finds an event covering a date", () => {
     expect(eventForDate([{ id: "a", startDate: "2026-07-04", endDate: "2026-07-05" }], "2026-07-05")?.id).toBe("a");
+  });
+
+  it("creates an unsaved weekend draft for a clicked Sunday", () => {
+    expect(createDraftEvent("2026-07-12")).toMatchObject({
+      id: "draft",
+      title: "Weekend trip",
+      type: "OvernightTrip",
+      startDate: "2026-07-11",
+      endDate: "2026-07-12",
+      canEdit: true,
+    });
   });
 });

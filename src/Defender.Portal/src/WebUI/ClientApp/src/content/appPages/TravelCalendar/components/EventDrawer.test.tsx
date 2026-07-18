@@ -37,6 +37,7 @@ const props = {
   calendar,
   open: true,
   busy: false,
+  isDraft: false,
   onClose: vi.fn(),
   onSave: vi.fn(),
   onRemove: vi.fn(),
