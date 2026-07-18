@@ -19,9 +19,10 @@ image:
   tag: 20260620-100
 ```
 
-Image publication alone does not deploy that image. Run promotion for every changed deployable
-service, wait for the promotion commit, then allow up to three minutes for ArgoCD detection and
-sync.
+Image publication alone does not deploy that image. Do not promote by default: first ask for and
+receive explicit user approval in the current task. A request to implement, commit, or push changes
+does not approve deployment. After approval, promote every changed deployable service, wait for the
+promotion commit, then allow up to three minutes for ArgoCD detection and sync.
 
 Apply project configuration before Applications:
 
@@ -42,6 +43,8 @@ Legacy `argocd-deploy.yml`, `argocd-tagged-deploy.yml`, and
 `create-tagged-deployment.sh` flows are not part of current repository state.
 
 ### Deployment validation
+
+Run these production checks only after explicit user approval in the current task:
 
 1. ArgoCD project permits destination namespace.
 2. Application uses correct chart path and values file.

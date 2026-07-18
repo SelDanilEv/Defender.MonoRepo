@@ -326,11 +326,11 @@ For every task that changes behavior, follow this delivery flow:
 1. Turn approved requirements into a Superpowers specification, implementation plan, then implementation.
 2. Run focused unit tests and all relevant local checks.
 3. Start `docker compose -f src/docker-compose.yml --profile local up -d --build`, run affected applications, and test changed behavior locally in detail.
-4. Commit scoped changes to `main`, push `main`, then use repository GitHub Actions and deployment scripts to build and promote images. For Portal, preview `scripts/deploy-portal.ps1` before using `-Execute`.
-5. Verify ArgoCD desired and live state, deployed workloads, and affected public endpoints.
-6. Smoke-test the affected user journey on [portal.coded-by-danil.dev](https://portal.coded-by-danil.dev/).
+4. Commit scoped changes. Pushes that publish images, GitHub Actions build/publish dispatches, and image promotion are separate production actions.
+5. Before any production action, ask for and receive explicit user approval in the current task. Approval to implement, commit, or use `main` does not approve publication or deployment.
+6. Only after approval, push/publish/promote the selected version, verify ArgoCD desired and live state, then smoke-test affected public endpoints and user journeys.
 
-Steps 3-6 are required when the task affects runtime behavior; documentation-only changes stop after local documentation verification and commit.
+Steps 1-3 are default for runtime changes. Step 4 may be performed when the user requests a commit. Steps 4-6 that publish or deploy, plus all production smoke tests, require explicit user approval; documentation-only changes stop after local documentation verification and commit.
 
 ### Troubleshooting and Common Ops
 

@@ -87,8 +87,10 @@ dotnet restore src/Defender.{ServiceName}/Defender.{ServiceName}.sln
 dotnet build src/Defender.{ServiceName}/Defender.{ServiceName}.sln
 ```
 
-Confirm all workflow, script, Helm, image, and service names match. After image build, promote its
-pinned tag. Promote every other deployable app changed by the same feature.
+Confirm all workflow, script, Helm, image, and service names match. Do not promote a built image
+by default. Before promotion, ArgoCD deployment, or any production smoke test, ask for and receive
+explicit user approval in the current task. After approval, promote the pinned tag for every
+deployable app changed by the same feature.
 
 ## Tests
 

@@ -27,7 +27,7 @@ powershell -NoProfile -File scripts/deploy-portal.ps1 -Execute
 powershell -NoProfile -File scripts/deploy-portal.ps1 -Execute -SkipLiveCheck
 ```
 
-Execution requires a clean `main`, authenticated `gh`, Python with `paramiko`, and ignored HomeServer credentials at `E:\MyApps\Defender.HomeServer\creds\argo-cd.config`. It pushes `main`, dispatches a Portal-only image build, reads its published `YYYYMMDD-build_version` tag (for example `20260712-208_1.3.0`), promotes that tag, waits for ArgoCD, then verifies the deployed image and public Portal/health routes. Secrets are never printed.
+Preview is read-only. Before `-Execute`, ask for and receive explicit user approval in the current task; a request to implement, commit, or use `main` is not approval. Execution requires a clean `main`, authenticated `gh`, Python with `paramiko`, and ignored HomeServer credentials at `E:\MyApps\Defender.HomeServer\creds\argo-cd.config`. It pushes `main`, dispatches a Portal-only image build, reads its published `YYYYMMDD-build_version` tag (for example `20260712-208_1.3.0`), promotes that tag, waits for ArgoCD, then verifies the deployed image and public Portal/health routes. Secrets are never printed.
 
 ## Token-efficient agent workflow
 

@@ -20,11 +20,12 @@
   - `docker compose -f src/docker-compose.yml down`
 - Portal frontend (if needed): `cd src/Defender.Portal/src/WebUI/ClientApp && npm install && npm start`.
 - Compact Portal verification: `powershell -NoProfile -File scripts/verify-portal.ps1` (`-IncludeE2E` for browser journeys, `-TestPath <path>` for one test file).
-- Guarded Portal deployment: preview with `powershell -NoProfile -File scripts/deploy-portal.ps1`; mutate GitHub/ArgoCD only with `powershell -NoProfile -File scripts/deploy-portal.ps1 -Execute`.
+- Guarded Portal deployment: preview with `powershell -NoProfile -File scripts/deploy-portal.ps1`; after explicit user approval, mutate GitHub/ArgoCD with `powershell -NoProfile -File scripts/deploy-portal.ps1 -Execute`.
 
 ## Token-Efficient Agent Workflow
 - For Portal work, use `scripts/verify-portal.ps1` instead of streaming raw npm command output. Successful runs should be reported from its compact summary; expand only the failing step's bounded log tail.
-- Use `scripts/deploy-portal.ps1` for Portal build/promotion/live verification. Always run preview first; `-Execute` is required for external writes.
+- Do not push `main` when it triggers image publication, dispatch build/publish workflows, promote images, mutate GitHub/ArgoCD, inspect production runtime state, or run public production smoke tests by default. Before any of those steps, ask for and receive explicit user approval in the current task; a request to implement a change, commit it, or use `main` is not approval.
+- Use `scripts/deploy-portal.ps1` for Portal build/promotion/live verification only after explicit user approval. Always run preview first; `-Execute` is required for external writes.
 - Read this file and only the nearest relevant `AGENTS.md`/README files. Avoid re-reading unrelated service documentation.
 - During long GitHub/Argo waits, report state transitions only. Do not repeat unchanged status or raw workflow logs.
 - Final reports should contain test counts, build/audit status, workflow IDs, deployed image, and live HTTP status—not full command output.

@@ -74,10 +74,12 @@ image:
   digest: sha256:<resolved-manifest-digest>
 ```
 
-After a successful build, run `Promote Image Tag` for every deployable service changed by the PR.
-For example, if a change touches both `Defender.HealthCareService` and `Defender.Portal`, promote
-both services to their newly published build tags. Resolve and commit an image digest when promoting
-a service that requires immutable delivery. The promote workflow commits the updated
+After a successful build, do not run `Promote Image Tag` by default. First ask for and receive
+explicit user approval in the current task; approval to implement, commit, or use `main` does not
+approve image promotion or deployment. After approval, promote every deployable service changed by
+the PR. For example, if a change touches both `Defender.HealthCareService` and `Defender.Portal`,
+promote both services to their newly published build tags. Resolve and commit an image digest when
+promoting a service that requires immutable delivery. The promote workflow commits the updated
 `helm/service-template/values-*.yaml` file, and ArgoCD deploys that pinned reference from git.
 
 ## Usage Examples
@@ -100,6 +102,8 @@ git push origin v1.0.0
 5. Click "Run workflow"
 
 ### Promote Built Image For Deployment
+Only after explicit user approval in the current task:
+
 1. Open the successful "Build and Publish Docker Images" run.
 2. Find the published tag for each changed service, usually `YYYYMMDD-<run-number>`.
 3. Select "Promote Image Tag".
@@ -119,7 +123,7 @@ docker.io/myusername/Defender.Portal:latest
 docker.io/myusername/Defender.UserManagementService:v1.0.0
 ```
 
-Portal release tags use `YYYYMMDD-build_version`, for example `20260712-208_1.3.0`. The version is read from `src/Defender.Portal/src/WebUI/ClientApp/package.json` and is intended for promotion to production.
+Portal release tags use `YYYYMMDD-build_version`, for example `20260712-208_1.3.0`. The version is read from `src/Defender.Portal/src/WebUI/ClientApp/package.json`; promotion to production requires explicit user approval in the current task.
 
 ## Build Context
 
