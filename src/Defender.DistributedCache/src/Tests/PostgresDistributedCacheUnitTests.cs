@@ -186,6 +186,53 @@ public class PostgresDistributedCacheUnitTests
     }
 
     [Fact]
+    public async Task GetByExpressions_WhenQueryExecuted_OrdersByLatestExpirationAndLimitsToOne()
+    {
+        var capturedQuery = string.Empty;
+        var sut = new PostgresDistributedCache(
+            Microsoft.Extensions.Options.Options.Create(Options),
+            new Mock<ILogger<PostgresDistributedCache>>().Object,
+            (query, _) =>
+            {
+                capturedQuery = query;
+                return Task.FromResult<string?>(null);
+            });
+
+        await sut.Get<TestModel>([model => model.Name == "same"]);
+
+        Assert.Contains("ORDER BY expiration DESC", capturedQuery, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("LIMIT 1", capturedQuery, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void BuildCreateTableQuery_WhenCalled_UsesTimeZoneAwareExpiration()
+    {
+        var query = InvokeSchemaQuery("BuildCreateTableQuery");
+
+        Assert.Contains("expiration TIMESTAMPTZ NOT NULL", query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void BuildExpirationMigrationQuery_WhenCalled_PreservesUtcInstant()
+    {
+        var query = InvokeSchemaQuery("BuildExpirationMigrationQuery");
+
+        Assert.Contains("ALTER COLUMN expiration TYPE TIMESTAMPTZ", query, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("AT TIME ZONE 'UTC'", query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public void BuildCreateIndexesQuery_WhenCalled_CreatesExpirationAndJsonbIndexes()
+    {
+        var query = InvokeSchemaQuery("BuildCreateIndexesQuery");
+
+        Assert.Contains("cache_expiration_idx", query, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("ON cache (expiration)", query, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("cache_value_gin_idx", query, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains("USING GIN (value jsonb_path_ops)", query, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
     public void CheckIfConnectionEstablished_WhenFlagIsTrue_ReturnsTrue()
     {
         var sut = CreateSut();
@@ -302,5 +349,15 @@ public class PostgresDistributedCacheUnitTests
         var flagProperty = typeof(PostgresDistributedCache)
             .GetProperty("IsConnectionEstablished", BindingFlags.Instance | BindingFlags.NonPublic)!;
         flagProperty.SetValue(cache, value);
+    }
+
+    private static string InvokeSchemaQuery(string methodName)
+    {
+        var method = typeof(PostgresDistributedCache)
+            .GetMethod(methodName, BindingFlags.Static | BindingFlags.NonPublic);
+
+        Assert.NotNull(method);
+
+        return (string)method.Invoke(null, new object[] { "cache" })!;
     }
 }

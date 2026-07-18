@@ -1,3 +1,4 @@
+using Dapper;
 using Defender.DistributedCache.Configuration.Options;
 using Defender.DistributedCache.Postgres;
 using Microsoft.Extensions.Options;
@@ -423,6 +424,74 @@ namespace Defender.DistributedCache.Tests
             Assert.NotNull(result);
             Assert.Equal("fresh", result.Name);
             Assert.Equal(2, result.Age);
+        }
+
+        [Fact]
+        public async Task Init_WhenLegacyCacheTableExists_MigratesExpiryAndCreatesIndexes()
+        {
+            if (!_containerStarted)
+            {
+                return;
+            }
+
+            var tableName = $"legacy_cache_{Guid.NewGuid():N}";
+            var expectedExpiration = new DateTimeOffset(2026, 7, 18, 12, 0, 0, TimeSpan.Zero);
+
+            await using var connection = new NpgsqlConnection(ConnectionString);
+            await connection.OpenAsync();
+            await connection.ExecuteAsync($@"
+                CREATE TABLE {tableName} (
+                    key TEXT PRIMARY KEY,
+                    value JSONB NOT NULL,
+                    expiration TIMESTAMP NOT NULL
+                );
+                INSERT INTO {tableName} (key, value, expiration)
+                VALUES ('legacy', '{{}}'::jsonb, @Expiration);",
+                new { Expiration = expectedExpiration.UtcDateTime });
+
+            try
+            {
+                _ = new PostgresDistributedCache(
+                    Options.Create(new DistributedCacheOptions
+                    {
+                        ConnectionString = ConnectionString,
+                        CacheTableName = tableName
+                    }),
+                    new Mock<ILogger<PostgresDistributedCache>>().Object);
+
+                var dataType = string.Empty;
+                for (var attempt = 0; attempt < 20; attempt++)
+                {
+                    dataType = await connection.QuerySingleAsync<string>(
+                        "SELECT data_type FROM information_schema.columns " +
+                        "WHERE table_schema = current_schema() AND table_name = @TableName " +
+                        "AND column_name = 'expiration'",
+                        new { TableName = tableName });
+
+                    if (dataType == "timestamp with time zone")
+                    {
+                        break;
+                    }
+
+                    await Task.Delay(300);
+                }
+
+                var actualExpiration = await connection.QuerySingleAsync<DateTime>(
+                    $"SELECT expiration FROM {tableName} WHERE key = 'legacy'");
+                var indexNames = (await connection.QueryAsync<string>(
+                    "SELECT indexname FROM pg_indexes " +
+                    "WHERE schemaname = current_schema() AND tablename = @TableName",
+                    new { TableName = tableName })).ToList();
+
+                Assert.Equal("timestamp with time zone", dataType);
+                Assert.Equal(expectedExpiration, new DateTimeOffset(actualExpiration, TimeSpan.Zero));
+                Assert.Contains($"{tableName}_expiration_idx", indexNames);
+                Assert.Contains($"{tableName}_value_gin_idx", indexNames);
+            }
+            finally
+            {
+                await connection.ExecuteAsync($"DROP TABLE IF EXISTS {tableName}");
+            }
         }
     }
 }

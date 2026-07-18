@@ -50,14 +50,9 @@ namespace Defender.DistributedCache.Postgres
                     using var connection = CreateConnection();
                     await connection.OpenAsync();
 
-                    var createTableQuery = $@"
-                        CREATE TABLE IF NOT EXISTS {_options.CacheTableName} (
-                            key TEXT PRIMARY KEY,
-                            value JSONB NOT NULL,
-                            expiration TIMESTAMP NOT NULL
-                        );";
-
-                    await connection.ExecuteAsync(createTableQuery);
+                    await connection.ExecuteAsync(BuildCreateTableQuery(_options.CacheTableName));
+                    await MigrateExpirationColumnAsync(connection);
+                    await connection.ExecuteAsync(BuildCreateIndexesQuery(_options.CacheTableName));
 
                     IsConnectionEstablished = true;
                 }
@@ -90,7 +85,7 @@ namespace Defender.DistributedCache.Postgres
             ttl ??= _options.ResolveDefaultTtl();
 
             var json = JsonSerializer.Serialize(value);
-            var expiration = DateTime.UtcNow.Add(ttl.Value);
+            var expiration = DateTimeOffset.UtcNow.Add(ttl.Value);
 
             var query = $@"
                 INSERT INTO {_options.CacheTableName} (key, value, expiration)
@@ -149,7 +144,9 @@ namespace Defender.DistributedCache.Postgres
                 SELECT value
                 FROM {_options.CacheTableName}
                 WHERE expiration > NOW()
-                  AND {string.Join(" AND ", conditions)}";
+                  AND {string.Join(" AND ", conditions)}
+                ORDER BY expiration DESC
+                LIMIT 1;";
 
             var result = await ExecuteQueryAsync<string>(query, parameters);
 
@@ -191,6 +188,47 @@ namespace Defender.DistributedCache.Postgres
         }
 
         #region Private methods
+
+        private async Task MigrateExpirationColumnAsync(NpgsqlConnection connection)
+        {
+            var dataType = await connection.QuerySingleOrDefaultAsync<string>(
+                "SELECT data_type FROM information_schema.columns " +
+                "WHERE table_schema = current_schema() AND table_name = @TableName " +
+                "AND column_name = 'expiration'",
+                new { TableName = _options.CacheTableName });
+
+            if (dataType == "timestamp without time zone")
+            {
+                await connection.ExecuteAsync(BuildExpirationMigrationQuery(_options.CacheTableName));
+            }
+        }
+
+        private static string BuildCreateTableQuery(string tableName)
+        {
+            return $@"
+                CREATE TABLE IF NOT EXISTS {tableName} (
+                    key TEXT PRIMARY KEY,
+                    value JSONB NOT NULL,
+                    expiration TIMESTAMPTZ NOT NULL
+                );";
+        }
+
+        private static string BuildExpirationMigrationQuery(string tableName)
+        {
+            return $@"
+                ALTER TABLE {tableName}
+                ALTER COLUMN expiration TYPE TIMESTAMPTZ
+                USING expiration AT TIME ZONE 'UTC';";
+        }
+
+        private static string BuildCreateIndexesQuery(string tableName)
+        {
+            return $@"
+                CREATE INDEX IF NOT EXISTS {tableName}_expiration_idx
+                ON {tableName} (expiration);
+                CREATE INDEX IF NOT EXISTS {tableName}_value_gin_idx
+                ON {tableName} USING GIN (value jsonb_path_ops);";
+        }
 
         private NpgsqlConnection CreateConnection() => new(_options.ConnectionString);
 

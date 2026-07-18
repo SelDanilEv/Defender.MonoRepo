@@ -445,6 +445,13 @@ __mismatch__/
 
 # Test reports
 *.trx
+*.lcov
+*.sarif
+**/[Tt]est-[Rr]esults/
+**/[Tt]est[Rr]esults/
+**/[Tt]est[Rr]esults[Cc]overage/
+**/[Pp]laywright-[Rr]eport/
+**/[Bb]lob-[Rr]eport/
 .aider*
 
 # Ignore XRM Toolbox DBs
