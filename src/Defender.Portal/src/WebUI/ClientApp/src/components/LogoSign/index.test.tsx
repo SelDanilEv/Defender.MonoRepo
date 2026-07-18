@@ -12,6 +12,6 @@ describe("Logo", () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByLabelText("Frontend version 1.3").textContent).toBe("v1.3");
+    expect(screen.getByLabelText("Frontend version 1.4").textContent).toBe("v1.4");
   });
 });
