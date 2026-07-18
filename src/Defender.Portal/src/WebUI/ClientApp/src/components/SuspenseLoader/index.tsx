@@ -29,7 +29,12 @@ function SuspenseLoader() {
         width: '100%',
         height: '100%'
       }}>
-      <CircularProgress size={64} disableShrink thickness={3} />
+      <CircularProgress
+        aria-label="Loading page"
+        size={64}
+        disableShrink
+        thickness={3}
+      />
     </Box>
   );
 }
