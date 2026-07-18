@@ -34,7 +34,7 @@ const AuthPageShell = ({ children, title, description }: AuthPageShellProps) => 
             variant="h5"
             sx={{
               fontWeight: 800,
-              color: "#fff"
+              color: (theme) => theme.auth.storyTextPrimary,
             }}>
             Defender Portal
           </Typography>
@@ -47,7 +47,7 @@ const AuthPageShell = ({ children, title, description }: AuthPageShellProps) => 
             sx={{
               fontWeight: 800,
               lineHeight: 1.05,
-              color: "#fff",
+              color: (theme) => theme.auth.storyTextPrimary,
               fontSize: { md: "2.75rem", lg: "3.5rem" },
               letterSpacing: "-0.035em"
             }}>
@@ -57,14 +57,17 @@ const AuthPageShell = ({ children, title, description }: AuthPageShellProps) => 
             sx={{
               mt: 2,
               maxWidth: 560,
-              color: "rgba(255,255,255,0.76)",
+              color: (theme) => theme.auth.storyTextSecondary,
               fontSize: { md: "1rem", lg: "1.125rem" },
             }}
           >
             {u.t("welcome:login_story_description")}
           </Typography>
         </Box>
-        <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.56)" }}>
+        <Typography
+          variant="body2"
+          sx={{ color: (theme) => theme.auth.storyTextSecondary }}
+        >
           {u.t("welcome:login_story_footer")}
         </Typography>
       </Box>

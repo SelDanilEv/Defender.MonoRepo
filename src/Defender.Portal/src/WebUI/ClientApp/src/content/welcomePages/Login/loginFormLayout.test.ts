@@ -2,6 +2,8 @@ import {
   googleLoginButtonLayout,
   loginFormLayout,
   loginInputAutoComplete,
+  passwordVisibilityButtonLayout,
+  resetPasswordLinkLayout,
 } from "./loginFormLayout";
 
 describe("loginFormLayout", () => {
@@ -13,5 +15,17 @@ describe("loginFormLayout", () => {
       login: "username",
       password: "current-password",
     });
+  });
+
+  test("LoginForm_WhenRendered_UsesCompactAccessiblePasswordControls", () => {
+    expect(passwordVisibilityButtonLayout).toMatchObject({
+      width: 32,
+      height: 32,
+    });
+    expect(resetPasswordLinkLayout).toMatchObject({
+      fontSize: "0.75rem",
+      minHeight: 32,
+    });
+    expect(resetPasswordLinkLayout["&:focus-visible"]).toBeDefined();
   });
 });

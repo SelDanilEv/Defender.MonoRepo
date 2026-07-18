@@ -23,6 +23,8 @@ import AuthorizationService from "src/services/AuthorizationService";
 import {
   loginFormLayout,
   loginInputAutoComplete,
+  passwordVisibilityButtonLayout,
+  resetPasswordLinkLayout,
 } from "../loginFormLayout";
 
 const LoginForm = (props: any) => {
@@ -116,13 +118,13 @@ const LoginForm = (props: any) => {
                           : "welcome:show_password"
                       )}
                       edge="end"
-                      sx={{ width: 44, height: 44 }}
+                      sx={passwordVisibilityButtonLayout}
                       onClick={() => setShowPassword((current) => !current)}
                     >
                       {showPassword ? (
-                        <VisibilityOffTwoToneIcon />
+                        <VisibilityOffTwoToneIcon fontSize="small" />
                       ) : (
-                        <VisibilityTwoToneIcon />
+                        <VisibilityTwoToneIcon fontSize="small" />
                       )}
                     </IconButton>
                   </InputAdornment>
@@ -133,7 +135,7 @@ const LoginForm = (props: any) => {
           <Link
             component={RouterLink}
             to="/welcome/password/reset"
-            sx={{ ml: "auto", mt: 0.75, fontSize: "0.875rem" }}
+            sx={resetPasswordLinkLayout}
           >
             {u.t("welcome:reset_password_link")}
           </Link>

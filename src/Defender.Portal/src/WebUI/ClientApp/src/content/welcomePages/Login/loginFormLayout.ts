@@ -30,4 +30,24 @@ export const loginInputAutoComplete = {
   login: "username",
   password: "current-password",
 };
+
+export const passwordVisibilityButtonLayout = {
+  width: 32,
+  height: 32,
+};
+
+export const resetPasswordLinkLayout = {
+  ml: "auto",
+  mt: 0.5,
+  minHeight: 32,
+  px: 0.5,
+  fontSize: "0.75rem",
+  display: "inline-flex",
+  alignItems: "center",
+  "&:focus-visible": {
+    outline: "2px solid",
+    outlineColor: "primary.main",
+    outlineOffset: 2,
+  },
+};
 import { Theme } from "@mui/material";

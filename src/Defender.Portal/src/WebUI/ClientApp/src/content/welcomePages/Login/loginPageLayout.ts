@@ -1,3 +1,5 @@
+import { Theme } from "@mui/material";
+
 export const AUTH_MOBILE_LOGO_SIZE = "80px";
 
 export const loginPageLayout = {
@@ -13,9 +15,8 @@ export const loginStoryPanelLayout = {
   flexDirection: "column",
   justifyContent: "space-between",
   p: { md: 5, lg: 8 },
-  color: "common.white",
-  background:
-    "radial-gradient(circle at 24% 28%, rgba(126, 104, 255, 0.48), transparent 34%), linear-gradient(145deg, #17124a 0%, #080d2b 68%)",
+  color: (theme: Theme) => theme.auth.storyTextPrimary,
+  background: (theme: Theme) => theme.auth.storyPanelBackground,
 };
 
 export const loginFormPanelLayout = {
@@ -25,7 +26,7 @@ export const loginFormPanelLayout = {
   display: "flex",
   flexDirection: "column",
   position: "relative",
-  backgroundColor: "background.default",
+  backgroundColor: (theme: Theme) => theme.auth.formPanelBackground,
 };
 
 export const mobileLoginBrandLayout = {
