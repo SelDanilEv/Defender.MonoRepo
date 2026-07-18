@@ -1,6 +1,6 @@
 # Defender.MonoRepo
 
-Last updated: 2026-07-08
+Last updated: 2026-07-18
 
 ## AI Agent Maintenance Rules
 
@@ -10,6 +10,7 @@ Last updated: 2026-07-08
 - Maximum target size for this README is 2,000 lines.
 - If the file grows beyond that size, compress and reorganize the content, remove repetition, and keep only the most important and most operationally useful information here.
 - Move detailed or narrow topic material into dedicated docs under `docs/` or service/tool specific `README.md` files, and leave links here instead of duplicating long explanations.
+- Every documentation or instruction file must stay at or below 2,000 lines. If it exceeds that limit, compress it to essential operational information or move narrow detail into linked files.
 
 A microservices monorepo for the Defender ecosystem: portal, identity, user management, wallet, gaming, budgeting, notifications, and supporting platform services.
 
@@ -23,6 +24,7 @@ A microservices monorepo for the Defender ecosystem: portal, identity, user mana
   - [Quick Start](#quick-start)
   - [Local Runtime Reference](#local-runtime-reference)
   - [Testing and Quality](#testing-and-quality)
+  - [Task Execution Workflow](#task-execution-workflow)
   - [Troubleshooting and Common Ops](#troubleshooting-and-common-ops)
   - [Deployment](#deployment)
   - [CI/CD Pipeline](#cicd-pipeline)
@@ -316,6 +318,19 @@ Within each `Defender.<Service>` use `src/Tests/` and group tests by layer:
 - `Controllers/`
 
 Use test naming style: `Method_WhenCondition_ExpectedResult`.
+
+### Task Execution Workflow
+
+For every task that changes behavior, follow this delivery flow:
+
+1. Turn approved requirements into a Superpowers specification, implementation plan, then implementation.
+2. Run focused unit tests and all relevant local checks.
+3. Start `docker compose -f src/docker-compose.yml --profile local up -d --build`, run affected applications, and test changed behavior locally in detail.
+4. Commit scoped changes to `main`, push `main`, then use repository GitHub Actions and deployment scripts to build and promote images. For Portal, preview `scripts/deploy-portal.ps1` before using `-Execute`.
+5. Verify ArgoCD desired and live state, deployed workloads, and affected public endpoints.
+6. Smoke-test the affected user journey on [portal.coded-by-danil.dev](https://portal.coded-by-danil.dev/).
+
+Steps 3-6 are required when the task affects runtime behavior; documentation-only changes stop after local documentation verification and commit.
 
 ### Troubleshooting and Common Ops
 
