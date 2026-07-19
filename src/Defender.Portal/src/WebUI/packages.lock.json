@@ -74,6 +74,15 @@
           "OpenIddict.Server": "7.6.0"
         }
       },
+      "OpenIddict.Validation.AspNetCore": {
+        "type": "Direct",
+        "requested": "[7.6.0, )",
+        "resolved": "7.6.0",
+        "contentHash": "oby5/Ymdxd+g1TGtyTGrcK5J3/NSI80aw2CJgULwwIxraiCjiIfexrBjCxkPchWqPNFe6aAdGJ/Jz6amHNfrzg==",
+        "dependencies": {
+          "OpenIddict.Validation": "7.6.0"
+        }
+      },
       "prometheus-net.AspNetCore": {
         "type": "Direct",
         "requested": "[8.2.1, )",
@@ -394,14 +403,6 @@
           "Microsoft.IdentityModel.JsonWebTokens": "8.19.2",
           "Microsoft.IdentityModel.Protocols": "8.19.2",
           "OpenIddict.Abstractions": "7.6.0"
-        }
-      },
-      "OpenIddict.Validation.AspNetCore": {
-        "type": "Transitive",
-        "resolved": "7.6.0",
-        "contentHash": "oby5/Ymdxd+g1TGtyTGrcK5J3/NSI80aw2CJgULwwIxraiCjiIfexrBjCxkPchWqPNFe6aAdGJ/Jz6amHNfrzg==",
-        "dependencies": {
-          "OpenIddict.Validation": "7.6.0"
         }
       },
       "OpenIddict.Validation.DataProtection": {

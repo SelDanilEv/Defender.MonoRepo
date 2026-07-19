@@ -1,0 +1,37 @@
+image:
+  repository: defendersd/defender.portal-mcp
+  tag: "pending"
+  pullPolicy: Always
+
+replicaCount: 1
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 3000
+resources:
+  requests:
+    cpu: "50m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+configMapData:
+  PORT: "3000"
+  PORTAL_BASE_URL: "https://portal.coded-by-danil.dev"
+  PORTAL_OAUTH_ISSUER: "https://portal.coded-by-danil.dev"
+  MCP_PUBLIC_URL: "https://mcp.coded-by-danil.dev"
+  MCP_AUDIENCE: "defender-mcp"
+  MCP_ALLOWED_ORIGINS: ""
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: mcp.coded-by-danil.dev
+      paths:
+        - path: /
+          pathType: Prefix
+autoscaling:
+  http:
+    enabled: false
+  cron:
+    enabled: false

@@ -22,6 +22,8 @@ public sealed class PortalOpenIddictServerOptions(
         options.Issuer = new Uri(portalOptions.Issuer);
         options.AuthorizationEndpointUris.Add(new Uri("/oauth/authorize", UriKind.Relative));
         options.TokenEndpointUris.Add(new Uri("/oauth/token", UriKind.Relative));
+        options.ConfigurationEndpointUris.Add(new Uri("/.well-known/openid-configuration", UriKind.Relative));
+        options.JsonWebKeySetEndpointUris.Add(new Uri("/.well-known/jwks", UriKind.Relative));
         options.IntrospectionEndpointUris.Add(new Uri("/oauth/introspect", UriKind.Relative));
         options.UserInfoEndpointUris.Add(new Uri("/oauth/userinfo", UriKind.Relative));
         options.GrantTypes.Add(OpenIddictConstants.GrantTypes.AuthorizationCode);

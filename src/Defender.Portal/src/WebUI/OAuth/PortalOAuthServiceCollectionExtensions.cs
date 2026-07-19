@@ -27,7 +27,11 @@ public static class PortalOAuthServiceCollectionExtensions
             .AddOpenIddict()
             .AddCore(options => options.UseMongoDb())
             .AddServer(options => options.UseAspNetCore().EnableAuthorizationEndpointPassthrough())
-            .AddValidation(options => options.UseLocalServer());
+            .AddValidation(options =>
+            {
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            });
 
         services.AddAuthorizationBuilder()
             .AddPolicy(PortalOAuthScopes.Read, policy =>

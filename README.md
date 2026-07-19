@@ -114,6 +114,7 @@ Defender.MonoRepo/
 |-- secrets/                       # Local/dev secret file templates
 |-- src/                           # Services, shared libs, docker files
 |   |-- Defender.Portal/
+|   |-- Defender.Portal.Mcp/       # Remote MCP server; calls only the Portal BFF
 |   |-- Defender.IdentityService/
 |   |-- Defender.UserManagementService/
 |   |-- Defender.WalletService/
@@ -420,15 +421,16 @@ See [OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md) for details.
 ### Production Services
 
 1. Defender.Portal - Main UI and BFF
-2. Defender.IdentityService - Authentication and authorization
-3. Defender.UserManagementService - User profile management
-4. Defender.WalletService - Wallets and transactions
-5. Defender.RiskGamesService - Lottery and gaming
-6. Defender.NotificationService - Outbound notifications
-7. Defender.BudgetTracker - Budget tracking and reviews
-8. Defender.PersonalFoodAdvisor - Menu parsing and food recommendations
-9. Defender.HealthCareService - Personal health timeline
-10. Defender.TravelCalendarService - Travel calendar and trip planning
+2. Defender.Portal.Mcp - Remote Streamable HTTP MCP service for Portal OAuth and Travel Calendar access
+3. Defender.IdentityService - Authentication and authorization
+4. Defender.UserManagementService - User profile management
+5. Defender.WalletService - Wallets and transactions
+6. Defender.RiskGamesService - Lottery and gaming
+7. Defender.NotificationService - Outbound notifications
+8. Defender.BudgetTracker - Budget tracking and reviews
+9. Defender.PersonalFoodAdvisor - Menu parsing and food recommendations
+10. Defender.HealthCareService - Personal health timeline
+11. Defender.TravelCalendarService - Travel calendar and trip planning
 
 ### Supporting Services
 

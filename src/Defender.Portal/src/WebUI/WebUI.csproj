@@ -18,7 +18,8 @@
         <PackageReference Include="Microsoft.OpenApi" />
         <PackageReference Include="OpenIddict.AspNetCore" />
         <PackageReference Include="OpenIddict.MongoDb" />
-        <PackageReference Include="OpenIddict.Server.AspNetCore" />
+    <PackageReference Include="OpenIddict.Server.AspNetCore" />
+    <PackageReference Include="OpenIddict.Validation.AspNetCore" />
         <PackageReference Include="prometheus-net.AspNetCore" />
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" >
           <TreatAsUsed>true</TreatAsUsed>

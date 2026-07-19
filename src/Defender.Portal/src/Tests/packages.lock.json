@@ -532,14 +532,6 @@
           "OpenIddict.Abstractions": "7.6.0"
         }
       },
-      "OpenIddict.Validation.AspNetCore": {
-        "type": "Transitive",
-        "resolved": "7.6.0",
-        "contentHash": "oby5/Ymdxd+g1TGtyTGrcK5J3/NSI80aw2CJgULwwIxraiCjiIfexrBjCxkPchWqPNFe6aAdGJ/Jz6amHNfrzg==",
-        "dependencies": {
-          "OpenIddict.Validation": "7.6.0"
-        }
-      },
       "OpenIddict.Validation.DataProtection": {
         "type": "Transitive",
         "resolved": "7.6.0",
@@ -813,6 +805,7 @@
           "OpenIddict.AspNetCore": "[7.6.0, )",
           "OpenIddict.MongoDb": "[7.6.0, )",
           "OpenIddict.Server.AspNetCore": "[7.6.0, )",
+          "OpenIddict.Validation.AspNetCore": "[7.6.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "Swashbuckle.AspNetCore.Swagger": "[10.2.3, )",
           "Swashbuckle.AspNetCore.SwaggerGen": "[10.2.3, )",
@@ -1019,6 +1012,15 @@
         "contentHash": "m2Hk2R4gaTlEYBvNHz2fvIr38p1agiR2nW2gi5WMgSByFHxeEK5uhxqVGdSB2kEHRtp9kza/zBWBgIM4TdcVqw==",
         "dependencies": {
           "OpenIddict.Server": "7.6.0"
+        }
+      },
+      "OpenIddict.Validation.AspNetCore": {
+        "type": "CentralTransitive",
+        "requested": "[7.6.0, )",
+        "resolved": "7.6.0",
+        "contentHash": "oby5/Ymdxd+g1TGtyTGrcK5J3/NSI80aw2CJgULwwIxraiCjiIfexrBjCxkPchWqPNFe6aAdGJ/Jz6amHNfrzg==",
+        "dependencies": {
+          "OpenIddict.Validation": "7.6.0"
         }
       },
       "prometheus-net.AspNetCore": {

@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json.Serialization;
 using Defender.Portal.WebUI.OAuth;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
@@ -63,6 +64,9 @@ public sealed class OAuthDynamicClientRegistrationController(
     }
 }
 
-public sealed record DynamicClientRegistrationRequest(string[]? RedirectUris, string? ClientName);
+public sealed record DynamicClientRegistrationRequest(
+    [property: JsonPropertyName("redirect_uris")] string[]? RedirectUris,
+    [property: JsonPropertyName("client_name")] string? ClientName);
 
-public sealed record DynamicClientRegistrationResponse(string ClientId);
+public sealed record DynamicClientRegistrationResponse(
+    [property: JsonPropertyName("client_id")] string ClientId);
