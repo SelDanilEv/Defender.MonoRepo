@@ -1,8 +1,7 @@
 image:
   repository: defendersd/defender.portal-mcp
-  tag: "pending"
+  tag: "20260719-233"
   pullPolicy: Always
-
 replicaCount: 1
 service:
   type: ClusterIP
