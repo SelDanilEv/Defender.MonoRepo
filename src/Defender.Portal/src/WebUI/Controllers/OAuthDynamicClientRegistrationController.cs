@@ -17,7 +17,7 @@ public sealed class OAuthDynamicClientRegistrationController(
         [FromBody] DynamicClientRegistrationRequest request,
         CancellationToken cancellationToken)
     {
-        if (request.RedirectUris is null || request.RedirectUris.Length == 0 || request.RedirectUris.Any(uri => !IsAllowedRedirectUri(uri)))
+        if (request?.RedirectUris is null || request.RedirectUris.Length == 0 || request.RedirectUris.Any(uri => !IsAllowedRedirectUri(uri)))
         {
             return BadRequest(new { error = "invalid_redirect_uri" });
         }
