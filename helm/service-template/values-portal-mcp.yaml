@@ -34,5 +34,3 @@ autoscaling:
     enabled: false
   cron:
     enabled: false
-probes:
-  host: "mcp.coded-by-danil.dev"

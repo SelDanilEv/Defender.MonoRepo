@@ -9,10 +9,8 @@ import { PortalBffClient } from "./portal-bff-client.js";
 const config = loadConfig();
 const bff = new PortalBffClient(config.portalBaseUrl);
 const jwks = createRemoteJWKSet(new URL("/.well-known/jwks", config.portalIssuer));
-const app = createMcpExpressApp({
-  host: "0.0.0.0",
-  allowedHosts: [new URL(config.publicUrl).host],
-});
+const publicHost = new URL(config.publicUrl).host.toLowerCase();
+const app = createMcpExpressApp({ host: "0.0.0.0" });
 
 app.get("/health", (_request, response) => response.status(200).json({ status: "ok" }));
 app.get("/.well-known/oauth-protected-resource/mcp", (_request, response) => response.json({
@@ -20,6 +18,8 @@ app.get("/.well-known/oauth-protected-resource/mcp", (_request, response) => res
   scopes_supported: ["mcp:portal:read", "mcp:calendar:write", "mcp:calendar:delete"],
 }));
 app.post("/mcp", async (request, response) => {
+  if (request.header("host")?.toLowerCase() !== publicHost) return response.sendStatus(403);
+
   const origin = request.header("origin");
   if (origin && !config.allowedOrigins.has(origin)) return response.sendStatus(403);
 
