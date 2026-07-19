@@ -9,7 +9,10 @@ import { PortalBffClient } from "./portal-bff-client.js";
 const config = loadConfig();
 const bff = new PortalBffClient(config.portalBaseUrl);
 const jwks = createRemoteJWKSet(new URL("/.well-known/jwks", config.portalIssuer));
-const app = createMcpExpressApp();
+const app = createMcpExpressApp({
+  host: "0.0.0.0",
+  allowedHosts: [new URL(config.publicUrl).host],
+});
 
 app.get("/health", (_request, response) => response.status(200).json({ status: "ok" }));
 app.get("/.well-known/oauth-protected-resource/mcp", (_request, response) => response.json({

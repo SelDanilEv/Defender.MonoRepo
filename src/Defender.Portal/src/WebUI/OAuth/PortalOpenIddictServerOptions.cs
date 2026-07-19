@@ -46,7 +46,7 @@ public sealed class PortalOpenIddictServerOptions(
     private RSA GetRsaKey(string secretName)
     {
         var key = RSA.Create();
-        var pem = SecretsHelper.GetSecretSync(secretName);
+        var pem = SecretsHelper.GetSecretSync(secretName, useMongo: true);
 
         if (string.IsNullOrWhiteSpace(pem) && hostEnvironment.IsDevelopment())
         {
