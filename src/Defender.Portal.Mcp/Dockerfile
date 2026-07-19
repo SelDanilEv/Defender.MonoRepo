@@ -1,9 +1,9 @@
 FROM node:24.14.1-alpine AS build
 WORKDIR /app
-COPY package.json package-lock.json ./
+COPY Defender.Portal.Mcp/package.json Defender.Portal.Mcp/package-lock.json ./
 RUN npm ci
-COPY src ./src
-COPY tsconfig.json ./
+COPY Defender.Portal.Mcp/src ./src
+COPY Defender.Portal.Mcp/tsconfig.json ./
 RUN npm run build && npm prune --omit=dev
 
 FROM node:24.14.1-alpine
