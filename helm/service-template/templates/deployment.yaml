@@ -7,6 +7,7 @@ metadata:
 {{- $httpAutoscaling := $autoscaling.http | default dict }}
 {{- $cronAutoscaling := $autoscaling.cron | default dict }}
 {{- $autoscalingEnabled := or ($httpAutoscaling.enabled | default false) ($cronAutoscaling.enabled | default false) }}
+{{- $probeHostHeader := .Values.probes.hostHeader | default "" }}
 spec:
 {{- if not $autoscalingEnabled }}
   replicas: {{ .Values.replicaCount }}
@@ -49,6 +50,11 @@ spec:
             httpGet:
               path: {{ .Values.probes.path }}
               port: http
+{{- if $probeHostHeader }}
+              httpHeaders:
+                - name: Host
+                  value: {{ $probeHostHeader | quote }}
+{{- end }}
             failureThreshold: {{ .Values.probes.startup.failureThreshold }}
             periodSeconds: {{ .Values.probes.startup.periodSeconds }}
             timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
@@ -58,6 +64,11 @@ spec:
             httpGet:
               path: {{ .Values.probes.path }}
               port: http
+{{- if $probeHostHeader }}
+              httpHeaders:
+                - name: Host
+                  value: {{ $probeHostHeader | quote }}
+{{- end }}
             initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
             failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
             periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
@@ -68,6 +79,11 @@ spec:
             httpGet:
               path: {{ .Values.probes.path }}
               port: http
+{{- if $probeHostHeader }}
+              httpHeaders:
+                - name: Host
+                  value: {{ $probeHostHeader | quote }}
+{{- end }}
             initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
             failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
             periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
