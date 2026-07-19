@@ -8,8 +8,8 @@ export interface McpConfig {
 }
 
 export function loadConfig(environment: NodeJS.ProcessEnv = process.env): McpConfig {
-  const portalBaseUrl = requireHttpsUrl(environment.PORTAL_BASE_URL ?? "https://portal.coded-by-danil.dev");
-  const portalIssuer = requireHttpsUrl(environment.PORTAL_OAUTH_ISSUER ?? portalBaseUrl);
+  const portalBaseUrl = requireHttpsOrigin(environment.PORTAL_BASE_URL ?? "https://portal.coded-by-danil.dev");
+  const portalIssuer = requireHttpsIssuer(environment.PORTAL_OAUTH_ISSUER ?? portalBaseUrl);
   const allowedOrigins = (environment.MCP_ALLOWED_ORIGINS ?? "")
     .split(",")
     .map((origin) => origin.trim())
@@ -19,14 +19,20 @@ export function loadConfig(environment: NodeJS.ProcessEnv = process.env): McpCon
     port: Number.parseInt(environment.PORT ?? "3000", 10),
     portalBaseUrl,
     portalIssuer,
-    publicUrl: requireHttpsUrl(environment.MCP_PUBLIC_URL ?? "https://mcp.coded-by-danil.dev"),
+    publicUrl: requireHttpsOrigin(environment.MCP_PUBLIC_URL ?? "https://mcp.coded-by-danil.dev"),
     mcpAudience: environment.MCP_AUDIENCE ?? "defender-mcp",
     allowedOrigins: new Set(allowedOrigins),
   };
 }
 
-function requireHttpsUrl(value: string): string {
+function requireHttpsOrigin(value: string): string {
   const url = new URL(value);
   if (url.protocol !== "https:") throw new Error("MCP public dependencies must use HTTPS.");
   return url.origin;
+}
+
+function requireHttpsIssuer(value: string): string {
+  const url = new URL(value);
+  if (url.protocol !== "https:") throw new Error("MCP public dependencies must use HTTPS.");
+  return url.href;
 }
