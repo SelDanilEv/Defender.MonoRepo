@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.portal-mcp
-  tag: "20260719-236"
+  tag: "20260719-240"
   pullPolicy: Always
 replicaCount: 1
 service:
