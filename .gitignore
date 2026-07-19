@@ -468,6 +468,9 @@ __mismatch__/
 # Agent feature worktrees
 .worktrees/
 
+# Node build output
+src/Defender.Portal.Mcp/dist/
+
 # Playwright MCP/CLI local state
 **/.playwright-cli/
 **/.playwright-mcp/
