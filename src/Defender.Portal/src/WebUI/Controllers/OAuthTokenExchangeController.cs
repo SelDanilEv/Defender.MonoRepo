@@ -35,6 +35,7 @@ public sealed class OAuthTokenExchangeController(
             Subject = new ClaimsIdentity(
             [
                 new Claim(Defender.Common.Consts.ClaimTypes.NameIdentifier, subject),
+                new Claim(Defender.Common.Consts.ClaimTypes.Role, Defender.Common.Consts.Roles.User),
             ]),
             Expires = expires,
             Issuer = configuration["JwtTokenIssuer"],

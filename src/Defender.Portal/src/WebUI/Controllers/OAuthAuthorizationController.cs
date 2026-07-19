@@ -62,12 +62,17 @@ public sealed class OAuthAuthorizationController(IOptions<PortalOAuthOptions> po
         var requestedScopes = string.Join(
             string.Empty,
             scopes.Select(scope => $"<li>{HtmlEncoder.Default.Encode(scope)}</li>"));
+        var authorizationParameters = string.Join(
+            string.Empty,
+            Request.Query.SelectMany(parameter => parameter.Value.Select(value =>
+                $"<input type=\"hidden\" name=\"{HtmlEncoder.Default.Encode(parameter.Key)}\" value=\"{HtmlEncoder.Default.Encode(value ?? string.Empty)}\">")));
 
         return $"""
             <!doctype html>
             <html lang="en"><head><meta charset="utf-8"><title>Defender Portal access</title></head>
             <body><main><h1>Allow access to Defender Portal?</h1><p>{application} requests:</p>
             <ul>{requestedScopes}</ul><form method="post" action="{action}">
+            {authorizationParameters}
             <button name="consent" value="approve" type="submit">Allow</button>
             <button name="consent" value="deny" type="submit">Deny</button></form></main></body></html>
             """;
