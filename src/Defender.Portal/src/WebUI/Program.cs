@@ -3,6 +3,7 @@ using Defender.Portal.Application;
 using Defender.Portal.Infrastructure;
 using Defender.Portal.WebUI;
 using Hellang.Middleware.ProblemDetails;
+using Microsoft.AspNetCore.HttpOverrides;
 using Prometheus;
 using Serilog;
 
@@ -24,8 +25,17 @@ builder.Services.AddInfrastructureServices();
 
 builder.Services.AddDefenderHealthChecks();
 builder.Services.AddDefenderCors(builder.Environment);
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedHost;
+    options.ForwardLimit = 2;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 if (builder.Environment.IsLocalOrDevelopment())
 {
