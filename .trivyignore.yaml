@@ -1,0 +1,37 @@
+misconfigurations:
+  # Vendored upstream observability charts require these permissions or writable mounts.
+  - id: KSV-0041
+    paths:
+      - helm/observability/charts/kube-prometheus-stack/charts/grafana/templates/clusterrole.yaml
+      - helm/observability/charts/kube-prometheus-stack/charts/kube-state-metrics/templates/role.yaml
+      - helm/observability/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml
+    statement: Required by vendored upstream observability charts; review on chart upgrades.
+  - id: KSV-0014
+    paths:
+      - helm/observability/charts/kube-prometheus-stack/charts/grafana/templates/deployment.yaml
+      - helm/observability/charts/loki/templates/single-binary/statefulset.yaml
+    statement: Required writable paths are managed by the vendored upstream charts; review on chart upgrades.
+  - id: KSV-0009
+    paths:
+      - helm/observability/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml
+    statement: Node exporter requires host networking; review on chart upgrades.
+  - id: KSV-0010
+    paths:
+      - helm/observability/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml
+    statement: Node exporter requires host PID access; review on chart upgrades.
+  - id: KSV-0121
+    paths:
+      - helm/observability/charts/kube-prometheus-stack/charts/prometheus-node-exporter/templates/daemonset.yaml
+    statement: Node exporter requires host mounts; review on chart upgrades.
+  - id: KSV-0045
+    paths:
+      - helm/observability/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml
+    statement: Required by the vendored upstream Prometheus operator chart; review on chart upgrades.
+  - id: KSV-0056
+    paths:
+      - helm/observability/charts/kube-prometheus-stack/templates/prometheus-operator/clusterrole.yaml
+    statement: Required by the vendored upstream Prometheus operator chart; review on chart upgrades.
+  - id: KSV-0047
+    paths:
+      - helm/observability/charts/promtail/templates/clusterrole.yaml
+    statement: Promtail needs node proxy access for node log collection; review on chart upgrades.
