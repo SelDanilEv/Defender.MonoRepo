@@ -662,6 +662,10 @@ jobs:
             echo "dockerfile=Dockerfile.Portal" >> $GITHUB_OUTPUT
             echo "project_type=WebUI" >> $GITHUB_OUTPUT
             echo "clean_name=defender.portal" >> $GITHUB_OUTPUT
+          elif [[ "$SERVICE_NAME" == "Defender.Portal.Mcp" ]]; then
+            echo "dockerfile=Defender.Portal.Mcp/Dockerfile" >> $GITHUB_OUTPUT
+            echo "project_type=Node" >> $GITHUB_OUTPUT
+            echo "clean_name=defender.portal-mcp" >> $GITHUB_OUTPUT
           else
             echo "dockerfile=Dockerfile.Service" >> $GITHUB_OUTPUT
             echo "project_type=WebApi" >> $GITHUB_OUTPUT

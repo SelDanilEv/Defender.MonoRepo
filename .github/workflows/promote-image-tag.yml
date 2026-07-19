@@ -17,6 +17,7 @@ on:
           - "Defender.NotificationService"
           - "Defender.PersonalFoodAdvisor"
           - "Defender.Portal"
+          - "Defender.Portal.Mcp"
           - "Defender.RiskGamesService"
           - "Defender.TravelCalendarService"
           - "Defender.UserManagementService"

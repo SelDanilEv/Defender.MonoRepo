@@ -16,6 +16,9 @@ case "$SERVICE_NAME" in
     "Defender.Portal")
         echo "portal"
         ;;
+    "Defender.Portal.Mcp")
+        echo "portal-mcp"
+        ;;
     "Defender.UserManagementService")
         echo "user-management"
         ;;
