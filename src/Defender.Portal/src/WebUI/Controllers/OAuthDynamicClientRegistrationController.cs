@@ -47,7 +47,7 @@ public sealed class OAuthDynamicClientRegistrationController(
         ]);
 
         await applicationManager.CreateAsync(descriptor, cancellationToken);
-        return Created(string.Empty, new DynamicClientRegistrationResponse(clientId));
+        return Created(string.Empty, new DynamicClientRegistrationResponse(clientId, "none"));
     }
 
     private static bool IsAllowedRedirectUri(string value)
@@ -69,4 +69,5 @@ public sealed record DynamicClientRegistrationRequest(
     [property: JsonPropertyName("client_name")] string? ClientName);
 
 public sealed record DynamicClientRegistrationResponse(
-    [property: JsonPropertyName("client_id")] string ClientId);
+    [property: JsonPropertyName("client_id")] string ClientId,
+    [property: JsonPropertyName("token_endpoint_auth_method")] string TokenEndpointAuthMethod);

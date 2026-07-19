@@ -7,6 +7,7 @@ Remote Streamable HTTP MCP server for Defender Portal. It calls only the Portal 
 - Portal is the OAuth authorization server and publishes JWKS.
 - MCP validates the public `Host` header before serving any route, including Kubernetes health probes.
 - External clients use Authorization Code + PKCE and dynamic client registration.
+- Any person can connect a compatible MCP client: it discovers Portal OAuth, registers a public PKCE client, redirects to Portal login, then receives access only to that person's Portal data after consent.
 - The MCP server validates Portal tokens for `defender-mcp`, then exchanges them at Portal for a 60-second BFF token.
 - Tools use `defender_portal_*` names, match Portal controller routes, and return structured JSON data.
 - `defender_portal_calendar_mutate` covers every mutation in `TravelCalendarController`. Deletes require `confirm: true` and the `mcp:calendar:delete` scope.

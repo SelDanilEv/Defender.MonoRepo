@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using OpenIddict.Abstractions;
+using OpenIddict.Server;
 
 namespace Defender.Portal.WebUI.OAuth;
 
@@ -11,6 +12,9 @@ public static class PortalOAuthServiceCollectionExtensions
 {
     public static IServiceCollection AddPortalOAuth(this IServiceCollection services, IConfiguration configuration)
     {
+        var discoveryMetadata = PortalOAuthDiscoveryMetadata.Create(
+            configuration.GetRequiredSection(PortalOAuthOptions.SectionName).Get<PortalOAuthOptions>()!);
+
         services
             .AddOptions<PortalOAuthOptions>()
             .Bind(configuration.GetRequiredSection(PortalOAuthOptions.SectionName))
@@ -26,7 +30,20 @@ public static class PortalOAuthServiceCollectionExtensions
         services
             .AddOpenIddict()
             .AddCore(options => options.UseMongoDb())
-            .AddServer(options => options.UseAspNetCore().EnableAuthorizationEndpointPassthrough())
+            .AddServer(options =>
+            {
+                options.UseAspNetCore().EnableAuthorizationEndpointPassthrough();
+                options.AddEventHandler<OpenIddictServerEvents.HandleConfigurationRequestContext>(builder =>
+                    builder.UseInlineHandler(context =>
+                    {
+                        foreach (var metadata in discoveryMetadata)
+                        {
+                            context.Metadata[metadata.Key] = metadata.Value;
+                        }
+
+                        return default;
+                    }));
+            })
             .AddValidation(options =>
             {
                 options.UseLocalServer();
