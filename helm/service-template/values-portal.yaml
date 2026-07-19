@@ -10,6 +10,14 @@ ingress:
       paths:
         - path: /
           pathType: Prefix
+    - host: portal.coded-by-danil.dev
+      paths:
+        - path: /
+          pathType: Prefix
+    - host: defender-portal.coded-by-danil.dev
+      paths:
+        - path: /
+          pathType: Prefix
 autoscaling:
   http:
     enabled: true
