@@ -26,6 +26,9 @@ RUN dotnet publish "WebApi.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+RUN groupadd --system --gid 10001 appgroup \
+    && useradd --system --uid 10001 --gid appgroup --no-create-home appuser
+COPY --from=publish --chown=10001:10001 /app/publish .
 
+USER 10001:10001
 CMD ASPNETCORE_URLS=http://*:$PORT dotnet WebApi.dll

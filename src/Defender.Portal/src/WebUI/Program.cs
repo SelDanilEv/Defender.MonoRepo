@@ -47,6 +47,7 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseCors(CorsExtensions.DefenderCorsPolicy);
+app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
