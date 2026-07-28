@@ -14,6 +14,7 @@ describe("critical route contract", () => {
 
   test.each([
     "/welcome/login",
+    "/telegram",
     "/banking",
     "/games/lottery/tickets",
     "/budget-tracker/positions",

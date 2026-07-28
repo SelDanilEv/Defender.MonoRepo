@@ -10,6 +10,7 @@ using Defender.Portal.Application.Configuration.Options;
 using Defender.Portal.Infrastructure.Clients.BudgetTracker;
 using Defender.Portal.Infrastructure.Clients.HealthCare;
 using Defender.Portal.Infrastructure.Clients.TravelCalendar;
+using Defender.Portal.Infrastructure.Clients.Telegram;
 using Defender.Portal.Infrastructure.Clients.Identity;
 using Defender.Portal.Infrastructure.Clients.PersonalFoodAdvisor;
 using Defender.Portal.Infrastructure.Clients.RiskGames;
@@ -105,6 +106,12 @@ public static class ConfigureServices
         services.AddHttpClient<ITravelCalendarClient, TravelCalendarClient>((serviceProvider, client) =>
         {
             client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<TravelCalendarOptions>>().Value.Url.TrimEnd('/') + "/");
+        });
+
+        services.AddHttpClient<ITelegramBotClient, TelegramBotClient>(client =>
+        {
+            client.BaseAddress = new Uri("https://api.telegram.org/");
+            client.Timeout = TimeSpan.FromSeconds(10);
         });
 
         return services;

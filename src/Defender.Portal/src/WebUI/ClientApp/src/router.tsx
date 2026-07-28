@@ -33,6 +33,9 @@ const Verification = Loader(
 const VerifyEmail = Loader(
   lazy(() => import("src/content/welcomePages/Verification/VerifyEmail"))
 );
+const TelegramBootstrap = Loader(
+  lazy(() => import("src/telegram/TelegramBootstrap"))
+);
 
 // Configuration
 
@@ -173,6 +176,10 @@ const routes: RouteObject[] = [
         element: <Status404 />,
       },
     ],
+  },
+  {
+    path: "telegram",
+    element: <TelegramBootstrap />,
   },
   {
     path: "health-care/share",

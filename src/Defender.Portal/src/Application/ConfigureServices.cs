@@ -70,6 +70,7 @@ public static class ConfigureServices
             var options = configuration.GetSection(TelegramOptions.SectionName).Get<TelegramOptions>() ?? new TelegramOptions();
             return new TelegramInitDataValidator(options);
         });
+        services.AddSingleton<ITelegramAccountLinkService, TelegramAccountLinkService>();
 
         return services;
     }
