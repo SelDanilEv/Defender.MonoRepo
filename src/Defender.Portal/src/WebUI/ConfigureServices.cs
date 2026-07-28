@@ -6,6 +6,7 @@ using Defender.Common.Exceptions;
 using Defender.Common.Extension;
 using Defender.Common.Helpers;
 using Defender.Portal.Application.Configuration.Extension;
+using Defender.Portal.Application.Modules.Telegram;
 using Defender.Portal.WebUI.ErrorMapping;
 using Defender.Portal.WebUI.OAuth;
 using FluentValidation.AspNetCore;
@@ -30,6 +31,7 @@ public static class ConfigureServices
         services.AddCommonServices(configuration);
 
         services.AddApplicationOptions(configuration);
+        services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
 
         services.AddHttpContextAccessor();
 
