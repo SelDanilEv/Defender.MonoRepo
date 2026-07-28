@@ -23,6 +23,12 @@ describe("Telegram Web App runtime", () => {
     expect(isTelegramMiniApp()).toBe(true);
   });
 
+  test("isTelegramMiniApp_WhenBridgeHasNoLaunchData_ReturnsFalse", () => {
+    setTelegramRuntime(createRuntime(""));
+
+    expect(isTelegramMiniApp()).toBe(false);
+  });
+
   test("getInitData_WhenTelegramProvidesSignedLaunchData_ReturnsRawValueForServerHandoff", () => {
     const runtime = createRuntime("query_id=AAEAA&hash=signed-value");
     setTelegramRuntime(runtime);

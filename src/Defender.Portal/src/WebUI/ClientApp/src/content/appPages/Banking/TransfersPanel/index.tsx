@@ -25,6 +25,21 @@ import LockedButton from "src/components/LockedComponents/LockedButton/LockedBut
 import ParamsObjectBuilder from "src/helpers/ParamsObjectBuilder";
 import LockedSelect from "src/components/LockedComponents/LockedSelect/LockedSelect";
 
+export const calculateTransferAllowed = (
+  walletNumber: number,
+  amount: number,
+  currency: string,
+  currencyAccounts?: CurrencyAccount[],
+): boolean => {
+  const selectedAccount = currencyAccounts?.find((account) => account.currency === currency);
+
+  return (
+    WalletNumberRegex.test(walletNumber.toString()) &&
+    amount > 0 &&
+    amount * 100 <= (selectedAccount?.balance ?? 0)
+  );
+};
+
 const TransfersPanel = (props: any) => {
   const u = useUtils();
 
@@ -41,12 +56,12 @@ const TransfersPanel = (props: any) => {
 
   useEffect(() => {
     setIsTransferAllowed(
-      WalletNumberRegex.test(transferRequest.walletNumber.toString()) &&
-        transferRequest.amount > 0 &&
-        transferRequest.amount * 100 <=
-          props.wallet.currencyAccounts.find(
-            (wallet) => wallet.currency === transferRequest.currency
-          ).balance
+      calculateTransferAllowed(
+        transferRequest.walletNumber,
+        transferRequest.amount,
+        transferRequest.currency,
+        props.wallet.currencyAccounts,
+      )
     );
   }, [transferRequest, props.wallet.currencyAccounts]);
 
@@ -136,6 +151,7 @@ const TransfersPanel = (props: any) => {
             }}>
             <LockedSelect
               name="currency"
+              aria-label={u.t("banking_page__transfer_currency_label")}
               value={transferRequest.currency}
               onChange={UpdateRequest}
               size="small"
