@@ -144,15 +144,17 @@ export const TelegramFallback = () => (
   </TelegramShell>
 );
 
-export const telegramLinkSignInPath = "/welcome/login?returnUrl=%2Ftelegram%2Flink";
+interface TelegramLinkRequiredProps {
+  onSignIn: () => void;
+}
 
-export const TelegramLinkRequired = () => (
+export const TelegramLinkRequired = ({ onSignIn }: TelegramLinkRequiredProps) => (
   <TelegramShell title="Link your Defender account" showNavigation={false}>
     <Stack spacing={2} sx={{ py: 4 }}>
       <Typography>
         Sign in to your Defender account before linking it to Telegram.
       </Typography>
-      <Button component={RouterLink} to={telegramLinkSignInPath} variant="contained">
+      <Button variant="contained" onClick={onSignIn}>
         Sign in to link
       </Button>
     </Stack>

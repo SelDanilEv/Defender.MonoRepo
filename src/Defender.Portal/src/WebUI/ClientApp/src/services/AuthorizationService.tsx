@@ -14,6 +14,19 @@ export const getSafeReturnUrl = (returnUrl: string | null): string | null => {
   return null;
 };
 
+export const getSafeSsoUrl = (ssoUrl: string | null, origin = window.location.origin): string | null => {
+  if (!ssoUrl) {
+    return null;
+  }
+
+  try {
+    const url = new URL(ssoUrl);
+    return url.origin === origin ? url.origin : null;
+  } catch {
+    return null;
+  }
+};
+
 const AuthorizationService = {
   HandleLoginAttempt: (u: IUtils, session: Session) => {
     if (!session.isAuthenticated) {
@@ -30,14 +43,16 @@ const AuthorizationService = {
       return;
     }
 
-    const ssoUrl = u.searchParams.get("SsoUrl");
+    const ssoUrl = getSafeSsoUrl(u.searchParams.get("SsoUrl"));
     if (ssoUrl) {
       LoadingStateService.StartLoading();
 
       if (window.opener) {
-        let token = session.token;
-
-        window.opener.postMessage({ token }, ssoUrl);
+        const telegramHandoff = u.searchParams.get("TelegramHandoff");
+        const message = telegramHandoff
+          ? { token: session.token, session, telegramHandoff }
+          : { token: session.token };
+        window.opener.postMessage(message, ssoUrl);
         window.close();
       } else {
         console.error("No parent window found. Cannot send token.");

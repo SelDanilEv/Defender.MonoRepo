@@ -80,15 +80,14 @@ describe("TelegramBootstrap", () => {
     });
   });
 
-  test("WhenTelegramSessionNeedsAccountLink_ShowsSafeSignInRoute", async () => {
+  test("WhenTelegramSessionNeedsAccountLink_ShowsTopLevelSignInButton", async () => {
     const requestSession = vi.fn().mockResolvedValue({ kind: "link-required" as const });
     const runtime = createRuntime("query_id=AAEAA&hash=signed-value");
 
     renderBootstrap(<TelegramBootstrap webApp={runtime} requestSession={requestSession} />);
 
     await waitFor(() => expect(requestSession).toHaveBeenCalledTimes(1));
-    expect(screen.getByRole("link", { name: "Sign in to link" }).getAttribute("href"))
-      .toBe("/welcome/login?returnUrl=%2Ftelegram%2Flink");
+    expect(screen.getByRole("button", { name: "Sign in to link" })).not.toBeNull();
   });
 });
 

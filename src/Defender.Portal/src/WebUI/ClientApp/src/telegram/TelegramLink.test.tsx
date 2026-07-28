@@ -31,16 +31,16 @@ describe("Telegram account linking", () => {
     vi.restoreAllMocks();
   });
 
-  test("createTelegramAccountLink_WhenSessionIsAuthenticated_PostsOnlyRawInitData", async () => {
+  test("createTelegramAccountLink_WhenSessionIsAuthenticated_SendsPortalTokenAndRawInitData", async () => {
     const fetchSpy = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
     vi.stubGlobal("fetch", fetchSpy);
 
-    await expect(createTelegramAccountLink("query_id=AAEAA&hash=signed-value")).resolves.toBe("linked");
+    await expect(createTelegramAccountLink("query_id=AAEAA&hash=signed-value", "portal-token")).resolves.toBe("linked");
 
     expect(fetchSpy).toHaveBeenCalledWith("/api/telegram/link", {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: "Bearer portal-token" },
       body: JSON.stringify({ initData: "query_id=AAEAA&hash=signed-value" }),
     });
   });
@@ -65,7 +65,7 @@ describe("Telegram account linking", () => {
       </Provider>,
     );
 
-    await waitFor(() => expect(requestLink).toHaveBeenCalledWith("query_id=AAEAA&hash=signed-value"));
+    await waitFor(() => expect(requestLink).toHaveBeenCalledWith("query_id=AAEAA&hash=signed-value", ""));
     await waitFor(() => expect(requestSession).toHaveBeenCalledWith("query_id=AAEAA&hash=signed-value"));
     expect(await screen.findByText("Home portal")).not.toBeNull();
     expect(getTelegramLaunchData()).toBeNull();

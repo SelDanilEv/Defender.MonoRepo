@@ -124,7 +124,7 @@ const TelegramBootstrap = ({
   }
 
   if (state === "link-required") {
-    return <TelegramLinkRequired />;
+    return <TelegramLinkRequired onSignIn={() => navigate("/telegram/link")} />;
   }
 
   return (

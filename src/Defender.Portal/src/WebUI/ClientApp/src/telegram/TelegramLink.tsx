@@ -7,17 +7,19 @@ import { createTelegramSession, type TelegramSessionRequester } from "./Telegram
 import { clearTelegramLaunchData, getTelegramLaunchData } from "./telegramLaunchContext";
 import { login } from "src/actions/sessionActions";
 import { useAppDispatch, useAppSelector } from "src/state/hooks";
+import type { Session } from "src/models/Session";
+import { createTelegramSignInHandoff, getHandoffSession } from "./telegramSignInHandoff";
 
 type TelegramAccountLinkResult = "linked" | "unauthorized" | "failed";
 
-export type TelegramAccountLinkRequester = (initData: string) => Promise<TelegramAccountLinkResult>;
+export type TelegramAccountLinkRequester = (initData: string, token: string) => Promise<TelegramAccountLinkResult>;
 
-export const createTelegramAccountLink: TelegramAccountLinkRequester = async (initData) => {
+export const createTelegramAccountLink: TelegramAccountLinkRequester = async (initData, token) => {
   try {
     const response = await fetch("/api/telegram/link", {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ initData }),
     });
 
@@ -45,6 +47,31 @@ const TelegramLink = ({
   const isAuthenticated = useAppSelector((store) => store.session.isAuthenticated);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const session = useAppSelector((store) => store.session as Session);
+  const handoffId = useRef<string | null>(null);
+
+  const startTopLevelSignIn = () => {
+    const handoff = createTelegramSignInHandoff(window.location.origin);
+    handoffId.current = handoff.id;
+    window.open(handoff.url, "_blank");
+  };
+
+  useEffect(() => {
+    const receiveSession = (event: MessageEvent) => {
+      if (!handoffId.current) {
+        return;
+      }
+
+      const receivedSession = getHandoffSession(event, window.location.origin, handoffId.current);
+      if (receivedSession) {
+        handoffId.current = null;
+        dispatch(login(receivedSession));
+      }
+    };
+
+    window.addEventListener("message", receiveSession);
+    return () => window.removeEventListener("message", receiveSession);
+  }, [dispatch]);
 
   useEffect(() => {
     const initData = getTelegramLaunchData();
@@ -64,7 +91,7 @@ const TelegramLink = ({
 
     started.current = true;
     let active = true;
-    void requestLink(initData).then(async (linkResult) => {
+    void requestLink(initData, session.token).then(async (linkResult) => {
       if (!active) {
         return;
       }
@@ -97,14 +124,14 @@ const TelegramLink = ({
     return () => {
       active = false;
     };
-  }, [dispatch, isAuthenticated, navigate, requestLink, requestSession]);
+  }, [dispatch, isAuthenticated, navigate, requestLink, requestSession, session.token]);
 
   if (state === "fallback") {
     return <TelegramFallback />;
   }
 
   if (state === "link-required") {
-    return <TelegramLinkRequired />;
+    return <TelegramLinkRequired onSignIn={startTopLevelSignIn} />;
   }
 
   if (state === "failed") {
