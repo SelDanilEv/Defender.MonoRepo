@@ -12,6 +12,8 @@ import { logout } from "src/actions/sessionActions";
 import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 import { getProtectedRedirectPath } from "src/layouts/authGuard";
+import TelegramShell from "src/telegram/TelegramShell";
+import { isTelegramMiniApp } from "src/telegram/telegramWebApp";
 
 interface SidebarLayoutProps {
   children?: ReactNode;
@@ -47,6 +49,16 @@ const SidebarLayout: FC<SidebarLayoutProps> = (props: any) => {
 
   if (redirectPath) {
     return <Navigate to={redirectPath} replace />;
+  }
+
+  if (isTelegramMiniApp()) {
+    return (
+      <TelegramShell>
+        <Box sx={{ fontSize: u.isMobile ? "0.9em" : "0.98em" }}>
+          <Outlet />
+        </Box>
+      </TelegramShell>
+    );
   }
 
   return (

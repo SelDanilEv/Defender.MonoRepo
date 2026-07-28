@@ -1,4 +1,4 @@
-namespace Defender.Portal.Infrastructure.Clients.Telegram;
+namespace Defender.Portal.Application.Modules.Telegram;
 
 public interface ITelegramBotClient
 {

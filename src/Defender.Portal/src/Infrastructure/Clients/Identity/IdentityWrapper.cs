@@ -98,6 +98,16 @@ public class IdentityWrapper(
         }, AuthorizationType.User);
     }
 
+    public async Task<Common.DTOs.AccountDto> GetAccountDetailsAsServiceAsync(Guid accountId)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var response = await identityServiceClient.DetailsAsync(accountId);
+
+            return mapper.Map<Common.DTOs.AccountDto>(response);
+        }, AuthorizationType.Service);
+    }
+
     public async Task<bool> VerifyAccountEmailAsync(int hash, int code)
     {
         return await ExecuteSafelyAsync(async () =>

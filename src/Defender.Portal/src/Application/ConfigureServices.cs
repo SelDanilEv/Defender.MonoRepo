@@ -70,7 +70,16 @@ public static class ConfigureServices
             var options = configuration.GetSection(TelegramOptions.SectionName).Get<TelegramOptions>() ?? new TelegramOptions();
             return new TelegramInitDataValidator(options);
         });
-        services.AddSingleton<ITelegramAccountLinkService, TelegramAccountLinkService>();
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<ITelegramSessionTokenIssuer, TelegramSessionTokenIssuer>();
+        services.AddTransient<ITelegramSessionService, TelegramSessionService>();
+        services.AddTransient<ITelegramWebhookService, TelegramWebhookService>();
+        services.AddSingleton<ITelegramWebhookSecretValidator>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var options = configuration.GetSection(TelegramOptions.SectionName).Get<TelegramOptions>() ?? new TelegramOptions();
+            return new TelegramWebhookSecretValidator(options);
+        });
 
         return services;
     }

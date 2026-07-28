@@ -113,6 +113,13 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.secretName }}
                   key: Defender_App_SecretsEncryptionKey
+{{- range $name, $key := .Values.extraSecretEnv }}
+            - name: {{ $name }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.secretName }}
+                  key: {{ $key }}
+{{- end }}
       volumes:
         - name: tmp
           emptyDir: {}

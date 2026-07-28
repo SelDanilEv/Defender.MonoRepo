@@ -7,6 +7,7 @@ using Defender.Common.Clients.Wallet;
 using Defender.Portal.Application.Common.Interfaces.Repositories;
 using Defender.Portal.Application.Common.Interfaces.Wrappers;
 using Defender.Portal.Application.Configuration.Options;
+using Defender.Portal.Application.Modules.Telegram;
 using Defender.Portal.Infrastructure.Clients.BudgetTracker;
 using Defender.Portal.Infrastructure.Clients.HealthCare;
 using Defender.Portal.Infrastructure.Clients.TravelCalendar;
@@ -56,6 +57,8 @@ public static class ConfigureServices
     private static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         services.AddSingleton<IUserActivityRepository, UserActivityRepository>();
+        services.AddSingleton<ITelegramAccountLinkRepository, TelegramAccountLinkRepository>();
+        services.AddSingleton<ITelegramWebhookReceiptRepository, TelegramWebhookReceiptRepository>();
 
         return services;
     }

@@ -12,6 +12,7 @@ public interface IIdentityWrapper
     Task<SessionDto> CreateAccountAsync(string email, string nickname, string phone, string password);
     Task<bool> VerifyAccountEmailAsync(int hash, int code);
     Task<Defender.Common.DTOs.AccountDto> GetAccountDetailsAsync(Guid accountId);
+    Task<Defender.Common.DTOs.AccountDto> GetAccountDetailsAsServiceAsync(Guid accountId);
     Task SendVerificationCodeAsync(Guid accountId, AccessCodeType accessCodeType);
     Task<bool> VerifyAccessCodeAsync(int code, AccessCodeType accessCodeType);
     Task<Guid> SendResetPasswordCodeAsync(string email);

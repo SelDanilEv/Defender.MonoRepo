@@ -19,6 +19,8 @@ const readyRuntimeInstances = new WeakSet<TelegramWebApp>();
 export const getTelegramWebApp = (): TelegramWebApp | null =>
   (window as TelegramWindow).Telegram?.WebApp ?? null;
 
+export const isTelegramMiniApp = (): boolean => getTelegramWebApp() !== null;
+
 export const getInitData = (webApp = getTelegramWebApp()): string | null => {
   const initData = webApp?.initData.trim();
   return initData || null;

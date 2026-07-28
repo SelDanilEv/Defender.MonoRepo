@@ -1,16 +1,39 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import TelegramShell, { TelegramFallback, TelegramLoading } from "./TelegramShell";
+import TelegramShell, {
+  TelegramFallback,
+  TelegramLinkRequired,
+  TelegramLoading,
+} from "./TelegramShell";
 import {
   getInitData,
   getTelegramWebApp,
   initializeTelegramWebApp,
   type TelegramWebApp,
 } from "./telegramWebApp";
+import { login } from "src/actions/sessionActions";
+import type { Session } from "src/models/Session";
+import { useAppDispatch } from "src/state/hooks";
+import { rememberTelegramLaunchData } from "./telegramLaunchContext";
 
-type BootstrapState = "loading" | "ready" | "fallback";
+type BootstrapState = "loading" | "ready" | "fallback" | "link-required";
 
-export type TelegramSessionRequester = (initData: string) => Promise<boolean>;
+export type TelegramSessionResult =
+  | { kind: "authenticated"; session: Session }
+  | { kind: "link-required" }
+  | { kind: "failed" };
+
+export type TelegramSessionRequester = (initData: string) => Promise<TelegramSessionResult>;
+
+const isTelegramSession = (value: unknown): value is Session =>
+  typeof value === "object" &&
+  value !== null &&
+  "isAuthenticated" in value &&
+  (value as Session).isAuthenticated === true &&
+  "user" in value &&
+  typeof (value as Session).user === "object" &&
+  (value as Session).user !== null;
 
 export const createTelegramSession: TelegramSessionRequester = async (initData) => {
   try {
@@ -21,9 +44,16 @@ export const createTelegramSession: TelegramSessionRequester = async (initData) 
       body: JSON.stringify({ initData }),
     });
 
-    return response.ok;
+    if (!response.ok) {
+      return response.status === 401 ? { kind: "link-required" } : { kind: "failed" };
+    }
+
+    const session = (await response.json()) as unknown;
+    return isTelegramSession(session)
+      ? { kind: "authenticated", session }
+      : { kind: "failed" };
   } catch {
-    return false;
+    return { kind: "failed" };
   }
 };
 
@@ -38,6 +68,8 @@ const TelegramBootstrap = ({
 }: TelegramBootstrapProps) => {
   const [state, setState] = useState<BootstrapState>("loading");
   const started = useRef(false);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const resolvedWebApp = webApp ?? getTelegramWebApp();
 
   useEffect(() => {
@@ -58,17 +90,30 @@ const TelegramBootstrap = ({
       return;
     }
 
+    rememberTelegramLaunchData(initData);
     let active = true;
-    void requestSession(initData).then((isAuthenticated) => {
+    void requestSession(initData).then((result) => {
       if (active) {
-        setState(isAuthenticated ? "ready" : "fallback");
+        if (result.kind === "link-required") {
+          setState("link-required");
+          return;
+        }
+
+        if (result.kind !== "authenticated") {
+          setState("fallback");
+          return;
+        }
+
+        dispatch(login(result.session));
+        setState("ready");
+        navigate("/home", { replace: true });
       }
     });
 
     return () => {
       active = false;
     };
-  }, [requestSession, resolvedWebApp]);
+  }, [dispatch, navigate, requestSession, resolvedWebApp]);
 
   if (state === "loading") {
     return <TelegramLoading />;
@@ -78,7 +123,15 @@ const TelegramBootstrap = ({
     return <TelegramFallback />;
   }
 
-  return <TelegramShell />;
+  if (state === "link-required") {
+    return <TelegramLinkRequired />;
+  }
+
+  return (
+    <TelegramShell title="Opening Defender">
+      <TelegramLoading />
+    </TelegramShell>
+  );
 };
 
 export default TelegramBootstrap;

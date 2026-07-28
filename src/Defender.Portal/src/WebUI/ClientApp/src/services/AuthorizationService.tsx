@@ -2,6 +2,18 @@ import IUtils from "src/appUtils/interface";
 import { Session } from "src/models/Session";
 import LoadingStateService from "./LoadingStateService";
 
+export const getSafeReturnUrl = (returnUrl: string | null): string | null => {
+  if (returnUrl === "/telegram/link") {
+    return returnUrl;
+  }
+
+  if (returnUrl === "/oauth/authorize" || returnUrl?.startsWith("/oauth/authorize?")) {
+    return returnUrl;
+  }
+
+  return null;
+};
+
 const AuthorizationService = {
   HandleLoginAttempt: (u: IUtils, session: Session) => {
     if (!session.isAuthenticated) {
@@ -31,11 +43,13 @@ const AuthorizationService = {
         console.error("No parent window found. Cannot send token.");
       }
     } else {
-      const returnUrl = u.searchParams.get("returnUrl");
-      if (
-        returnUrl &&
-        (returnUrl === "/oauth/authorize" || returnUrl.startsWith("/oauth/authorize?"))
-      ) {
+      const returnUrl = getSafeReturnUrl(u.searchParams.get("returnUrl"));
+      if (returnUrl) {
+        if (returnUrl === "/telegram/link") {
+          u.react.navigate(returnUrl);
+          return;
+        }
+
         window.location.assign(returnUrl);
         return;
       }

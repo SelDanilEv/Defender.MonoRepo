@@ -2,6 +2,7 @@ import {
   getInitData,
   getTelegramWebApp,
   initializeTelegramWebApp,
+  isTelegramMiniApp,
   type TelegramWebApp,
 } from "./telegramWebApp";
 
@@ -13,6 +14,13 @@ describe("Telegram Web App runtime", () => {
 
   test("getTelegramWebApp_WhenRuntimeIsMissing_ReturnsNull", () => {
     expect(getTelegramWebApp()).toBeNull();
+    expect(isTelegramMiniApp()).toBe(false);
+  });
+
+  test("isTelegramMiniApp_WhenTelegramRuntimeIsPresent_ReturnsTrue", () => {
+    setTelegramRuntime(createRuntime("query_id=AAEAA&hash=signed-value"));
+
+    expect(isTelegramMiniApp()).toBe(true);
   });
 
   test("getInitData_WhenTelegramProvidesSignedLaunchData_ReturnsRawValueForServerHandoff", () => {

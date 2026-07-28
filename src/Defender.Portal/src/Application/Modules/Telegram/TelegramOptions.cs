@@ -7,4 +7,6 @@ public sealed class TelegramOptions
     public string BotToken { get; init; } = string.Empty;
 
     public TimeSpan InitDataMaximumAge { get; init; } = TimeSpan.FromMinutes(5);
+
+    public string WebhookSecret { get; init; } = string.Empty;
 }
