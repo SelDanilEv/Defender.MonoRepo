@@ -1,4 +1,4 @@
-import type { RouteObject } from "react-router-dom";
+import type { RouteObject } from "react-router";
 import routes from "src/router";
 import Role from "src/consts/Role";
 import UserService from "src/services/UserService";

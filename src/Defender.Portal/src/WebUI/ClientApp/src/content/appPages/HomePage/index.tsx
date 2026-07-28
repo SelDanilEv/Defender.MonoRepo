@@ -9,7 +9,7 @@ import {
   Grid,
   Typography,
 } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import StackedLineChartIcon from "@mui/icons-material/StackedLineChart";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LocalActivityIcon from "@mui/icons-material/LocalActivity";

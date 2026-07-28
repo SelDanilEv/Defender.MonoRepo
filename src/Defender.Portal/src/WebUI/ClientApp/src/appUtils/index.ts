@@ -1,7 +1,7 @@
 import { useMediaQuery, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate } from "react-router-dom";
-import { useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
+import { useSearchParams } from "react-router";
 
 import ErrorToast from "src/components/Toast/DefaultErrorToast";
 

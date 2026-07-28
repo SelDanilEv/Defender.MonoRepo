@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { healthCareApi, HealthChartShare, HealthEvent } from "src/api/healthCare";
 import useUtils from "src/appUtils";
 import LanguageSwitcher from "src/components/LanguageSwitcher";

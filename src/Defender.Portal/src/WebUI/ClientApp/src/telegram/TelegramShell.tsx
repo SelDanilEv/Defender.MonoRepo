@@ -17,7 +17,7 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation } from "react-router";
 
 type TelegramShellProps = PropsWithChildren<{
   title?: string;

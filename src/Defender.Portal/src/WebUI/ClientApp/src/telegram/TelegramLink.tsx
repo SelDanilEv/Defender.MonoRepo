@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { Stack, Typography } from "@mui/material";
 
 import TelegramShell, { TelegramFallback, TelegramLinkRequired, TelegramLoading } from "./TelegramShell";

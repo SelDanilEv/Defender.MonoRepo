@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 
 import TelegramBootstrap, { createTelegramSession } from "./TelegramBootstrap";
 import type { TelegramWebApp } from "./telegramWebApp";

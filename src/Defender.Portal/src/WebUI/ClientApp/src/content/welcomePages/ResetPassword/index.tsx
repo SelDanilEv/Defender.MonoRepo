@@ -1,7 +1,7 @@
 import useUtils from "src/appUtils";
 
 import { Link, Typography } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 
 import AuthPageShell from "../Components/AuthPageShell";
 import ResetPasswordForm from "./Form";

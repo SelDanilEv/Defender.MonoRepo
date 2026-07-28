@@ -1,7 +1,7 @@
 import { FC, ReactNode, useEffect, useRef } from "react";
 import { Box, alpha, lighten } from "@mui/material";
 import { connect } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router";
 
 import Sidebar from "./Sidebar";
 import Header from "./Header";

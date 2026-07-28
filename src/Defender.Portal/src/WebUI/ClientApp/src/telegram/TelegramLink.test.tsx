@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router";
 
 import TelegramLink, { createTelegramAccountLink } from "./TelegramLink";
 import { getTelegramLaunchData, rememberTelegramLaunchData } from "./telegramLaunchContext";

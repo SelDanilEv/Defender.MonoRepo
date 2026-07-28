@@ -1,5 +1,5 @@
 import { Theme } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default interface IUtils {
   searchParams: URLSearchParams;

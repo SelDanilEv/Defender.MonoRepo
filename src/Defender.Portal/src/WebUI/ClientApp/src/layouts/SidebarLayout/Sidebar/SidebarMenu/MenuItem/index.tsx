@@ -1,7 +1,7 @@
 import { Button, ListItem } from "@mui/material";
 import { useContext } from "react";
 import { connect } from "react-redux";
-import { NavLink as RouterLink } from "react-router-dom";
+import { NavLink as RouterLink } from "react-router";
 import { SidebarContext } from "src/contexts/SidebarContext";
 
 const MenuItem = (props: any) => {
