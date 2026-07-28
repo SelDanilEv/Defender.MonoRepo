@@ -6,72 +6,62 @@ import TelegramShell, { TelegramFallback, TelegramLinkRequired, TelegramLoading 
 import { createTelegramSession, type TelegramSessionRequester } from "./TelegramBootstrap";
 import { clearTelegramLaunchData, getTelegramLaunchData } from "./telegramLaunchContext";
 import { login } from "src/actions/sessionActions";
-import { useAppDispatch, useAppSelector } from "src/state/hooks";
-import type { Session } from "src/models/Session";
-import { createTelegramSignInHandoff, getHandoffSession } from "./telegramSignInHandoff";
+import { useAppDispatch } from "src/state/hooks";
+import { openTelegramLink } from "./telegramWebApp";
 
-type TelegramAccountLinkResult = "linked" | "unauthorized" | "failed";
+export type TelegramLinkHandoffRequester = (initData: string) => Promise<string | null>;
 
-export type TelegramAccountLinkRequester = (initData: string, token: string) => Promise<TelegramAccountLinkResult>;
-
-export const createTelegramAccountLink: TelegramAccountLinkRequester = async (initData, token) => {
+export const createTelegramLinkHandoff: TelegramLinkHandoffRequester = async (initData) => {
   try {
-    const response = await fetch("/api/telegram/link", {
+    const response = await fetch("/api/telegram/link-handoff", {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ initData }),
     });
 
-    if (response.ok) {
-      return "linked";
+    if (!response.ok) {
+      return null;
     }
 
-    return response.status === 401 ? "unauthorized" : "failed";
+    const handoff = (await response.json()) as { loginUrl?: unknown };
+    return typeof handoff.loginUrl === "string" ? handoff.loginUrl : null;
   } catch {
-    return "failed";
+    return null;
   }
 };
 
 interface TelegramLinkProps {
-  requestLink?: TelegramAccountLinkRequester;
+  requestHandoff?: TelegramLinkHandoffRequester;
   requestSession?: TelegramSessionRequester;
 }
 
 const TelegramLink = ({
-  requestLink = createTelegramAccountLink,
+  requestHandoff = createTelegramLinkHandoff,
   requestSession = createTelegramSession,
 }: TelegramLinkProps) => {
-  const [state, setState] = useState<"loading" | "fallback" | "link-required" | "failed">("loading");
-  const started = useRef(false);
-  const isAuthenticated = useAppSelector((store) => store.session.isAuthenticated);
+  const [state, setState] = useState<"loading" | "fallback" | "link-required" | "waiting" | "failed">("loading");
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const session = useAppSelector((store) => store.session as Session);
-  const handoffId = useRef<string | null>(null);
+  const pollingStarted = useRef(false);
 
-  const startTopLevelSignIn = () => {
-    const handoff = createTelegramSignInHandoff(window.location.origin);
-    handoffId.current = handoff.id;
-    window.open(handoff.url, "_blank");
+  const startNativeSignIn = async () => {
+    const initData = getTelegramLaunchData();
+    if (!initData) {
+      setState("fallback");
+      return;
+    }
+
+    setState("loading");
+    const loginUrl = await requestHandoff(initData);
+    if (!loginUrl) {
+      setState("failed");
+      return;
+    }
+
+    openTelegramLink(loginUrl);
+    setState("waiting");
   };
-
-  useEffect(() => {
-    const receiveSession = (event: MessageEvent) => {
-      if (!handoffId.current) {
-        return;
-      }
-
-      const receivedSession = getHandoffSession(event, window.location.origin, handoffId.current);
-      if (receivedSession) {
-        handoffId.current = null;
-        dispatch(login(receivedSession));
-      }
-    };
-
-    window.addEventListener("message", receiveSession);
-    return () => window.removeEventListener("message", receiveSession);
-  }, [dispatch]);
 
   useEffect(() => {
     const initData = getTelegramLaunchData();
@@ -80,58 +70,63 @@ const TelegramLink = ({
       return;
     }
 
-    if (!isAuthenticated) {
-      setState("link-required");
+    setState("link-required");
+  }, []);
+
+  useEffect(() => {
+    if (state !== "waiting" || pollingStarted.current) {
       return;
     }
 
-    if (started.current) {
+    const initData = getTelegramLaunchData();
+    if (!initData) {
+      setState("fallback");
       return;
     }
 
-    started.current = true;
+    pollingStarted.current = true;
     let active = true;
-    void requestLink(initData, session.token).then(async (linkResult) => {
-      if (!active) {
+    const poll = async () => {
+      const result = await requestSession(initData);
+      if (!active || result.kind === "link-required") {
         return;
       }
 
-      if (linkResult === "unauthorized") {
-        setState("link-required");
-        return;
-      }
-
-      if (linkResult !== "linked") {
-        setState("failed");
-        return;
-      }
-
-      const sessionResult = await requestSession(initData);
-      if (!active) {
-        return;
-      }
-
-      if (sessionResult.kind !== "authenticated") {
+      if (result.kind !== "authenticated") {
         setState("failed");
         return;
       }
 
       clearTelegramLaunchData();
-      dispatch(login(sessionResult.session));
+      dispatch(login(result.session));
       navigate("/home", { replace: true });
-    });
+    };
 
+    void poll();
+    const interval = window.setInterval(() => void poll(), 2000);
     return () => {
       active = false;
+      window.clearInterval(interval);
     };
-  }, [dispatch, isAuthenticated, navigate, requestLink, requestSession, session.token]);
+  }, [dispatch, navigate, requestSession, state]);
 
   if (state === "fallback") {
     return <TelegramFallback />;
   }
 
   if (state === "link-required") {
-    return <TelegramLinkRequired onSignIn={startTopLevelSignIn} />;
+    return <TelegramLinkRequired onSignIn={() => void startNativeSignIn()} />;
+  }
+
+  if (state === "waiting") {
+    return (
+      <TelegramShell title="Finish signing in" showNavigation={false}>
+        <Stack spacing={1.5} sx={{ py: 4 }}>
+          <Typography>Finish signing in in the Portal tab. This app will continue automatically.</Typography>
+          <TelegramLoading />
+        </Stack>
+      </TelegramShell>
+    );
   }
 
   if (state === "failed") {

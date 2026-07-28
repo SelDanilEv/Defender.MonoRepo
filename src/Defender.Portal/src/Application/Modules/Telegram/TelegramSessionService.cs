@@ -31,10 +31,15 @@ public sealed class TelegramSessionService(
     public async Task LinkAsync(Guid accountId, string initData, CancellationToken cancellationToken)
     {
         var telegramUser = initDataValidator.Validate(initData, timeProvider.GetUtcNow());
+        await LinkTelegramUserAsync(accountId, telegramUser.TelegramUserId, cancellationToken);
+    }
+
+    public async Task LinkTelegramUserAsync(Guid accountId, long telegramUserId, CancellationToken cancellationToken)
+    {
         var accountLink = await accountLinkRepository.GetByAccountIdAsync(accountId, cancellationToken);
         if (accountLink != null)
         {
-            if (accountLink.TelegramUserId == telegramUser.TelegramUserId)
+            if (accountLink.TelegramUserId == telegramUserId)
             {
                 return;
             }
@@ -42,7 +47,7 @@ public sealed class TelegramSessionService(
             throw new TelegramAccountLinkConflictException();
         }
 
-        var telegramLink = await accountLinkRepository.GetByTelegramUserIdAsync(telegramUser.TelegramUserId, cancellationToken);
+        var telegramLink = await accountLinkRepository.GetByTelegramUserIdAsync(telegramUserId, cancellationToken);
         if (telegramLink != null)
         {
             throw new TelegramAccountLinkConflictException();
@@ -51,13 +56,13 @@ public sealed class TelegramSessionService(
         try
         {
             await accountLinkRepository.CreateAsync(
-                new TelegramAccountLink(accountId, telegramUser.TelegramUserId, timeProvider.GetUtcNow()),
+                new TelegramAccountLink(accountId, telegramUserId, timeProvider.GetUtcNow()),
                 cancellationToken);
         }
         catch (TelegramAccountLinkConflictException)
         {
             var persistedAccountLink = await accountLinkRepository.GetByAccountIdAsync(accountId, cancellationToken);
-            if (persistedAccountLink?.TelegramUserId == telegramUser.TelegramUserId)
+            if (persistedAccountLink?.TelegramUserId == telegramUserId)
             {
                 return;
             }

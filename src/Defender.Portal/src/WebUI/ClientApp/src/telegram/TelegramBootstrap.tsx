@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 
 import TelegramShell, {
   TelegramFallback,
-  TelegramLinkRequired,
   TelegramLoading,
 } from "./TelegramShell";
 import {
@@ -17,7 +16,7 @@ import type { Session } from "src/models/Session";
 import { useAppDispatch } from "src/state/hooks";
 import { rememberTelegramLaunchData } from "./telegramLaunchContext";
 
-type BootstrapState = "loading" | "ready" | "fallback" | "link-required";
+type BootstrapState = "loading" | "ready" | "fallback";
 
 export type TelegramSessionResult =
   | { kind: "authenticated"; session: Session }
@@ -95,7 +94,7 @@ const TelegramBootstrap = ({
     void requestSession(initData).then((result) => {
       if (active) {
         if (result.kind === "link-required") {
-          setState("link-required");
+          navigate("/telegram/link", { replace: true });
           return;
         }
 
@@ -121,10 +120,6 @@ const TelegramBootstrap = ({
 
   if (state === "fallback") {
     return <TelegramFallback />;
-  }
-
-  if (state === "link-required") {
-    return <TelegramLinkRequired onSignIn={() => navigate("/telegram/link")} />;
   }
 
   return (

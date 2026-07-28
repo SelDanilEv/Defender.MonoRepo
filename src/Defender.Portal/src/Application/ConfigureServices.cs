@@ -73,6 +73,7 @@ public static class ConfigureServices
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<ITelegramSessionTokenIssuer, TelegramSessionTokenIssuer>();
         services.AddTransient<ITelegramSessionService, TelegramSessionService>();
+        services.AddTransient<ITelegramLinkHandoffService, TelegramLinkHandoffService>();
         services.AddTransient<ITelegramWebhookService, TelegramWebhookService>();
         services.AddSingleton<ITelegramWebhookSecretValidator>(serviceProvider =>
         {

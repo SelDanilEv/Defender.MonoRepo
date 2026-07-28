@@ -59,6 +59,7 @@ public static class ConfigureServices
         services.AddSingleton<IUserActivityRepository, UserActivityRepository>();
         services.AddSingleton<ITelegramAccountLinkRepository, TelegramAccountLinkRepository>();
         services.AddSingleton<ITelegramWebhookReceiptRepository, TelegramWebhookReceiptRepository>();
+        services.AddSingleton<ITelegramLinkHandoffRepository, TelegramLinkHandoffRepository>();
 
         return services;
     }

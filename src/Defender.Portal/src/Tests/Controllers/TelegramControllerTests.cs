@@ -58,6 +58,39 @@ public class TelegramControllerTests
     }
 
     [Fact]
+    public async Task CreateLinkHandoffAsync_WhenInitDataIsAccepted_ReturnsOpaqueCodeWithoutInitData()
+    {
+        var handoffs = new Mock<ITelegramLinkHandoffService>();
+        handoffs.Setup(value => value.CreateAsync("signed-init-data", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new TelegramLinkHandoff("a".PadLeft(64, 'a'), 123456789, DateTimeOffset.UtcNow.AddMinutes(5)));
+        var controller = CreateController(handoffService: handoffs.Object);
+
+        var result = await controller.CreateLinkHandoffAsync(new TelegramInitDataRequest("signed-init-data"), CancellationToken.None);
+
+        var ok = Assert.IsType<OkObjectResult>(result.Result);
+        var response = Assert.IsType<TelegramLinkHandoffResponse>(ok.Value);
+        Assert.Equal(64, response.Code.Length);
+        Assert.DoesNotContain("signed-init-data", response.LoginUrl, StringComparison.Ordinal);
+        Assert.Contains("#TelegramHandoff=", response.LoginUrl, StringComparison.Ordinal);
+        Assert.DoesNotContain("?TelegramHandoff=", response.LoginUrl, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task ConsumeLinkHandoffAsync_WhenTelegramAccountIsAlreadyLinked_ReturnsConflict()
+    {
+        var handoffs = new Mock<ITelegramLinkHandoffService>();
+        handoffs.Setup(value => value.ConsumeAsync(It.IsAny<Guid>(), "a".PadLeft(64, 'a'), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new TelegramAccountLinkConflictException());
+        var controller = CreateController(handoffService: handoffs.Object);
+
+        var result = await controller.ConsumeLinkHandoffAsync(
+            new TelegramLinkHandoffConsumeRequest("a".PadLeft(64, 'a')),
+            CancellationToken.None);
+
+        Assert.IsType<ConflictResult>(result);
+    }
+
+    [Fact]
     public async Task ReceiveWebhookAsync_WhenBodyIsMissing_ReturnsBadRequest()
     {
         var controller = CreateController();
@@ -69,11 +102,13 @@ public class TelegramControllerTests
 
     private static TelegramController CreateController(
         ITelegramSessionService? sessionService = null,
+        ITelegramLinkHandoffService? handoffService = null,
         ITelegramWebhookService? webhookService = null,
         ITelegramWebhookSecretValidator? secretValidator = null)
     {
         var controller = new TelegramController(
             sessionService ?? Mock.Of<ITelegramSessionService>(),
+            handoffService ?? Mock.Of<ITelegramLinkHandoffService>(),
             secretValidator ?? Mock.Of<ITelegramWebhookSecretValidator>(),
             webhookService ?? Mock.Of<ITelegramWebhookService>(),
             Mock.Of<ICurrentAccountAccessor>())

@@ -4,6 +4,7 @@ export interface TelegramWebApp {
   initData: string;
   ready: () => void;
   expand: () => void;
+  openLink?: (url: string, options?: { try_instant_view?: boolean }) => void;
   onEvent: (event: TelegramWebAppEvent, listener: () => void) => void;
   offEvent: (event: TelegramWebAppEvent, listener: () => void) => void;
 }
@@ -42,6 +43,15 @@ export const expand = (webApp = getTelegramWebApp()): void => {
 export const initializeTelegramWebApp = (webApp = getTelegramWebApp()): void => {
   ready(webApp);
   expand(webApp);
+};
+
+export const openTelegramLink = (url: string, webApp = getTelegramWebApp()): void => {
+  if (webApp?.openLink) {
+    webApp.openLink(url, { try_instant_view: false });
+    return;
+  }
+
+  window.open(url, "_blank", "noopener,noreferrer");
 };
 
 const subscribe = (

@@ -27,11 +27,42 @@ export const getSafeSsoUrl = (ssoUrl: string | null, origin = window.location.or
   }
 };
 
+export const getTelegramHandoffCode = (handoff: string | null): string | null =>
+  handoff && /^[a-f0-9]{64}$/i.test(handoff) ? handoff.toLowerCase() : null;
+
+export const getTelegramHandoffCodeFromHash = (hash: string): string | null =>
+  getTelegramHandoffCode(new URLSearchParams(hash.replace(/^#/, "")).get("TelegramHandoff"));
+
+export const consumeTelegramLinkHandoff = async (code: string): Promise<boolean> => {
+  try {
+    const response = await fetch("/api/telegram/link-handoff/consume", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ code }),
+    });
+
+    return response.ok;
+  } catch {
+    return false;
+  }
+};
+
 const AuthorizationService = {
-  HandleLoginAttempt: (u: IUtils, session: Session) => {
+  HandleLoginAttempt: async (u: IUtils, session: Session) => {
     if (!session.isAuthenticated) {
       u.e("AuthorizationFailed");
       return;
+    }
+
+    const telegramHandoff = getTelegramHandoffCodeFromHash(window.location.hash);
+    if (telegramHandoff && !(await consumeTelegramLinkHandoff(telegramHandoff))) {
+      u.e("AuthorizationFailed");
+      return;
+    }
+
+    if (telegramHandoff) {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
     }
 
     if (
@@ -48,9 +79,9 @@ const AuthorizationService = {
       LoadingStateService.StartLoading();
 
       if (window.opener) {
-        const telegramHandoff = u.searchParams.get("TelegramHandoff");
-        const message = telegramHandoff
-          ? { token: session.token, session, telegramHandoff }
+        const legacyTelegramHandoff = u.searchParams.get("TelegramHandoff");
+        const message = legacyTelegramHandoff
+          ? { token: session.token, session, telegramHandoff: legacyTelegramHandoff }
           : { token: session.token };
         window.opener.postMessage(message, ssoUrl);
         window.close();

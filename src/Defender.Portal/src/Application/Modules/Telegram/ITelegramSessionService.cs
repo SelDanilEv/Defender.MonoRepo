@@ -6,5 +6,7 @@ public interface ITelegramSessionService
 
     Task LinkAsync(Guid accountId, string initData, CancellationToken cancellationToken);
 
+    Task LinkTelegramUserAsync(Guid accountId, long telegramUserId, CancellationToken cancellationToken);
+
     Task UnlinkAsync(Guid accountId, CancellationToken cancellationToken);
 }

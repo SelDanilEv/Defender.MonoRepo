@@ -14,6 +14,7 @@ namespace Defender.Portal.WebUI.Controllers.V1;
 [Route("api/telegram")]
 public sealed class TelegramController(
     ITelegramSessionService sessionService,
+    ITelegramLinkHandoffService handoffService,
     ITelegramWebhookSecretValidator webhookSecretValidator,
     ITelegramWebhookService webhookService,
     ICurrentAccountAccessor currentAccountAccessor) : ControllerBase
@@ -67,6 +68,49 @@ public sealed class TelegramController(
         }
     }
 
+    [AllowAnonymous]
+    [HttpPost("link-handoff")]
+    [ProducesResponseType(typeof(TelegramLinkHandoffResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<TelegramLinkHandoffResponse>> CreateLinkHandoffAsync(
+        [FromBody] TelegramInitDataRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var handoff = await handoffService.CreateAsync(request.InitData, cancellationToken);
+            return Ok(new TelegramLinkHandoffResponse(handoff.Code, $"https://portal.coded-by-danil.dev/welcome/login#TelegramHandoff={handoff.Code}", handoff.ExpiresAt));
+        }
+        catch (TelegramInitDataValidationException)
+        {
+            return Unauthorized();
+        }
+    }
+
+    [HttpPost("link-handoff/consume")]
+    [Auth(Roles.User)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult> ConsumeLinkHandoffAsync(
+        [FromBody] TelegramLinkHandoffConsumeRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await handoffService.ConsumeAsync(currentAccountAccessor.GetAccountId(), request.Code, cancellationToken);
+            return NoContent();
+        }
+        catch (TelegramLinkHandoffNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (TelegramAccountLinkConflictException)
+        {
+            return Conflict();
+        }
+    }
+
     [HttpDelete("link")]
     [Auth(Roles.User)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -109,3 +153,5 @@ public sealed class TelegramController(
 }
 
 public sealed record TelegramInitDataRequest(string InitData);
+public sealed record TelegramLinkHandoffConsumeRequest(string Code);
+public sealed record TelegramLinkHandoffResponse(string Code, string LoginUrl, DateTimeOffset ExpiresAt);

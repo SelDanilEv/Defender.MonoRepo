@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
-import { MemoryRouter } from "react-router";
+import { MemoryRouter, Route, Routes } from "react-router";
 
 import TelegramBootstrap, { createTelegramSession } from "./TelegramBootstrap";
 import type { TelegramWebApp } from "./telegramWebApp";
@@ -80,14 +80,26 @@ describe("TelegramBootstrap", () => {
     });
   });
 
-  test("WhenTelegramSessionNeedsAccountLink_ShowsTopLevelSignInButton", async () => {
+  test("WhenTelegramSessionNeedsAccountLink_NavigatesDirectlyToAccountLink", async () => {
     const requestSession = vi.fn().mockResolvedValue({ kind: "link-required" as const });
     const runtime = createRuntime("query_id=AAEAA&hash=signed-value");
 
-    renderBootstrap(<TelegramBootstrap webApp={runtime} requestSession={requestSession} />);
+    render(
+      <Provider store={store}>
+        <MemoryRouter initialEntries={["/telegram"]}>
+          <Routes>
+            <Route
+              path="/telegram"
+              element={<TelegramBootstrap webApp={runtime} requestSession={requestSession} />}
+            />
+            <Route path="/telegram/link" element={<div>Telegram account link</div>} />
+          </Routes>
+        </MemoryRouter>
+      </Provider>,
+    );
 
     await waitFor(() => expect(requestSession).toHaveBeenCalledTimes(1));
-    expect(screen.getByRole("button", { name: "Sign in to link" })).not.toBeNull();
+    expect(await screen.findByText("Telegram account link")).not.toBeNull();
   });
 });
 

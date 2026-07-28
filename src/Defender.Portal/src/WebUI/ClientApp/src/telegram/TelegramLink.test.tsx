@@ -1,10 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { Provider } from "react-redux";
 import { MemoryRouter, Route, Routes } from "react-router";
 
-import TelegramLink, { createTelegramAccountLink } from "./TelegramLink";
+import TelegramLink, { createTelegramLinkHandoff } from "./TelegramLink";
 import { getTelegramLaunchData, rememberTelegramLaunchData } from "./telegramLaunchContext";
-import { loginActionName, logoutActionName } from "src/reducers/sessionReducer";
+import { logoutActionName } from "src/reducers/sessionReducer";
 import store from "src/state/store";
 
 const session = {
@@ -31,25 +31,28 @@ describe("Telegram account linking", () => {
     vi.restoreAllMocks();
   });
 
-  test("createTelegramAccountLink_WhenSessionIsAuthenticated_SendsPortalTokenAndRawInitData", async () => {
-    const fetchSpy = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+  test("createTelegramLinkHandoff_WhenMiniAppRequestsSignIn_SendsRawInitDataWithoutPuttingItInTheLoginUrl", async () => {
+    const loginUrl = "https://portal.coded-by-danil.dev/welcome/login?TelegramHandoff=" + "a".repeat(64);
+    const fetchSpy = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ code: "a".repeat(64), loginUrl }), { status: 200 }),
+    );
     vi.stubGlobal("fetch", fetchSpy);
 
-    await expect(createTelegramAccountLink("query_id=AAEAA&hash=signed-value", "portal-token")).resolves.toBe("linked");
+    await expect(createTelegramLinkHandoff("query_id=AAEAA&hash=signed-value")).resolves.toBe(loginUrl);
 
-    expect(fetchSpy).toHaveBeenCalledWith("/api/telegram/link", {
+    expect(fetchSpy).toHaveBeenCalledWith("/api/telegram/link-handoff", {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json", Authorization: "Bearer portal-token" },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ initData: "query_id=AAEAA&hash=signed-value" }),
     });
   });
 
-  test("WhenLinkedWithAuthenticatedPortalSession_RefreshesTelegramSessionAndNavigatesHome", async () => {
-    const requestLink = vi.fn().mockResolvedValue("linked");
+  test("WhenPortalCompletesNativeSignIn_RefreshesTelegramSessionAndNavigatesHome", async () => {
+    const requestHandoff = vi.fn().mockResolvedValue("https://portal.coded-by-danil.dev/welcome/login?TelegramHandoff=" + "a".repeat(64));
     const requestSession = vi.fn().mockResolvedValue({ kind: "authenticated", session });
     rememberTelegramLaunchData("query_id=AAEAA&hash=signed-value");
-    store.dispatch({ type: loginActionName, payload: session });
+    vi.stubGlobal("open", vi.fn());
 
     render(
       <Provider store={store}>
@@ -57,7 +60,7 @@ describe("Telegram account linking", () => {
           <Routes>
             <Route
               path="/telegram/link"
-              element={<TelegramLink requestLink={requestLink} requestSession={requestSession} />}
+              element={<TelegramLink requestHandoff={requestHandoff} requestSession={requestSession} />}
             />
             <Route path="/home" element={<div>Home portal</div>} />
           </Routes>
@@ -65,7 +68,9 @@ describe("Telegram account linking", () => {
       </Provider>,
     );
 
-    await waitFor(() => expect(requestLink).toHaveBeenCalledWith("query_id=AAEAA&hash=signed-value", ""));
+    fireEvent.click(await screen.findByRole("button", { name: "Sign in to link" }));
+
+    await waitFor(() => expect(requestHandoff).toHaveBeenCalledWith("query_id=AAEAA&hash=signed-value"));
     await waitFor(() => expect(requestSession).toHaveBeenCalledWith("query_id=AAEAA&hash=signed-value"));
     expect(await screen.findByText("Home portal")).not.toBeNull();
     expect(getTelegramLaunchData()).toBeNull();
