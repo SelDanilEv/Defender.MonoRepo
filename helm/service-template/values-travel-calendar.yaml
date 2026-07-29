@@ -11,7 +11,7 @@ deploymentStrategy:
 resources:
   # Keep the request schedulable while retaining the shared service limit.
   requests:
-    cpu: "20m"
+    cpu: "5m"
 ingress:
   enabled: true
   ingressClassName: traefik
