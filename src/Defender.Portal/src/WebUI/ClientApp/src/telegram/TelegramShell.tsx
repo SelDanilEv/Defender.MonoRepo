@@ -1,21 +1,20 @@
-import { useState, type PropsWithChildren, type ReactNode } from "react";
+import { type PropsWithChildren, type ReactNode } from "react";
 import {
   BottomNavigation,
   BottomNavigationAction,
   Box,
   Button,
   CircularProgress,
-  Drawer,
-  List,
-  ListItemButton,
-  ListItemText,
   Stack,
   Typography,
 } from "@mui/material";
 import AccountBalanceOutlinedIcon from "@mui/icons-material/AccountBalanceOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
+import ConfirmationNumberOutlinedIcon from "@mui/icons-material/ConfirmationNumberOutlined";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
+import MedicalServicesOutlinedIcon from "@mui/icons-material/MedicalServicesOutlined";
+import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined";
+import RestaurantOutlinedIcon from "@mui/icons-material/RestaurantOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import { Link as RouterLink, useLocation } from "react-router";
 
@@ -31,7 +30,7 @@ type PortalLink = {
   icon?: ReactNode;
 };
 
-const primaryLinks: PortalLink[] = [
+const navigationLinks: PortalLink[] = [
   {
     label: "Home",
     to: "/home",
@@ -56,27 +55,41 @@ const primaryLinks: PortalLink[] = [
     matches: (pathname) => pathname.startsWith("/travel-calendar"),
     icon: <CalendarMonthOutlinedIcon />,
   },
-];
-
-const moreLinks: PortalLink[] = [
-  { label: "Food Advisor", to: "/food-advisor", matches: (pathname) => pathname.startsWith("/food-advisor") },
-  { label: "Health Care", to: "/health-care", matches: (pathname) => pathname.startsWith("/health-care") },
-  { label: "Lottery", to: "/games/lottery", matches: (pathname) => pathname.startsWith("/games") },
-  { label: "Profile", to: "/account/update", matches: (pathname) => pathname.startsWith("/account") },
+  {
+    label: "Food Advisor",
+    to: "/food-advisor",
+    matches: (pathname) => pathname.startsWith("/food-advisor"),
+    icon: <RestaurantOutlinedIcon />,
+  },
+  {
+    label: "Health Care",
+    to: "/health-care",
+    matches: (pathname) => pathname.startsWith("/health-care"),
+    icon: <MedicalServicesOutlinedIcon />,
+  },
+  {
+    label: "Lottery",
+    to: "/games/lottery",
+    matches: (pathname) => pathname.startsWith("/games"),
+    icon: <ConfirmationNumberOutlinedIcon />,
+  },
+  {
+    label: "Profile",
+    to: "/account/update",
+    matches: (pathname) => pathname.startsWith("/account"),
+    icon: <PersonOutlineOutlinedIcon />,
+  },
 ];
 
 const TelegramNavigation = () => {
-  const [isMoreOpen, setMoreOpen] = useState(false);
   const { pathname } = useLocation();
-  const selectedPrimaryLink = primaryLinks.findIndex((link) => link.matches(pathname));
-  const isMoreSelected = moreLinks.some((link) => link.matches(pathname));
+  const selectedLink = navigationLinks.findIndex((link) => link.matches(pathname));
 
   return (
-    <>
-      <BottomNavigation
+    <BottomNavigation
         component="nav"
         aria-label="Telegram navigation"
-        value={selectedPrimaryLink >= 0 ? selectedPrimaryLink : isMoreSelected ? primaryLinks.length : false}
+        value={selectedLink >= 0 ? selectedLink : false}
         showLabels
         sx={{
           position: "fixed",
@@ -117,7 +130,7 @@ const TelegramNavigation = () => {
           },
         }}
       >
-        {primaryLinks.map((link, index) => (
+        {navigationLinks.map((link, index) => (
           <BottomNavigationAction
             key={link.to}
             component={RouterLink}
@@ -128,43 +141,7 @@ const TelegramNavigation = () => {
             aria-current={link.matches(pathname) ? "page" : undefined}
           />
         ))}
-        <BottomNavigationAction
-          value={primaryLinks.length}
-          label="More"
-          icon={<MoreHorizIcon />}
-          aria-current={isMoreSelected ? "page" : undefined}
-          onClick={() => setMoreOpen(true)}
-        />
       </BottomNavigation>
-      <Drawer
-        anchor="bottom"
-        open={isMoreOpen}
-        onClose={() => setMoreOpen(false)}
-        slotProps={{
-          paper: {
-            sx: {
-              pb: "env(safe-area-inset-bottom)",
-              borderTopLeftRadius: 16,
-              borderTopRightRadius: 16,
-            },
-          },
-        }}
-      >
-        <List aria-label="More Defender destinations">
-          {moreLinks.map((link) => (
-            <ListItemButton
-              key={link.to}
-              component={RouterLink}
-              to={link.to}
-              selected={link.matches(pathname)}
-              onClick={() => setMoreOpen(false)}
-            >
-              <ListItemText primary={link.label} />
-            </ListItemButton>
-          ))}
-        </List>
-      </Drawer>
-    </>
   );
 };
 

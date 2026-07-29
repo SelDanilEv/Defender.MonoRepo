@@ -10,7 +10,7 @@ describe("TelegramShell", () => {
     expect(screen.getByText("Connecting your Telegram session...")).not.toBeNull();
   });
 
-  test("WhenRendered_ProvidesCompactBottomNavigationAndMorePortalDestinations", () => {
+  test("WhenRendered_ProvidesEveryPortalDestinationInHorizontallyScrollableBottomNavigation", () => {
     render(
       <MemoryRouter>
         <TelegramShell>
@@ -21,7 +21,11 @@ describe("TelegramShell", () => {
 
     expect(screen.getByRole("navigation", { name: "Telegram navigation" })).not.toBeNull();
     expect(screen.getByRole("link", { name: "Home" }).getAttribute("href")).toBe("/home");
-    expect(screen.getByRole("button", { name: "More" })).not.toBeNull();
+    expect(screen.getByRole("link", { name: "Food Advisor" }).getAttribute("href")).toBe("/food-advisor");
+    expect(screen.getByRole("link", { name: "Health Care" }).getAttribute("href")).toBe("/health-care");
+    expect(screen.getByRole("link", { name: "Lottery" }).getAttribute("href")).toBe("/games/lottery");
+    expect(screen.getByRole("link", { name: "Profile" }).getAttribute("href")).toBe("/account/update");
+    expect(screen.queryByRole("button", { name: "More" })).toBeNull();
   });
 
   test("WhenCurrentRouteIsPrimaryPortalDestination_MarksActiveTabAndKeepsBottomStripHorizontallyReachable", () => {
