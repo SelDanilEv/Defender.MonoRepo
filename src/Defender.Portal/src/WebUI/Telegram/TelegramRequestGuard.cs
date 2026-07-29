@@ -5,6 +5,8 @@ namespace Defender.Portal.WebUI.Telegram;
 
 public static class TelegramRequestGuard
 {
+    private const string PortalOrigin = "https://portal.coded-by-danil.dev";
+
     public static bool BlocksMutation(HttpContext context)
     {
         if (!context.User.HasClaim("amr", "telegram") || HttpMethods.IsGet(context.Request.Method)
@@ -13,7 +15,11 @@ public static class TelegramRequestGuard
             return false;
         }
 
-        return !context.Request.Path.StartsWithSegments("/api/telegram")
-            && !context.Request.Path.StartsWithSegments("/api/integrations/telegram");
+        if (context.Request.Path.StartsWithSegments("/api/telegram"))
+        {
+            return !string.Equals(context.Request.Headers.Origin, PortalOrigin, StringComparison.Ordinal);
+        }
+
+        return true;
     }
 }
