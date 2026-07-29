@@ -12,7 +12,7 @@ namespace Defender.Portal.Application.Modules.Telegram;
 
 public sealed class TelegramSessionTokenIssuer(IConfiguration configuration, TimeProvider timeProvider) : ITelegramSessionTokenIssuer
 {
-    private static readonly TimeSpan SessionLifetime = TimeSpan.FromMinutes(15);
+    private static readonly TimeSpan SessionLifetime = TimeSpan.FromHours(1);
 
     public string Issue(Guid accountId, IReadOnlyCollection<string> roles)
     {

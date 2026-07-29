@@ -37,7 +37,7 @@ public class TelegramSessionTokenIssuerTests
             Assert.DoesNotContain(token.Claims, claim => claim.Type == CustomClaimTypes.Role && claim.Value == "Admin");
             Assert.DoesNotContain(token.Claims, claim => claim.Type == CustomClaimTypes.Role && claim.Value == "SuperAdmin");
             Assert.Contains(token.Claims, claim => claim.Type == "amr" && claim.Value == "telegram");
-            Assert.Equal(now.AddMinutes(15), new DateTimeOffset(token.ValidTo));
+            Assert.Equal(now.AddHours(1), new DateTimeOffset(token.ValidTo));
         }
         finally
         {

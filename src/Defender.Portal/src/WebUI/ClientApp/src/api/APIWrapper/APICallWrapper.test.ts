@@ -1,6 +1,11 @@
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
 import LoadingStateService from "src/services/LoadingStateService";
 import { resetSessionExpiryHandling } from "src/services/SessionExpiryService";
+import { refreshTelegramSession } from "src/telegram/telegramSessionRecovery";
+
+vi.mock("src/telegram/telegramSessionRecovery", () => ({
+  refreshTelegramSession: vi.fn(),
+}));
 
 const response = (status: number, body = "") =>
   new Response(body, {
@@ -12,6 +17,7 @@ describe("APICallWrapper", () => {
   beforeEach(() => {
     vi.restoreAllMocks();
     resetSessionExpiryHandling();
+    vi.mocked(refreshTelegramSession).mockResolvedValue(false);
   });
 
   test("WhenCalled_SetsSameOriginCredentialsAndDoesNotSetAuthorizationHeader", async () => {
@@ -89,6 +95,28 @@ describe("APICallWrapper", () => {
 
     expect(onFinal).toHaveBeenCalledTimes(1);
     expect(LoadingStateService.FinishLoading).toHaveBeenCalledTimes(1);
+  });
+
+  test("WhenTelegramReadRequestIsUnauthorizedAndSessionRefreshes_RetriesWithNewSession", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(response(401, JSON.stringify({ detail: "Cookie expired" })))
+      .mockResolvedValueOnce(response(200));
+    vi.stubGlobal("fetch", fetchMock);
+    vi.mocked(refreshTelegramSession).mockResolvedValue(true);
+    const onSuccess = vi.fn();
+    const onFailure = vi.fn();
+
+    await APICallWrapper({
+      url: "/api/travelCalendar?from=2026-07-01&to=2026-10-31",
+      options: { method: "GET" },
+      doLock: false,
+      onSuccess,
+      onFailure,
+    });
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+    expect(onFailure).not.toHaveBeenCalled();
   });
 
   test("WhenSuccessCallbackThrows_DoesNotMisclassifyItAsTransportFailure", async () => {

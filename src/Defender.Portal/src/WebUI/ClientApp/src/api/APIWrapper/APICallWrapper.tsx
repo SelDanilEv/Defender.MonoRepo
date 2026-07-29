@@ -3,6 +3,7 @@ import APICallProps, { APICallFailure } from "./interfaces/APICallProps";
 import LoadingStateService from "src/services/LoadingStateService";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 import { beginSessionExpiryHandling, expireSession } from "src/services/SessionExpiryService";
+import { refreshTelegramSession } from "src/telegram/telegramSessionRecovery";
 
 const DEFAULT_TIMEOUT_MS = 30_000;
 
@@ -89,8 +90,12 @@ const APICallWrapper = async ({
     const requestSignal = createRequestSignal(options.signal, timeoutMs);
     cleanupSignal = requestSignal.cleanup;
     const requestOptions = getRequestOptions({ ...options, signal: requestSignal.signal });
-    const response = await fetch(url, requestOptions);
+    let response = await fetch(url, requestOptions);
     responseReceived = true;
+
+    if (response.status === 401 && options.method?.toUpperCase() === "GET" && await refreshTelegramSession()) {
+      response = await fetch(url, requestOptions);
+    }
 
     if (response.ok) {
         await onSuccess(response);
