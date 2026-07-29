@@ -231,12 +231,15 @@ export const NebulaFighterLightTheme = createTheme(NebulaFighterTheme, {
     MuiTooltip: {
       styleOverrides: {
         tooltip: {
-          backgroundColor: alpha(textPrimary, 0.92),
+          backgroundColor: backgroundPaper,
+          color: textPrimary,
+          border: `1px solid ${alpha(textPrimary, 0.12)}`,
+          boxShadow: "0px 6px 18px rgba(87, 103, 160, 0.14)",
           padding: "6px 12px",
           fontSize: 12,
         },
         arrow: {
-          color: alpha(textPrimary, 0.92),
+          color: backgroundPaper,
         },
       },
     },
