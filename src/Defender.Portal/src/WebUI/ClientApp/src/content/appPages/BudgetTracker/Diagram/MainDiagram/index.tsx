@@ -25,6 +25,7 @@ import RequestParamsBuilder from "src/api/APIWrapper/RequestParamsBuilder";
 import { mapToDataset } from "./DiagramBuilding/dataset";
 import { generateSeries } from "./DiagramBuilding/series";
 import { buildDatasetItemId } from "./DiagramBuilding/convention";
+import { getMainDiagramLayout } from "./chartLayout";
 
 import "src/helpers/dateExtensions";
 
@@ -141,7 +142,7 @@ const MainDiagram = (props: MainDiagramProps) => {
     updatedDataset: BudgetHistory,
     groupsAmount: number
   ) => {
-    const coef = u.isMobile ? 50 : u.isLargeScreen ? 10 : 20;
+    const coef = u.isMobile ? 20 : u.isLargeScreen ? 10 : 20;
 
     const addMargin =
       (updatedDataset.allowedCurrencies.length / 3) * groupsAmount * coef;
@@ -149,13 +150,11 @@ const MainDiagram = (props: MainDiagramProps) => {
     setAdditionalMargin(addMargin);
   };
 
-  const recalculateHeight = () => {
-    let height = u.isLargeScreen ? 700 : u.isMobile ? 400 : 450;
-
-    height += additionalMargin;
-
-    return height;
-  };
+  const chartLayout = getMainDiagramLayout({
+    isMobile: u.isMobile,
+    isLargeScreen: u.isLargeScreen,
+    additionalLegendMargin: additionalMargin,
+  });
 
   return (
     <Box
@@ -164,13 +163,8 @@ const MainDiagram = (props: MainDiagramProps) => {
         width: "100%"
       }}>
       <LineChart
-        margin={{
-          top: 10,
-          bottom: 65 + additionalMargin,
-          left: 68,
-          right: 40,
-        }}
-        height={recalculateHeight()}
+        margin={chartLayout.margin}
+        height={chartLayout.height}
         dataset={dataset}
         series={generateSeries(
           dataset,

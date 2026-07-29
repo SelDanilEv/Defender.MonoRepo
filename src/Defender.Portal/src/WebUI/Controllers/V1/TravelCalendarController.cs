@@ -26,8 +26,8 @@ public class TravelCalendarController(
     {
         var userId = currentAccountAccessor.GetAccountId();
         var key = CacheConventionBuilder.BuildDistributedCacheKey(CacheForService.Portal, CacheModel.TravelCalendar, $"{userId}_{from ?? "all"}_{to ?? "all"}");
-        var entry = await distributedCache.Get(key, async () => new TravelCalendarCacheEntry(userId, from, to, await wrapper.GetAsync(from, to, ct)), TimeSpan.FromDays(7));
-        return Ok(entry!.Calendar);
+        var entry = await distributedCache.Get(key, async () => new TravelCalendarCacheEntry(userId, from, to, await GetCalendarWithOrganizerNamesAsync(from, to, ct)), TimeSpan.FromDays(7));
+        return Ok(await AddMissingOrganizerNamesAsync(entry!.Calendar));
     }
     [HttpGet("users"), Auth(Roles.User)] public async Task<IActionResult> SearchUsers([FromQuery] string query, CancellationToken ct)
     {
@@ -69,7 +69,7 @@ public class TravelCalendarController(
     {
         var result = await wrapper.SendAsync(method, path, request, ct);
         await InvalidateCalendarsAsync([currentAccountAccessor.GetAccountId()]);
-        return result;
+        return result with { Calendar = await AddMissingOrganizerNamesAsync(result.Calendar) };
     }
 
     private async Task<TravelCalendarMutationResultDto> SendEventMutationAsync(Guid eventId, HttpMethod method, string path, object request, CancellationToken ct)
@@ -77,7 +77,7 @@ public class TravelCalendarController(
         var before = await wrapper.GetAsync(null, null, ct);
         var result = await wrapper.SendAsync(method, path, request, ct);
         await InvalidateCalendarsAsync(GetEventUsers(before, eventId).Concat(GetEventUsers(result.Calendar, eventId)).Append(currentAccountAccessor.GetAccountId()));
-        return result;
+        return result with { Calendar = await AddMissingOrganizerNamesAsync(result.Calendar) };
     }
 
     private Task InvalidateCalendarsAsync(IEnumerable<Guid> userIds)
@@ -87,5 +87,41 @@ public class TravelCalendarController(
     {
         var travelEvent = calendar.Events.FirstOrDefault(item => item.Id == eventId);
         return travelEvent is null ? [] : travelEvent.Participants.Select(item => item.UserId).Append(travelEvent.OwnerUserId);
+    }
+
+    private async Task<TravelCalendarDto> GetCalendarWithOrganizerNamesAsync(string? from, string? to, CancellationToken ct)
+    {
+        return await AddMissingOrganizerNamesAsync(await wrapper.GetAsync(from, to, ct));
+    }
+
+    private async Task<TravelCalendarDto> AddMissingOrganizerNamesAsync(TravelCalendarDto calendar)
+    {
+        var organizers = await Task.WhenAll(calendar.Events
+            .Where(item => string.IsNullOrWhiteSpace(item.OwnerDisplayName))
+            .Select(item => item.OwnerUserId)
+            .Distinct()
+            .Select(async userId => (userId, name: await GetOrganizerNameAsync(userId))));
+        var names = organizers
+            .Where(item => !string.IsNullOrWhiteSpace(item.name))
+            .ToDictionary(item => item.userId, item => item.name!);
+
+        return calendar with
+        {
+            Events = calendar.Events
+                .Select(item => item with { OwnerDisplayName = names.TryGetValue(item.OwnerUserId, out var name) ? name : item.OwnerDisplayName })
+                .ToArray(),
+        };
+    }
+
+    private async Task<string?> GetOrganizerNameAsync(Guid userId)
+    {
+        try
+        {
+            return (await userManagementWrapper.GetPublicUserInfoAsync(userId)).Nickname;
+        }
+        catch
+        {
+            return null;
+        }
     }
 }

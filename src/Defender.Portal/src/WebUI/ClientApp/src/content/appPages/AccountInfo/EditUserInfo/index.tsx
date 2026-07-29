@@ -24,7 +24,7 @@ const EditUserInfo = (props: any) => {
 
   let sessionUser = props.currentUser;
 
-  const [user, setUser] = useState<UserAccountInfo>({ ...props.currentUser });
+  const [user, setUser] = useState<UserAccountInfo>({ ...props.currentUser, nickname: props.currentUser?.nickname ?? "" });
   const [isSaveActionDisabled, setSaveActionDisabled] = useState<boolean>(true);
 
   useEffect(() => {
@@ -58,9 +58,9 @@ const EditUserInfo = (props: any) => {
   };
 
   const UpdateRequest = (event) => {
-    user[event.target.id] = event.target.value;
-    setUser(user);
-    DisableButtonIfDataNotChanged();
+    const updated = { ...user, [event.target.id]: event.target.value };
+    setUser(updated);
+    setSaveActionDisabled(sessionUser?.nickname == updated.nickname);
   };
 
   const DisableButtonIfDataNotChanged = () => {

@@ -17,6 +17,7 @@ import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined
 import RestaurantOutlinedIcon from "@mui/icons-material/RestaurantOutlined";
 import SavingsOutlinedIcon from "@mui/icons-material/SavingsOutlined";
 import { Link as RouterLink, useLocation } from "react-router";
+import HeaderPreferences from "src/components/HeaderPreferences";
 
 type TelegramShellProps = PropsWithChildren<{
   title?: string;
@@ -203,7 +204,23 @@ const TelegramShell = ({
         </Typography>
       </Box>
     )}
-    <Box component="main" sx={{ px: 1.5, py: 2 }}>
+    {showNavigation && (
+      <Box
+        aria-label="Telegram preferences"
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          px: 1.5,
+          pt: 0.75,
+          "& .MuiOutlinedInput-root": {
+            bgcolor: (theme) => `var(--tg-theme-secondary-bg-color, ${theme.palette.background.paper})`,
+          },
+        }}
+      >
+        <HeaderPreferences />
+      </Box>
+    )}
+    <Box component="main" sx={{ px: 1.5, py: showNavigation ? 1 : 2 }}>
       {children}
     </Box>
     {showNavigation && <TelegramNavigation />}

@@ -34,6 +34,13 @@
     "addItem": "Add item",
     "removeItem": "Remove item"
   },
+  "invitations": {
+    "title": "Invitations",
+    "subtitle": "Events shared with you",
+    "filterLabel": "Invitation status",
+    "open": "Open invitation: {{title}}",
+    "empty": "No {{status}} invitations"
+  },
   "legend": {
     "title": "Event types",
     "OvernightTrip": { "title": "Overnight trip", "note": "weekend and hotel" },
@@ -56,7 +63,8 @@
   },
   "monthGrid": {
     "addEvent": "Add event",
-    "today": "Today"
+    "today": "Today",
+    "invitationStatus": "{{status}} invitation"
   },
   "navigation": {
     "previous": "Show previous month",

@@ -33,6 +33,13 @@
     "addItem": "Добавить вещь",
     "removeItem": "Удалить вещь"
   },
+  "invitations": {
+    "title": "Приглашения",
+    "subtitle": "События, которыми с вами поделились",
+    "filterLabel": "Статус приглашения",
+    "open": "Открыть приглашение: {{title}}",
+    "empty": "Нет приглашений со статусом {{status}}"
+  },
   "legend": {
     "title": "Типы событий",
     "OvernightTrip": { "title": "Поездка с ночёвкой", "note": "выходные и отель" },
@@ -55,7 +62,8 @@
   },
   "monthGrid": {
     "addEvent": "Добавить событие",
-    "today": "Сегодня"
+    "today": "Сегодня",
+    "invitationStatus": "Приглашение: {{status}}"
   },
   "subtitleGeneric": "Планируйте поездки из {{city}}",
   "navigation": {

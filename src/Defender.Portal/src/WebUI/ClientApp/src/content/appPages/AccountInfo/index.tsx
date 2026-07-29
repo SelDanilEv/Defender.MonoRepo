@@ -16,25 +16,25 @@ import EditUserInfo from "./EditUserInfo";
 import useUtils from "src/appUtils";
 import EditSensitiveUserInfo from "./EditSensitiveUserInfo";
 
-const UpdateUserPage = (props: any) => {
+export const AccountInfoPage = ({ currentUser }: { currentUser?: { nickname?: string | null } }) => {
   const u = useUtils();
 
   const GetUserNicknameForHeader = () => {
-    const user = props.currentUser;
+    const nickname = currentUser?.nickname?.trim();
 
-    if (!user) return;
+    if (!nickname) return "Profile";
 
     const maxLength = 12;
     const smallWindowWidth = 600;
 
     if (
-      user.nickname.length < maxLength ||
+      nickname.length < maxLength ||
       window.innerWidth > smallWindowWidth
     ) {
-      return user.nickname;
+      return nickname;
     }
 
-    return user.nickname.substring(0, maxLength) + "...";
+    return nickname.substring(0, maxLength) + "...";
   };
 
   return (
@@ -109,4 +109,4 @@ const mapStateToProps = (state: any) => {
   };
 };
 
-export default connect(mapStateToProps)(UpdateUserPage);
+export default connect(mapStateToProps)(AccountInfoPage);

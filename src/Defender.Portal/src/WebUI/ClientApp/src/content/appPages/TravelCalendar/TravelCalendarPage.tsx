@@ -32,6 +32,7 @@ import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArro
 
 import { MonthGrid } from "./components/MonthGrid";
 import { EventDrawer } from "./components/EventDrawer";
+import { InvitationPanel } from "./components/InvitationPanel";
 import { useTravelCalendar } from "./hooks/useTravelCalendar";
 import { addCalendarMonths, calendarMonths, currentCalendarMonth, visibleCalendarMonthCount } from "./monthNavigation";
 
@@ -590,6 +591,10 @@ export default function TravelCalendarPage() {
                   <AddIcon />
                 </IconButton>
               </Stack>
+            </Panel>
+
+            <Panel>
+              <InvitationPanel events={calendar.events} onOpen={state.openEvent} />
             </Panel>
           </Stack>
 

@@ -49,7 +49,12 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
           const today = isToday(date);
           const day = Number(date.slice(-2));
           const weekend = index % 7 > 4;
-          const label = `${date}${today ? `, ${t("travelCalendar:monthGrid.today")}` : ""}${event ? `, ${event.title}, ${event.type}` : ""}${holiday ? `, ${holiday.flag}` : ""}`;
+          const invitationStatus = !event?.canEdit && (event?.myParticipationStatus === "Pending" || event?.myParticipationStatus === "Declined")
+            ? event.myParticipationStatus
+            : null;
+          const invitationLabel = invitationStatus ? t("travelCalendar:monthGrid.invitationStatus", { status: t(`travelCalendar:statuses.${invitationStatus}`) }) : "";
+          const invitationColor = invitationStatus === "Pending" ? theme.colors.warning.main : theme.palette.text.secondary;
+          const label = `${date}${today ? `, ${t("travelCalendar:monthGrid.today")}` : ""}${event ? `, ${event.title}, ${event.type}` : ""}${invitationLabel ? `, ${invitationLabel}` : ""}${holiday ? `, ${holiday.flag}` : ""}`;
 
           return (
             <Tooltip key={date} title={event?.title ?? (holiday ? holiday.flag : t("travelCalendar:monthGrid.addEvent"))}>
@@ -61,9 +66,10 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
                 sx={{
                   minWidth: 0,
                   minHeight: 52,
-                  border: today ? `2px solid ${theme.colors.primary.main}` : event ? `1px solid ${alpha(colors[event.type], 0.5)}` : "1px solid transparent",
+                  border: today ? `2px solid ${theme.colors.primary.main}` : invitationStatus ? `2px dashed ${alpha(invitationColor, 0.85)}` : event ? `1px solid ${alpha(colors[event.type], 0.5)}` : "1px solid transparent",
                   borderRadius: "10px",
-                  background: event ? alpha(colors[event.type], 0.12) : weekend ? "var(--tc-weekend)" : "transparent",
+                  background: invitationStatus === "Declined" ? alpha(invitationColor, 0.08) : event ? alpha(colors[event.type], invitationStatus ? 0.2 : 0.12) : weekend ? "var(--tc-weekend)" : "transparent",
+                  opacity: invitationStatus === "Declined" ? 0.72 : 1,
                   color: "inherit",
                   cursor: "pointer",
                   position: "relative",
@@ -87,7 +93,8 @@ export const MonthGrid = ({ year, month, events, holidays, onDate, onEvent }: { 
                     ml: .4
                   }}>{holiday.flag}</Typography>}
                 {event && <>
-                  <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: colors[event.type], position: "absolute", top: 7, right: 7 }} />
+                  <Box sx={{ width: 6, height: 6, borderRadius: "50%", bgcolor: invitationStatus ? invitationColor : colors[event.type], position: "absolute", top: 7, right: 7 }} />
+                  {invitationStatus && <Typography component="span" sx={{ display: "block", color: invitationColor, fontSize: 8, fontWeight: 900, lineHeight: 1.1 }}>{invitationStatus === "Pending" ? "!" : "−"}</Typography>}
                   <Typography sx={{ display: { xs: "none", sm: "-webkit-box" }, WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden", fontSize: 9.5, lineHeight: 1.15, mt: .25 }}>{event.title}</Typography>
                 </>}
               </Box>
