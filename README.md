@@ -378,7 +378,8 @@ docker ps --filter "name=Local" --format "table {{.Names}}\t{{.Status}}\t{{.Port
 - ArgoCD app definitions: `helm/argocd-applications/`
 - Portal uses a no-surge rolling strategy (`maxSurge: 0`, `maxUnavailable: 1`)
   because the single-node home-server cluster has no spare CPU for a second
-  Portal Pod during an update.
+  Portal Pod during an update, and requests `20m` CPU while keeping its
+  `250m` CPU limit.
 
 #### ArgoCD Integration
 

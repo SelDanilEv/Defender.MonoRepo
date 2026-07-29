@@ -7,6 +7,9 @@ deploymentStrategy:
   rollingUpdate:
     maxSurge: 0
     maxUnavailable: 1
+resources:
+  requests:
+    cpu: "20m"
 extraSecretEnv:
   Telegram__BotToken: Telegram__BotToken
   Telegram__WebhookSecret: Telegram__WebhookSecret
