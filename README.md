@@ -380,6 +380,8 @@ docker ps --filter "name=Local" --format "table {{.Names}}\t{{.Status}}\t{{.Port
   because the single-node home-server cluster has no spare CPU for a second
   Portal Pod during an update, and requests `20m` CPU while keeping its
   `250m` CPU limit.
+- Travel Calendar uses the same no-surge strategy and `20m` CPU request so
+  its image updates remain schedulable on that node.
 
 #### ArgoCD Integration
 

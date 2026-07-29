@@ -3,6 +3,16 @@ image:
   tag: 20260718-226
   digest: sha256:921f56f41835a293b1f4289132d1b7db3aa2de01dc9dc7f5b615763222c21112
   pullPolicy: Always
+deploymentStrategy:
+  # The single-node cluster cannot schedule the old and replacement pods together.
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 1
+resources:
+  # Keep the request schedulable while retaining the shared service limit.
+  requests:
+    cpu: "20m"
 ingress:
   enabled: true
   ingressClassName: traefik
