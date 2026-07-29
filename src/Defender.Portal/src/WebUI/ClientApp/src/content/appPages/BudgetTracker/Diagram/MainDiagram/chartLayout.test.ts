@@ -1,7 +1,7 @@
 import { getMainDiagramLayout } from "./chartLayout";
 
 describe("getMainDiagramLayout", () => {
-  test("WhenMobile_UsesCompactAxisAndLegendMargins", () => {
+  test("WhenMobile_UsesOnlyAxisSpaceInsideTheChartCanvas", () => {
     expect(
       getMainDiagramLayout({
         isMobile: true,
@@ -10,7 +10,7 @@ describe("getMainDiagramLayout", () => {
       })
     ).toEqual({
       height: 413,
-      margin: { top: 10, bottom: 55, left: 44, right: 12 },
+      margin: { top: 0, bottom: 0, left: 0, right: 0 },
     });
   });
 
