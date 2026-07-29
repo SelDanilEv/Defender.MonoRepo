@@ -21,7 +21,7 @@ import ImageOutlinedIcon from "@mui/icons-material/ImageOutlined";
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
 import type { DragEvent } from "react";
 import { connect } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import useUtils from "src/appUtils";
 import { foodAdvisorApi, MenuSessionDto } from "src/api/foodAdvisor";

@@ -14,7 +14,7 @@ import AddIcon from "@mui/icons-material/Add";
 import { useEffect, useRef, useState } from "react";
 import type { Dispatch, KeyboardEvent, SetStateAction } from "react";
 import { connect } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 import useUtils from "src/appUtils";
 import { foodAdvisorApi, PreferencesDto } from "src/api/foodAdvisor";

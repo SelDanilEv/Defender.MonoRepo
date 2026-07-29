@@ -6,8 +6,10 @@ using Defender.Common.Exceptions;
 using Defender.Common.Extension;
 using Defender.Common.Helpers;
 using Defender.Portal.Application.Configuration.Extension;
+using Defender.Portal.Application.Modules.Telegram;
 using Defender.Portal.WebUI.ErrorMapping;
 using Defender.Portal.WebUI.OAuth;
+using Defender.Portal.WebUI.Telegram;
 using FluentValidation.AspNetCore;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,6 +32,7 @@ public static class ConfigureServices
         services.AddCommonServices(configuration);
 
         services.AddApplicationOptions(configuration);
+        services.Configure<TelegramOptions>(configuration.GetSection(TelegramOptions.SectionName));
 
         services.AddHttpContextAccessor();
 
@@ -93,6 +96,7 @@ public static class ConfigureServices
                         if (string.IsNullOrWhiteSpace(context.Token))
                         {
                             context.Token = AuthCookieHelper.GetAuthToken(context.Request);
+                            context.Token ??= TelegramSessionCookieHelper.GetToken(context.Request);
                         }
 
                         return Task.CompletedTask;

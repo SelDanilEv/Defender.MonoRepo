@@ -140,6 +140,7 @@ const HistoricalTransactionsTable = (
               arrow
             >
               <IconButton
+                aria-label={u.t("banking_page__trans_info_table_action_info")}
                 sx={{
                   "&:hover": { background: theme.colors.info.lighter },
                   color: theme.palette.info.dark,
@@ -164,7 +165,12 @@ const HistoricalTransactionsTable = (
     <Card>
       <CardHeader
         action={
-          <LockedButton sx={{ mr: "1em" }} variant="outlined" onClick={refresh}>
+          <LockedButton
+            aria-label={u.t("banking_page__wallet_button_refresh")}
+            sx={{ mr: "1em" }}
+            variant="outlined"
+            onClick={refresh}
+          >
             <CachedIcon />
           </LockedButton>
         }
@@ -244,6 +250,13 @@ const HistoricalTransactionsTable = (
           rowsPerPage={limit}
           rowsPerPageOptions={[5, 10, 25, 30]}
           labelRowsPerPage=""
+          slotProps={{
+            select: {
+              inputProps: {
+                "aria-label": u.t("table_rows_per_page_label"),
+              },
+            },
+          }}
         />
       </Box>
       <CustomDialog

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { FC } from "react";
 import PropTypes from "prop-types";
-import { Outlet, useLocation } from "react-router-dom";
+import { Outlet, useLocation } from "react-router";
 import { connect } from "react-redux";
 import { Box, Card, Container, Typography } from "@mui/material";
 import { Helmet } from "react-helmet-async";

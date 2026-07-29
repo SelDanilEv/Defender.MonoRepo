@@ -1,7 +1,10 @@
 image:
   repository: defendersd/defender.portal
-  tag: 20260719-249_1.4.0
+  tag: 20260728-264_1.4.0
   pullPolicy: Always
+extraSecretEnv:
+  Telegram__BotToken: Telegram__BotToken
+  Telegram__WebhookSecret: Telegram__WebhookSecret
 ingress:
   enabled: true
   ingressClassName: traefik

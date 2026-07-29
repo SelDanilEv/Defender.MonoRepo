@@ -85,3 +85,7 @@ configMapData:
   JwtTokenAudience: "defender-api"
 
 secretName: basic-secret
+
+# Additional environment variables sourced from secretName. Services opt in
+# through their own values file so shared secrets are never exposed by default.
+extraSecretEnv: {}

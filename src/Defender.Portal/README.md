@@ -34,6 +34,18 @@ password: demo2024
 
 # Defender Ecosystem
 
+## Telegram Mini App
+
+- Main Mini App URL: `https://portal.coded-by-danil.dev/telegram`.
+- Configure `Telegram__BotToken` and `Telegram__WebhookSecret` only in the
+  runtime secret store. For Kubernetes Portal deployments, both keys belong in
+  `basic-secret`; never commit them to appsettings or Helm values.
+- Register the webhook after deployment at
+  `https://portal.coded-by-danil.dev/api/integrations/telegram/webhook`, using
+  the same `Telegram__WebhookSecret` as Telegram's `secret_token`.
+- The Mini App uses a short-lived Telegram session for read-only Portal access.
+  Mutating or sensitive operations require a normal Portal step-up.
+
 The Defender ecosystem is a collection of services and utilities designed to work together to provide a comprehensive solution for various needs. The idea is to make it easy to implement new services and features. Below is an overview of each component in the ecosystem.
 
 # Overview

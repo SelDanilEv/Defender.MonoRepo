@@ -1,5 +1,5 @@
 import { Suspense, lazy } from "react";
-import { Navigate, type RouteObject } from "react-router-dom";
+import { Navigate, type RouteObject } from "react-router";
 
 import SidebarLayout from "src/layouts/SidebarLayout";
 import EmptyLayout from "src/layouts/EmptyLayout";
@@ -32,6 +32,12 @@ const Verification = Loader(
 );
 const VerifyEmail = Loader(
   lazy(() => import("src/content/welcomePages/Verification/VerifyEmail"))
+);
+const TelegramBootstrap = Loader(
+  lazy(() => import("src/telegram/TelegramBootstrap"))
+);
+const TelegramLink = Loader(
+  lazy(() => import("src/telegram/TelegramLink"))
 );
 
 // Configuration
@@ -173,6 +179,14 @@ const routes: RouteObject[] = [
         element: <Status404 />,
       },
     ],
+  },
+  {
+    path: "telegram",
+    element: <TelegramBootstrap />,
+  },
+  {
+    path: "telegram/link",
+    element: <TelegramLink />,
   },
   {
     path: "health-care/share",

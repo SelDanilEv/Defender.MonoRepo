@@ -1,6 +1,6 @@
 import { FC } from "react";
 import PropTypes from "prop-types";
-import { Outlet } from "react-router-dom";
+import { Outlet } from "react-router";
 import { connect } from "react-redux";
 import { Box, Container } from "@mui/material";
 import { Helmet } from "react-helmet-async";

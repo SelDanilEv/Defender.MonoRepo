@@ -1,5 +1,5 @@
 import { Box, Link, Stack, Typography } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 import React from "react";
 
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";

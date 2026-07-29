@@ -1,6 +1,6 @@
 import { act } from "react";
 import { createRoot, Root } from "react-dom/client";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 
 vi.mock("react-redux", () => ({
   connect: () => (component: unknown) => component,

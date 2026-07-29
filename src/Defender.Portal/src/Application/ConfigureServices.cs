@@ -8,6 +8,7 @@ using Defender.Portal.Application.Common.Interfaces.Services.Accounts;
 using Defender.Portal.Application.Common.Interfaces.Services.Admin;
 using Defender.Portal.Application.Common.Interfaces.Services.Banking;
 using Defender.Portal.Application.Common.Interfaces.Services.RiskGames.Lottery;
+using Defender.Portal.Application.Modules.Telegram;
 using Defender.Portal.Application.Services.Accounts;
 using Defender.Portal.Application.Services.Admin;
 using Defender.Portal.Application.Services.Banking;
@@ -63,6 +64,23 @@ public static class ConfigureServices
         services.AddTransient<IAdminWalletManagementService, AdminWalletManagementService>();
         services.AddTransient<IAdminTransactionManagementService, AdminTransactionManagementService>();
         services.AddTransient<IAdminAccountManagementService, AdminAccountManagementService>();
+        services.AddSingleton<ITelegramInitDataValidator>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var options = configuration.GetSection(TelegramOptions.SectionName).Get<TelegramOptions>() ?? new TelegramOptions();
+            return new TelegramInitDataValidator(options);
+        });
+        services.AddSingleton(TimeProvider.System);
+        services.AddSingleton<ITelegramSessionTokenIssuer, TelegramSessionTokenIssuer>();
+        services.AddTransient<ITelegramSessionService, TelegramSessionService>();
+        services.AddTransient<ITelegramLinkHandoffService, TelegramLinkHandoffService>();
+        services.AddTransient<ITelegramWebhookService, TelegramWebhookService>();
+        services.AddSingleton<ITelegramWebhookSecretValidator>(serviceProvider =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var options = configuration.GetSection(TelegramOptions.SectionName).Get<TelegramOptions>() ?? new TelegramOptions();
+            return new TelegramWebhookSecretValidator(options);
+        });
 
         return services;
     }

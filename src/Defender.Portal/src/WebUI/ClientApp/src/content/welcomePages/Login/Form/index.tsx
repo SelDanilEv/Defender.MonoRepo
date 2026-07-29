@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import VisibilityTwoToneIcon from "@mui/icons-material/VisibilityTwoTone";
 import VisibilityOffTwoToneIcon from "@mui/icons-material/VisibilityOffTwoTone";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink } from "react-router";
 import { connect } from "react-redux";
 import { useState } from "react";
 

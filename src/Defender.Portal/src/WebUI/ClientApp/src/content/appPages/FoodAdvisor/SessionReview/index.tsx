@@ -14,7 +14,7 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 
 import useUtils from "src/appUtils";
 import { foodAdvisorApi, MenuSessionDto } from "src/api/foodAdvisor";

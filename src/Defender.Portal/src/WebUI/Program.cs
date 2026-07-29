@@ -2,6 +2,7 @@ using Defender.Common.Extension;
 using Defender.Portal.Application;
 using Defender.Portal.Infrastructure;
 using Defender.Portal.WebUI;
+using Defender.Portal.WebUI.Telegram;
 using Hellang.Middleware.ProblemDetails;
 using Microsoft.AspNetCore.HttpOverrides;
 using Prometheus;
@@ -60,6 +61,16 @@ app.UseCors(CorsExtensions.DefenderCorsPolicy);
 app.UseRateLimiter();
 
 app.UseAuthentication();
+app.Use(async (context, next) =>
+{
+    if (TelegramRequestGuard.BlocksMutation(context))
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return;
+    }
+
+    await next();
+});
 app.UseAuthorization();
 
 app.UseProblemDetails();
