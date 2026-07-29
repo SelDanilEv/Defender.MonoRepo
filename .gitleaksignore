@@ -1,5 +1,6 @@
 # Historical findings baseline. Each entry is an exact Gitleaks fingerprint;
 # new findings remain blocking in the full-history CI scan.
+3814792fcd88d0f1ea28bf1977a5fe52c77362f3:graphify-out/graph.json:generic-api-key:621412
 6b3eef3f90ca76b4c50cfc3fc5935af08240eb79:src/Defender.Portal/src/Tests/Services/TelegramSessionTokenIssuerTests.cs:generic-api-key:14
 479aef1eababd630e3727fb9cd5a21b6a4dab92c:src/Defender.IdentityService/src/Tests/Services/TokenManagementServiceTests.cs:generic-api-key:20
 9221069c312dd3ff7257727c9282e3c1ca85214b:src/Defender.Common/src/Tests/AccessorsAndBehaviorsTests.cs:generic-api-key:56
