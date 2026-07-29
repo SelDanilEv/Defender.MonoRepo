@@ -21,7 +21,7 @@ public static class TelegramSessionCookieHelper
     {
         HttpOnly = true,
         Secure = true,
-        SameSite = SameSiteMode.Strict,
+        SameSite = SameSiteMode.None,
         Path = "/",
         IsEssential = true,
     };

@@ -22,6 +22,24 @@ public class TelegramRequestGuardTests
         Assert.False(TelegramRequestGuard.BlocksMutation(context));
     }
 
+    [Fact]
+    public void BlocksMutation_WhenTelegramSessionPostsToTelegramApiFromForeignOrigin_ReturnsTrue()
+    {
+        var context = CreateTelegramContext("DELETE", "/api/telegram/link");
+        context.Request.Headers.Origin = "https://attacker.example";
+
+        Assert.True(TelegramRequestGuard.BlocksMutation(context));
+    }
+
+    [Fact]
+    public void BlocksMutation_WhenTelegramSessionPostsToTelegramApiFromPortalOrigin_ReturnsFalse()
+    {
+        var context = CreateTelegramContext("DELETE", "/api/telegram/link");
+        context.Request.Headers.Origin = "https://portal.coded-by-danil.dev";
+
+        Assert.False(TelegramRequestGuard.BlocksMutation(context));
+    }
+
     private static HttpContext CreateTelegramContext(string method, string path)
     {
         var context = new DefaultHttpContext();
