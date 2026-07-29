@@ -95,8 +95,9 @@ public static class ConfigureServices
                     {
                         if (string.IsNullOrWhiteSpace(context.Token))
                         {
-                            context.Token = AuthCookieHelper.GetAuthToken(context.Request);
-                            context.Token ??= TelegramSessionCookieHelper.GetToken(context.Request);
+                            context.Token = PortalAuthenticationTokenResolver.ResolveAndForward(
+                                context.Request
+                            );
                         }
 
                         return Task.CompletedTask;
