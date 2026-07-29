@@ -51,6 +51,7 @@ public class FoodAdvisorEventListenerService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error handling MenuParsingRequested for session {SessionId}", evt.SessionId);
+            throw;
         }
     }
 
@@ -71,6 +72,7 @@ public class FoodAdvisorEventListenerService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Error handling RecommendationsRequested for session {SessionId}, attempt {Attempt}", evt.SessionId, evt.Attempt);
+            throw;
         }
     }
 }

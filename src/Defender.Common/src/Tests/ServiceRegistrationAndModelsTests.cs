@@ -75,7 +75,24 @@ public class ServiceRegistrationAndModelsTests
     }
 
     [Fact]
-    public void DefenderHealthChecks_WhenMapped_ExposeOnlyStandardHealthPath()
+    public void DefenderHealthChecks_WhenRegistered_DoesNotAddMongoDbReadiness()
+    {
+        var services = new ServiceCollection();
+        services.AddLogging();
+
+        services.AddDefenderHealthChecks();
+
+        using var provider = services.BuildServiceProvider();
+        var registrations = provider
+            .GetRequiredService<IOptions<HealthCheckServiceOptions>>()
+            .Value
+            .Registrations;
+
+        Assert.DoesNotContain(registrations, registration => registration.Name == "mongodb");
+    }
+
+    [Fact]
+    public void DefenderHealthChecks_WhenMapped_ExposeSeparateLivenessAndReadinessPaths()
     {
         var builder = WebApplication.CreateSlimBuilder();
         builder.Services.AddDefenderHealthChecks();
@@ -83,8 +100,14 @@ public class ServiceRegistrationAndModelsTests
 
         app.MapDefenderHealthChecks();
 
-        var routeEndpoint = Assert.Single(((IEndpointRouteBuilder)app).DataSources.Single().Endpoints);
-        Assert.Equal("/health", ((RouteEndpoint)routeEndpoint).RoutePattern.RawText);
+        var paths = ((IEndpointRouteBuilder)app).DataSources
+            .SelectMany(dataSource => dataSource.Endpoints)
+            .Cast<RouteEndpoint>()
+            .Select(endpoint => endpoint.RoutePattern.RawText)
+            .Order()
+            .ToArray();
+
+        Assert.Equal(["/health", "/health/ready"], paths);
     }
 
     [Fact]
@@ -113,6 +136,14 @@ public class ServiceRegistrationAndModelsTests
         Assert.Contains(services, x => x.ServiceType == typeof(IMongoSecretAccessor));
         Assert.Contains(services, x => x.ServiceType == typeof(IAccountAccessor));
         Assert.Contains(services, x => x.ServiceType == typeof(IAuthorizationCheckingService));
+
+        using var provider = services.BuildServiceProvider();
+        var registrations = provider
+            .GetRequiredService<IOptions<HealthCheckServiceOptions>>()
+            .Value
+            .Registrations;
+        Assert.Contains(registrations, registration =>
+            registration.Name == "mongodb" && registration.Tags.Contains("ready"));
     }
 
     [Fact]

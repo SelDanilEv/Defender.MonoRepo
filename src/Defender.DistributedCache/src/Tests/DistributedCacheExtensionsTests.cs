@@ -3,6 +3,7 @@ using Defender.DistributedCache.Postgres;
 using Defender.DistributedCache.Postgres.Extensions;
 using Defender.DistributedCache.Postgres.TTL;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 
 namespace Defender.DistributedCache.Tests;
@@ -55,5 +56,23 @@ public class DistributedCacheExtensionsTests
         Assert.Equal(expectedConnectionString, configuredOptions.ConnectionString);
         Assert.Equal(expectedTableName, configuredOptions.CacheTableName);
         Assert.Equal(expectedTtl, configuredOptions.TtlForCacheEntriesSeconds);
+    }
+
+    [Fact]
+    public void AddPostgresDistributedCache_WhenCalled_TagsPostgresDependencyAsReady()
+    {
+        var services = new ServiceCollection();
+
+        services.AddPostgresDistributedCache(options =>
+            options.ConnectionString = "Host=127.0.0.1;Port=5432;Database=cache_database;Username=postgres;Password=postgres");
+
+        using var provider = services.BuildServiceProvider();
+        var registrations = provider
+            .GetRequiredService<IOptions<HealthCheckServiceOptions>>()
+            .Value
+            .Registrations;
+
+        Assert.Contains(registrations, registration =>
+            registration.Name == "postgres" && registration.Tags.Contains("ready"));
     }
 }

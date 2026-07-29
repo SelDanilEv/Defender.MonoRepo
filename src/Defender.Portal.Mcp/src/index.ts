@@ -2,6 +2,7 @@ import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { loadConfig } from "./config.js";
+import { createPortalReadinessProbe, mapHealthRoutes } from "./health.js";
 import { PortalBffClient } from "./services/portal-bff-client.js";
 import { createPortalMcpServer } from "./server.js";
 
@@ -11,8 +12,7 @@ const jwks = createRemoteJWKSet(new URL("/.well-known/jwks", config.portalIssuer
 const publicHost = new URL(config.publicUrl).host.toLowerCase();
 const publicHostname = new URL(config.publicUrl).hostname.toLowerCase();
 const app = createMcpExpressApp({ host: "0.0.0.0", allowedHosts: [publicHostname] });
-
-app.get("/health", (_request, response) => response.status(200).json({ status: "ok" }));
+mapHealthRoutes(app, createPortalReadinessProbe(config));
 app.get("/.well-known/oauth-protected-resource/mcp", (_request, response) => response.json({
   resource: `${config.publicUrl}/mcp`, authorization_servers: [config.portalIssuer],
   scopes_supported: ["mcp:portal:read", "mcp:calendar:write", "mcp:calendar:delete"],

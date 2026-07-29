@@ -41,7 +41,6 @@ env:
 
 jobs:
   security-gate:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -127,6 +126,7 @@ jobs:
     outputs:
       src-changed: ${{ steps.filter.outputs.src-changed }}
       portal-changed: ${{ steps.portal-filter.outputs.portal-changed }}
+      portal-mcp-changed: ${{ steps.portal-mcp-filter.outputs.portal-mcp-changed }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -221,9 +221,41 @@ jobs:
             echo "portal-changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+      - name: Check for Portal MCP build inputs
+        id: portal-mcp-filter
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            case "${{ github.event.inputs.service }}" in
+              ""|"ALL"|"Defender.Portal.Mcp") echo "portal-mcp-changed=true" >> "$GITHUB_OUTPUT" ;;
+              *) echo "portal-mcp-changed=false" >> "$GITHUB_OUTPUT" ;;
+            esac
+            exit 0
+          fi
+
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "portal-mcp-changed=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+          fi
+          HEAD_SHA="${{ github.sha }}"
+
+          if [ -z "$BASE_SHA" ] || [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "portal-mcp-changed=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep -Eq '^(src/Defender\.Portal\.Mcp/|src/Directory\.Build\.[^/]+$|src/Directory\.Packages\.props$)'; then
+            echo "portal-mcp-changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "portal-mcp-changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
   test-shared-libraries:
     needs: check-changes
-    if: needs.check-changes.outputs.src-changed == 'true'
+    if: github.event_name == 'pull_request' || needs.check-changes.outputs.src-changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -250,7 +282,7 @@ jobs:
 
   test-services:
     needs: check-changes
-    if: needs.check-changes.outputs.src-changed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.service == '' || github.event.inputs.service == 'ALL')
+    if: (github.event_name == 'pull_request' || needs.check-changes.outputs.src-changed == 'true') && (github.event_name != 'workflow_dispatch' || github.event.inputs.service == '' || github.event.inputs.service == 'ALL')
     runs-on: ubuntu-latest
 
     strategy:
@@ -414,8 +446,53 @@ jobs:
         if: needs.check-changes.outputs.portal-changed == 'true'
         run: npm run test:e2e
 
+  portal-mcp-quality:
+    needs: check-changes
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: src/Defender.Portal.Mcp
+
+    steps:
+      - name: Skip unchanged Portal MCP
+        if: needs.check-changes.outputs.portal-mcp-changed != 'true'
+        working-directory: .
+        run: echo "Portal MCP build inputs unchanged; quality gate not required."
+
+      - name: Checkout code
+        if: needs.check-changes.outputs.portal-mcp-changed == 'true'
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Set up Node.js
+        if: needs.check-changes.outputs.portal-mcp-changed == 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: src/Defender.Portal.Mcp/package-lock.json
+
+      - name: Install locked dependencies
+        if: needs.check-changes.outputs.portal-mcp-changed == 'true'
+        run: npm ci
+
+      - name: Audit dependencies
+        if: needs.check-changes.outputs.portal-mcp-changed == 'true'
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Type-check
+        if: needs.check-changes.outputs.portal-mcp-changed == 'true'
+        run: npm run typecheck
+
+      - name: Run tests
+        if: needs.check-changes.outputs.portal-mcp-changed == 'true'
+        run: npm test
+
+      - name: Build production bundle
+        if: needs.check-changes.outputs.portal-mcp-changed == 'true'
+        run: npm run build
+
   build-and-publish:
-    needs: [check-changes, portal-frontend-quality]
+    needs: [security-gate, check-changes, test-shared-libraries, test-services, portal-frontend-quality, portal-mcp-quality]
     if: (github.event_name == 'pull_request' || needs.check-changes.outputs.src-changed == 'true') && (github.event_name != 'workflow_dispatch' || github.event.inputs.service == '' || github.event.inputs.service == 'ALL')
     runs-on: ubuntu-latest
 
@@ -617,7 +694,7 @@ jobs:
 
   # Additional job for building specific service when workflow_dispatch is used
   build-specific-service:
-    needs: [check-changes, portal-frontend-quality]
+    needs: [security-gate, check-changes, test-specific-service, portal-frontend-quality, portal-mcp-quality]
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.service != '' && github.event.inputs.service != 'ALL' && needs.check-changes.outputs.src-changed == 'true'
     runs-on: ubuntu-latest
 

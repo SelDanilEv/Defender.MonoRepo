@@ -79,4 +79,4 @@ npm run build
 node dist/index.js
 ```
 
-The service provides `/health`, `/mcp`, and `/.well-known/oauth-protected-resource/mcp`.
+The service provides `/health`, `/health/ready`, `/mcp`, and `/.well-known/oauth-protected-resource/mcp`.

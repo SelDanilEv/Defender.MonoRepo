@@ -26,6 +26,7 @@ public static class CommonServiceExtensions
     {
         services.AddCommonAccessors();
         services.AddCommonOptions(configuration);
+        services.AddMongoDbReadiness();
         services.AddSecretAccessor();
         services.AddAccountInfoAccessor();
         services.AddCommonServices();

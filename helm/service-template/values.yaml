@@ -48,6 +48,7 @@ containerSecurityContext:
 
 probes:
   path: /health
+  readinessPath: /health/ready
   startup:
     enabled: true
     failureThreshold: 30

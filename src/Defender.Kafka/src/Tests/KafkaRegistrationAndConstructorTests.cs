@@ -6,6 +6,7 @@ using Defender.Kafka.Extension;
 using Defender.Kafka.Serialization;
 using Defender.Kafka.Service;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -26,6 +27,23 @@ public class KafkaRegistrationAndConstructorTests
         Assert.Contains(services, x => x.ServiceType == typeof(IDefaultKafkaConsumer<>));
         Assert.Contains(services, x => x.ServiceType == typeof(ISerializer<>));
         Assert.Contains(services, x => x.ServiceType == typeof(IDeserializer<>));
+    }
+
+    [Fact]
+    public void AddKafka_WhenCalled_TagsKafkaDependencyAsReady()
+    {
+        var services = new ServiceCollection();
+
+        services.AddKafka(options => options.BootstrapServers = "localhost:9092");
+
+        using var provider = services.BuildServiceProvider();
+        var registrations = provider
+            .GetRequiredService<IOptions<HealthCheckServiceOptions>>()
+            .Value
+            .Registrations;
+
+        Assert.Contains(registrations, registration =>
+            registration.Name == "kafka" && registration.Tags.Contains("ready"));
     }
 
     [Fact]
