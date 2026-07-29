@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.portal
-  tag: 20260728-264_1.4.0
+  tag: 20260729-265_1.4.0
   pullPolicy: Always
 extraSecretEnv:
   Telegram__BotToken: Telegram__BotToken
