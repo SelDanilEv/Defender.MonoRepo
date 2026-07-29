@@ -24,6 +24,7 @@
 
 ## Token-Efficient Agent Workflow
 - For Portal work, use `scripts/verify-portal.ps1` instead of streaming raw npm command output. Successful runs should be reported from its compact summary; expand only the failing step's bounded log tail.
+- **Graphify knowledge graph:** After a large architectural, cross-service, infrastructure, or documentation change, refresh the root graph with `/graphify . --no-viz` (PowerShell: `graphify . --no-viz`). If a graph already exists, use the incremental `/graphify . --update --no-viz` flow. Review Graphify's health diagnostic, then stage only `graphify-out/graph.json` and `graphify-out/GRAPH_REPORT.md`; do not generate or commit HTML, caches, or hooks.
 - Do not push `main` when it triggers image publication, dispatch build/publish workflows, promote images, mutate GitHub/ArgoCD, inspect production runtime state, or run public production smoke tests by default. Before any of those steps, ask for and receive explicit user approval in the current task; a request to implement a change, commit it, or use `main` is not approval.
 - Use `scripts/deploy-portal.ps1` for Portal build/promotion/live verification only after explicit user approval. Always run preview first; `-Execute` is required for external writes.
 - Read this file and only the nearest relevant `AGENTS.md`/README files. Avoid re-reading unrelated service documentation.
