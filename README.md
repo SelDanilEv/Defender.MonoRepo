@@ -376,6 +376,9 @@ docker ps --filter "name=Local" --format "table {{.Names}}\t{{.Status}}\t{{.Port
 - Helm chart template: `helm/service-template/`
 - Service values files: `helm/service-template/values-*.yaml`
 - ArgoCD app definitions: `helm/argocd-applications/`
+- Portal uses a no-surge rolling strategy (`maxSurge: 0`, `maxUnavailable: 1`)
+  because the single-node home-server cluster has no spare CPU for a second
+  Portal Pod during an update.
 
 #### ArgoCD Integration
 

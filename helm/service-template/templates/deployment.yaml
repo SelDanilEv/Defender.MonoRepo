@@ -9,6 +9,10 @@ metadata:
 {{- $autoscalingEnabled := or ($httpAutoscaling.enabled | default false) ($cronAutoscaling.enabled | default false) }}
 {{- $probeHostHeader := .Values.probes.hostHeader | default "" }}
 spec:
+{{- with .Values.deploymentStrategy }}
+  strategy:
+{{- toYaml . | nindent 4 }}
+{{- end }}
 {{- if not $autoscalingEnabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}

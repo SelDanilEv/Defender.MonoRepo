@@ -2,6 +2,11 @@ image:
   repository: defendersd/defender.portal
   tag: 20260729-272_1.4.0
   pullPolicy: Always
+deploymentStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 1
 extraSecretEnv:
   Telegram__BotToken: Telegram__BotToken
   Telegram__WebhookSecret: Telegram__WebhookSecret
