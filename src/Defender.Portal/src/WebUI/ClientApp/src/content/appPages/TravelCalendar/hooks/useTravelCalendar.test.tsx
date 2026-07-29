@@ -1,4 +1,4 @@
-import { act, renderHook, waitFor } from "@testing-library/react";
+import { act, fireEvent, renderHook, waitFor } from "@testing-library/react";
 
 import { TravelCalendar, UpdateEventRequest, travelCalendarApi } from "src/api/travelCalendar";
 import { useTravelCalendar } from "./useTravelCalendar";
@@ -65,5 +65,42 @@ describe("useTravelCalendar", () => {
     });
 
     expect(travelCalendarApi.createEvent).toHaveBeenCalledWith(1, request, expect.anything());
+  });
+
+  test("WhenCalendarRegainsFocusAfterExternalInvite_ReloadsLatestCalendar", async () => {
+    const invitedCalendar: TravelCalendar = {
+      ...calendar,
+      events: [{
+        id: "33333333-3333-4333-8333-333333333333",
+        version: 1,
+        ownerUserId: "44444444-4444-4444-8444-444444444444",
+        title: "Invited trip",
+        type: "Event",
+        startDate: "2026-07-18",
+        endDate: "2026-07-18",
+        isMustVisit: false,
+        queueOrder: 0,
+        participants: [],
+        myParticipationStatus: "Pending",
+        canEdit: false,
+        canRespond: true,
+        distanceKm: 0,
+        points: [],
+        otherCostPln: 0,
+        transportCostPln: 0,
+        totalCostPln: 0,
+      }],
+    };
+    vi.mocked(travelCalendarApi.get)
+      .mockResolvedValueOnce(calendar)
+      .mockResolvedValueOnce(invitedCalendar);
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    fireEvent.focus(window);
+
+    await waitFor(() => expect(result.current.calendar?.events).toEqual(invitedCalendar.events));
+    expect(travelCalendarApi.get).toHaveBeenCalledTimes(2);
   });
 });

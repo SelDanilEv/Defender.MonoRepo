@@ -82,6 +82,21 @@ export const useTravelCalendar = (initialMonthCount: number) => {
     }
   }, [load]);
 
+  useEffect(() => {
+    const refreshWhenVisible = () => {
+      if (document.visibilityState === "visible") {
+        void load();
+      }
+    };
+
+    window.addEventListener("focus", refreshWhenVisible);
+    document.addEventListener("visibilitychange", refreshWhenVisible);
+    return () => {
+      window.removeEventListener("focus", refreshWhenVisible);
+      document.removeEventListener("visibilitychange", refreshWhenVisible);
+    };
+  }, [load]);
+
   const ensureMonths = useCallback(async (months: CalendarMonth[]) => {
     try {
       for (const month of months) {
