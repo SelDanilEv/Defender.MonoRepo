@@ -1,4 +1,4 @@
-import { useState, type PropsWithChildren } from "react";
+import { useState, type PropsWithChildren, type ReactNode } from "react";
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -28,13 +28,34 @@ type PortalLink = {
   label: string;
   to: string;
   matches: (pathname: string) => boolean;
+  icon?: ReactNode;
 };
 
 const primaryLinks: PortalLink[] = [
-  { label: "Home", to: "/home", matches: (pathname) => pathname === "/home" },
-  { label: "Wallet", to: "/banking", matches: (pathname) => pathname.startsWith("/banking") },
-  { label: "Budget", to: "/budget-tracker/diagram", matches: (pathname) => pathname.startsWith("/budget-tracker") },
-  { label: "Calendar", to: "/travel-calendar", matches: (pathname) => pathname.startsWith("/travel-calendar") },
+  {
+    label: "Home",
+    to: "/home",
+    matches: (pathname) => pathname === "/home",
+    icon: <HomeOutlinedIcon />,
+  },
+  {
+    label: "Wallet",
+    to: "/banking",
+    matches: (pathname) => pathname.startsWith("/banking"),
+    icon: <AccountBalanceOutlinedIcon />,
+  },
+  {
+    label: "Budget",
+    to: "/budget-tracker/diagram",
+    matches: (pathname) => pathname.startsWith("/budget-tracker"),
+    icon: <SavingsOutlinedIcon />,
+  },
+  {
+    label: "Calendar",
+    to: "/travel-calendar",
+    matches: (pathname) => pathname.startsWith("/travel-calendar"),
+    icon: <CalendarMonthOutlinedIcon />,
+  },
 ];
 
 const moreLinks: PortalLink[] = [
@@ -42,13 +63,6 @@ const moreLinks: PortalLink[] = [
   { label: "Health Care", to: "/health-care", matches: (pathname) => pathname.startsWith("/health-care") },
   { label: "Lottery", to: "/games/lottery", matches: (pathname) => pathname.startsWith("/games") },
   { label: "Profile", to: "/account/update", matches: (pathname) => pathname.startsWith("/account") },
-];
-
-const navigationIcons = [
-  <HomeOutlinedIcon key="home" />,
-  <AccountBalanceOutlinedIcon key="wallet" />,
-  <SavingsOutlinedIcon key="budget" />,
-  <CalendarMonthOutlinedIcon key="calendar" />,
 ];
 
 const TelegramNavigation = () => {
@@ -75,6 +89,32 @@ const TelegramNavigation = () => {
           borderTop: 1,
           borderColor: "divider",
           bgcolor: (theme) => `var(--tg-theme-secondary-bg-color, ${theme.palette.background.paper})`,
+          overflowX: "auto",
+          overflowY: "hidden",
+          justifyContent: "flex-start",
+          WebkitOverflowScrolling: "touch",
+          boxShadow: (theme) => `0 -1px 8px ${theme.palette.action.disabledBackground}`,
+          "& .MuiBottomNavigationAction-root": {
+            flex: "0 0 72px",
+            minWidth: 72,
+            maxWidth: 104,
+            minHeight: 58,
+            px: 1,
+            color: "text.secondary",
+            borderRadius: 1.5,
+          },
+          "& .MuiBottomNavigationAction-root.Mui-selected": {
+            color: "primary.main",
+            bgcolor: (theme) => theme.palette.action.selected,
+          },
+          "& .MuiBottomNavigationAction-label": {
+            mt: 0.25,
+            fontSize: "0.66rem",
+          },
+          "& .MuiBottomNavigationAction-label.Mui-selected": {
+            fontSize: "0.66rem",
+            fontWeight: 700,
+          },
         }}
       >
         {primaryLinks.map((link, index) => (
@@ -82,13 +122,17 @@ const TelegramNavigation = () => {
             key={link.to}
             component={RouterLink}
             to={link.to}
+            value={index}
             label={link.label}
-            icon={navigationIcons[index]}
+            icon={link.icon}
+            aria-current={link.matches(pathname) ? "page" : undefined}
           />
         ))}
         <BottomNavigationAction
+          value={primaryLinks.length}
           label="More"
           icon={<MoreHorizIcon />}
+          aria-current={isMoreSelected ? "page" : undefined}
           onClick={() => setMoreOpen(true)}
         />
       </BottomNavigation>

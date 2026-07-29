@@ -23,4 +23,20 @@ describe("TelegramShell", () => {
     expect(screen.getByRole("link", { name: "Home" }).getAttribute("href")).toBe("/home");
     expect(screen.getByRole("button", { name: "More" })).not.toBeNull();
   });
+
+  test("WhenCurrentRouteIsPrimaryPortalDestination_MarksActiveTabAndKeepsBottomStripHorizontallyReachable", () => {
+    render(
+      <MemoryRouter initialEntries={["/budget-tracker/positions"]}>
+        <TelegramShell>
+          <div>Portal content</div>
+        </TelegramShell>
+      </MemoryRouter>,
+    );
+
+    const navigation = screen.getByRole("navigation", { name: "Telegram navigation" });
+
+    expect(screen.getByRole("link", { name: "Budget" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("link", { name: "Home" }).getAttribute("aria-current")).toBeNull();
+    expect(getComputedStyle(navigation).overflowX).toBe("auto");
+  });
 });
