@@ -84,12 +84,13 @@ public class TransactionProcessingService : ITransactionProcessingService
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
-        await ProcessDebitAsync(transaction, sessionHandle);
+        var isStepSuccess = await ProcessDebitAsync(transaction, sessionHandle);
 
-        await _transactionManagementService
-            .UpdateTransactionStatusAsync(
-                transaction,
-                TransactionStatus.Proceed);
+        if (isStepSuccess)
+            await _transactionManagementService
+                .UpdateTransactionStatusAsync(
+                    transaction,
+                    TransactionStatus.Proceed);
     }
 
     private async Task ProcessTransfer(
@@ -107,7 +108,7 @@ public class TransactionProcessingService : ITransactionProcessingService
         var isStepSuccess =
             await ProcessCreditAsync(transaction, sessionHandle);
         if (isStepSuccess)
-            await ProcessDebitAsync(transaction, sessionHandle);
+            isStepSuccess = await ProcessDebitAsync(transaction, sessionHandle);
 
         if (isStepSuccess)
             await _transactionManagementService
@@ -120,12 +121,13 @@ public class TransactionProcessingService : ITransactionProcessingService
         Transaction transaction,
         IClientSessionHandle sessionHandle)
     {
-        await ProcessCreditAsync(transaction, sessionHandle);
+        var isStepSuccess = await ProcessCreditAsync(transaction, sessionHandle);
 
-        await _transactionManagementService
-            .UpdateTransactionStatusAsync(
-                transaction,
-                TransactionStatus.Proceed);
+        if (isStepSuccess)
+            await _transactionManagementService
+                .UpdateTransactionStatusAsync(
+                    transaction,
+                    TransactionStatus.Proceed);
     }
 
     private async Task ProcessRevert(

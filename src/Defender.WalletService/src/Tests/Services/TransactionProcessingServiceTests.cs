@@ -145,6 +145,9 @@ public class TransactionProcessingServiceTests
         transactionService.Verify(
             s => s.UpdateTransactionStatusAsync(tx, TransactionStatus.Failed, ErrorCode.BR_WLT_WalletIsNotExist),
             Times.Once);
+        transactionService.Verify(
+            s => s.UpdateTransactionStatusAsync(tx, TransactionStatus.Proceed, It.IsAny<string>()),
+            Times.Never);
     }
 
     [Fact]
@@ -229,6 +232,9 @@ public class TransactionProcessingServiceTests
         transactionService.Verify(
             s => s.UpdateTransactionStatusAsync(tx, TransactionStatus.Failed, ErrorCode.BR_WLT_SenderCurrencyAccountIsNotExist),
             Times.Once);
+        transactionService.Verify(
+            s => s.UpdateTransactionStatusAsync(tx, TransactionStatus.Proceed, It.IsAny<string>()),
+            Times.Never);
     }
 
     [Fact]
@@ -280,6 +286,60 @@ public class TransactionProcessingServiceTests
         Assert.True(result);
         Assert.Equal(80, fromWallet.GetCurrencyAccount(Currency.USD).Balance);
         Assert.Equal(25, toWallet.GetCurrencyAccount(Currency.USD).Balance);
+    }
+
+    [Fact]
+    public async Task ProcessTransaction_WhenTransferRecipientCurrencyMissing_FailsAndDoesNotProceed()
+    {
+        var tx = new Transaction
+        {
+            TransactionId = "TX-7B",
+            TransactionStatus = TransactionStatus.Queued,
+            TransactionType = TransactionType.Transfer,
+            FromWallet = 33330000,
+            ToWallet = 44440000,
+            Currency = Currency.USD,
+            Amount = 20
+        };
+
+        var fromWallet = new Wallet
+        {
+            Id = Guid.NewGuid(),
+            WalletNumber = 33330000,
+            CurrencyAccounts = [new CurrencyAccount(Currency.USD, true) { Balance = 100 }]
+        };
+        var toWallet = new Wallet
+        {
+            Id = Guid.NewGuid(),
+            WalletNumber = 44440000,
+            CurrencyAccounts = [new CurrencyAccount(Currency.EUR, true) { Balance = 5 }]
+        };
+
+        var transactionService = new Mock<ITransactionManagementService>();
+        transactionService.Setup(s => s.GetTransactionByTransactionIdAsync("TX-7B")).ReturnsAsync(tx);
+        transactionService
+            .Setup(s => s.UpdateTransactionStatusAsync(tx, TransactionStatus.Failed, ErrorCode.BR_WLT_RecipientCurrencyAccountIsNotExist))
+            .ReturnsAsync(new Transaction { TransactionId = "TX-7B", TransactionStatus = TransactionStatus.Failed });
+
+        var session = CreateSession();
+        var walletService = new Mock<IWalletManagementService>();
+        walletService.Setup(w => w.OpenWalletUpdateSessionAsync()).ReturnsAsync(session);
+        walletService.Setup(w => w.GetWalletByNumberAsync(33330000)).ReturnsAsync(fromWallet);
+        walletService.Setup(w => w.GetWalletByNumberAsync(44440000)).ReturnsAsync(toWallet);
+        walletService.Setup(w => w.UpdateCurrencyAccountsAsync(fromWallet.Id, fromWallet.CurrencyAccounts, session))
+            .ReturnsAsync(fromWallet);
+
+        var sut = new TransactionProcessingService(transactionService.Object, walletService.Object);
+
+        var result = await sut.ProcessTransaction("TX-7B");
+
+        Assert.True(result);
+        transactionService.Verify(
+            s => s.UpdateTransactionStatusAsync(tx, TransactionStatus.Failed, ErrorCode.BR_WLT_RecipientCurrencyAccountIsNotExist),
+            Times.Once);
+        transactionService.Verify(
+            s => s.UpdateTransactionStatusAsync(tx, TransactionStatus.Proceed, It.IsAny<string>()),
+            Times.Never);
     }
 
     [Fact]
