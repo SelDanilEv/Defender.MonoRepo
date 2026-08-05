@@ -55,6 +55,11 @@ public class AccountManagementService(
                 ErrorCodeHelper.GetErrorCode(ErrorCode.BR_ACC_InvalidPassword));
         }
 
+        if (PasswordHelper.IsLegacyHash(accountInfo.PasswordHash))
+        {
+            accountInfo = await PrivateChangePasswordAsync(accountId, password);
+        }
+
         return accountInfo;
     }
 
