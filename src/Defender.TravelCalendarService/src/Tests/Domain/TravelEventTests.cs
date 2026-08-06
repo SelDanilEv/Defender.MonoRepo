@@ -65,4 +65,26 @@ public class TravelEventTests
             0,
             DateTimeOffset.UtcNow));
     }
+
+    [Fact]
+    public void UpdateSharedDetails_WhenTransportCostIsNegative_ThrowsValidation()
+    {
+        var ownerId = Guid.NewGuid();
+        var travelEvent = TravelEvent.Scheduled(ownerId, "Trip", TravelEventType.OvernightTrip, new DateOnly(2026, 7, 4), new DateOnly(2026, 7, 5));
+
+        var exception = Assert.Throws<TravelCalendarValidationException>(() => travelEvent.UpdateSharedDetails(
+            ownerId,
+            "Trip",
+            TravelEventType.OvernightTrip,
+            new DateOnly(2026, 7, 4),
+            new DateOnly(2026, 7, 5),
+            null,
+            null,
+            -1,
+            null,
+            0,
+            DateTimeOffset.UtcNow));
+
+        Assert.Equal("TRAVEL_CALENDAR_INVALID_COST", exception.Code);
+    }
 }

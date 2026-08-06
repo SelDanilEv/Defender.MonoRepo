@@ -39,7 +39,7 @@ public class TravelEvent : IBaseModel
         TravelEventType type,
         DateOnly start,
         DateOnly end,
-        decimal distanceKm = 0,
+        decimal transportCostPln = 0,
         decimal hotelCostPln = 0,
         decimal otherCostPln = 0) => new()
         {
@@ -49,7 +49,7 @@ public class TravelEvent : IBaseModel
             StartDate = start,
             EndDate = end,
             Hotel = type == TravelEventType.OvernightTrip ? new HotelDetails { CostPln = hotelCostPln } : null,
-            Trip = type is TravelEventType.OvernightTrip or TravelEventType.DayTrip ? new TripDetails { DistanceKm = distanceKm } : null,
+            Trip = type is TravelEventType.OvernightTrip or TravelEventType.DayTrip ? new TripDetails { TransportCostPln = transportCostPln } : null,
             OtherCostPln = otherCostPln,
         };
 
@@ -83,7 +83,7 @@ public class TravelEvent : IBaseModel
         DateOnly end,
         string? notes,
         HotelDetails? hotel,
-        decimal distanceKm,
+        decimal transportCostPln,
         string? mainPoint,
         decimal otherCostPln,
         DateTimeOffset now)
@@ -94,9 +94,9 @@ public class TravelEvent : IBaseModel
             (start, end) = (end, start);
         }
 
-        if (distanceKm < 0 || otherCostPln < 0 || (hotel?.CostPln ?? 0) < 0)
+        if (transportCostPln < 0 || otherCostPln < 0 || (hotel?.CostPln ?? 0) < 0)
         {
-            throw new TravelCalendarValidationException("TRAVEL_CALENDAR_INVALID_COST", "Costs and distance must be non-negative.");
+            throw new TravelCalendarValidationException("TRAVEL_CALENDAR_INVALID_COST", "Costs must be non-negative.");
         }
 
         Title = RequireText(title, 120, "TRAVEL_CALENDAR_TITLE_REQUIRED");
@@ -118,7 +118,7 @@ public class TravelEvent : IBaseModel
         if (type is TravelEventType.OvernightTrip or TravelEventType.DayTrip)
         {
             Trip ??= new TripDetails();
-            Trip.DistanceKm = distanceKm;
+            Trip.TransportCostPln = transportCostPln;
             Trip.MainPoint = mainPoint?.Trim();
         }
         else

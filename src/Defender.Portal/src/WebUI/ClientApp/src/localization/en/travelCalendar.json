@@ -96,7 +96,7 @@
       "hotelBookingUrl": "Booking link",
       "mainPoint": "Main point",
       "hotelCost": "Hotel, PLN",
-      "distanceKm": "Distance, km",
+      "transportCost": "Transport, PLN",
       "otherCost": "Other, PLN",
       "eventCost": "Cost, PLN"
     },
@@ -121,6 +121,10 @@
   },
   "errors": {
     "loadFailed": "Failed to load travel calendar",
-    "saveFailed": "Changes were not saved. The calendar was refreshed — please try again."
+    "saveFailed": "Changes were not saved. The calendar was refreshed — please try again.",
+    "dateOverlap": "These dates are already taken by another event",
+    "dateOutsideSeason": "Date is outside the available season",
+    "ownerOnly": "Only the organizer can change this event",
+    "saveFailedGeneric": "Failed to save changes. Please try again."
   }
 }

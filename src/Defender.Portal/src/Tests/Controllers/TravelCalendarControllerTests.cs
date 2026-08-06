@@ -44,7 +44,7 @@ public class TravelCalendarControllerTests
         var organizerId = Guid.NewGuid();
         var calendar = CreateCalendar() with
         {
-            Events = [new TravelEventDto(organizerId, 1, organizerId, null, "Weekend trip", "DayTrip", new DateOnly(2026, 7, 18), new DateOnly(2026, 7, 18), null, false, 0, [], "Pending", false, true, null, 0, null, [], 0, 0, 0)],
+            Events = [new TravelEventDto(organizerId, 1, organizerId, null, "Weekend trip", "DayTrip", new DateOnly(2026, 7, 18), new DateOnly(2026, 7, 18), null, false, 0, [], "Pending", false, true, null, null, [], 0, 0, 0)],
         };
         var account = new Mock<ICurrentAccountAccessor>();
         account.Setup(item => item.GetAccountId()).Returns(userId);

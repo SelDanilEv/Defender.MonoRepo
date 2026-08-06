@@ -25,7 +25,6 @@ export interface TravelEvent {
   canEdit: boolean;
   canRespond: boolean;
   hotel?: HotelDetails;
-  distanceKm: number;
   mainPoint?: string;
   points: PointOfInterest[];
   otherCostPln: number;
@@ -50,7 +49,7 @@ export interface TravelCalendar {
   updatedAtUtc: string;
 }
 export interface MutationResult { calendar: TravelCalendar; affectedEventId?: string; affectedItemId?: string; }
-export interface UpdateEventRequest { title: string; type: TravelEventType; startDate: string; endDate: string; notes?: string; hotelBooked: boolean; hotelName?: string; hotelAddress?: string; hotelBookingUrl?: string; hotelCostPln: number; distanceKm: number; mainPoint?: string; otherCostPln: number; }
+export interface UpdateEventRequest { title: string; type: TravelEventType; startDate: string; endDate: string; notes?: string; hotelBooked: boolean; hotelName?: string; hotelAddress?: string; hotelBookingUrl?: string; hotelCostPln: number; transportCostPln: number; mainPoint?: string; otherCostPln: number; }
 
 const base = "/api/travelCalendar";
 const call = <T>(path: string, method: string, body: unknown, utils?: IUtils | null): Promise<T> => new Promise((resolve, reject) => APICallWrapper({

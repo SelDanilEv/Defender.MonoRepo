@@ -39,7 +39,7 @@ const request: UpdateEventRequest = {
   notes: "Modern art",
   hotelBooked: false,
   hotelCostPln: 0,
-  distanceKm: 0,
+  transportCostPln: 0,
   otherCostPln: 25,
 };
 
@@ -84,7 +84,6 @@ describe("useTravelCalendar", () => {
         myParticipationStatus: "Pending",
         canEdit: false,
         canRespond: true,
-        distanceKm: 0,
         points: [],
         otherCostPln: 0,
         transportCostPln: 0,
@@ -102,5 +101,68 @@ describe("useTravelCalendar", () => {
 
     await waitFor(() => expect(result.current.calendar?.events).toEqual(invitedCalendar.events));
     expect(travelCalendarApi.get).toHaveBeenCalledTimes(2);
+  });
+
+  test("Run_WhenFailureCodeIsVersionConflict_ReloadsAndShowsConflictMessage", async () => {
+    vi.mocked(travelCalendarApi.createEvent).mockRejectedValueOnce({ status: 409, code: "TRAVEL_CALENDAR_VERSION_CONFLICT" });
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => result.current.createDraft("2026-07-18"));
+    await act(async () => {
+      await result.current.saveDraft(request);
+    });
+
+    await waitFor(() => expect(travelCalendarApi.get).toHaveBeenCalledTimes(2));
+    expect(result.current.error).toBe("travelCalendar:errors.saveFailed");
+  });
+
+  test("Run_WhenFailureCodeIsDateOverlap_ShowsOverlapMessageWithoutReloading", async () => {
+    vi.mocked(travelCalendarApi.createEvent).mockRejectedValueOnce({ status: 409, code: "TRAVEL_CALENDAR_DATE_OVERLAP" });
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => result.current.createDraft("2026-07-18"));
+    await act(async () => {
+      await result.current.saveDraft(request);
+    });
+
+    expect(result.current.error).toBe("travelCalendar:errors.dateOverlap");
+    expect(travelCalendarApi.get).toHaveBeenCalledTimes(1);
+  });
+
+  test("Run_WhenFailureHasNoRecognizedCode_ShowsGenericMessage", async () => {
+    vi.mocked(travelCalendarApi.createEvent).mockRejectedValueOnce({ status: 500 });
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => result.current.createDraft("2026-07-18"));
+    await act(async () => {
+      await result.current.saveDraft(request);
+    });
+
+    expect(result.current.error).toBe("travelCalendar:errors.saveFailedGeneric");
+    expect(travelCalendarApi.get).toHaveBeenCalledTimes(1);
+  });
+
+  test("ClearError_WhenCalledAfterFailure_ResetsErrorToEmptyString", async () => {
+    vi.mocked(travelCalendarApi.createEvent).mockRejectedValueOnce({ status: 500 });
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    act(() => result.current.createDraft("2026-07-18"));
+    await act(async () => {
+      await result.current.saveDraft(request);
+    });
+
+    expect(result.current.error).toBe("travelCalendar:errors.saveFailedGeneric");
+
+    act(() => result.current.clearError());
+
+    expect(result.current.error).toBe("");
   });
 });

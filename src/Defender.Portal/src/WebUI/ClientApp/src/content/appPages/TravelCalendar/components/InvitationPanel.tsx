@@ -26,15 +26,18 @@ export const InvitationPanel = ({ events, onOpen }: { events: TravelEvent[]; onO
   const invitations = useMemo(() => events.filter((event) =>
     !event.canEdit && (event.myParticipationStatus === "Pending" || event.myParticipationStatus === "Declined"),
   ), [events]);
+  const hasPending = invitations.some((event) => event.myParticipationStatus === "Pending");
+  const hasDeclined = invitations.some((event) => event.myParticipationStatus === "Declined");
   const [filter, setFilter] = useState<InvitationFilter>("Pending");
   const filtered = invitations.filter((event) => event.myParticipationStatus === filter);
   const locale = i18n.language === "ru" ? "ru-RU" : "en-US";
 
   useEffect(() => {
-    if (!invitations.some((event) => event.myParticipationStatus === filter)) {
-      setFilter(invitations.some((event) => event.myParticipationStatus === "Pending") ? "Pending" : "Declined");
-    }
-  }, [filter, invitations]);
+    setFilter((current) => {
+      if (current === "Pending" ? hasPending : hasDeclined) return current;
+      return hasDeclined && !hasPending ? "Declined" : "Pending";
+    });
+  }, [hasPending, hasDeclined]);
 
   return (
     <Box>

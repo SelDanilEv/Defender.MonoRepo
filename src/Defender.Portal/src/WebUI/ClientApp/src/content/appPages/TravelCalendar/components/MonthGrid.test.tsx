@@ -18,7 +18,6 @@ const invitedEvent: TravelEvent = {
   myParticipationStatus: "Pending",
   canEdit: false,
   canRespond: true,
-  distanceKm: 0,
   points: [],
   otherCostPln: 0,
   transportCostPln: 0,

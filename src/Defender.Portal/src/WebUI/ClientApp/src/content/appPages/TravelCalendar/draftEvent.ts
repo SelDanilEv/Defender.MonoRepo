@@ -18,7 +18,6 @@ export const createDraftEvent = (date: string): TravelEvent => {
     participants: [],
     canEdit: true,
     canRespond: false,
-    distanceKm: 0,
     points: [],
     otherCostPln: 0,
     transportCostPln: 0,

@@ -22,6 +22,7 @@ import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import { useTranslation } from "react-i18next";
 import { TravelCalendar, TravelCalendarUserOption, TravelEvent, TravelParticipantStatus, TravelEventType, UpdateEventRequest } from "src/api/travelCalendar";
 import { liveTotal } from "../budgetMath";
+import { createEventDraft, toAmount, toUpdateEventRequest } from "./eventDrawerDraft";
 import { getEventDrawerPaperSx } from "./eventDrawerStyles";
 
 const participantColor = (status?: TravelParticipantStatus) => {
@@ -100,21 +101,7 @@ export const EventDrawer = ({
 
     draftEventId.current = event.id;
 
-    setDraft({
-      title: event.title,
-      type: event.type,
-      startDate: event.startDate || "",
-      endDate: event.endDate || "",
-      notes: event.notes || "",
-      hotelBooked: event.hotel?.isBooked || false,
-      hotelName: event.hotel?.name || "",
-      hotelAddress: event.hotel?.address || "",
-      hotelBookingUrl: event.hotel?.bookingUrl || "",
-      hotelCostPln: event.hotel?.costPln || 0,
-      distanceKm: event.distanceKm || 0,
-      mainPoint: event.mainPoint || "",
-      otherCostPln: event.otherCostPln || 0,
-    });
+    setDraft(createEventDraft(event));
   }, [event]);
 
   useEffect(() => {
@@ -141,8 +128,8 @@ export const EventDrawer = ({
   const isTrip = draft?.type === "OvernightTrip" || draft?.type === "DayTrip";
   const overnight = draft?.type === "OvernightTrip";
   const total = useMemo(() => draft
-    ? liveTotal(draft.type, Number(draft.hotelCostPln), Number(draft.distanceKm), Number(draft.otherCostPln), calendar.vehicle.fuelConsumptionLitersPer100Km, calendar.vehicle.fuelPricePlnPerLiter)
-    : 0, [draft, calendar]);
+    ? liveTotal(draft.type, toAmount(draft.hotelCostPln), toAmount(draft.transportCostPln), toAmount(draft.otherCostPln))
+    : 0, [draft]);
   const set = (name: string, value: any) => setDraft((current: any) => ({ ...current, [name]: value }));
 
   if (!draft || !event) {
@@ -298,9 +285,9 @@ export const EventDrawer = ({
               mb: 1
             }}>{t("travelCalendar:drawer.eventBudget")}</Typography>
           <Stack spacing={1.5}>
-            {overnight && <TextField label={t("travelCalendar:drawer.fields.hotelCost")} type="number" value={draft.hotelCostPln} disabled={!event.canEdit} onChange={(e) => set("hotelCostPln", Number(e.target.value))} />}
-            {isTrip && <TextField label={t("travelCalendar:drawer.fields.distanceKm")} type="number" value={draft.distanceKm} disabled={!event.canEdit} onChange={(e) => set("distanceKm", Number(e.target.value))} />}
-            <TextField label={t(isTrip ? "travelCalendar:drawer.fields.otherCost" : "travelCalendar:drawer.fields.eventCost")} type="number" value={draft.otherCostPln} disabled={!event.canEdit} onChange={(e) => set("otherCostPln", Number(e.target.value))} />
+            {overnight && <TextField label={t("travelCalendar:drawer.fields.hotelCost")} type="number" value={draft.hotelCostPln} disabled={!event.canEdit} onChange={(e) => set("hotelCostPln", e.target.value)} />}
+            {isTrip && <TextField label={t("travelCalendar:drawer.fields.transportCost")} type="number" value={draft.transportCostPln} disabled={!event.canEdit} onChange={(e) => set("transportCostPln", e.target.value)} />}
+            <TextField label={t(isTrip ? "travelCalendar:drawer.fields.otherCost" : "travelCalendar:drawer.fields.eventCost")} type="number" value={draft.otherCostPln} disabled={!event.canEdit} onChange={(e) => set("otherCostPln", e.target.value)} />
           </Stack>
           <Stack
             direction="row"
@@ -328,7 +315,7 @@ export const EventDrawer = ({
             flex: 1
           }} />
           <Button onClick={onClose}>{t("travelCalendar:drawer.close")}</Button>
-          {event.canEdit && <Button disabled={busy || !draft.title.trim() || !draft.startDate || !draft.endDate} variant="contained" onClick={async () => { const result = await onSave(draft); if (result) { onClose(); } }}>{t("travelCalendar:drawer.save")}</Button>}
+          {event.canEdit && <Button disabled={busy || !draft.title.trim() || !draft.startDate || !draft.endDate} variant="contained" onClick={async () => { const result = await onSave(toUpdateEventRequest(draft)); if (result) { onClose(); } }}>{t("travelCalendar:drawer.save")}</Button>}
         </Stack>
       </Stack>
     </Drawer>

@@ -20,4 +20,24 @@ public class TravelCalendarMongoCompatibilityTests
 
         Assert.NotEqual(Guid.Empty, calendar.UserId);
     }
+
+    [Fact]
+    public void Deserialize_WhenLegacyTripDistanceFieldExists_IgnoresTheRemovedField()
+    {
+        var document = new BsonDocument
+        {
+            ["_id"] = Guid.NewGuid().ToString(),
+            ["OwnerUserId"] = Guid.NewGuid().ToString(),
+            ["Trip"] = new BsonDocument
+            {
+                ["DistanceKm"] = 568,
+                ["MainPoint"] = "Tatra Mountains",
+                ["Points"] = new BsonArray(),
+            },
+        };
+
+        var travelEvent = BsonSerializer.Deserialize<TravelEvent>(document);
+
+        Assert.Equal(0m, travelEvent.Trip!.TransportCostPln);
+    }
 }

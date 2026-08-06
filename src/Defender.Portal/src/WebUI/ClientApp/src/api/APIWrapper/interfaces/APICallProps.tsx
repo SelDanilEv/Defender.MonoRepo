@@ -8,6 +8,7 @@ export interface APICallFailure {
   instance?: string;
   traceId?: string;
   errors?: Record<string, string[]>;
+  code?: string;
 }
 
 interface APICallProps {

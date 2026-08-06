@@ -97,7 +97,7 @@ public class TravelCalendarService(
                 BookingUrl = request.HotelBookingUrl,
                 CostPln = request.HotelCostPln,
             },
-            request.DistanceKm,
+            request.TransportCostPln,
             request.MainPoint,
             request.OtherCostPln,
             Now);
@@ -125,7 +125,7 @@ public class TravelCalendarService(
             EnsureSeason(calendar, start, end);
             EnsureAvailable(visibleEvents, start, end, eventId);
 
-            travelEvent.UpdateSharedDetails(userId, request.Title, request.Type, request.StartDate, request.EndDate, request.Notes, hotel, request.DistanceKm, request.MainPoint, request.OtherCostPln, Now);
+            travelEvent.UpdateSharedDetails(userId, request.Title, request.Type, request.StartDate, request.EndDate, request.Notes, hotel, request.TransportCostPln, request.MainPoint, request.OtherCostPln, Now);
             await SaveEventAsync(travelEvent, request.ExpectedVersion, cancellationToken);
             return (travelEvent.Id, (Guid?)null);
         }, cancellationToken);
@@ -346,7 +346,7 @@ public class TravelCalendarService(
             .ThenBy(item => item.StartDate)
             .ThenBy(item => item.QueueOrder)
             .ToArray();
-        var budget = TravelBudgetCalculator.Calculate(orderedSummaryEvents, calendar.Vehicle);
+        var budget = TravelBudgetCalculator.Calculate(orderedSummaryEvents);
 
         return new(
             calendar.Id,
@@ -360,7 +360,7 @@ public class TravelCalendarService(
             calendar.Holidays.Select(item => new CalendarHolidayDto(item.Date, item.NameKey, item.Flag, item.Type)).ToArray(),
             orderedEvents.Select(item =>
             {
-                var transport = TravelBudgetCalculator.CalculateTransport(item.Trip?.DistanceKm ?? 0, calendar.Vehicle);
+                var transport = item.Trip?.TransportCostPln ?? 0;
                 return new TravelEventDto(
                     item.Id,
                     item.Version,
@@ -378,7 +378,6 @@ public class TravelCalendarService(
                     item.CanEdit(viewerUserId),
                     item.CanRespond(viewerUserId),
                     item.Hotel == null ? null : new HotelDetailsDto(item.Hotel.IsBooked, item.Hotel.Name, item.Hotel.Address, item.Hotel.BookingUrl, item.Hotel.CostPln),
-                    item.Trip?.DistanceKm ?? 0,
                     item.Trip?.MainPoint,
                     item.Trip?.Points.Select(point => new PointOfInterestDto(point.Id, point.Text, point.IsChecked)).ToArray() ?? [],
                     item.OtherCostPln,

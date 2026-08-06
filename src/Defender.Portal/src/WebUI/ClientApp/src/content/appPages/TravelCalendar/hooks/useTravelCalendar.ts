@@ -14,6 +14,13 @@ import { createDraftEvent } from "../draftEvent";
 
 const overlaps = (event: TravelEvent, from: string, to: string) => Boolean(event.startDate && event.endDate && event.startDate <= to && event.endDate >= from);
 
+const ERROR_MESSAGE_KEYS: Record<string, string> = {
+  TRAVEL_CALENDAR_VERSION_CONFLICT: "travelCalendar:errors.saveFailed",
+  TRAVEL_CALENDAR_DATE_OVERLAP: "travelCalendar:errors.dateOverlap",
+  TRAVEL_CALENDAR_DATE_OUTSIDE_SEASON: "travelCalendar:errors.dateOutsideSeason",
+  TRAVEL_CALENDAR_OWNER_ONLY: "travelCalendar:errors.ownerOnly",
+};
+
 const mergeCalendarPage = (previous: TravelCalendar | null, page: TravelCalendar, from: string, to: string): TravelCalendar => {
   if (!previous) {
     return page;
@@ -119,11 +126,12 @@ export const useTravelCalendar = (initialMonthCount: number) => {
       setCalendar(result.calendar);
       return result;
     } catch (failure: any) {
-      if (failure?.status === 409) {
+      const code = failure?.code as string | undefined;
+      if (code === "TRAVEL_CALENDAR_VERSION_CONFLICT" || (!code && failure?.status === 409)) {
         await load();
       }
 
-      setError(utilsRef.current.t("travelCalendar:errors.saveFailed"));
+      setError(utilsRef.current.t(ERROR_MESSAGE_KEYS[code ?? ""] ?? "travelCalendar:errors.saveFailedGeneric"));
       return null;
     } finally {
       setMutating(false);
@@ -151,6 +159,7 @@ export const useTravelCalendar = (initialMonthCount: number) => {
     openEvent,
     closeActiveEvent,
     retry: load,
+    clearError: () => setError(""),
     ensureMonths,
     searchUsers: async (query: string): Promise<TravelCalendarUserOption[]> => {
       if (!query.trim()) {
