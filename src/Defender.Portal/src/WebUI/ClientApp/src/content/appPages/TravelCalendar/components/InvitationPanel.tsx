@@ -159,6 +159,7 @@ export const InvitationPanel = ({
                 position: "relative",
                 border: "1px solid var(--tc-border)",
                 borderRadius: 1.25,
+                flexShrink: 0,
                 opacity: status === "Declined" ? 0.68 : 1,
                 overflow: "hidden",
               }}
@@ -221,6 +222,7 @@ export const InvitationPanel = ({
                 position: "relative",
                 border: "1px solid var(--tc-border)",
                 borderRadius: 1.25,
+                flexShrink: 0,
                 overflow: "hidden",
               }}
             >

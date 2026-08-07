@@ -153,6 +153,38 @@ describe("InvitationPanel - Received tab status filter", () => {
 });
 
 describe("InvitationPanel - Received/Sent direction tabs", () => {
+  test("ReceivedTab_WhenManyInvitationsAreVisible_PreventsCardsFromShrinkingIntoEachOther", () => {
+    renderPanel({
+      events: Array.from({ length: 9 }, (_, index) =>
+        receivedInvite("Accepted", { id: `accepted-${index}`, title: `Accepted event ${index}` }),
+      ),
+    });
+
+    const cards = screen
+      .getAllByRole("button", { name: /^Open invitation:/ })
+      .map((button) => button.parentElement);
+
+    expect(cards).toHaveLength(9);
+    expect(cards.every((card) => card && getComputedStyle(card).flexShrink === "0")).toBe(true);
+  });
+
+  test("SentTab_WhenManyInvitationsAreVisible_PreventsCardsFromShrinkingIntoEachOther", () => {
+    renderPanel({
+      events: Array.from({ length: 9 }, (_, index) =>
+        sentEvent({ id: `sent-${index}`, title: `Sent event ${index}` }),
+      ),
+    });
+
+    fireEvent.click(screen.getByRole("tab", { name: "Sent" }));
+
+    const cards = screen
+      .getAllByRole("button", { name: /^Open sent invitation:/ })
+      .map((button) => button.parentElement);
+
+    expect(cards).toHaveLength(9);
+    expect(cards.every((card) => card && getComputedStyle(card).flexShrink === "0")).toBe(true);
+  });
+
   test("WhenUserSwitchesToTheSentTab_ShowsOrganizedEventsInsteadOfReceivedOnes", () => {
     renderPanel({
       events: [receivedInvite("Pending"), sentEvent({ id: "sent-1", title: "Organized trip" })],
