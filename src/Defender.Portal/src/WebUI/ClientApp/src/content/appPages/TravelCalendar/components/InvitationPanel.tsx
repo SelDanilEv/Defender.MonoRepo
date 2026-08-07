@@ -156,13 +156,14 @@ export const InvitationPanel = ({
             <Box
               key={event.id}
               sx={{
+                position: "relative",
                 border: "1px solid var(--tc-border)",
-                borderLeft: `4px solid ${receivedAccentColor(status)}`,
-                borderRadius: 2.5,
+                borderRadius: 1.25,
                 opacity: status === "Declined" ? 0.68 : 1,
                 overflow: "hidden",
               }}
             >
+              <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, bgcolor: receivedAccentColor(status) }} />
               <ButtonBase
                 onClick={() => onOpen(event.id)}
                 aria-label={t("travelCalendar:invitations.open", { title: event.title })}
@@ -217,12 +218,13 @@ export const InvitationPanel = ({
             <Box
               key={event.id}
               sx={{
+                position: "relative",
                 border: "1px solid var(--tc-border)",
-                borderLeft: `4px solid ${summary.pending > 0 ? "var(--tc-accent)" : "var(--tc-muted)"}`,
-                borderRadius: 2.5,
+                borderRadius: 1.25,
                 overflow: "hidden",
               }}
             >
+              <Box sx={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 4, bgcolor: summary.pending > 0 ? "var(--tc-accent)" : "var(--tc-muted)" }} />
               <ButtonBase
                 onClick={() => onOpen(event.id)}
                 aria-label={t("travelCalendar:invitations.openSent", { title: event.title })}
