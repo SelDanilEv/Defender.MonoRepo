@@ -39,10 +39,14 @@ import useUtils from "src/appUtils";
 import { useAppSelector } from "src/state/hooks";
 import {
   buildHealthCareChartData,
-  ChartTimeRange,
-  getTimeRangeBounds,
   paginateHealthEvents,
 } from "./chartData";
+import {
+  HealthDateRangeSelection,
+  filterEventsByDateRange,
+  resolveHealthDateRange,
+  validateHealthDateRange,
+} from "./dateRange";
 import { formatEventDateTime } from "./dateFormat";
 import {
   analysisStatusOptions,
@@ -51,6 +55,7 @@ import {
   getAnalysisStatusTranslationKey,
 } from "./eventFormatting";
 import HealthCareChart from "./HealthCareChart";
+import HealthDateRangeSelector from "./HealthDateRangeSelector";
 import { getAbsoluteShareUrl } from "./ShareLink";
 import TemperatureSlider, { normalizeTemperature } from "./TemperatureSlider";
 import WellbeingSelector from "./WellbeingSelector";
@@ -93,11 +98,15 @@ const HealthCarePage = () => {
   const [analysisName, setAnalysisName] = useState("");
   const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>("HasDeviations");
   const [notes, setNotes] = useState("");
-  const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
+  const [dateRangeSelection, setDateRangeSelection] = useState<HealthDateRangeSelection>({
+    kind: "preset",
+    preset: "week",
+  });
   const [medicationOptions, setMedicationOptions] = useState<MedicationOptions>(emptyMedicationOptions);
   const [share, setShare] = useState<HealthChartShare | null>(null);
   const [shareCopied, setShareCopied] = useState(false);
   const [shareStatusUpdating, setShareStatusUpdating] = useState(false);
+  const [shareRangeUpdating, setShareRangeUpdating] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -112,12 +121,16 @@ const HealthCarePage = () => {
   }, []);
 
   const chartData = useMemo(
-    () => buildHealthCareChartData(events, chartTimeRange),
-    [events, chartTimeRange]
+    () => buildHealthCareChartData(events, dateRangeSelection),
+    [events, dateRangeSelection]
+  );
+  const visibleEvents = useMemo(
+    () => filterEventsByDateRange(events, dateRangeSelection),
+    [events, dateRangeSelection]
   );
   const pagedEvents = useMemo(
-    () => paginateHealthEvents(events, page, rowsPerPage),
-    [events, page, rowsPerPage]
+    () => paginateHealthEvents(visibleEvents, page, rowsPerPage),
+    [visibleEvents, page, rowsPerPage]
   );
   const shareLink = share
     ? getAbsoluteShareUrl(share.publicUrl, window.location.origin)
@@ -130,16 +143,20 @@ const HealthCarePage = () => {
 
   useEffect(() => {
     setShareCopied(false);
-  }, [events, chartTimeRange]);
+  }, [events, dateRangeSelection]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [dateRangeSelection]);
 
   useEffect(() => {
     const maxPage =
-      events.length === 0
+      visibleEvents.length === 0
         ? 0
-        : Math.max(0, Math.ceil(events.length / rowsPerPage) - 1);
+        : Math.max(0, Math.ceil(visibleEvents.length / rowsPerPage) - 1);
 
     setPage((currentPage) => Math.min(currentPage, maxPage));
-  }, [events.length, rowsPerPage]);
+  }, [visibleEvents.length, rowsPerPage]);
 
   const resetForm = () => {
     setEditingEventId(null);
@@ -223,23 +240,48 @@ const HealthCarePage = () => {
   };
 
   const shareChart = async () => {
-    const bounds = getTimeRangeBounds(chartTimeRange);
-    const share = await healthCareApi.createShare(
-      {
-        from: bounds.from?.toISOString(),
-        to: bounds.to?.toISOString(),
-      },
-      u
-    );
-    const url = getAbsoluteShareUrl(share.publicUrl, window.location.origin);
-    setShare(share);
-    setShareCopied(false);
+    if (shareRangeUpdating) {
+      return;
+    }
+
+    const customValidationError =
+      dateRangeSelection.kind === "custom"
+        ? validateHealthDateRange(dateRangeSelection.from, dateRangeSelection.to)
+        : null;
+    if (customValidationError || chartData.chartEvents.length === 0) {
+      return;
+    }
+
+    setShareRangeUpdating(true);
 
     try {
-      await navigator.clipboard.writeText(url);
-      setShareCopied(true);
-    } catch {
+      const bounds = resolveHealthDateRange(dateRangeSelection);
+      const rangeMode =
+        dateRangeSelection.kind === "custom"
+          ? "Absolute"
+          : dateRangeSelection.preset === "all"
+            ? "All"
+            : "Rolling";
+      const nextShare = await healthCareApi.createShare(
+        {
+          rangeMode,
+          from: rangeMode === "All" ? undefined : bounds.from?.toISOString(),
+          to: rangeMode === "All" ? undefined : bounds.to?.toISOString(),
+        },
+        u
+      );
+      const url = getAbsoluteShareUrl(nextShare.publicUrl, window.location.origin);
+      setShare(nextShare);
       setShareCopied(false);
+
+      try {
+        await navigator.clipboard.writeText(url);
+        setShareCopied(true);
+      } catch {
+        setShareCopied(false);
+      }
+    } finally {
+      setShareRangeUpdating(false);
     }
   };
 
@@ -303,7 +345,12 @@ const HealthCarePage = () => {
             flexWrap: "wrap"
           }}>
           {!share && (
-            <Button variant="outlined" size="small" onClick={shareChart} disabled={chartData.chartEvents.length === 0}>
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={shareChart}
+              disabled={shareRangeUpdating || chartData.chartEvents.length === 0}
+            >
               {u.t("healthCare:share_chart")}
             </Button>
           )}
@@ -497,28 +544,23 @@ const HealthCarePage = () => {
                 mb: 1
               }}>
               <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
-              <TextField
-                select
-                label={u.t("healthCare:chart_time_range")}
-                value={chartTimeRange}
-                onChange={(event) => setChartTimeRange(event.target.value as ChartTimeRange)}
-                size="small"
-                sx={{ minWidth: 180 }}
-              >
-                <MenuItem value="day">{u.t("healthCare:range_day")}</MenuItem>
-                <MenuItem value="week">{u.t("healthCare:range_week")}</MenuItem>
-                <MenuItem value="month">{u.t("healthCare:range_month")}</MenuItem>
-                <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
-              </TextField>
+              <HealthDateRangeSelector
+                value={dateRangeSelection}
+                onChange={setDateRangeSelection}
+                showApply={Boolean(share)}
+                applyLabel={u.t("healthCare:update_shared_range")}
+                onApply={shareChart}
+                applyDisabled={shareRangeUpdating || chartData.chartEvents.length === 0}
+              />
             </Stack>
             <WellbeingSummary
               events={events}
-              timeRange={chartTimeRange}
+              timeRange={dateRangeSelection}
               title={u.t("healthCare:latest_wellbeing")}
               scoreLabel={(score) => u.t("healthCare:wellbeing_score", { score })}
               language={currentLanguage}
             />
-            <HealthCareChart events={events} timeRange={chartTimeRange} language={currentLanguage} />
+            <HealthCareChart events={events} timeRange={dateRangeSelection} language={currentLanguage} />
             <Typography
               variant="h4"
               sx={{
@@ -559,7 +601,7 @@ const HealthCarePage = () => {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {events.length === 0 && (
+                  {visibleEvents.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={5}>
                         <Typography sx={{
@@ -571,7 +613,7 @@ const HealthCarePage = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            {events.length > 0 && (
+            {visibleEvents.length > 0 && (
               <Box
                 sx={{
                   display: "flex",
@@ -595,7 +637,7 @@ const HealthCarePage = () => {
                 </Typography>
                 <TablePagination
                   component="div"
-                  count={events.length}
+                  count={visibleEvents.length}
                   page={page}
                   onPageChange={handleChangePage}
                   rowsPerPage={rowsPerPage}

@@ -3,11 +3,15 @@ using Defender.Common.Consts;
 using Defender.Common.Interfaces;
 using Defender.HealthCareService.Application.Common.Interfaces.Repositories;
 using Defender.HealthCareService.Domain.Entities;
+using Defender.HealthCareService.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.Controllers.V1;
 
-public record HealthChartShareRequest(DateTimeOffset? From, DateTimeOffset? To);
+public record HealthChartShareRequest(
+    DateTimeOffset? From,
+    DateTimeOffset? To,
+    HealthChartShareRangeMode? RangeMode = null);
 public record HealthChartShareStatusRequest(bool IsEnabled);
 public record HealthChartShareDto(
     string Token,
@@ -15,19 +19,26 @@ public record HealthChartShareDto(
     IReadOnlyList<HealthEvent> Events,
     DateTimeOffset? From,
     DateTimeOffset? To,
+    HealthChartShareRangeMode RangeMode,
     bool IsEnabled,
     DateTimeOffset CreatedAtUtc);
 
 public class HealthChartSharesController(
     ICurrentAccountAccessor currentAccountAccessor,
     IHealthEventRepository healthEventRepository,
-    IHealthChartShareRepository healthChartShareRepository) : ControllerBase
+    IHealthChartShareRepository healthChartShareRepository,
+    TimeProvider timeProvider) : ControllerBase
 {
     [HttpPost("api/health-chart-shares")]
     [Auth(Roles.User)]
     [ProducesResponseType(typeof(HealthChartShareDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<HealthChartShareDto>> CreateShare([FromBody] HealthChartShareRequest request)
     {
+        if (!TryResolveRequestRangeMode(request, out var rangeMode, out var validationError))
+        {
+            return BadRequest(validationError);
+        }
+
         var userId = currentAccountAccessor.GetAccountId();
         var share = await healthChartShareRepository.GetHealthChartShareByUserIdAsync(userId);
 
@@ -39,14 +50,16 @@ public class HealthChartSharesController(
                 UserId = userId,
                 From = request.From,
                 To = request.To,
+                RangeMode = rangeMode,
                 IsEnabled = true,
-                CreatedAtUtc = DateTimeOffset.UtcNow,
+                CreatedAtUtc = timeProvider.GetUtcNow(),
             });
         }
         else
         {
             share.From = request.From;
             share.To = request.To;
+            share.RangeMode = rangeMode;
             share.IsEnabled = true;
             share = await healthChartShareRepository.UpdateHealthChartShareAsync(share);
         }
@@ -104,11 +117,18 @@ public class HealthChartSharesController(
 
         var (from, to) = GetEffectivePublicRange(share);
         var events = await healthEventRepository.GetHealthEventsAsync(share.UserId, from, to);
-        return Ok(ToDto(share, events, from, to));
+        return Ok(ToDto(share, events, from, to, true));
     }
 
-    private static (DateTimeOffset? From, DateTimeOffset? To) GetEffectivePublicRange(HealthChartShare share)
+    private (DateTimeOffset? From, DateTimeOffset? To) GetEffectivePublicRange(HealthChartShare share)
     {
+        var rangeMode = ResolveRangeMode(share);
+
+        if (rangeMode == HealthChartShareRangeMode.All || rangeMode == HealthChartShareRangeMode.Absolute)
+        {
+            return (share.From, share.To);
+        }
+
         if (share.From == null || share.To == null)
         {
             return (share.From, share.To);
@@ -121,7 +141,7 @@ public class HealthChartSharesController(
             return (share.From, share.To);
         }
 
-        var to = DateTimeOffset.UtcNow;
+        var to = timeProvider.GetUtcNow();
         return (to - range, to);
     }
 
@@ -129,13 +149,64 @@ public class HealthChartSharesController(
         HealthChartShare share,
         IReadOnlyList<HealthEvent> events,
         DateTimeOffset? from = null,
-        DateTimeOffset? to = null) =>
+        DateTimeOffset? to = null,
+        bool useProvidedRange = false) =>
         new(
             share.Token,
             $"/api/public/health-chart-shares/{share.Token}",
             events.OrderByDescending(x => x.StartedAt).ToArray(),
-            from ?? share.From,
-            to ?? share.To,
+            useProvidedRange ? from : share.From,
+            useProvidedRange ? to : share.To,
+            ResolveRangeMode(share),
             share.IsEnabled,
             share.CreatedAtUtc);
+
+    private static HealthChartShareRangeMode ResolveRangeMode(HealthChartShare share) =>
+        share.RangeMode ?? InferRangeMode(share.From, share.To);
+
+    private static HealthChartShareRangeMode InferRangeMode(
+        DateTimeOffset? from,
+        DateTimeOffset? to) =>
+        from.HasValue && to.HasValue
+            ? HealthChartShareRangeMode.Rolling
+            : from.HasValue || to.HasValue
+                ? HealthChartShareRangeMode.Absolute
+                : HealthChartShareRangeMode.All;
+
+    private static bool TryResolveRequestRangeMode(
+        HealthChartShareRequest request,
+        out HealthChartShareRangeMode rangeMode,
+        out string? validationError)
+    {
+        rangeMode = request.RangeMode ?? InferRangeMode(request.From, request.To);
+        validationError = null;
+
+        if (request.From.HasValue && request.To.HasValue && request.From >= request.To)
+        {
+            validationError = "The share range must have a start before its end.";
+            return false;
+        }
+
+        if (request.RangeMode == null)
+        {
+            return true;
+        }
+
+        var hasBothBounds = request.From.HasValue && request.To.HasValue;
+        var hasNoBounds = !request.From.HasValue && !request.To.HasValue;
+        var isValid = rangeMode switch
+        {
+            HealthChartShareRangeMode.Rolling or HealthChartShareRangeMode.Absolute => hasBothBounds,
+            HealthChartShareRangeMode.All => hasNoBounds,
+            _ => false,
+        };
+
+        if (!isValid)
+        {
+            validationError = "The selected share range mode does not match its bounds.";
+            return false;
+        }
+
+        return true;
+    }
 }

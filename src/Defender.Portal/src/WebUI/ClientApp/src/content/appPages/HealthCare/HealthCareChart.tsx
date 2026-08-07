@@ -2,12 +2,12 @@ import { Box, Tooltip, Typography } from "@mui/material";
 import { LineChart } from "@mui/x-charts/LineChart";
 import { HealthEvent } from "src/api/healthCare";
 import useUtils from "src/appUtils";
-import { buildHealthCareChartData, ChartTimeRange } from "./chartData";
+import { buildHealthCareChartData, HealthChartRange } from "./chartData";
 import { formatEventTime } from "./dateFormat";
 
 interface HealthCareChartProps {
   events: HealthEvent[];
-  timeRange?: ChartTimeRange;
+  timeRange?: HealthChartRange;
   height?: number;
   language?: string;
 }

@@ -2,6 +2,7 @@ using Defender.Common.Enums;
 using Defender.Common.Interfaces;
 using Defender.HealthCareService.Application.Common.Interfaces.Repositories;
 using Defender.HealthCareService.Domain.Entities;
+using Defender.HealthCareService.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using WebApi.Controllers.V1;
@@ -10,6 +11,199 @@ namespace Defender.HealthCareService.Tests.Controllers;
 
 public class HealthChartSharesControllerTests
 {
+    private static readonly DateTimeOffset FixedNow = DateTimeOffset.Parse("2026-08-07T12:00:00Z");
+
+    [Fact]
+    public async Task GetPublicShare_WhenRangeModeIsAbsolute_PreservesExactDateRange()
+    {
+        var from = DateTimeOffset.Parse("2026-06-18T08:30:00Z");
+        var to = DateTimeOffset.Parse("2026-06-19T17:00:00Z");
+        var token = "absolute-token";
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var healthEventRepository = new Mock<IHealthEventRepository>();
+        healthEventRepository
+            .Setup(x => x.GetHealthEventsAsync(userId, from, to))
+            .ReturnsAsync([]);
+        var shareRepository = new Mock<IHealthChartShareRepository>();
+        shareRepository
+            .Setup(x => x.GetHealthChartShareByTokenAsync(token))
+            .ReturnsAsync(new HealthChartShare
+            {
+                Token = token,
+                UserId = userId,
+                From = from,
+                To = to,
+                RangeMode = HealthChartShareRangeMode.Absolute,
+            });
+        var controller = CreateController(healthEventRepository, shareRepository);
+
+        var result = await controller.GetPublicShare(token);
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var dto = Assert.IsType<HealthChartShareDto>(okResult.Value);
+        Assert.Equal(from, dto.From);
+        Assert.Equal(to, dto.To);
+        Assert.Equal(HealthChartShareRangeMode.Absolute, dto.RangeMode);
+        healthEventRepository.Verify(x => x.GetHealthEventsAsync(userId, from, to), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetPublicShare_WhenRangeModeIsRolling_UsesCurrentRollingWindow()
+    {
+        var storedFrom = DateTimeOffset.Parse("2026-06-20T08:00:00Z");
+        var storedTo = DateTimeOffset.Parse("2026-06-21T08:00:00Z");
+        var expectedFrom = FixedNow - (storedTo - storedFrom);
+        var token = "rolling-token";
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var healthEventRepository = new Mock<IHealthEventRepository>();
+        DateTimeOffset? requestedFrom = null;
+        DateTimeOffset? requestedTo = null;
+        healthEventRepository
+            .Setup(x => x.GetHealthEventsAsync(userId, It.IsAny<DateTimeOffset?>(), It.IsAny<DateTimeOffset?>()))
+            .Callback<Guid, DateTimeOffset?, DateTimeOffset?>((_, from, to) =>
+            {
+                requestedFrom = from;
+                requestedTo = to;
+            })
+            .ReturnsAsync([]);
+        var shareRepository = new Mock<IHealthChartShareRepository>();
+        shareRepository
+            .Setup(x => x.GetHealthChartShareByTokenAsync(token))
+            .ReturnsAsync(new HealthChartShare
+            {
+                Token = token,
+                UserId = userId,
+                From = storedFrom,
+                To = storedTo,
+                RangeMode = HealthChartShareRangeMode.Rolling,
+            });
+        var controller = CreateController(healthEventRepository, shareRepository);
+
+        var result = await controller.GetPublicShare(token);
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var dto = Assert.IsType<HealthChartShareDto>(okResult.Value);
+        Assert.Equal(expectedFrom, requestedFrom);
+        Assert.Equal(FixedNow, requestedTo);
+        Assert.Equal(expectedFrom, dto.From);
+        Assert.Equal(FixedNow, dto.To);
+        Assert.Equal(HealthChartShareRangeMode.Rolling, dto.RangeMode);
+    }
+
+    [Fact]
+    public async Task GetPublicShare_WhenRangeModeIsAll_DoesNotApplyBounds()
+    {
+        var token = "all-token";
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var healthEventRepository = new Mock<IHealthEventRepository>();
+        healthEventRepository
+            .Setup(x => x.GetHealthEventsAsync(userId, null, null))
+            .ReturnsAsync([]);
+        var shareRepository = new Mock<IHealthChartShareRepository>();
+        shareRepository
+            .Setup(x => x.GetHealthChartShareByTokenAsync(token))
+            .ReturnsAsync(new HealthChartShare
+            {
+                Token = token,
+                UserId = userId,
+                RangeMode = HealthChartShareRangeMode.All,
+            });
+        var controller = CreateController(healthEventRepository, shareRepository);
+
+        var result = await controller.GetPublicShare(token);
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var dto = Assert.IsType<HealthChartShareDto>(okResult.Value);
+        Assert.Null(dto.From);
+        Assert.Null(dto.To);
+        Assert.Equal(HealthChartShareRangeMode.All, dto.RangeMode);
+    }
+
+    [Fact]
+    public async Task GetPublicShare_WhenLegacyShareHasOneBound_PreservesStoredBoundsAsAbsolute()
+    {
+        var from = DateTimeOffset.Parse("2026-06-18T08:30:00Z");
+        var token = "legacy-one-sided-token";
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var healthEventRepository = new Mock<IHealthEventRepository>();
+        healthEventRepository
+            .Setup(x => x.GetHealthEventsAsync(userId, from, null))
+            .ReturnsAsync([]);
+        var shareRepository = new Mock<IHealthChartShareRepository>();
+        shareRepository
+            .Setup(x => x.GetHealthChartShareByTokenAsync(token))
+            .ReturnsAsync(new HealthChartShare
+            {
+                Token = token,
+                UserId = userId,
+                From = from,
+                RangeMode = null,
+            });
+        var controller = CreateController(healthEventRepository, shareRepository);
+
+        var result = await controller.GetPublicShare(token);
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var dto = Assert.IsType<HealthChartShareDto>(okResult.Value);
+        Assert.Equal(from, dto.From);
+        Assert.Null(dto.To);
+        Assert.Equal(HealthChartShareRangeMode.Absolute, dto.RangeMode);
+    }
+
+    [Fact]
+    public async Task CreateShare_WhenAbsoluteRangeIsValid_PersistsModeAndUsesFixedTimestamp()
+    {
+        var userId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+        var from = DateTimeOffset.Parse("2026-06-18T08:30:00Z");
+        var to = DateTimeOffset.Parse("2026-06-19T17:00:00Z");
+        HealthChartShare? addedShare = null;
+        var healthEventRepository = new Mock<IHealthEventRepository>();
+        healthEventRepository
+            .Setup(x => x.GetHealthEventsAsync(userId, from, to))
+            .ReturnsAsync([]);
+        var shareRepository = new Mock<IHealthChartShareRepository>();
+        shareRepository
+            .Setup(x => x.GetHealthChartShareByUserIdAsync(userId))
+            .ReturnsAsync((HealthChartShare?)null);
+        shareRepository
+            .Setup(x => x.AddHealthChartShareAsync(It.IsAny<HealthChartShare>()))
+            .Callback<HealthChartShare>(share => addedShare = share)
+            .ReturnsAsync((HealthChartShare share) => share);
+        var controller = CreateController(healthEventRepository, shareRepository);
+
+        var result = await controller.CreateShare(
+            new HealthChartShareRequest(from, to, HealthChartShareRangeMode.Absolute));
+
+        var createdResult = Assert.IsType<CreatedResult>(result.Result);
+        var dto = Assert.IsType<HealthChartShareDto>(createdResult.Value);
+        Assert.NotNull(addedShare);
+        Assert.Equal(HealthChartShareRangeMode.Absolute, addedShare.RangeMode);
+        Assert.Equal(FixedNow, addedShare.CreatedAtUtc);
+        Assert.Equal(HealthChartShareRangeMode.Absolute, dto.RangeMode);
+    }
+
+    [Theory]
+    [InlineData(HealthChartShareRangeMode.Absolute, true, false)]
+    [InlineData(HealthChartShareRangeMode.Rolling, false, true)]
+    [InlineData(HealthChartShareRangeMode.All, false, false)]
+    public async Task CreateShare_WhenRangeModePayloadIsInvalid_ReturnsBadRequest(
+        HealthChartShareRangeMode mode,
+        bool missingFrom,
+        bool reversed)
+    {
+        var from = missingFrom
+            ? (DateTimeOffset?)null
+            : DateTimeOffset.Parse("2026-06-19T08:00:00Z");
+        var to = mode == HealthChartShareRangeMode.All
+            ? DateTimeOffset.Parse("2026-06-20T08:00:00Z")
+            : DateTimeOffset.Parse(reversed ? "2026-06-18T08:00:00Z" : "2026-06-20T08:00:00Z");
+        var controller = CreateController(new Mock<IHealthEventRepository>(), new Mock<IHealthChartShareRepository>());
+
+        var result = await controller.CreateShare(new HealthChartShareRequest(from, to, mode));
+
+        Assert.IsType<BadRequestObjectResult>(result.Result);
+    }
+
     [Fact]
     public async Task GetPublicShare_WhenShareExists_ReturnsCurrentRollingDateRange()
     {
@@ -223,7 +417,8 @@ public class HealthChartSharesControllerTests
 
     private static HealthChartSharesController CreateController(
         Mock<IHealthEventRepository> healthEventRepository,
-        Mock<IHealthChartShareRepository> shareRepository)
+        Mock<IHealthChartShareRepository> shareRepository,
+        DateTimeOffset? now = null)
     {
         var currentAccountAccessor = new Mock<ICurrentAccountAccessor>();
         currentAccountAccessor
@@ -239,6 +434,12 @@ public class HealthChartSharesControllerTests
         return new HealthChartSharesController(
             currentAccountAccessor.Object,
             healthEventRepository.Object,
-            shareRepository.Object);
+            shareRepository.Object,
+            new FixedTimeProvider(now ?? FixedNow));
+    }
+
+    private sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
+    {
+        public override DateTimeOffset GetUtcNow() => now;
     }
 }

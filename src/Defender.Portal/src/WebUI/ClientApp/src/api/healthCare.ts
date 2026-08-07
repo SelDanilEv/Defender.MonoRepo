@@ -10,6 +10,7 @@ export type HealthEventType =
   | "Analysis";
 
 export type AnalysisStatus = "Bad" | "HasDeviations" | "Excellent";
+export type HealthChartShareRangeMode = "Rolling" | "Absolute" | "All";
 
 export interface HealthEvent {
   id: string;
@@ -33,6 +34,7 @@ export interface HealthChartShare {
   events: HealthEvent[];
   from?: string;
   to?: string;
+  rangeMode?: HealthChartShareRangeMode;
   isEnabled: boolean;
   createdAtUtc: string;
 }
@@ -46,6 +48,7 @@ export interface MedicationOptions {
 export interface HealthChartShareRequest {
   from?: string;
   to?: string;
+  rangeMode: HealthChartShareRangeMode;
 }
 
 export interface HealthChartShareStatusRequest {

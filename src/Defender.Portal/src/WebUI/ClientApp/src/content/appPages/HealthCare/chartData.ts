@@ -1,47 +1,38 @@
 import { HealthEvent } from "src/api/healthCare";
+import {
+  filterEventsByDateRange,
+  HealthDateRangePreset,
+  HealthDateRangeSelection,
+  resolveHealthDateRange,
+} from "./dateRange";
 
 export const eventAxisMin = 0.5;
 export const eventAxisMax = 2.5;
 export const medicationLane = 1;
 export const sleepLane = 2;
-export type ChartTimeRange = "day" | "week" | "month" | "all";
+export type ChartTimeRange = HealthDateRangePreset;
+export type HealthChartRange = ChartTimeRange | HealthDateRangeSelection;
 
 const wellbeingEmojiByScore = ["😢", "😟", "😐", "🙂", "😄"];
 
-const rangeDays: Partial<Record<ChartTimeRange, number>> = {
-  day: 1,
-  week: 7,
-  month: 30,
-};
+const toSelection = (timeRange: HealthChartRange): HealthDateRangeSelection =>
+  typeof timeRange === "string"
+    ? { kind: "preset", preset: timeRange }
+    : timeRange;
 
 export const filterEventsByTimeRange = (
   events: HealthEvent[],
-  timeRange: ChartTimeRange,
+  timeRange: HealthChartRange,
   now = new Date()
 ) => {
-  const bounds = getTimeRangeBounds(timeRange, now);
-
-  if (!bounds.from) {
-    return events;
-  }
-
-  return events.filter((event) => new Date(event.startedAt) >= bounds.from!);
+  return filterEventsByDateRange(events, toSelection(timeRange), now);
 };
 
 export const getTimeRangeBounds = (
-  timeRange: ChartTimeRange,
+  timeRange: HealthChartRange,
   now = new Date()
 ) => {
-  const days = rangeDays[timeRange];
-
-  if (!days) {
-    return { from: undefined, to: undefined };
-  }
-
-  const from = new Date(now);
-  from.setDate(from.getDate() - days);
-
-  return { from, to: now };
+  return resolveHealthDateRange(toSelection(timeRange), now);
 };
 
 export const wellbeingScoreToEmoji = (score?: number) => {
@@ -56,7 +47,7 @@ export const wellbeingScoreToEmoji = (score?: number) => {
 
 export const getLatestWellbeingEvent = (
   events: HealthEvent[],
-  timeRange: ChartTimeRange = "all",
+  timeRange: HealthChartRange = "all",
   now = new Date()
 ) =>
   [...filterEventsByTimeRange(events, timeRange, now)]
@@ -90,9 +81,10 @@ const eventTimeLabel = (event: HealthEvent) =>
 
 export const buildHealthCareChartData = (
   events: HealthEvent[],
-  timeRange: ChartTimeRange = "all"
+  timeRange: HealthChartRange = "all",
+  anchor = new Date()
 ) => {
-  const chartEvents = [...filterEventsByTimeRange(events, timeRange)].sort(
+  const chartEvents = [...filterEventsByTimeRange(events, timeRange, anchor)].sort(
     (left, right) =>
       new Date(left.startedAt).getTime() - new Date(right.startedAt).getTime()
   );
@@ -100,7 +92,7 @@ export const buildHealthCareChartData = (
     (event) =>
       event.type === "Temperature" && event.temperatureCelsius !== undefined
   );
-  const bounds = getTimeRangeBounds(timeRange);
+  const bounds = getTimeRangeBounds(timeRange, anchor);
   const eventTimes = chartEvents.flatMap((event) => [
     new Date(event.startedAt).getTime(),
     event.endedAt ? new Date(event.endedAt).getTime() : new Date(event.startedAt).getTime(),

@@ -8,7 +8,16 @@ public enum PortalHealthEventType
     Temperature,
     Medication,
     Sleep,
-    Wellbeing
+    Wellbeing,
+    Analysis,
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum PortalAnalysisStatus
+{
+    Bad,
+    HasDeviations,
+    Excellent,
 }
 
 public class PortalHealthEventDto
@@ -32,6 +41,10 @@ public class PortalHealthEventDto
     public string? MedicationUnit { get; set; }
 
     public int? WellbeingScore { get; set; }
+
+    public string? AnalysisName { get; set; }
+
+    public PortalAnalysisStatus? AnalysisStatus { get; set; }
 
     public string? Notes { get; set; }
 }
