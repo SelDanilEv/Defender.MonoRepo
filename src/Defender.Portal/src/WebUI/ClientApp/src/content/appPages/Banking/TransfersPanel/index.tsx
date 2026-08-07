@@ -177,7 +177,6 @@ const TransfersPanel = (props: any) => {
               onClick={() => setShowTransferDialog(true)}
               variant="outlined"
               fullWidth
-              sx={{ minHeight: 38 }}
             >
               {u.t("banking_page__transfer_button_transfer")}
             </LockedButton>

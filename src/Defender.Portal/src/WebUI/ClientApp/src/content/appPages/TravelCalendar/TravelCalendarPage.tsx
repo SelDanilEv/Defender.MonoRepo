@@ -35,7 +35,7 @@ import { MonthGrid } from "./components/MonthGrid";
 import { EventDrawer } from "./components/EventDrawer";
 import { InvitationPanel } from "./components/InvitationPanel";
 import { useTravelCalendar } from "./hooks/useTravelCalendar";
-import { addCalendarMonths, calendarMonths, currentCalendarMonth, visibleCalendarMonthCount } from "./monthNavigation";
+import { addCalendarMonths, calendarMonthFromDate, calendarMonths, clampMonthToRange, currentCalendarMonth, visibleCalendarMonthCount } from "./monthNavigation";
 
 const Panel = ({ children, ...props }: any) => (
   <Paper
@@ -62,6 +62,7 @@ export default function TravelCalendarPage() {
   const formatMoney = (value: number) => value.toLocaleString(locale);
   const visibleMonthCount = visibleCalendarMonthCount(laptop);
   const [firstMonth, setFirstMonth] = useState(currentCalendarMonth);
+  const [seasonClampResolved, setSeasonClampResolved] = useState(false);
   const state = useTravelCalendar(visibleMonthCount);
   const { calendar, ensureMonths } = state;
   const [tripDialog, setTripDialog] = useState(false);
@@ -70,11 +71,35 @@ export default function TravelCalendarPage() {
   const [budgetOpen, setBudgetOpen] = useState(false);
   const visibleMonths = useMemo(() => calendarMonths(firstMonth, visibleMonthCount), [firstMonth, visibleMonthCount]);
 
+  // `firstMonth` starts out as today's real-world month, but the calendar's actual data
+  // lives in a season (calendar.seasonStart/seasonEnd) that's only known once `calendar`
+  // has loaded, and is currently hardcoded server-side to 2026-07-01..2026-09-30. Once
+  // that season ends (2026-10-01), today's month would otherwise fall entirely outside
+  // it and the grid (plus this page's invitations panel) would render blank with no hint
+  // that data exists a few months back. Runs once per load (guarded by
+  // seasonClampResolved, not by `calendar` alone, since a manual navigation away from the
+  // clamped position afterwards must not be fought). Declared before the ensureMonths
+  // effect below and gates it via the same flag, so that effect never fires with the
+  // pre-clamp (about-to-be-abandoned) visibleMonths.
   useEffect(() => {
-    if (calendar) {
+    if (!calendar || seasonClampResolved) {
+      return;
+    }
+
+    setSeasonClampResolved(true);
+    const seasonStart = calendarMonthFromDate(calendar.seasonStart);
+    const seasonEnd = calendarMonthFromDate(calendar.seasonEnd);
+    const clamped = clampMonthToRange(firstMonth, seasonStart, seasonEnd, visibleMonthCount);
+    if (clamped.year !== firstMonth.year || clamped.month !== firstMonth.month) {
+      setFirstMonth(clamped);
+    }
+  }, [calendar, seasonClampResolved, firstMonth, visibleMonthCount]);
+
+  useEffect(() => {
+    if (calendar && seasonClampResolved) {
       ensureMonths(visibleMonths);
     }
-  }, [calendar, ensureMonths, visibleMonths]);
+  }, [calendar, seasonClampResolved, ensureMonths, visibleMonths]);
 
   const moveMonths = (direction: -1 | 1, count = 1) => {
     const nextFirstMonth = addCalendarMonths(firstMonth, direction * count);
@@ -600,7 +625,13 @@ export default function TravelCalendarPage() {
             </Panel>
 
             <Panel>
-              <InvitationPanel events={calendar.events} onOpen={state.openEvent} />
+              <InvitationPanel
+                events={calendar.events}
+                onOpen={state.openEvent}
+                onRespond={state.updateMyParticipation}
+                onRemoveParticipant={state.removeParticipant}
+                busy={state.mutating}
+              />
             </Panel>
           </Stack>
 

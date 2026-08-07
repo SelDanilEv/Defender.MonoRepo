@@ -34,7 +34,7 @@ const WellbeingSelector = ({
             variant={score === value ? "contained" : "outlined"}
             size="small"
             onClick={() => onChange(value)}
-            sx={{ minWidth: 44, fontSize: "1.2rem", lineHeight: 1.2 }}
+            sx={{ minWidth: 44, fontSize: 18, lineHeight: 1.2 }}
           >
             {wellbeingScoreToEmoji(value)}
           </Button>

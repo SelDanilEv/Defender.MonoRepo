@@ -16,7 +16,7 @@ const MenuItem = (props: any) => {
         onClick={closeSidebar}
         to={props.to}
         startIcon={props.icon}
-        sx={{ fontSize: "0.92rem", lineHeight: 1.2 }}
+        sx={{ fontSize: 15, lineHeight: 1.2 }}
       >
         {props.text}
       </Button>

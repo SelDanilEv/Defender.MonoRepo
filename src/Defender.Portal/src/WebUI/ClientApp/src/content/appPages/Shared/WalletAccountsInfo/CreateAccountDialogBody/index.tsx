@@ -85,7 +85,6 @@ const CreateAccountDialogBody = (props: any) => {
           variant="outlined"
           color="success"
           onClick={createNewAccount}
-          sx={{ fontSize: "1.2em" }}
         >
           {u.t("banking_page__wallet_dialog_button_create")}
         </LockedButton>

@@ -13,6 +13,7 @@ import { CardCc, CardLogo } from "./styledComponents";
 
 import CurrencySymbolsMap from "src/consts/CurrencySymbolsMap";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
+import { compactIconButtonLayout } from "src/components/Buttons/buttonLayouts";
 import AddIcon from "@mui/icons-material/Add";
 import { useState } from "react";
 import { RechargeRequest } from "src/models/requests/admin/banking/RefundRequest";
@@ -84,11 +85,7 @@ const WalletAccountsInfo = (props: WalletAccountsInfoProps) => {
                     <LockedButton
                       onClick={() => startRecharge(account.currency)}
                       color="success"
-                      sx={{
-                        minWidth: "30px",
-                        width: "45px",
-                        height: "45px",
-                      }}
+                      sx={compactIconButtonLayout}
                       variant="outlined"
                     >
                       <AddIcon />

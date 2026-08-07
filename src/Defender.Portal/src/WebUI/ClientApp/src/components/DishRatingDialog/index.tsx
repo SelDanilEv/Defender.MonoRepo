@@ -50,7 +50,6 @@ const DishRatingDialog = ({
           {[1, 2, 3, 4, 5].map((value) => (
             <Button
               key={value}
-              size="large"
               variant={ratingValue === value ? "contained" : "outlined"}
               onClick={() => onChange(value)}
               sx={{ minWidth: 56 }}

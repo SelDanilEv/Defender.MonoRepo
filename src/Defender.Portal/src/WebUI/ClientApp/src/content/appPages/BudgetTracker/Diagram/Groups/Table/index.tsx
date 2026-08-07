@@ -31,6 +31,7 @@ import CustomDialog from "src/components/Dialog";
 import { PaginationRequest } from "src/models/base/PaginationRequest";
 import { DialogMode, OpenDialog } from "src/models/shared/DialogMode";
 import LockedIconButton from "src/components/LockedComponents/LockedIconButtons/LockedIconButton";
+import { compactIconButtonLayout } from "src/components/Buttons/buttonLayouts";
 import { BudgetDiagramGroup } from "src/models/budgetTracker/BudgetDiagramGroups";
 
 import GroupDialogBody from "./GroupDialogBody";
@@ -166,7 +167,6 @@ const GroupsTable = (props: GroupsTableProps) => {
                 disabled
                 color="inherit"
                 size="small"
-                sx={{ p: 0.4 }}
               >
                 <VisibilityOffIcon fontSize="small" />
               </LockedIconButton>
@@ -179,7 +179,6 @@ const GroupsTable = (props: GroupsTableProps) => {
               {model.isActive ? (
                 <LockedIconButton
                   sx={{
-                    p: 0.45,
                     "&:hover": { background: theme.colors.success.light },
                     color: theme.palette.success.light,
                   }}
@@ -203,7 +202,6 @@ const GroupsTable = (props: GroupsTableProps) => {
               ) : (
                 <LockedIconButton
                   sx={{
-                    p: 0.45,
                     "&:hover": { background: theme.colors.error.light },
                     color: theme.palette.error.light,
                   }}
@@ -228,7 +226,6 @@ const GroupsTable = (props: GroupsTableProps) => {
 
               <LockedIconButton
                 sx={{
-                  p: 0.45,
                   "&:hover": { background: theme.colors.warning.lighter },
                   color: theme.palette.warning.dark,
                 }}
@@ -244,7 +241,6 @@ const GroupsTable = (props: GroupsTableProps) => {
               </LockedIconButton>
               <LockedIconButton
                 sx={{
-                  p: 0.45,
                   "&:hover": { background: theme.colors.error.lighter },
                   color: theme.palette.error.dark,
                 }}
@@ -271,13 +267,7 @@ const GroupsTable = (props: GroupsTableProps) => {
         action={
           <>
             <LockedButton
-              sx={{
-                mr: 1,
-                minWidth: 44,
-                width: 44,
-                height: 44,
-                p: 0,
-              }}
+              sx={{ ...compactIconButtonLayout, mr: 1 }}
               variant="outlined"
               color="success"
               onClick={() => {
@@ -288,13 +278,7 @@ const GroupsTable = (props: GroupsTableProps) => {
               <AddIcon />
             </LockedButton>
             <LockedButton
-              sx={{
-                mr: 1,
-                minWidth: 44,
-                width: 44,
-                height: 44,
-                p: 0,
-              }}
+              sx={{ ...compactIconButtonLayout, mr: 1 }}
               variant="outlined"
               onClick={refresh}
             >

@@ -11,6 +11,7 @@ describe("loginFormLayout", () => {
     expect(loginFormLayout.width).toBe("100%");
     expect(googleLoginButtonLayout.width).toBe("100%");
     expect(googleLoginButtonLayout.minHeight).toBe(48);
+    expect(googleLoginButtonLayout.fontSize).toBe(16);
     expect(loginInputAutoComplete).toEqual({
       login: "username",
       password: "current-password",
@@ -23,7 +24,7 @@ describe("loginFormLayout", () => {
       height: 32,
     });
     expect(resetPasswordLinkLayout).toMatchObject({
-      fontSize: "0.75rem",
+      fontSize: 12,
       minHeight: 32,
     });
     expect(resetPasswordLinkLayout["&:focus-visible"]).toBeDefined();

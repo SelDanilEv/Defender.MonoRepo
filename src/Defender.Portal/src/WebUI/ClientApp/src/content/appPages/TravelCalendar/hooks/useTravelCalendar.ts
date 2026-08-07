@@ -69,10 +69,19 @@ export const useTravelCalendar = (initialMonthCount: number) => {
     loadedMonths.current.clear();
     loadingMonths.current.clear();
     try {
+      // Fetch the full calendar unbounded (no from/to) instead of an initial N-month
+      // window. calendar.events must stay complete regardless of which months are
+      // scrolled into view: activeEvent/getEventVersion read it directly (a stale/narrow
+      // window made responding to an out-of-window invitation silently no-op), and the
+      // Received/Sent invitation feeds need every invitation, not just ones in the
+      // initial window. Data volume is trivial (bounded by one travel season), so this
+      // is cheap, and it also simplifies the BFF cache to one canonical
+      // {userId}_all_all key instead of one entry per initial window.
+      // Tripwire: if the event corpus ever outgrows a single season, the correct next
+      // step is a dedicated GET /invitations?since= endpoint WITH repository-level date
+      // filtering added (doesn't exist today) - not re-narrowing this call.
+      const page = await travelCalendarApi.get(undefined, undefined, utilsRef.current);
       const initialMonths = calendarMonths(currentCalendarMonth(), initialMonthCount);
-      const first = monthRange(initialMonths[0]);
-      const last = monthRange(initialMonths[initialMonths.length - 1]);
-      const page = await travelCalendarApi.get(first.from, last.to, utilsRef.current);
       initialMonths.forEach((month) => loadedMonths.current.add(monthKey(month)));
       setCalendar(page);
     } catch {

@@ -8,6 +8,7 @@ export const loginFormLayout = {
 export const googleLoginButtonLayout = {
   width: "100%",
   minHeight: 48,
+  fontSize: 16,
   justifyContent: "center",
   gap: 1.5,
   fontWeight: 700,
@@ -41,7 +42,7 @@ export const resetPasswordLinkLayout = {
   mt: 0.5,
   minHeight: 32,
   px: 0.5,
-  fontSize: "0.75rem",
+  fontSize: 12,
   display: "inline-flex",
   alignItems: "center",
   "&:focus-visible": {

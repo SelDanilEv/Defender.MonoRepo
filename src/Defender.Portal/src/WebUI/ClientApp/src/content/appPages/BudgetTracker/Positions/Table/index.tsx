@@ -28,6 +28,7 @@ import { PaginationRequest } from "src/models/base/PaginationRequest";
 import { BudgetPosition } from "src/models/budgetTracker/BudgetPositions";
 import { DialogMode, OpenDialog } from "src/models/shared/DialogMode";
 import LockedIconButton from "src/components/LockedComponents/LockedIconButtons/LockedIconButton";
+import { compactIconButtonLayout } from "src/components/Buttons/buttonLayouts";
 import { BudgetTrackerAvailableCurrencies } from "src/models/shared/Currency";
 import DefaultTableConsts from "src/consts/DefaultTableConsts";
 import TagChip from "src/components/TagChip";
@@ -177,7 +178,7 @@ const PositionsTable = (props: PositionsTableProps) => {
           <>
             <LockedButton
               aria-label={u.t("budgetTracker:positions_dialog_title")}
-              sx={{ mr: "1em" }}
+              sx={{ ...compactIconButtonLayout, mr: 1 }}
               variant="outlined"
               color="success"
               onClick={() => {
@@ -189,7 +190,7 @@ const PositionsTable = (props: PositionsTableProps) => {
             </LockedButton>
             <LockedButton
               aria-label="Refresh positions"
-              sx={{ mr: "1em" }}
+              sx={{ ...compactIconButtonLayout, mr: 1 }}
               variant="outlined"
               onClick={refresh}
             >

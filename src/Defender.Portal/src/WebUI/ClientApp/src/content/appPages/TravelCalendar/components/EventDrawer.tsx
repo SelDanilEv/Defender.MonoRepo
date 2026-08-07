@@ -24,17 +24,7 @@ import { TravelCalendar, TravelCalendarUserOption, TravelEvent, TravelParticipan
 import { liveTotal } from "../budgetMath";
 import { createEventDraft, toAmount, toUpdateEventRequest } from "./eventDrawerDraft";
 import { getEventDrawerPaperSx } from "./eventDrawerStyles";
-
-const participantColor = (status?: TravelParticipantStatus) => {
-  switch (status) {
-    case "Accepted":
-      return "success";
-    case "Declined":
-      return "default";
-    default:
-      return "warning";
-  }
-};
+import { participantColor } from "./participantStatus";
 
 export const EventDrawer = ({
   event,

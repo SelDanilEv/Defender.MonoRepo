@@ -31,7 +31,7 @@ const SubMenuWrapper = styled(Box)(
 
           .MuiBadge-standard {
             background: ${theme.colors.primary.main};
-            font-size: ${theme.typography.pxToRem(10)};
+            font-size: 10px;
             font-weight: bold;
             text-transform: uppercase;
             color: ${theme.palette.primary.contrastText};
@@ -59,7 +59,7 @@ const SubMenuWrapper = styled(Box)(
 
           .MuiButton-startIcon {
             color: ${theme.sidebar.menuItemIconColor};
-            font-size: ${theme.typography.pxToRem(16)};
+            font-size: 16px;
             margin-right: ${theme.spacing(0.75)};
           }
           
@@ -67,7 +67,7 @@ const SubMenuWrapper = styled(Box)(
             color: ${theme.sidebar.menuItemIconColor};
             margin-left: auto;
             opacity: .8;
-            font-size: ${theme.typography.pxToRem(16)};
+            font-size: 16px;
           }
 
           &.active,

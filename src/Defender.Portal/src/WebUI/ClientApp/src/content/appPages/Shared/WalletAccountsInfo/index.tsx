@@ -27,6 +27,7 @@ import CreateAccountDialogBody from "./CreateAccountDialogBody";
 import { BankingSupportedCurrencies } from "src/consts/SupportedCurrencies";
 import RechargeOrRefundDialogBody from "./RechargeOrRefundDialogBody";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
+import { compactIconButtonLayout } from "src/components/Buttons/buttonLayouts";
 
 import HomeIcon from "@mui/icons-material/Home";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
@@ -209,7 +210,6 @@ const WalletAccountsInfo = (props: any) => {
           startIcon={<AccountBalanceIcon />}
           variant="outlined"
           color="primary"
-          sx={{ fontSize: "1.1em" }}
           onClick={() => u.react.navigate("/banking")}
         >
           {u.t("banking_page__wallet_button_open_banking")}
@@ -221,7 +221,6 @@ const WalletAccountsInfo = (props: any) => {
           startIcon={<HomeIcon />}
           variant="outlined"
           color="primary"
-          sx={{ fontSize: "1.1em" }}
           onClick={() => u.react.navigate("/home")}
         >
           {u.t("banking_page__wallet_button_home")}
@@ -266,6 +265,7 @@ const WalletAccountsInfo = (props: any) => {
                   variant="outlined"
                   aria-label={u.t("banking_page__wallet_button_refresh")}
                   onClick={updateWalletInfo}
+                  sx={compactIconButtonLayout}
                 >
                   <CachedIcon />
                 </LockedButton>
@@ -273,7 +273,6 @@ const WalletAccountsInfo = (props: any) => {
               <LockedButton
                 variant="outlined"
                 color="primary"
-                sx={{ fontSize: "1.1em" }}
                 onClick={() => setShowRechargeOrRefundAccountDialog(true)}
               >
                 {u.t("banking_page__wallet_button_recharge_or_refund")}

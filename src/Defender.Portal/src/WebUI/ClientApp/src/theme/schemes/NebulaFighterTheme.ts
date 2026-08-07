@@ -721,21 +721,60 @@ export const NebulaFighterTheme = createTheme({
         },
       },
     },
+    // Tier 1t (Toggle): must render identically to Tier 1 (MuiButton) - minHeight 30,
+    // fontSize 13, bold, lineHeight 1.5, textTransform "none". This block used to be
+    // colour-only, which left ToggleButton on MUI's built-in ~44px/0.8125rem defaults.
+    // fontSize is repeated in root AND in each sizeSmall/Medium/Large slot (not just root)
+    // because theme styleOverrides slots are merged by SOURCE ORDER, not CSS specificity -
+    // MUI's own built-in per-size rem-based fontSize can still win over a root-only
+    // override for that slot, so both must agree on 13 to be safe regardless of which one
+    // is serialized last.
     MuiToggleButton: {
       defaultProps: {
         disableRipple: true,
+        size: "small",
       },
       styleOverrides: {
         root: {
           color: colors.primary.main,
           background: colors.alpha.white[100],
           transition: "all .2s",
+          fontWeight: "bold",
+          fontSize: 13,
+          lineHeight: 1.5,
+          textTransform: "none",
+          minHeight: 30,
+          paddingLeft: 12,
+          paddingRight: 12,
 
           "&:hover, &.Mui-selected, &.Mui-selected:hover": {
             color: themeColors.trueWhite,
             background: colors.primary.main,
           },
         },
+        sizeSmall: {
+          padding: "4px 12px",
+          fontSize: 13,
+        },
+        sizeMedium: {
+          padding: "6px 14px",
+          fontSize: 13,
+        },
+        sizeLarge: {
+          padding: "9px 18px",
+          fontSize: 13,
+        },
+      },
+    },
+    // ToggleButtonGroup pushes `size` into React context for its ToggleButton children,
+    // which beats MuiToggleButton.defaultProps above (MUI prop-resolution priority is
+    // inProps > contextProps > themeDefaultProps). Without this block every GROUPED
+    // toggle (e.g. Travel Calendar's Pending/Declined filter) would stay on MUI's
+    // "medium" context default regardless of MuiToggleButton.defaultProps.size - this was
+    // the actual cause of the reported sizing bug.
+    MuiToggleButtonGroup: {
+      defaultProps: {
+        size: "small",
       },
     },
     MuiIconButton: {
@@ -753,6 +792,26 @@ export const NebulaFighterTheme = createTheme({
         },
         sizeSmall: {
           padding: 3,
+        },
+      },
+    },
+    // Icons pinned to plain px instead of MUI's built-in rem-based fontSizeSmall/Medium/
+    // Large. These px values (20/24/35) are MUI's own nominal pxToRem(20/24/35) output AT
+    // the 16px base root - below the 1280px breakpoint (where custom.css hasn't scaled
+    // html{font-size} yet) this renders byte-identical to today; it only removes the
+    // unintended growth above that breakpoint, where rem-based icons were scaling with the
+    // page but buttons around them were not. fontSize="inherit" and an explicit per-call
+    // sx={{fontSize:n}} both still win over this default.
+    MuiSvgIcon: {
+      styleOverrides: {
+        fontSizeSmall: {
+          fontSize: 20,
+        },
+        fontSizeMedium: {
+          fontSize: 24,
+        },
+        fontSizeLarge: {
+          fontSize: 35,
         },
       },
     },

@@ -1,6 +1,6 @@
 import { act, fireEvent, renderHook, waitFor } from "@testing-library/react";
 
-import { TravelCalendar, UpdateEventRequest, travelCalendarApi } from "src/api/travelCalendar";
+import { TravelCalendar, TravelEvent, UpdateEventRequest, travelCalendarApi } from "src/api/travelCalendar";
 import { useTravelCalendar } from "./useTravelCalendar";
 
 vi.mock("src/appUtils", () => ({
@@ -12,6 +12,7 @@ vi.mock("src/api/travelCalendar", () => ({
     get: vi.fn(),
     createEvent: vi.fn(),
     createFromDate: vi.fn(),
+    updateMyParticipation: vi.fn(),
   },
 }));
 
@@ -164,5 +165,93 @@ describe("useTravelCalendar", () => {
     act(() => result.current.clearError());
 
     expect(result.current.error).toBe("");
+  });
+
+  test("Load_OnInitialMount_RequestsTheFullCalendarWithoutADateRange", async () => {
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Regression guard for the unbounded-fetch fix: calendar.events must stay complete
+    // (not scoped to an initial N-month window), so activeEvent/getEventVersion and the
+    // Received/Sent invitation feeds work regardless of which months are visible.
+    expect(travelCalendarApi.get).toHaveBeenCalledWith(undefined, undefined, expect.anything());
+  });
+
+  test("EnsureMonths_AfterFullInitialLoad_KeepsEventsOutsideTheFetchedMonth", async () => {
+    const septemberEvent: TravelEvent = {
+      id: "55555555-5555-4555-8555-555555555555",
+      version: 1,
+      ownerUserId: "66666666-6666-4666-8666-666666666666",
+      title: "September trip",
+      type: "Event",
+      startDate: "2026-09-05",
+      endDate: "2026-09-05",
+      isMustVisit: false,
+      queueOrder: 0,
+      participants: [],
+      myParticipationStatus: "Pending",
+      canEdit: false,
+      canRespond: true,
+      points: [],
+      otherCostPln: 0,
+      transportCostPln: 0,
+      totalCostPln: 0,
+    };
+    const fullCalendar: TravelCalendar = { ...calendar, events: [septemberEvent] };
+    const julyPage: TravelCalendar = { ...calendar, events: [] };
+    vi.mocked(travelCalendarApi.get)
+      .mockResolvedValueOnce(fullCalendar)
+      .mockResolvedValueOnce(julyPage);
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.calendar?.events).toEqual([septemberEvent]);
+
+    await act(async () => {
+      await result.current.ensureMonths([{ year: 2026, month: 6 }]);
+    });
+
+    expect(travelCalendarApi.get).toHaveBeenNthCalledWith(2, "2026-07-01", "2026-07-31", expect.anything());
+    // The September event doesn't overlap the fetched July range, so mergeCalendarPage
+    // must not have dropped it from calendar.events.
+    expect(result.current.calendar?.events).toEqual([septemberEvent]);
+  });
+
+  test("UpdateMyParticipation_ForAnEventOutsideTheVisibleMonths_StillSendsTheRequest", async () => {
+    const farEvent: TravelEvent = {
+      id: "77777777-7777-4777-8777-777777777777",
+      version: 3,
+      ownerUserId: "88888888-8888-4888-8888-888888888888",
+      title: "Far-future trip",
+      type: "Event",
+      startDate: "2026-09-25",
+      endDate: "2026-09-25",
+      isMustVisit: false,
+      queueOrder: 0,
+      participants: [],
+      myParticipationStatus: "Pending",
+      canEdit: false,
+      canRespond: true,
+      points: [],
+      otherCostPln: 0,
+      transportCostPln: 0,
+      totalCostPln: 0,
+    };
+    const calendarWithFarEvent: TravelCalendar = { ...calendar, events: [farEvent] };
+    vi.mocked(travelCalendarApi.get).mockResolvedValue(calendarWithFarEvent);
+    vi.mocked(travelCalendarApi.updateMyParticipation).mockResolvedValue({ calendar: calendarWithFarEvent });
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    // Before the unbounded-fetch fix, an event dated outside the initially-fetched
+    // window would be missing from calendar.events, getEventVersion would return
+    // undefined, and this call would silently short-circuit to Promise.resolve(null)
+    // instead of reaching the API.
+    await act(async () => {
+      await result.current.updateMyParticipation(farEvent.id, "Accepted");
+    });
+
+    expect(travelCalendarApi.updateMyParticipation).toHaveBeenCalledWith(3, farEvent.id, "Accepted", expect.anything());
   });
 });

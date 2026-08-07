@@ -131,7 +131,7 @@ const UserInfoTabs = (props: UserInfoTabsProps) => {
                   variant="outlined"
                   onClick={handleLogin}
                 >
-                  <LoginIcon />
+                  <LoginIcon fontSize="small" />
                 </LockedButton>
               )}
               <LockedButton
@@ -143,7 +143,7 @@ const UserInfoTabs = (props: UserInfoTabsProps) => {
                 variant="outlined"
                 onClick={refresh}
               >
-                <CachedIcon />
+                <CachedIcon fontSize="small" />
               </LockedButton>
             </Box>
           </Box>

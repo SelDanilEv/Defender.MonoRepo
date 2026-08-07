@@ -25,7 +25,7 @@ import useUtils from "src/appUtils";
 import TicketInfoDialogBody from "./TicketInfoDialogBody";
 import CustomDialog from "src/components/Dialog";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
-import { compactRefreshButtonLayout } from "../../refreshButtonLayout";
+import { compactIconButtonLayout } from "src/components/Buttons/buttonLayouts";
 import CachedIcon from "@mui/icons-material/Cached";
 import LotteryTicket from "src/models/games/lottery/LotteryTicket";
 import CurrencySymbolsMap from "src/consts/CurrencySymbolsMap";
@@ -112,7 +112,7 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
         action={
           <LockedButton
             aria-label="Refresh tickets"
-            sx={{ ...compactRefreshButtonLayout, mr: "1em" }}
+            sx={{ ...compactIconButtonLayout, mr: 1 }}
             variant="outlined"
             onClick={refresh}
           >

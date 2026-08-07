@@ -1,7 +1,7 @@
-export const compactRefreshButtonLayout = {
-  width: 32,
-  height: 32,
-  minWidth: 32,
+export const compactIconButtonLayout = {
+  width: 30,
+  height: 30,
+  minWidth: 30,
   p: 0,
   "& .MuiSvgIcon-root": {
     fontSize: 20,

@@ -10,7 +10,7 @@ const WelcomeMenuButton = (props: any) => {
       variant="contained"
       size="small"
       sx={{
-        fontSize: isCompact ? "0.75rem" : "0.8em",
+        fontSize: isCompact ? 12 : 13,
         minHeight: isCompact ? 28 : undefined,
         px: isCompact ? 1.5 : undefined,
         py: isCompact ? 0.25 : undefined,

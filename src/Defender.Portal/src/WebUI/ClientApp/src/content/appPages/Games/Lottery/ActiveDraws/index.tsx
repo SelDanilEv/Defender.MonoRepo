@@ -7,7 +7,7 @@ import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 import CachedIcon from "@mui/icons-material/Cached";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
-import { compactRefreshButtonLayout } from "../refreshButtonLayout";
+import { compactIconButtonLayout } from "src/components/Buttons/buttonLayouts";
 import { PaginationRequest } from "src/models/base/PaginationRequest";
 import LotteryDraw from "src/models/games/lottery/LotteryDraw";
 import ActiveLotteryDrawsResponse from "src/models/responses/games/lottery/ActiveLotteryDrawsResponse";
@@ -85,7 +85,7 @@ const ActiveDraws = (props: ActiveDrawsProps) => {
           aria-label="Refresh active draws"
           variant="outlined"
           onClick={reloadActiveDraws}
-          sx={compactRefreshButtonLayout}
+          sx={compactIconButtonLayout}
         >
           <CachedIcon />
         </LockedButton>

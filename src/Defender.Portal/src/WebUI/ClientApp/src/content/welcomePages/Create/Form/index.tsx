@@ -19,7 +19,10 @@ import apiUrls from "src/api/apiUrls";
 import useUtils from "src/appUtils";
 import APIRequestValidator from "src/validators/APIRequestValidator";
 import AuthorizationService from "src/services/AuthorizationService";
-import { loginFormLayout } from "../../Login/loginFormLayout";
+import {
+  loginFormLayout,
+  passwordVisibilityButtonLayout,
+} from "../../Login/loginFormLayout";
 
 const CreateForm = (props: any) => {
   const [createRequest, setCreateRequest]: any = useState({
@@ -136,7 +139,7 @@ const CreateForm = (props: any) => {
                   onClick={handleClickShowPassword}
                   onMouseDown={handleMouseDownPassword}
                   edge="end"
-                  sx={{ width: 44, height: 44 }}
+                  sx={passwordVisibilityButtonLayout}
                 >
                   {showPassword ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
@@ -146,7 +149,7 @@ const CreateForm = (props: any) => {
           />
         </FormControl>
         <LockedButton
-          sx={{ minHeight: 48, fontSize: "1rem", fontWeight: 700 }}
+          sx={{ minHeight: 48, fontSize: 16, fontWeight: 700 }}
           variant="contained"
           fullWidth
           onClick={() => Create()}

@@ -142,7 +142,7 @@ const LoginForm = (props: any) => {
         </Box>
 
         <LockedButton
-          sx={{ minHeight: 48, fontSize: "1rem", fontWeight: 700 }}
+          sx={{ minHeight: 48, fontSize: 16, fontWeight: 700 }}
           variant="contained"
           fullWidth
           onClick={() => login()}

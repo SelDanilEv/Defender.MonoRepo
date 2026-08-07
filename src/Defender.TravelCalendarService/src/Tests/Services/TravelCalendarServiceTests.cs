@@ -165,4 +165,68 @@ public class TravelCalendarServiceTests
 
         Assert.Equal("TRAVEL_CALENDAR_VERSION_CONFLICT", exception.Code);
     }
+
+    // Contract guard for the Portal-side "widen the invitations fetch to unbounded" fix:
+    // useTravelCalendar.ts's load() now calls GET with no from/to at all. This asserts
+    // that already-existing backend behavior (no production code changed here) really
+    // does return everything in that case, so the frontend fix has something to rely on.
+    [Fact]
+    public async Task GetAsync_WhenNoRangeProvided_ReturnsEveryVisibleEventRegardlessOfDate()
+    {
+        var userId = Guid.NewGuid();
+        var calendar = TravelCalendar.Create(userId, DateTimeOffset.Parse("2026-07-01T00:00:00Z"));
+        var calendarRepository = new Mock<ITravelCalendarRepository>();
+        var eventRepository = new Mock<ITravelEventRepository>();
+        calendarRepository
+            .Setup(repository => repository.GetOrCreateAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(calendar);
+
+        var withinSeason = TravelEvent.Scheduled(userId, "Within season", TravelEventType.DayTrip, new DateOnly(2026, 7, 18), new DateOnly(2026, 7, 18));
+        var farInThePast = TravelEvent.Scheduled(userId, "Long past", TravelEventType.DayTrip, new DateOnly(2020, 1, 1), new DateOnly(2020, 1, 1));
+        var farInTheFuture = TravelEvent.Scheduled(userId, "Far future", TravelEventType.DayTrip, new DateOnly(2030, 1, 1), new DateOnly(2030, 1, 1));
+        var undated = TravelEvent.Queued(userId, "Wishlist item", 0, DateTimeOffset.Parse("2026-07-01T00:00:00Z"));
+        eventRepository
+            .Setup(repository => repository.GetVisibleAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([withinSeason, farInThePast, farInTheFuture, undated]);
+
+        var service = new CalendarService(calendarRepository.Object, eventRepository.Object, TimeProvider.System);
+
+        var result = await service.GetAsync(userId, null, null, CancellationToken.None);
+
+        Assert.Equal(4, result.Events.Count);
+        Assert.Contains(result.Events, item => item.Id == withinSeason.Id);
+        Assert.Contains(result.Events, item => item.Id == farInThePast.Id);
+        Assert.Contains(result.Events, item => item.Id == farInTheFuture.Id);
+        Assert.Contains(result.Events, item => item.Id == undated.Id);
+    }
+
+    [Fact]
+    public async Task GetAsync_WhenRangeProvided_ExcludesDatedEventsOutsideItButKeepsUndatedOnes()
+    {
+        var userId = Guid.NewGuid();
+        var calendar = TravelCalendar.Create(userId, DateTimeOffset.Parse("2026-07-01T00:00:00Z"));
+        var calendarRepository = new Mock<ITravelCalendarRepository>();
+        var eventRepository = new Mock<ITravelEventRepository>();
+        calendarRepository
+            .Setup(repository => repository.GetOrCreateAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(calendar);
+
+        var insideRange = TravelEvent.Scheduled(userId, "Inside range", TravelEventType.DayTrip, new DateOnly(2026, 7, 18), new DateOnly(2026, 7, 18));
+        var beforeRange = TravelEvent.Scheduled(userId, "Before range", TravelEventType.DayTrip, new DateOnly(2026, 6, 1), new DateOnly(2026, 6, 1));
+        var afterRange = TravelEvent.Scheduled(userId, "After range", TravelEventType.DayTrip, new DateOnly(2026, 9, 1), new DateOnly(2026, 9, 1));
+        var undated = TravelEvent.Queued(userId, "Wishlist item", 0, DateTimeOffset.Parse("2026-07-01T00:00:00Z"));
+        eventRepository
+            .Setup(repository => repository.GetVisibleAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([insideRange, beforeRange, afterRange, undated]);
+
+        var service = new CalendarService(calendarRepository.Object, eventRepository.Object, TimeProvider.System);
+
+        var result = await service.GetAsync(userId, new DateOnly(2026, 7, 1), new DateOnly(2026, 7, 31), CancellationToken.None);
+
+        Assert.Equal(2, result.Events.Count);
+        Assert.Contains(result.Events, item => item.Id == insideRange.Id);
+        Assert.Contains(result.Events, item => item.Id == undated.Id);
+        Assert.DoesNotContain(result.Events, item => item.Id == beforeRange.Id);
+        Assert.DoesNotContain(result.Events, item => item.Id == afterRange.Id);
+    }
 }

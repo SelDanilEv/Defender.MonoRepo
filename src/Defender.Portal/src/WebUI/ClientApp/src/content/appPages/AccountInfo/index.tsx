@@ -51,7 +51,7 @@ export const AccountInfoPage = ({ currentUser }: { currentUser?: { nickname?: st
           <IconButton
             onClick={() => u.react.navigate("/home")}
             color="primary"
-            sx={{ p: 2, mr: 2 }}
+            sx={{ mr: 2 }}
           >
             <ArrowBackTwoToneIcon />
           </IconButton>

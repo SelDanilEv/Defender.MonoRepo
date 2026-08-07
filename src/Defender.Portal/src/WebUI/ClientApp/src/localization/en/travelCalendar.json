@@ -36,10 +36,17 @@
   },
   "invitations": {
     "title": "Invitations",
-    "subtitle": "Events shared with you",
+    "tabs": { "received": "Received", "sent": "Sent" },
+    "subtitleReceived": "Events shared with you",
+    "subtitleSent": "People you've invited",
     "filterLabel": "Invitation status",
     "open": "Open invitation: {{title}}",
-    "empty": "No {{status}} invitations"
+    "openSent": "Open sent invitation: {{title}}",
+    "empty": "No {{status}} invitations",
+    "emptySent": "You haven't invited anyone yet",
+    "awaiting": "{{count}} awaiting reply",
+    "participantStatus": "{{name}} — {{status}}",
+    "past": "Past"
   },
   "legend": {
     "title": "Event types",

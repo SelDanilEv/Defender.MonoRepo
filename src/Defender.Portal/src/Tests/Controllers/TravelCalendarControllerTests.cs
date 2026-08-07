@@ -1,4 +1,5 @@
 using AutoMapper;
+using Defender.Common.Cache;
 using Defender.Common.Interfaces;
 using Defender.DistributedCache;
 using Defender.Portal.Application.Common.Interfaces.Wrappers;
@@ -64,6 +65,39 @@ public class TravelCalendarControllerTests
         var responseCalendar = Assert.IsType<TravelCalendarDto>(response.Value);
         Assert.Equal("Alice", responseCalendar.Events.Single().OwnerDisplayName);
         users.Verify(item => item.GetPublicUserInfoAsync(organizerId), Times.Once);
+    }
+
+    // Contract guard for the invitations fetch-unbounded fix: the Portal client now
+    // gets called with from=null/to=null on the initial load. This asserts the
+    // already-existing cache-key convention (no production code changed here) collapses
+    // that to one canonical key instead of minting a new cache entry per call.
+    [Fact]
+    public async Task Get_WhenRangeOmitted_UsesTheCanonicalAllAllCacheKey()
+    {
+        var userId = Guid.NewGuid();
+        var calendar = CreateCalendar();
+        var account = new Mock<ICurrentAccountAccessor>();
+        account.Setup(item => item.GetAccountId()).Returns(userId);
+        var wrapper = new Mock<ITravelCalendarWrapper>();
+        wrapper.Setup(item => item.GetAsync(null, null, It.IsAny<CancellationToken>())).ReturnsAsync(calendar);
+        string? capturedKey = null;
+        var cache = new Mock<IDistributedCache>();
+        cache
+            .Setup(item => item.Get<TravelCalendarCacheEntry>(It.IsAny<string>(), It.IsAny<Func<Task<TravelCalendarCacheEntry>>>(), TimeSpan.FromDays(7)))
+            .Callback<string, Func<Task<TravelCalendarCacheEntry>>, TimeSpan?>((key, _, _) => capturedKey = key)
+            .ReturnsAsync(new TravelCalendarCacheEntry(userId, null, null, calendar));
+        var sut = new TravelCalendarController(
+            Mock.Of<IMediator>(),
+            Mock.Of<IMapper>(),
+            wrapper.Object,
+            Mock.Of<IUserManagementWrapper>(),
+            account.Object,
+            cache.Object);
+
+        await sut.Get(null, null, CancellationToken.None);
+
+        var expectedKey = CacheConventionBuilder.BuildDistributedCacheKey(CacheForService.Portal, CacheModel.TravelCalendar, $"{userId}_all_all");
+        Assert.Equal(expectedKey, capturedKey);
     }
 
     private static TravelCalendarDto CreateCalendar() => new(
