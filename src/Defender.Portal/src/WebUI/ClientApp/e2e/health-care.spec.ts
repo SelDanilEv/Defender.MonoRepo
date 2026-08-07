@@ -53,6 +53,20 @@ const fillDateTimeGroup = async (
   await group.press("Tab");
 };
 
+const formatPickerValue = (page: Page, isoValue: string) =>
+  page.evaluate((value) => {
+    const parts = new Intl.DateTimeFormat("en-US", {
+      day: "2-digit",
+      hour: "2-digit",
+      hour12: true,
+      minute: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).formatToParts(new Date(value));
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return `${values.month}/${values.day}/${values.year} ${values.hour}:${values.minute} ${values.dayPeriod}`;
+  }, isoValue);
+
 const shareResponse = (overrides: Record<string, unknown> = {}) => ({
   token: "health-share-token",
   publicUrl: "/health-care/share/health-share-token",
@@ -180,8 +194,12 @@ test.describe("Health Care date-time ranges", () => {
     await page.goto("/health-care/share/health-share-token");
     await expect(page.getByText("Shared Health Care chart", { exact: true })).toBeVisible();
     await expect(page.getByRole("combobox", { name: "Chart period" })).toBeVisible();
-    await expect(page.getByRole("group", { name: "From" }).locator('input[aria-hidden="true"]')).toHaveValue("06/18/2026 10:30 AM");
-    await expect(page.getByRole("group", { name: "To" }).locator('input[aria-hidden="true"]')).toHaveValue("06/19/2026 07:00 PM");
+    await expect(page.getByRole("group", { name: "From" }).locator('input[aria-hidden="true"]')).toHaveValue(
+      await formatPickerValue(page, "2026-06-18T08:30:00.000Z")
+    );
+    await expect(page.getByRole("group", { name: "To" }).locator('input[aria-hidden="true"]')).toHaveValue(
+      await formatPickerValue(page, "2026-06-19T17:00:00.000Z")
+    );
     await expect(page.getByText("custom-range-event")).toBeVisible();
     await expect(page.getByText("outside-custom-range")).toHaveCount(0);
   });
