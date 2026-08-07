@@ -32,6 +32,7 @@ public static class ConfigureServices
     )
     {
         services.AddCommonServices(configuration);
+        services.AddSingleton(TimeProvider.System);
 
         services.AddApplicationOptions(configuration);
 

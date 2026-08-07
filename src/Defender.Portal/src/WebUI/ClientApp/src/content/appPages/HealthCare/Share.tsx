@@ -6,7 +6,6 @@ import {
   CardContent,
   IconButton,
   LinearProgress,
-  MenuItem,
   Stack,
   Table,
   TableBody,
@@ -15,7 +14,6 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -26,21 +24,29 @@ import useUtils from "src/appUtils";
 import LanguageSwitcher from "src/components/LanguageSwitcher";
 import { useAppSelector } from "src/state/hooks";
 import {
-  ChartTimeRange,
-  filterEventsByTimeRange,
   paginateHealthEvents,
 } from "./chartData";
+import {
+  HealthDateRangeSelection,
+  filterEventsByDateRange,
+} from "./dateRange";
 import { formatEventDateTime } from "./dateFormat";
 import {
   formatHealthEventType,
   formatHealthEventValue,
 } from "./eventFormatting";
 import HealthCareChart from "./HealthCareChart";
+import HealthDateRangeSelector from "./HealthDateRangeSelector";
 import {
   dismissHealthCareShareGuide,
   shouldShowHealthCareShareGuide,
 } from "./ShareGuideState";
-import { getNextDisplayedShare } from "./ShareState";
+import {
+  clampHealthDateRangeSelection,
+  getHealthShareAllowedBounds,
+  getInitialHealthShareSelection,
+  getNextDisplayedShare,
+} from "./ShareState";
 import WellbeingSummary from "./WellbeingSummary";
 
 const publicShareRefreshIntervalMs = 10000;
@@ -53,7 +59,11 @@ const HealthCareSharePage = () => {
   const { token } = useParams();
   const [share, setShare] = useState<HealthChartShare | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [chartTimeRange, setChartTimeRange] = useState<ChartTimeRange>("week");
+  const [dateRangeSelection, setDateRangeSelection] = useState<HealthDateRangeSelection>({
+    kind: "preset",
+    preset: "week",
+  });
+  const selectionInitializedRef = useRef(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [showGuide, setShowGuide] = useState(() => shouldShowHealthCareShareGuide());
@@ -62,9 +72,19 @@ const HealthCareSharePage = () => {
     () => (share?.to ? new Date(share.to) : undefined),
     [share?.to]
   );
+  const allowedBounds = useMemo(
+    () => (share ? getHealthShareAllowedBounds(share) : undefined),
+    [share]
+  );
   const visibleEvents = useMemo(
-    () => filterEventsByTimeRange(events, chartTimeRange, rangeAnchor),
-    [events, chartTimeRange, rangeAnchor]
+    () =>
+      filterEventsByDateRange(
+        events,
+        dateRangeSelection,
+        rangeAnchor,
+        allowedBounds
+      ),
+    [events, dateRangeSelection, rangeAnchor, allowedBounds]
   );
   const pagedEvents = useMemo(
     () => paginateHealthEvents(visibleEvents, page, rowsPerPage),
@@ -109,6 +129,30 @@ const HealthCareSharePage = () => {
 
     return () => window.clearInterval(intervalId);
   }, [refreshShare, token]);
+
+  useEffect(() => {
+    if (!share) {
+      return;
+    }
+
+    setDateRangeSelection((currentSelection) => {
+      if (!selectionInitializedRef.current) {
+        selectionInitializedRef.current = true;
+        return getInitialHealthShareSelection(share);
+      }
+
+      return clampHealthDateRangeSelection(currentSelection, getHealthShareAllowedBounds(share));
+    });
+  }, [share]);
+
+  useEffect(() => {
+    selectionInitializedRef.current = false;
+    setDateRangeSelection({ kind: "preset", preset: "week" });
+  }, [token]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [dateRangeSelection]);
 
   useEffect(() => {
     const maxPage =
@@ -188,19 +232,11 @@ const HealthCareSharePage = () => {
           mb: { xs: 0.5, sm: 1 }
         }}>
         <Typography variant="h4">{u.t("healthCare:events_chart")}</Typography>
-        <TextField
-          select
-          label={u.t("healthCare:chart_time_range")}
-          value={chartTimeRange}
-          onChange={(event) => setChartTimeRange(event.target.value as ChartTimeRange)}
-          size="small"
-          sx={{ minWidth: 180 }}
-        >
-          <MenuItem value="day">{u.t("healthCare:range_day")}</MenuItem>
-          <MenuItem value="week">{u.t("healthCare:range_week")}</MenuItem>
-          <MenuItem value="month">{u.t("healthCare:range_month")}</MenuItem>
-          <MenuItem value="all">{u.t("healthCare:range_all")}</MenuItem>
-        </TextField>
+        <HealthDateRangeSelector
+          value={dateRangeSelection}
+          onChange={setDateRangeSelection}
+          allowedBounds={allowedBounds}
+        />
       </Stack>
       <WellbeingSummary
         events={visibleEvents}

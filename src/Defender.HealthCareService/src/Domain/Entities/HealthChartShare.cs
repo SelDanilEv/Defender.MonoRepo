@@ -1,4 +1,5 @@
 using Defender.Common.Entities;
+using Defender.HealthCareService.Domain.Enums;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -18,6 +19,9 @@ public class HealthChartShare : IBaseModel
     public DateTimeOffset? From { get; set; }
 
     public DateTimeOffset? To { get; set; }
+
+    [BsonRepresentation(BsonType.String)]
+    public HealthChartShareRangeMode? RangeMode { get; set; }
 
     [BsonDefaultValue(true)]
     public bool IsEnabled { get; set; } = true;

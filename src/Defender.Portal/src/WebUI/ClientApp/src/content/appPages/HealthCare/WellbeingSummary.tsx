@@ -1,7 +1,7 @@
 import { Box, Chip, Stack, Typography } from "@mui/material";
 import { HealthEvent } from "src/api/healthCare";
 import {
-  ChartTimeRange,
+  HealthChartRange,
   getLatestWellbeingEvent,
   wellbeingScoreToEmoji,
 } from "./chartData";
@@ -9,7 +9,7 @@ import { formatEventDateTime } from "./dateFormat";
 
 interface WellbeingSummaryProps {
   events: HealthEvent[];
-  timeRange: ChartTimeRange;
+  timeRange: HealthChartRange;
   title: string;
   scoreLabel: (score: number) => string;
   language: string;

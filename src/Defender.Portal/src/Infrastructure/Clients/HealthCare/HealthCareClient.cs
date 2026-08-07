@@ -17,7 +17,10 @@ public class HealthCareClient(
     IAuthenticationHeaderAccessor authenticationHeaderAccessor,
     IOptions<HealthCareOptions> options) : IHealthCareClient
 {
-    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+    private static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
+    {
+        PropertyNameCaseInsensitive = true,
+    };
 
     private string BaseUrl => options.Value.Url.TrimEnd('/');
 

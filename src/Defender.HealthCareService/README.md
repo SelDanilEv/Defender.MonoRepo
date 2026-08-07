@@ -1,45 +1,34 @@
-Defender Service Template
+# Defender Health Care Service
 
-Initialization
+Health Care stores 30-minute health events in MongoDB and exposes authenticated event management plus public read-only chart shares. The Portal BFF forwards these contracts to `/api/healthCare/...`.
 
-1. Rename solution file
-2. Rename {HealthCareService} to ServiceName
-3. Rename {Service Template} to Service Name
-4. Update port in launchSettings
-5. Update description in Swagger UI
-6. Set as startup project WebUI
-7. Update README.md
+## API surface
 
-Ports:
+Authenticated endpoints:
 
-1. Local
+- `GET /api/health-events?from={iso}&to={iso}` — list inclusive events for the current user.
+- `GET /api/health-events/medication-options` — distinct medication values.
+- `POST /api/health-events`, `PUT /api/health-events/{id}`, `DELETE /api/health-events/{id}` — manage events.
+- `POST /api/health-chart-shares` — create or update the current user’s stable-token share.
+- `GET /api/health-chart-shares/current` — read the current share metadata.
+- `PUT /api/health-chart-shares/status` — pause or resume public access.
 
-- 47050 - Local Identity Service
-- 47051 - Local User Management Service
-- 47052 - Local Notification Service
-- 47053 - Local Portal API
-- 47054 - Local Portal UI
-- 47055 - Local Walutomat Helper Service
-- 47056 - Local Secret Management Service
-- 47057 - Local Job Scheduler Service
-- 47058 - Local Wallet Service
-- 47059 - Local General Testing Service
-- 47060 - Local Risk Games Service
-- 47061 - Local Budget Tracker Service
-- 47062 - Local Personal Food Advisor
+Public endpoint:
 
-2. Dev
+- `GET /api/public/health-chart-shares/{token}` — read an enabled share and its already-authorized events.
 
-- 49050 - Dev Identity Service
-- 49051 - Dev User Management Service
-- 49052 - Dev Notification Service
-- 49053 - Dev Portal API
-- 49054 - Dev Portal UI
-- 49055 - Dev Walutomat Helper Service
-- 49056 - Dev Secret Management Service
-- 49057 - Dev Job Scheduler Service
-- 49058 - Dev Wallet Service
-- 49059 - Dev General Testing Service
-- 49060 - Dev Risk Games Service
-- 49061 - Dev Budget Tracker Service
-- 49062 - Dev Personal Food Advisor
+## Share range semantics
+
+`HealthChartShareRequest.RangeMode` is a string enum:
+
+- `Rolling` requires both bounds and preserves their duration while moving the window to the current time on each public refresh.
+- `Absolute` requires both bounds and keeps the exact inclusive interval selected by the owner.
+- `All` requires both bounds to be omitted and returns an unbounded event query.
+
+The persisted `RangeMode` is nullable for backward compatibility. Existing documents with both bounds are inferred as `Rolling`, documents with no bounds as `All`, and one-sided legacy documents retain their fixed bound as `Absolute`.
+
+All `from` and `to` comparisons are inclusive. The Portal shared page may narrow the event array returned by the public endpoint, but it cannot widen the server-authorized range.
+
+## Health checks
+
+The service uses the repository’s common health-check mapping registered by `Program.cs`. Deployment probes should target the service health and readiness endpoints configured by the hosting manifests.

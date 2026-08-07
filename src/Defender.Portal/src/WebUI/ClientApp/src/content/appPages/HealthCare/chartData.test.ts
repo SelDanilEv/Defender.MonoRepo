@@ -60,6 +60,21 @@ describe("health care chart helpers", () => {
     expect(filtered.map((item) => item.id)).toEqual(["recent"]);
   });
 
+  test("filterEventsByTimeRange_WhenCustomRangeIsSelected_ExcludesEventsAfterTheEnd", () => {
+    const events = [
+      event("inside", "Wellbeing", "2026-06-20T08:00:00.000Z"),
+      event("after", "Wellbeing", "2026-06-21T08:00:00.000Z"),
+    ];
+
+    const filtered = filterEventsByTimeRange(events, {
+      kind: "custom",
+      from: new Date("2026-06-20T00:00:00.000Z"),
+      to: new Date("2026-06-20T23:59:00.000Z"),
+    });
+
+    expect(filtered.map((item) => item.id)).toEqual(["inside"]);
+  });
+
   test("paginateHealthEvents_WhenPageWouldOverflow_ReturnsAvailableItemsOnly", () => {
     const events = [
       event("1", "Temperature", "2026-06-21T08:00:00.000Z"),
