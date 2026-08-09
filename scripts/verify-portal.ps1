@@ -22,10 +22,17 @@ function Invoke-CompactStep {
     $log = Join-Path ([System.IO.Path]::GetTempPath()) ("portal-{0}-{1}.log" -f $Label, [guid]::NewGuid())
     $stepStarted = Get-Date
     Push-Location $clientRoot
+    $previousPreference = $ErrorActionPreference
     try {
+        # Native commands (npm.cmd) write routine notices to stderr; under
+        # $ErrorActionPreference = "Stop", PowerShell wraps redirected stderr
+        # lines into terminating ErrorRecords even when the process exits 0.
+        # Relax to "Continue" for just this native call and trust $LASTEXITCODE.
+        $ErrorActionPreference = "Continue"
         & $FilePath @Arguments *> $log
         $exitCode = $LASTEXITCODE
     } finally {
+        $ErrorActionPreference = $previousPreference
         Pop-Location
     }
 
