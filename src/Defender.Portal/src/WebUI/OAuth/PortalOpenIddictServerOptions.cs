@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Defender.Common.Extension;
 using Defender.Common.Helpers;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
@@ -48,7 +49,7 @@ public sealed class PortalOpenIddictServerOptions(
         var key = RSA.Create();
         var pem = SecretsHelper.GetSecretSync(secretName, useMongo: true);
 
-        if (string.IsNullOrWhiteSpace(pem) && hostEnvironment.IsDevelopment())
+        if (string.IsNullOrWhiteSpace(pem) && (hostEnvironment.IsDevelopment() || hostEnvironment.IsLocalOrDevelopment()))
         {
             return key;
         }

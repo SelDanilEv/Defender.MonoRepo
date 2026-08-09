@@ -68,6 +68,31 @@ public class PortalOAuthOptionsTests
         Assert.Single(options.EncryptionCredentials);
     }
 
+    [Fact]
+    public void Configure_WhenLocalSecretsAreMissing_UsesEphemeralCredentials()
+    {
+        // The local docker-compose profile runs every service with
+        // ASPNETCORE_ENVIRONMENT=Local, not "Development" — GetRsaKey must
+        // treat that the same way (IsLocalOrDevelopment), or it throws
+        // trying to PEM-parse an empty secret on every local request.
+        var options = new OpenIddictServerOptions();
+        var sut = new PortalOpenIddictServerOptions(
+            new TestHostEnvironment { EnvironmentName = "Local" },
+            Options.Create(new PortalOAuthOptions
+            {
+                Issuer = "https://portal.coded-by-danil.dev",
+                McpResourceUri = "https://mcp.coded-by-danil.dev/mcp",
+                McpAudience = "defender-mcp",
+                BffAudience = "defender-api",
+            }));
+
+        sut.Configure(options);
+
+        Assert.True(options.DisableAccessTokenEncryption);
+        Assert.Single(options.SigningCredentials);
+        Assert.Single(options.EncryptionCredentials);
+    }
+
     private static IConfiguration BuildConfiguration() => new ConfigurationBuilder()
         .AddInMemoryCollection(
         [
