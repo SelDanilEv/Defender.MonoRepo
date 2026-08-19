@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import useUtils from "src/appUtils";
+import ErrorToast from "src/components/Toast/DefaultErrorToast";
 import {
   MutationResult,
   TravelCalendar,
@@ -119,7 +120,7 @@ export const useTravelCalendar = (initialMonthCount: number) => {
         await loadMonth(month);
       }
     } catch {
-      setError(utilsRef.current.t("travelCalendar:errors.loadFailed"));
+      ErrorToast(utilsRef.current.t("travelCalendar:errors.loadFailed"));
     }
   }, [loadMonth]);
 
@@ -140,7 +141,7 @@ export const useTravelCalendar = (initialMonthCount: number) => {
         await load();
       }
 
-      setError(utilsRef.current.t(ERROR_MESSAGE_KEYS[code ?? ""] ?? "travelCalendar:errors.saveFailedGeneric"));
+      ErrorToast(utilsRef.current.t(ERROR_MESSAGE_KEYS[code ?? ""] ?? "travelCalendar:errors.saveFailedGeneric"));
       return null;
     } finally {
       setMutating(false);

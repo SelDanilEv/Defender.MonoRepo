@@ -18,7 +18,6 @@ import {
   LinearProgress,
   Paper,
   Skeleton,
-  Snackbar,
   Stack,
   TextField,
   Typography,
@@ -329,16 +328,6 @@ export default function TravelCalendarPage() {
           </Stack>
         </Panel>
 
-        <Snackbar
-          open={!!state.error}
-          autoHideDuration={8000}
-          onClose={state.clearError}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
-          <Alert severity="error" variant="filled" onClose={state.clearError} sx={{ width: "100%" }}>
-            {state.error}
-          </Alert>
-        </Snackbar>
         {state.mutating && <LinearProgress sx={{ mb: 1, borderRadius: 2 }} />}
 
         <Box

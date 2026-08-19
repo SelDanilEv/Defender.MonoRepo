@@ -2,10 +2,13 @@ import { act, fireEvent, renderHook, waitFor } from "@testing-library/react";
 
 import { TravelCalendar, TravelEvent, UpdateEventRequest, travelCalendarApi } from "src/api/travelCalendar";
 import { useTravelCalendar } from "./useTravelCalendar";
+import ErrorToast from "src/components/Toast/DefaultErrorToast";
 
 vi.mock("src/appUtils", () => ({
   default: () => ({ t: (key: string) => key }),
 }));
+
+vi.mock("src/components/Toast/DefaultErrorToast", () => ({ default: vi.fn() }));
 
 vi.mock("src/api/travelCalendar", () => ({
   travelCalendarApi: {
@@ -116,7 +119,7 @@ describe("useTravelCalendar", () => {
     });
 
     await waitFor(() => expect(travelCalendarApi.get).toHaveBeenCalledTimes(2));
-    expect(result.current.error).toBe("travelCalendar:errors.saveFailed");
+    expect(ErrorToast).toHaveBeenCalledWith("travelCalendar:errors.saveFailed");
   });
 
   test("Run_WhenFailureCodeIsDateOverlap_ShowsOverlapMessageWithoutReloading", async () => {
@@ -130,7 +133,7 @@ describe("useTravelCalendar", () => {
       await result.current.saveDraft(request);
     });
 
-    expect(result.current.error).toBe("travelCalendar:errors.dateOverlap");
+    expect(ErrorToast).toHaveBeenCalledWith("travelCalendar:errors.dateOverlap");
     expect(travelCalendarApi.get).toHaveBeenCalledTimes(1);
   });
 
@@ -145,26 +148,8 @@ describe("useTravelCalendar", () => {
       await result.current.saveDraft(request);
     });
 
-    expect(result.current.error).toBe("travelCalendar:errors.saveFailedGeneric");
+    expect(ErrorToast).toHaveBeenCalledWith("travelCalendar:errors.saveFailedGeneric");
     expect(travelCalendarApi.get).toHaveBeenCalledTimes(1);
-  });
-
-  test("ClearError_WhenCalledAfterFailure_ResetsErrorToEmptyString", async () => {
-    vi.mocked(travelCalendarApi.createEvent).mockRejectedValueOnce({ status: 500 });
-
-    const { result } = renderHook(() => useTravelCalendar(1));
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    act(() => result.current.createDraft("2026-07-18"));
-    await act(async () => {
-      await result.current.saveDraft(request);
-    });
-
-    expect(result.current.error).toBe("travelCalendar:errors.saveFailedGeneric");
-
-    act(() => result.current.clearError());
-
-    expect(result.current.error).toBe("");
   });
 
   test("Load_OnInitialMount_RequestsTheFullCalendarWithoutADateRange", async () => {
