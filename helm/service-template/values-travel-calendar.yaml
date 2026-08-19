@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.travel-calendar
-  tag: latest
+  tag: 20260819-324
   digest: sha256:d12f2267a65d425e3346ed4c6d6fe71801e4db8a7bfdc1fc534fcf2cd0d18013
   pullPolicy: Always
 deploymentStrategy:
