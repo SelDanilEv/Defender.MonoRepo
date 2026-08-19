@@ -18,6 +18,7 @@ import {
 } from "@mui/material";
 
 import InfoIcon from "@mui/icons-material/Info";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
 import { CurrentPagination } from "src/models/base/CurrentPagination";
 import React from "react";
 import { connect } from "react-redux";
@@ -165,7 +166,35 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>{tickets.map(renderTicketInfo)}</TableBody>
+          <TableBody>
+            {tickets.length > 0 ? (
+              tickets.map(renderTicketInfo)
+            ) : (
+              <TableRow>
+                <TableCell colSpan={u.isMobile ? 4 : 5}>
+                  <Box
+                    sx={{
+                      minHeight: 190,
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      textAlign: "center",
+                      py: 3,
+                    }}
+                  >
+                    <ConfirmationNumberIcon sx={{ mb: 1, fontSize: 34, color: theme.palette.primary.main }} />
+                    <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                      {u.t("lottery:arena_empty_tickets_title")}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {u.t("lottery:arena_empty_tickets_description")}
+                    </Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
         </Table>
       </TableContainer>
       <Box

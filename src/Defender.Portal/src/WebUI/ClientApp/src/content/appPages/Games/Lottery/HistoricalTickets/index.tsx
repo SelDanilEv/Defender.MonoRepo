@@ -1,4 +1,3 @@
-import { Card } from "@mui/material";
 import HistoricalTicketsTable from "./Table";
 import { useEffect, useRef, useState } from "react";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
@@ -73,14 +72,12 @@ const HistoricalTickets = (props: HistoricalTicketsProps) => {
   reloadTicketHistoryRef.current = reloadTicketHistory;
 
   return (
-    <Card>
-      <HistoricalTicketsTable
-        tickets={tickets}
-        applyPagination={applyPagination}
-        pagination={pagination}
-        refresh={reloadTicketHistory}
-      />
-    </Card>
+    <HistoricalTicketsTable
+      tickets={tickets}
+      applyPagination={applyPagination}
+      pagination={pagination}
+      refresh={reloadTicketHistory}
+    />
   );
 };
 

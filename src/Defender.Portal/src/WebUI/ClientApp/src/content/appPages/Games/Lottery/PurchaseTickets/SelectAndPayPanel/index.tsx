@@ -1,4 +1,5 @@
-import { Card, Divider, Grid, MenuItem, Typography } from "@mui/material";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
+import { Card, Chip, Divider, Grid, MenuItem, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import useUtils from "src/appUtils";
@@ -22,6 +23,7 @@ interface SelectAndPayPanelProps {
 
 const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
   const u = useUtils();
+  const theme = u.react.theme;
   const utilsRef = useRef(u);
   utilsRef.current = u;
 
@@ -139,35 +141,89 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
   };
 
   return (
-    <Card sx={{ m: 1, p: 1 }}>
+    <Card
+      sx={{
+        m: 0,
+        p: { xs: 1.5, md: 2 },
+        border: `1px solid ${theme.colors.primary.lighter}`,
+        background: `radial-gradient(circle at 0% 0%, ${theme.colors.primary.lighter}, transparent 30%), ${theme.palette.background.paper}`,
+      }}
+    >
       <Grid container spacing={2}>
-        <Grid
-          container
-          size={{
-            xs: 0,
-            sm: 1
-          }}></Grid>
+        <Grid size={12}>
+          <Grid container spacing={1} sx={{ alignItems: "center" }}>
+            <Grid size={{ xs: 12, sm: 7 }}>
+              <Typography variant="overline" sx={{ color: theme.palette.primary.main, fontWeight: 800 }}>
+                {u.t("lottery:draw_entry_kicker")}
+              </Typography>
+              <Typography variant="h4" sx={{ fontWeight: 900, lineHeight: 1.05 }}>
+                {u.t("lottery:draw_entry_stake")}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {u.t("lottery:draw_entry_ticket_hint")}
+              </Typography>
+            </Grid>
+            <Grid
+              size={{ xs: 12, sm: 5 }}
+              container
+              spacing={1}
+              sx={{ justifyContent: { xs: "flex-start", sm: "flex-end" } }}
+            >
+              <Grid size={{ xs: 6, sm: 12 }}>
+                <Chip
+                  icon={<ConfirmationNumberIcon />}
+                  label={
+                    selectedTickets.length > 0
+                      ? `${selectedTickets.length} ${u.t("lottery:draw_entry_selected")}`
+                      : u.t("lottery:draw_entry_selected_zero")
+                  }
+                  sx={{
+                    maxWidth: "100%",
+                    color: theme.palette.primary.main,
+                    backgroundColor: theme.colors.primary.lighter,
+                    "& .MuiChip-icon": { color: theme.palette.primary.main },
+                  }}
+                />
+              </Grid>
+              <Grid size={{ xs: 6, sm: 12 }} sx={{ textAlign: { xs: "left", sm: "right" } }}>
+                <Typography variant="caption" color="text.secondary">
+                  {u.t("lottery:draw_available_tickets_balance")}
+                </Typography>
+                <Typography variant="h6" sx={{ fontWeight: 900 }}>
+                  {selectedCurrencyBalance === undefined
+                    ? "—"
+                    : `${selectedCurrencyBalance / 100} ${CurrencySymbolsMap[purchaseTicketsRequest.currency]}`}
+                </Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid size={12}>
+          <Divider />
+        </Grid>
         <Grid
           container
           sx={{
-            gap: 1
+            gap: 1,
+            alignItems: "center",
           }}
           size={{
-            xs: 6,
-            sm: 5
+            xs: 12,
+            sm: 6
           }}>
           {renderPossibleBets()}
         </Grid>
         <Grid
           container
           sx={{
-            justifyContent: "right"
+            justifyContent: "right",
           }}
           size={{
-            xs: 2.8,
+            xs: 7,
             sm: 4
           }}>
           <LockedTextField
+            label={u.t("lottery:draw_entry_stake")}
             name={purchaseParams.amount}
             value={purchaseTicketsRequest.amount || ""}
             onChange={handleUpdateRequest}
@@ -180,7 +236,7 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
             justifyContent: "right"
           }}
           size={{
-            xs: 3.2,
+            xs: 5,
             sm: 2
           }}>
           <LockedSelect
@@ -195,35 +251,6 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
               </MenuItem>
             ))}
           </LockedSelect>
-        </Grid>
-        <Grid
-          container
-          sx={{
-            justifyContent: {
-              xs: "center",
-              sm: "right"
-            },
-            pr: {
-              sm: 1
-            }
-          }}
-          size={{
-            xs: 12,
-            sm: 12
-          }}>
-          <Typography variant="body2">
-            {u.t("lottery:draw_available_tickets_balance")}
-            {selectedCurrencyBalance === undefined
-              ? "—"
-              : `${selectedCurrencyBalance / 100} ${CurrencySymbolsMap[purchaseTicketsRequest.currency]}`}
-          </Typography>
-        </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 12
-          }}>
-          <Divider />
         </Grid>
         <Grid
           container

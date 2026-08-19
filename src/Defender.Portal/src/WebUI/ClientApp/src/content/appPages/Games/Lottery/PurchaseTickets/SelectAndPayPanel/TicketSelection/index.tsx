@@ -1,4 +1,6 @@
-import { Grid, Typography } from "@mui/material";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
+import { Chip, Grid, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import useUtils from "src/appUtils";
 import LockedTextField from "src/components/LockedComponents/LockedTextField/LockedTextField";
@@ -23,6 +25,7 @@ interface TicketSelectionProps {
 
 const TicketSelection = (props: TicketSelectionProps) => {
   const u = useUtils();
+  const theme = u.react.theme;
   const reloadAvailableTicketsRef = useRef<(request: SearchLotteryTicketsRequest) => void>(() => undefined);
 
   const mobileAmount = 12;
@@ -210,6 +213,30 @@ const TicketSelection = (props: TicketSelectionProps) => {
 
   return (
     <Grid container spacing={2}>
+      <Grid size={{ xs: 12 }}>
+        <Grid container spacing={1} sx={{ alignItems: "center" }}>
+          <Grid size={{ xs: 8, sm: 9 }}>
+            <Typography variant="overline" sx={{ color: theme.palette.primary.main, fontWeight: 800 }}>
+              {u.t("lottery:draw_entry_kicker")}
+            </Typography>
+            <Typography variant={u.isMobile ? "h5" : "h4"} sx={{ fontWeight: 900, lineHeight: 1.05 }}>
+              {u.t("lottery:draw_available_tickets_title")}
+            </Typography>
+          </Grid>
+          <Grid size={{ xs: 4, sm: 3 }} container sx={{ justifyContent: "flex-end" }}>
+            <Chip
+              icon={<ConfirmationNumberIcon />}
+              label={`${selectedTickets.length}/${getAmountOfTicketsToDisplay()}`}
+              size="small"
+              sx={{
+                color: theme.palette.primary.main,
+                backgroundColor: theme.colors.primary.lighter,
+                "& .MuiChip-icon": { color: theme.palette.primary.main },
+              }}
+            />
+          </Grid>
+        </Grid>
+      </Grid>
       <Grid
         container
         spacing={1}
@@ -226,14 +253,9 @@ const TicketSelection = (props: TicketSelectionProps) => {
             xs: 6,
             sm: 6
           }}>
-          <Typography
-            variant={u.isMobile ? "h4" : "h6"}
-            sx={{
-              paddingLeft: u.isMobile ? 0 : 2
-            }}
-          >
-            {u.t("lottery:draw_available_tickets_title")}
-          </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ paddingLeft: u.isMobile ? 0 : 2 }}>
+              {u.t("lottery:draw_entry_ticket_hint")}
+            </Typography>
         </Grid>
         <Grid
           container
@@ -296,6 +318,12 @@ const TicketSelection = (props: TicketSelectionProps) => {
         container
         rowSpacing={2}
         columnSpacing={4}
+        sx={{
+          p: { xs: 1, sm: 1.5 },
+          borderRadius: theme.general.borderRadiusLg,
+          border: `1px dashed ${theme.colors.primary.light}`,
+          backgroundColor: theme.colors.primary.lighter,
+        }}
         size={{
           xs: 12,
           sm: 12
@@ -318,15 +346,16 @@ const TicketSelection = (props: TicketSelectionProps) => {
             xs: 12,
             sm: 7
           }}>
-          <Typography
-            align={u.isMobile ? "center" : "left"}
-            variant={u.isMobile ? "h4" : "h6"}
+            <Typography
+              align={u.isMobile ? "center" : "left"}
+              variant={u.isMobile ? "h5" : "h6"}
             sx={{
               paddingLeft: u.isMobile ? 0 : 5,
               width: "100%"
             }}>
+            <AutoAwesomeIcon sx={{ mr: 0.5, verticalAlign: "middle", color: theme.palette.warning.main }} />
             {u.t("lottery:draw_available_tickets_total_bet")}
-            {totalBet / 100} {CurrencySymbolsMap[currency]}
+            <strong>{totalBet / 100} {CurrencySymbolsMap[currency]}</strong>
           </Typography>
         </Grid>
         <Grid
