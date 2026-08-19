@@ -15,6 +15,7 @@ vi.mock("src/api/travelCalendar", () => ({
     get: vi.fn(),
     createEvent: vi.fn(),
     createFromDate: vi.fn(),
+    searchUsers: vi.fn(),
     updateMyParticipation: vi.fn(),
   },
 }));
@@ -150,6 +151,30 @@ describe("useTravelCalendar", () => {
 
     expect(ErrorToast).toHaveBeenCalledWith("travelCalendar:errors.saveFailedGeneric");
     expect(travelCalendarApi.get).toHaveBeenCalledTimes(1);
+  });
+
+  test("Load_WhenInitialRequestFails_ShowsLoadErrorThroughTheGlobalToast", async () => {
+    vi.mocked(travelCalendarApi.get).mockRejectedValueOnce(new Error("calendar unavailable"));
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(ErrorToast).toHaveBeenCalledWith("travelCalendar:errors.loadFailed");
+  });
+
+  test("SearchUsers_WhenRequestFails_ShowsSearchErrorThroughTheGlobalToast", async () => {
+    vi.mocked(travelCalendarApi.searchUsers).mockRejectedValueOnce(new Error("search unavailable"));
+
+    const { result } = renderHook(() => useTravelCalendar(1));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    let users: unknown;
+    await act(async () => {
+      users = await result.current.searchUsers("alex");
+    });
+
+    expect(users).toEqual([]);
+    expect(ErrorToast).toHaveBeenCalledWith("travelCalendar:errors.searchUsersFailed");
   });
 
   test("Load_OnInitialMount_RequestsTheFullCalendarWithoutADateRange", async () => {

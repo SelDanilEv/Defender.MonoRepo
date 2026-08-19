@@ -128,6 +128,7 @@
   },
   "errors": {
     "loadFailed": "Failed to load travel calendar",
+    "searchUsersFailed": "Failed to load the user list",
     "saveFailed": "Changes were not saved. The calendar was refreshed — please try again.",
     "dateOverlap": "These dates are already taken by another event",
     "dateOutsideSeason": "Date is outside the available season",

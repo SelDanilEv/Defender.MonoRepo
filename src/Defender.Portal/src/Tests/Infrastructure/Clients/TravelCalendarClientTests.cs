@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text;
 using Defender.Common.Interfaces;
 using Defender.Common.Wrapper.Internal;
 using Defender.Portal.Application.Configuration.Options;
@@ -52,17 +53,50 @@ public class TravelCalendarClientTests
         Assert.Equal("/api/V1/travel-calendar", handler.RequestUri!.PathAndQuery);
     }
 
+    [Fact]
+    public async Task GetAsync_WhenUpstreamReturnsProblemDetails_PreservesStatusCodeAndErrorCode()
+    {
+        var handler = new CapturingHandler(new HttpResponseMessage(HttpStatusCode.Conflict)
+        {
+            Content = new StringContent(
+                "{\"detail\":\"These dates overlap\",\"code\":\"TRAVEL_CALENDAR_DATE_OVERLAP\"}",
+                Encoding.UTF8,
+                "application/problem+json"),
+        });
+        var authentication = new Mock<IAuthenticationHeaderAccessor>();
+        authentication
+            .Setup(item => item.GetAuthenticationHeader(AuthorizationType.User))
+            .ReturnsAsync(new AuthenticationHeaderValue("Bearer", "token"));
+        var sut = new TravelCalendarClient(
+            new HttpClient(handler),
+            authentication.Object,
+            Options.Create(new TravelCalendarOptions { Url = "https://calendar.test" }));
+
+        var exception = await Assert.ThrowsAsync<TravelCalendarUpstreamException>(() => sut.GetAsync(null, null));
+
+        Assert.Equal(409, exception.Status);
+        Assert.Equal("TRAVEL_CALENDAR_DATE_OVERLAP", exception.Code);
+        Assert.Equal("These dates overlap", exception.Message);
+    }
+
     private sealed class CapturingHandler : HttpMessageHandler
     {
+        private readonly HttpResponseMessage response;
+
+        public CapturingHandler(HttpResponseMessage? response = null)
+        {
+            this.response = response ?? new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("{}"),
+            };
+        }
+
         public Uri? RequestUri { get; private set; }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             RequestUri = request.RequestUri;
-            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent("{}"),
-            });
+            return Task.FromResult(response);
         }
     }
 }

@@ -13,6 +13,7 @@ const AppToastContainer = () => {
     draggable
     pauseOnHover
     theme='dark'
+    style={{ zIndex: 9999 }}
   />
 };
 

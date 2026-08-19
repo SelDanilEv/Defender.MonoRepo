@@ -43,7 +43,6 @@ export const useTravelCalendar = (initialMonthCount: number) => {
   const [calendar, setCalendar] = useState<TravelCalendar | null>(null);
   const [loading, setLoading] = useState(true);
   const [mutating, setMutating] = useState(false);
-  const [error, setError] = useState("");
   const [activeEventId, setActiveEventId] = useState<string | null>(null);
   const [draftEvent, setDraftEvent] = useState<TravelEvent | null>(null);
 
@@ -66,7 +65,6 @@ export const useTravelCalendar = (initialMonthCount: number) => {
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError("");
     loadedMonths.current.clear();
     loadingMonths.current.clear();
     try {
@@ -86,7 +84,7 @@ export const useTravelCalendar = (initialMonthCount: number) => {
       initialMonths.forEach((month) => loadedMonths.current.add(monthKey(month)));
       setCalendar(page);
     } catch {
-      setError(utilsRef.current.t("travelCalendar:errors.loadFailed"));
+      ErrorToast(utilsRef.current.t("travelCalendar:errors.loadFailed"));
     } finally {
       setLoading(false);
     }
@@ -130,7 +128,6 @@ export const useTravelCalendar = (initialMonthCount: number) => {
     }
 
     setMutating(true);
-    setError("");
     try {
       const result = await operation(calendar);
       setCalendar(result.calendar);
@@ -163,13 +160,11 @@ export const useTravelCalendar = (initialMonthCount: number) => {
     calendar,
     loading,
     mutating,
-    error,
     activeEvent,
     draftEvent,
     openEvent,
     closeActiveEvent,
     retry: load,
-    clearError: () => setError(""),
     ensureMonths,
     searchUsers: async (query: string): Promise<TravelCalendarUserOption[]> => {
       if (!query.trim()) {
@@ -179,6 +174,7 @@ export const useTravelCalendar = (initialMonthCount: number) => {
       try {
         return await travelCalendarApi.searchUsers(query, utilsRef.current);
       } catch {
+        ErrorToast(utilsRef.current.t("travelCalendar:errors.searchUsersFailed"));
         return [];
       }
     },

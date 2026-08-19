@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { alpha, useTheme } from "@mui/material/styles";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
-  Alert,
   Box,
   Button,
   Checkbox,
@@ -132,14 +131,11 @@ export default function TravelCalendarPage() {
   if (!calendar) {
     return (
       <Box sx={{
-        p: 4
+        p: 4,
+        display: "flex",
+        justifyContent: "center",
       }}>
-        <Alert
-          severity="error"
-          action={<Button onClick={state.retry}>{t("travelCalendar:retry")}</Button>}
-        >
-          {state.error || t("travelCalendar:unavailable")}
-        </Alert>
+        <Button onClick={state.retry}>{t("travelCalendar:retry")}</Button>
       </Box>
     );
   }
