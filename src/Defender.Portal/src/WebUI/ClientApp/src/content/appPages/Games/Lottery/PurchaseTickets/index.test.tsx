@@ -10,7 +10,9 @@ vi.mock("react-redux", () => ({
 vi.mock("src/appUtils", () => ({
   default: () => ({
     react: {
-      locationState: () => null,
+      locationState: () => {
+        throw new TypeError("Cannot read properties of null (reading 'draw')");
+      },
       navigate,
       theme: {
         colors: {

@@ -17,7 +17,12 @@ const PurchaseTickets = (props: PurchaseTicketsProps) => {
   const u = useUtils();
   const theme = u.react.theme;
 
-  const drawState = u.react.locationState<unknown>("draw");
+  let drawState: unknown = null;
+  try {
+    drawState = u.react.locationState<unknown>("draw");
+  } catch {
+    drawState = null;
+  }
   const draw = readLotteryDrawState(drawState);
 
   if (!draw) {
