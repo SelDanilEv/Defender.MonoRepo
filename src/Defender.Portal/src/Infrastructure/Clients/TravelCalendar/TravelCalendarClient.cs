@@ -46,6 +46,29 @@ public class TravelCalendarClient(HttpClient httpClient, IAuthenticationHeaderAc
     {
         if (response.IsSuccessStatusCode) return;
         var body = await response.Content.ReadAsStringAsync(ct);
-        throw new ApiException($"HTTP {(int)response.StatusCode}", (int)response.StatusCode, body, new ReadOnlyDictionary<string, IEnumerable<string>>(response.Headers.ToDictionary(item => item.Key, item => item.Value)), null!);
+
+        // Try to parse the response body with System.Text.Json to preserve the "code" extension
+        string? code = null;
+        string detail = response.StatusCode.ToString();
+
+        try
+        {
+            var document = JsonDocument.Parse(body);
+            if (document.RootElement.TryGetProperty("detail", out var detailElement))
+            {
+                detail = detailElement.GetString() ?? detail;
+            }
+
+            if (document.RootElement.TryGetProperty("code", out var codeElement))
+            {
+                code = codeElement.GetString();
+            }
+        }
+        catch
+        {
+            // If parsing fails, we'll use the defaults set above
+        }
+
+        throw new TravelCalendarUpstreamException((int)response.StatusCode, code, detail);
     }
 }

@@ -7,6 +7,7 @@ using Defender.Common.Extension;
 using Defender.Common.Helpers;
 using Defender.Portal.Application.Configuration.Extension;
 using Defender.Portal.Application.Modules.Telegram;
+using Defender.Portal.Infrastructure.Clients.TravelCalendar;
 using Defender.Portal.WebUI.ErrorMapping;
 using Defender.Portal.WebUI.OAuth;
 using Defender.Portal.WebUI.Telegram;
@@ -163,6 +164,16 @@ public static class ConfigureServices
             var problemDetails = new ProblemDetails();
             problemDetails.Detail = ErrorMappingHelper.MapErrorCode(exception.Message);
             problemDetails.Status = StatusCodes.Status400BadRequest;
+            return problemDetails;
+        });
+
+        options.Map<TravelCalendarUpstreamException>(exception =>
+        {
+            var problemDetails = new ProblemDetails { Detail = exception.Message, Status = exception.Status };
+            if (exception.Code != null)
+            {
+                problemDetails.Extensions["code"] = exception.Code;
+            }
             return problemDetails;
         });
 
