@@ -23,7 +23,7 @@ const PurchaseTickets = (props: PurchaseTicketsProps) => {
   } catch {
     drawState = null;
   }
-  const draw = readLotteryDrawState(drawState);
+  const draw = readLotteryDrawState({ draw: drawState });
 
   if (!draw) {
     return (
