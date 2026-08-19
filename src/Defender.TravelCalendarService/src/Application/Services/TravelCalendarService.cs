@@ -46,13 +46,12 @@ public class TravelCalendarService(
 
     public async Task<TravelCalendarMutationResultDto> CreateEventFromDateAsync(Guid userId, CreateEventFromDateRequest request, CancellationToken cancellationToken)
     {
-        var calendar = await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
+        await calendarRepository.GetOrCreateAsync(userId, cancellationToken);
 
         var start = request.Date.DayOfWeek == DayOfWeek.Sunday ? request.Date.AddDays(-1) : request.Date;
         var isWeekend = request.Date.DayOfWeek is DayOfWeek.Saturday or DayOfWeek.Sunday;
         var end = isWeekend ? start.AddDays(1) : start;
 
-        EnsureSeason(calendar, start, end);
         var visibleEvents = await eventRepository.GetVisibleAsync(userId, cancellationToken);
         EnsureAvailable(visibleEvents, start, end, null);
 
@@ -77,7 +76,6 @@ public class TravelCalendarService(
         var (start, end) = request.EndDate < request.StartDate
             ? (request.EndDate, request.StartDate)
             : (request.StartDate, request.EndDate);
-        EnsureSeason(calendar, start, end);
         var visibleEvents = await eventRepository.GetVisibleAsync(userId, cancellationToken);
         EnsureAvailable(visibleEvents, start, end, null);
 
@@ -108,7 +106,7 @@ public class TravelCalendarService(
     }
 
     public Task<TravelCalendarMutationResultDto> UpdateEventAsync(Guid userId, Guid eventId, UpdateTravelEventRequest request, CancellationToken cancellationToken)
-        => MutateEventAsync(userId, eventId, request.ExpectedVersion, async (travelEvent, calendar, visibleEvents) =>
+        => MutateEventAsync(userId, eventId, request.ExpectedVersion, async (travelEvent, _, visibleEvents) =>
         {
             var hotel = new HotelDetails
             {
@@ -122,7 +120,6 @@ public class TravelCalendarService(
             var (start, end) = request.EndDate < request.StartDate
                 ? (request.EndDate, request.StartDate)
                 : (request.StartDate, request.EndDate);
-            EnsureSeason(calendar, start, end);
             EnsureAvailable(visibleEvents, start, end, eventId);
 
             travelEvent.UpdateSharedDetails(userId, request.Title, request.Type, request.StartDate, request.EndDate, request.Notes, hotel, request.TransportCostPln, request.MainPoint, request.OtherCostPln, Now);
@@ -155,9 +152,9 @@ public class TravelCalendarService(
         }, cancellationToken);
 
     public Task<TravelCalendarMutationResultDto> AutoScheduleAsync(Guid userId, Guid eventId, VersionedRequest request, CancellationToken cancellationToken)
-        => MutateEventAsync(userId, eventId, request.ExpectedVersion, async (travelEvent, calendar, visibleEvents) =>
+        => MutateEventAsync(userId, eventId, request.ExpectedVersion, async (travelEvent, _, visibleEvents) =>
         {
-            travelEvent.AutoSchedule(userId, calendar.SeasonStart, calendar.SeasonEnd, visibleEvents, Now);
+            travelEvent.AutoSchedule(userId, visibleEvents, Now);
             await SaveEventAsync(travelEvent, request.ExpectedVersion, cancellationToken);
             return (eventId, (Guid?)null);
         }, cancellationToken);
@@ -290,14 +287,6 @@ public class TravelCalendarService(
         }
     }
 
-    private static void EnsureSeason(TravelCalendar calendar, DateOnly start, DateOnly end)
-    {
-        if (start < calendar.SeasonStart || end > calendar.SeasonEnd)
-        {
-            throw new TravelCalendarValidationException("TRAVEL_CALENDAR_DATE_OUTSIDE_SEASON", "Date is outside the season.");
-        }
-    }
-
     private static void EnsureAvailable(IEnumerable<TravelEvent> visibleEvents, DateOnly start, DateOnly end, Guid? excludedEventId)
     {
         if (visibleEvents.Where(item => item.Id != excludedEventId).Any(item => item.Overlaps(start, end)))
@@ -353,8 +342,6 @@ public class TravelCalendarService(
             calendar.Version,
             calendar.BaseCity,
             calendar.Currency,
-            calendar.SeasonStart,
-            calendar.SeasonEnd,
             calendar.Theme,
             new(calendar.Vehicle.Name, calendar.Vehicle.FuelConsumptionLitersPer100Km, calendar.Vehicle.FuelPricePlnPerLiter),
             calendar.Holidays.Select(item => new CalendarHolidayDto(item.Date, item.NameKey, item.Flag, item.Type)).ToArray(),

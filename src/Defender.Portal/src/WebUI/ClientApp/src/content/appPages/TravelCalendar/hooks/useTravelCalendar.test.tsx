@@ -25,8 +25,6 @@ const calendar = {
   version: 1,
   baseCity: "Warsaw",
   currency: "PLN",
-  seasonStart: "2026-07-01",
-  seasonEnd: "2026-09-30",
   theme: "Light",
   vehicle: { name: "Car", fuelConsumptionLitersPer100Km: 7, fuelPricePlnPerLiter: 6 },
   holidays: [],

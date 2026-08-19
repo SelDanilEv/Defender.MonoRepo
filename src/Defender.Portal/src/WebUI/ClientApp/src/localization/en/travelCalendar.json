@@ -131,7 +131,6 @@
     "searchUsersFailed": "Failed to load the user list",
     "saveFailed": "Changes were not saved. The calendar was refreshed — please try again.",
     "dateOverlap": "These dates are already taken by another event",
-    "dateOutsideSeason": "Date is outside the available season",
     "ownerOnly": "Only the organizer can change this event",
     "saveFailedGeneric": "Failed to save changes. Please try again."
   }

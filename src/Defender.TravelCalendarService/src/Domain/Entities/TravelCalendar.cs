@@ -17,8 +17,6 @@ public class TravelCalendar : IBaseModel
     public long Version { get; set; }
     public string BaseCity { get; set; } = "Warsaw";
     public string Currency { get; set; } = "PLN";
-    public DateOnly SeasonStart { get; set; } = new(2026, 7, 1);
-    public DateOnly SeasonEnd { get; set; } = new(2026, 9, 30);
     public CalendarTheme Theme { get; set; } = CalendarTheme.Light;
     public VehicleSettings Vehicle { get; set; } = new("Dodge Challenger", 12, 6.60m);
     public List<CalendarHoliday> Holidays { get; set; } = [];

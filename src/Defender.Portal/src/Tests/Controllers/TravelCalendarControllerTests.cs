@@ -101,6 +101,6 @@ public class TravelCalendarControllerTests
     }
 
     private static TravelCalendarDto CreateCalendar() => new(
-        Guid.NewGuid(), 1, "Warsaw", "PLN", new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31), "Light",
+        Guid.NewGuid(), 1, "Warsaw", "PLN", "Light",
         new VehicleSettingsDto("Car", 7, 6), [], [], [], new TravelCalendarSummaryDto(0, 0, 0, 0, 0, []), DateTimeOffset.UtcNow);
 }

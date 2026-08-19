@@ -38,8 +38,6 @@ export interface TravelCalendar {
   version: number;
   baseCity: string;
   currency: string;
-  seasonStart: string;
-  seasonEnd: string;
   theme: CalendarTheme;
   vehicle: { name: string; fuelConsumptionLitersPer100Km: number; fuelPricePlnPerLiter: number; };
   holidays: { date: string; nameKey: string; flag: string; type: string; }[];

@@ -5,13 +5,13 @@ namespace Defender.TravelCalendarService.Tests.Domain;
 public class WeekendSlotProviderTests
 {
     [Fact]
-    public void GetSlots_WhenQ3Season_ReturnsOrderedSaturdaySundaySlots()
+    public void GetSlots_WhenStartingMidweek_ReturnsConsecutiveWeekendSlots()
     {
-        var slots = WeekendSlotProvider.GetSlots(new DateOnly(2026, 7, 1), new DateOnly(2026, 9, 30));
+        var slots = WeekendSlotProvider.GetSlots(new DateOnly(2026, 7, 1)).Take(3).ToArray();
 
-        Assert.NotEmpty(slots);
-        Assert.Equal(DayOfWeek.Saturday, slots[0].Start.DayOfWeek);
-        Assert.Equal(slots[0].Start.AddDays(1), slots[0].End);
-        Assert.True(slots.SequenceEqual(slots.OrderBy(slot => slot.Start)));
+        Assert.Equal(new DateOnly(2026, 7, 4), slots[0].Start);
+        Assert.Equal(new DateOnly(2026, 7, 5), slots[0].End);
+        Assert.Equal(new DateOnly(2026, 7, 11), slots[1].Start);
+        Assert.Equal(new DateOnly(2026, 7, 18), slots[2].Start);
     }
 }

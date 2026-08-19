@@ -244,7 +244,7 @@ public class TravelEvent : IBaseModel
         Touch(now);
     }
 
-    public void AutoSchedule(Guid actorUserId, DateOnly seasonStart, DateOnly seasonEnd, IEnumerable<TravelEvent> visibleEvents, DateTimeOffset now)
+    public void AutoSchedule(Guid actorUserId, IEnumerable<TravelEvent> visibleEvents, DateTimeOffset now)
     {
         EnsureOwner(actorUserId);
         if (StartDate != null)
@@ -252,7 +252,7 @@ public class TravelEvent : IBaseModel
             throw new TravelCalendarConflictException("TRAVEL_CALENDAR_ALREADY_SCHEDULED", "Event is already scheduled.");
         }
 
-        var slot = WeekendSlotProvider.GetSlots(seasonStart, seasonEnd)
+        var slot = WeekendSlotProvider.GetSlots(DateOnly.FromDateTime(now.DateTime))
             .FirstOrDefault(candidate => visibleEvents
                 .Where(item => item.Id != Id && item.StartDate != null && item.EndDate != null)
                 .All(item => candidate.End < item.StartDate || candidate.Start > item.EndDate));

@@ -4,17 +4,22 @@ namespace Defender.TravelCalendarService.Domain.Services;
 
 public static class WeekendSlotProvider
 {
-    public static IReadOnlyList<WeekendSlot> GetSlots(DateOnly seasonStart, DateOnly seasonEnd)
+    public static IEnumerable<WeekendSlot> GetSlots(DateOnly startDate)
     {
-        var result = new List<WeekendSlot>();
-        for (var date = seasonStart; date <= seasonEnd; date = date.AddDays(1))
-        {
-            if (date.DayOfWeek == DayOfWeek.Saturday && date.AddDays(1) <= seasonEnd)
-            {
-                result.Add(new WeekendSlot(date, date.AddDays(1)));
-            }
-        }
+        var daysUntilSaturday = ((int)DayOfWeek.Saturday - (int)startDate.DayOfWeek + 7) % 7;
+        var date = startDate.AddDays(daysUntilSaturday);
+        var lastStartDate = DateOnly.MaxValue.AddDays(-1);
 
-        return result;
+        while (date <= lastStartDate)
+        {
+            yield return new WeekendSlot(date, date.AddDays(1));
+
+            if (date > lastStartDate.AddDays(-7))
+            {
+                yield break;
+            }
+
+            date = date.AddDays(7);
+        }
     }
 }

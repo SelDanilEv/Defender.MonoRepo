@@ -11,6 +11,35 @@ namespace Defender.TravelCalendarService.Tests.Services;
 public class TravelCalendarServiceTests
 {
     [Fact]
+    public async Task CreateEventFromDateAsync_WhenDateIsOutsideFormerRange_PersistsEvent()
+    {
+        var userId = Guid.NewGuid();
+        var calendar = TravelCalendar.Create(userId, DateTimeOffset.Parse("2026-07-01T00:00:00Z"));
+        var calendarRepository = new Mock<ITravelCalendarRepository>();
+        var eventRepository = new Mock<ITravelEventRepository>();
+        calendarRepository
+            .Setup(repository => repository.GetOrCreateAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(calendar);
+        eventRepository
+            .Setup(repository => repository.GetVisibleAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+
+        var service = new CalendarService(calendarRepository.Object, eventRepository.Object, TimeProvider.System);
+        var request = new CreateEventFromDateRequest(calendar.Version, new DateOnly(2026, 12, 25));
+
+        var result = await service.CreateEventFromDateAsync(userId, request, CancellationToken.None);
+
+        eventRepository.Verify(repository => repository.AddAsync(
+            It.Is<TravelEvent>(item =>
+                item.Title == "New event"
+                && item.Type == TravelEventType.DayTrip
+                && item.StartDate == new DateOnly(2026, 12, 25)
+                && item.EndDate == new DateOnly(2026, 12, 25)),
+            It.IsAny<CancellationToken>()), Times.Once);
+        Assert.NotNull(result.AffectedEventId);
+    }
+
+    [Fact]
     public async Task CreateEventAsync_WhenRequestIsValid_PersistsSuppliedEvent()
     {
         var userId = Guid.NewGuid();
@@ -181,20 +210,20 @@ public class TravelCalendarServiceTests
             .Setup(repository => repository.GetOrCreateAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(calendar);
 
-        var withinSeason = TravelEvent.Scheduled(userId, "Within season", TravelEventType.DayTrip, new DateOnly(2026, 7, 18), new DateOnly(2026, 7, 18));
+        var withinDateRange = TravelEvent.Scheduled(userId, "Within date range", TravelEventType.DayTrip, new DateOnly(2026, 7, 18), new DateOnly(2026, 7, 18));
         var farInThePast = TravelEvent.Scheduled(userId, "Long past", TravelEventType.DayTrip, new DateOnly(2020, 1, 1), new DateOnly(2020, 1, 1));
         var farInTheFuture = TravelEvent.Scheduled(userId, "Far future", TravelEventType.DayTrip, new DateOnly(2030, 1, 1), new DateOnly(2030, 1, 1));
         var undated = TravelEvent.Queued(userId, "Wishlist item", 0, DateTimeOffset.Parse("2026-07-01T00:00:00Z"));
         eventRepository
             .Setup(repository => repository.GetVisibleAsync(userId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync([withinSeason, farInThePast, farInTheFuture, undated]);
+            .ReturnsAsync([withinDateRange, farInThePast, farInTheFuture, undated]);
 
         var service = new CalendarService(calendarRepository.Object, eventRepository.Object, TimeProvider.System);
 
         var result = await service.GetAsync(userId, null, null, CancellationToken.None);
 
         Assert.Equal(4, result.Events.Count);
-        Assert.Contains(result.Events, item => item.Id == withinSeason.Id);
+        Assert.Contains(result.Events, item => item.Id == withinDateRange.Id);
         Assert.Contains(result.Events, item => item.Id == farInThePast.Id);
         Assert.Contains(result.Events, item => item.Id == farInTheFuture.Id);
         Assert.Contains(result.Events, item => item.Id == undated.Id);

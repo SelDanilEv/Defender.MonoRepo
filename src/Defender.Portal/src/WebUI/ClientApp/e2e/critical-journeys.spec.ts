@@ -54,7 +54,7 @@ const mockApi = async (page: Page, authenticated = false) => {
       return;
     }
     if (url.includes("/api/travelCalendar")) {
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: "calendar-1", version: 1, baseCity: "Warsaw", currency: "PLN", seasonStart: "2026-01-01", seasonEnd: "2026-12-31", theme: "Light", vehicle: { name: "", fuelConsumptionLitersPer100Km: 0, fuelPricePlnPerLiter: 0 }, holidays: [], events: [], packingItems: [], summary: { overnightTripCount: 0, hotelTotalPln: 0, transportTotalPln: 0, otherTotalPln: 0, grandTotalPln: 0, details: [] }, updatedAtUtc: "2026-07-28T00:00:00.000Z" }) });
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ id: "calendar-1", version: 1, baseCity: "Warsaw", currency: "PLN", theme: "Light", vehicle: { name: "", fuelConsumptionLitersPer100Km: 0, fuelPricePlnPerLiter: 0 }, holidays: [], events: [], packingItems: [], summary: { overnightTripCount: 0, hotelTotalPln: 0, transportTotalPln: 0, otherTotalPln: 0, grandTotalPln: 0, details: [] }, updatedAtUtc: "2026-07-28T00:00:00.000Z" }) });
       return;
     }
     if (url.includes("/api/budgetTracker/positions") || url.includes("/api/lottery/draw/active")) {
