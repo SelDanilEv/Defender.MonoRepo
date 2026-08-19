@@ -33,6 +33,7 @@
   "draw_available_tickets_target_number_label": "Number",
   "draw_available_tickets_search_button": "Search",
   "draw_available_tickets_total_bet": "Your total bet: ",
+  "draw_available_tickets_balance": "Your balance: ",
   "draw_available_tickets_back_button": "Back",
   "draw_available_tickets_proceed_button": "Proceed",
 

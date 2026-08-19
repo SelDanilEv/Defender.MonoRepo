@@ -1,14 +1,19 @@
-import { Card, Divider, Grid, MenuItem } from "@mui/material";
-import { useState } from "react";
+import { Card, Divider, Grid, MenuItem, Typography } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
 import { connect } from "react-redux";
 import useUtils from "src/appUtils";
+import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
+import apiUrls from "src/api/apiUrls";
+import CurrencySymbolsMap from "src/consts/CurrencySymbolsMap";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
 import LotteryDraw from "src/models/games/lottery/LotteryDraw";
 import LockedTextField from "src/components/LockedComponents/LockedTextField/LockedTextField";
 import ParamsObjectBuilder from "src/helpers/ParamsObjectBuilder";
+import { WalletInfo } from "src/models/banking/WalletInfo";
 import PurchaseLotteryTicketsRequest from "src/models/requests/games/lottery/PurchaseLotteryTicketsRequest";
 import { PositiveCurrencyAmountMaskRegex } from "src/consts/Regexes";
 import LockedSelect from "src/components/LockedComponents/LockedSelect/LockedSelect";
+import { getCurrencyAccountBalance } from "./currencyBalance";
 import TicketSelection from "./TicketSelection";
 
 interface SelectAndPayPanelProps {
@@ -17,10 +22,41 @@ interface SelectAndPayPanelProps {
 
 const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
 
   const draw = props.draw;
 
   const [selectedTickets, setSelectedTickets] = useState<number[]>([]);
+  const [walletInfo, setWalletInfo] = useState<WalletInfo>();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    APICallWrapper({
+      url: `${apiUrls.banking.walletInfo}`,
+      options: {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "default",
+      },
+      utils: utilsRef.current,
+      onSuccess: async (response) => {
+        const walletInfo: WalletInfo = await response.json();
+
+        if (isMounted) {
+          setWalletInfo(walletInfo);
+        }
+      },
+      showError: false,
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const selectTicket = (ticket: number) => {
     setSelectedTickets([...selectedTickets, ticket]);
@@ -42,6 +78,10 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
     });
 
   const purchaseParams = ParamsObjectBuilder.Build(u, purchaseTicketsRequest);
+  const selectedCurrencyBalance = getCurrencyAccountBalance(
+    purchaseTicketsRequest.currency,
+    walletInfo?.currencyAccounts
+  );
 
   const handleUpdateRequest = (event) => {
     const { name, type } = event.target;
@@ -155,6 +195,28 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
               </MenuItem>
             ))}
           </LockedSelect>
+        </Grid>
+        <Grid
+          container
+          sx={{
+            justifyContent: {
+              xs: "center",
+              sm: "right"
+            },
+            pr: {
+              sm: 1
+            }
+          }}
+          size={{
+            xs: 12,
+            sm: 12
+          }}>
+          <Typography variant="body2">
+            {u.t("lottery:draw_available_tickets_balance")}
+            {selectedCurrencyBalance === undefined
+              ? "—"
+              : `${selectedCurrencyBalance / 100} ${CurrencySymbolsMap[purchaseTicketsRequest.currency]}`}
+          </Typography>
         </Grid>
         <Grid
           size={{
