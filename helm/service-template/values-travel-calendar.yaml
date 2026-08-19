@@ -1,7 +1,7 @@
 image:
   repository: defendersd/defender.travel-calendar
   tag: latest
-  digest: sha256:3d4ea3ac74810916d34e2340f4176090ec0f3ba65411032dc8ec38a939f6e580
+  digest: sha256:d12f2267a65d425e3346ed4c6d6fe71801e4db8a7bfdc1fc534fcf2cd0d18013
   pullPolicy: Always
 deploymentStrategy:
   # The single-node cluster cannot schedule the old and replacement pods together.
