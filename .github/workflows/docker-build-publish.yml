@@ -32,6 +32,11 @@ on:
         required: false
         default: false
         type: boolean
+      skip_browser_smoke:
+        description: "Skip CI Playwright browser smoke; use only with an approved internal-browser verification"
+        required: false
+        default: false
+        type: boolean
 
 env:
   DOCKER_REGISTRY: docker.io
@@ -439,11 +444,11 @@ jobs:
         run: npm run build
 
       - name: Install Playwright Chromium
-        if: needs.check-changes.outputs.portal-changed == 'true'
+        if: needs.check-changes.outputs.portal-changed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_browser_smoke != 'true')
         run: npx playwright install --with-deps chromium
 
       - name: Run browser smoke tests
-        if: needs.check-changes.outputs.portal-changed == 'true'
+        if: needs.check-changes.outputs.portal-changed == 'true' && (github.event_name != 'workflow_dispatch' || github.event.inputs.skip_browser_smoke != 'true')
         run: npm run test:e2e
 
   portal-mcp-quality:

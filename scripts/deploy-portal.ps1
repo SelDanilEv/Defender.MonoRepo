@@ -5,6 +5,7 @@ param(
     [string]$HomeServerRoot = "E:\MyApps\Defender.HomeServer",
     [int]$TimeoutMinutes = 15,
     [switch]$SkipLiveCheck,
+    [switch]$SkipBrowserSmoke,
     [switch]$Execute
 )
 
@@ -91,6 +92,9 @@ try {
         Write-Host "PORTAL_DEPLOY PREVIEW"
         Write-Host "repo=$Repo ref=$Ref branch=$branch head=$shortSha image=$imageTag"
         Write-Host "would=push,build Defender.Portal,promote,live-check"
+        if ($SkipBrowserSmoke) {
+            Write-Host "skip-browser-smoke=true (internal Browser verification required)"
+        }
         Write-Host "Run again with -Execute to mutate GitHub and ArgoCD state."
         exit 0
     }
@@ -104,7 +108,17 @@ try {
 
     $buildWorkflow = "docker-build-publish.yml"
     $existingBuildIds = @(Get-Runs $buildWorkflow | ForEach-Object { [long]$_.databaseId })
-    if ((Invoke-SilentNative { & gh workflow run $buildWorkflow --repo $Repo --ref $Ref -f service=Defender.Portal -f force_build=true }) -ne 0) {
+    $buildDispatchArgs = @(
+        "workflow", "run", $buildWorkflow,
+        "--repo", $Repo,
+        "--ref", $Ref,
+        "-f", "service=Defender.Portal",
+        "-f", "force_build=true"
+    )
+    if ($SkipBrowserSmoke) {
+        $buildDispatchArgs += @("-f", "skip_browser_smoke=true")
+    }
+    if ((Invoke-SilentNative { & gh @buildDispatchArgs }) -ne 0) {
         throw "Portal build dispatch failed."
     }
     $buildRun = Wait-NewRun $buildWorkflow $headSha $existingBuildIds
