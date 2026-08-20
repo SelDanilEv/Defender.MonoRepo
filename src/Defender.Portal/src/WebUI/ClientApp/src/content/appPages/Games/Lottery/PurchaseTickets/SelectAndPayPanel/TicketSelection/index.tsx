@@ -1,11 +1,13 @@
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import CasinoIcon from "@mui/icons-material/Casino";
 import ConfirmationNumberIcon from "@mui/icons-material/ConfirmationNumber";
-import { Chip, Grid, Typography } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, ButtonBase, Chip, Grid, LinearProgress, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import useUtils from "src/appUtils";
 import LockedTextField from "src/components/LockedComponents/LockedTextField/LockedTextField";
 import LockedButton from "src/components/LockedComponents/LockedButton/LockedButton";
-import CheckBoxButton from "src/components/Buttons/CheckBoxButton";
 import { Currency } from "src/models/shared/Currency";
 import CurrencySymbolsMap from "src/consts/CurrencySymbolsMap";
 import APICallWrapper from "src/api/APIWrapper/APICallWrapper";
@@ -13,6 +15,10 @@ import RequestParamsBuilder from "src/api/APIWrapper/RequestParamsBuilder";
 import apiUrls from "src/api/apiUrls";
 import SearchLotteryTicketsRequest from "src/models/requests/games/lottery/SearchLotteryTicketsRequest";
 import PurchaseLotteryTicketsRequest from "src/models/requests/games/lottery/PurchaseLotteryTicketsRequest";
+import {
+  getLotteryTicketSelectionProgress,
+  getRandomAvailableLotteryTicket,
+} from "../../../lotteryPresentation";
 
 interface TicketSelectionProps {
   drawNumber: number;
@@ -181,35 +187,151 @@ const TicketSelection = (props: TicketSelectionProps) => {
 
     return tickets.map((ticket, index) => {
       const isSelected = selectedTickets.includes(ticket);
+      const isLocked = isFull && !isSelected;
 
       return (
         <Grid
           key={ticket}
-          container
           sx={{
-            justifyContent: "center"
+            display: "flex",
           }}
           size={{
             xs: 6,
             sm: 2.4
           }}>
-          <CheckBoxButton
-            isChecked={isSelected}
-            fullWidth
-            text={ticket.toString()}
-            onCheck={() => {
-              selectTicket(ticket);
+          <ButtonBase
+            aria-label={ticket.toString()}
+            aria-pressed={isSelected}
+            disabled={isLocked}
+            onClick={() => {
+              if (isSelected) {
+                unselectTicket(ticket);
+              } else {
+                selectTicket(ticket);
+              }
             }}
-            onUncheck={() => {
-              unselectTicket(ticket);
+            sx={{
+              position: "relative",
+              display: "block",
+              width: "100%",
+              minHeight: { xs: 68, sm: 82 },
+              overflow: "hidden",
+              borderRadius: theme.general.borderRadius,
+              border: `1px solid ${isSelected ? theme.colors.primary.main : theme.colors.alpha.black[10]}`,
+              color: isSelected
+                ? theme.colors.alpha.trueWhite[100]
+                : theme.palette.text.primary,
+              background: isSelected
+                ? theme.colors.gradients.purple3
+                : theme.palette.mode === "dark"
+                  ? theme.colors.alpha.trueWhite[5]
+                  : theme.colors.alpha.black[5],
+              boxShadow: isSelected ? theme.colors.shadows.primary : "none",
+              transition: "transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease",
+              animation: isSelected ? "lottery-ticket-pop .36s ease-out" : "none",
+              "@keyframes lottery-ticket-pop": {
+                "0%": { transform: "scale(.92)", opacity: 0.7 },
+                "100%": { transform: "scale(1)", opacity: 1 },
+              },
+              "&:hover": isLocked
+                ? undefined
+                : {
+                    transform: "translateY(-3px)",
+                    borderColor: theme.colors.primary.main,
+                    boxShadow: isSelected
+                      ? theme.colors.shadows.primary
+                      : `0 8px 18px ${theme.colors.alpha.black[10]}`,
+                  },
+              "&:focus-visible": {
+                outline: `3px solid ${theme.colors.info.main}`,
+                outlineOffset: 2,
+              },
+              "&.Mui-disabled": {
+                opacity: 0.42,
+                cursor: "not-allowed",
+              },
             }}
-          />
+          >
+            <Box
+              sx={{
+                display: "flex",
+                minHeight: "inherit",
+                flexDirection: "column",
+                justifyContent: "space-between",
+                alignItems: "stretch",
+                p: 1,
+                textAlign: "left",
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{
+                  color: isSelected
+                    ? theme.colors.alpha.trueWhite[70]
+                    : theme.colors.alpha.black[70],
+                  fontWeight: 800,
+                  letterSpacing: "0.08em",
+                  lineHeight: 1,
+                }}
+              >
+                #{String(index + 1).padStart(2, "0")}
+              </Typography>
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "inherit",
+                  fontWeight: 900,
+                  lineHeight: 1,
+                }}
+              >
+                {ticket}
+              </Typography>
+              <Box sx={{ display: "flex", justifyContent: "flex-end", minHeight: 16 }}>
+                {isSelected ? (
+                  <CheckCircleIcon sx={{ fontSize: 16, color: theme.colors.alpha.trueWhite[100] }} />
+                ) : (
+                  <AutoAwesomeIcon
+                    sx={{
+                      fontSize: 14,
+                      color: theme.palette.mode === "dark"
+                        ? theme.colors.alpha.trueWhite[30]
+                        : theme.colors.alpha.black[30],
+                    }}
+                  />
+                )}
+              </Box>
+            </Box>
+          </ButtonBase>
         </Grid>
       );
     });
   };
 
   const isFull = selectedTickets.length >= getAmountOfTicketsToDisplay();
+  const boardSize = getAmountOfTicketsToDisplay();
+  const selectionProgress = getLotteryTicketSelectionProgress(
+    selectedTickets.length,
+    boardSize,
+  );
+
+  const pickRandomTicket = () => {
+    if (isFull) {
+      return;
+    }
+
+    const randomTicket = getRandomAvailableLotteryTicket(
+      ticketsToDisplay,
+      selectedTickets,
+      Math.random(),
+    );
+
+    if (randomTicket === null) {
+      reloadAvailableTickets({ ...searchRequest, targetTicket: 0 });
+      return;
+    }
+
+    selectTicket(randomTicket);
+  };
 
   return (
     <Grid container spacing={2}>
@@ -236,6 +358,40 @@ const TicketSelection = (props: TicketSelectionProps) => {
             />
           </Grid>
         </Grid>
+        <Box
+          sx={{
+            mt: 1.5,
+            p: 1.25,
+            borderRadius: theme.general.borderRadius,
+            border: `1px solid ${theme.colors.primary.light}`,
+            background: theme.palette.mode === "dark"
+              ? `linear-gradient(110deg, ${theme.colors.alpha.trueWhite[5]}, ${theme.colors.primary.lighter})`
+              : `linear-gradient(110deg, ${theme.colors.alpha.black[5]}, ${theme.colors.primary.lighter})`,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 0.75 }}>
+            <Typography variant="caption" sx={{ color: theme.palette.primary.main, fontWeight: 900, letterSpacing: "0.08em" }}>
+              {u.t("lottery:draw_entry_ticket_progress")}
+            </Typography>
+            <Typography variant="caption" sx={{ color: "text.primary", fontWeight: 900 }}>
+              {selectedTickets.length}/{boardSize} · {selectionProgress}%
+            </Typography>
+          </Box>
+          <LinearProgress
+            variant="determinate"
+            value={selectionProgress}
+            aria-label={u.t("lottery:draw_entry_ticket_progress")}
+            sx={{
+              height: 8,
+              borderRadius: 4,
+              backgroundColor: theme.colors.alpha.black[10],
+              "& .MuiLinearProgress-bar": {
+                borderRadius: 4,
+                background: theme.colors.gradients.purple3,
+              },
+            }}
+          />
+        </Box>
       </Grid>
       <Grid
         container
@@ -268,12 +424,10 @@ const TicketSelection = (props: TicketSelectionProps) => {
           }}>
           <LockedButton
             disabled={isFull}
+            startIcon={<CasinoIcon />}
             fullWidth
             variant="outlined"
-            onClick={() => {
-              const request = { ...searchRequest, targetTicket: 0 };
-              reloadAvailableTickets(request);
-            }}
+            onClick={pickRandomTicket}
           >
             {u.t("lottery:draw_available_tickets_random_button")}
           </LockedButton>
@@ -304,6 +458,7 @@ const TicketSelection = (props: TicketSelectionProps) => {
             disabled={
               isFull || selectedTickets.includes(searchRequest.targetTicket)
             }
+            startIcon={<SearchIcon />}
             fullWidth
             variant="outlined"
             onClick={() => {
@@ -318,11 +473,18 @@ const TicketSelection = (props: TicketSelectionProps) => {
         container
         rowSpacing={2}
         columnSpacing={4}
+        role="group"
+        aria-label={u.t("lottery:draw_available_tickets_title")}
         sx={{
+          position: "relative",
+          overflow: "hidden",
           p: { xs: 1, sm: 1.5 },
           borderRadius: theme.general.borderRadiusLg,
-          border: `1px dashed ${theme.colors.primary.light}`,
-          backgroundColor: theme.colors.primary.lighter,
+          border: `1px solid ${theme.colors.primary.light}`,
+          background: theme.palette.mode === "dark"
+            ? `radial-gradient(circle at 15% 0%, ${theme.colors.primary.lighter}, transparent 45%), ${theme.colors.alpha.trueWhite[5]}`
+            : `radial-gradient(circle at 15% 0%, ${theme.colors.primary.lighter}, transparent 45%), ${theme.colors.alpha.black[5]}`,
+          boxShadow: `inset 0 1px 0 ${theme.colors.alpha.trueWhite[10]}`,
         }}
         size={{
           xs: 12,

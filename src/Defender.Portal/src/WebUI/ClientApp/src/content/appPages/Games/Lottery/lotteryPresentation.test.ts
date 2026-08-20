@@ -4,6 +4,8 @@ import {
   getDrawMultiplier,
   getLotteryArenaHeroTextColors,
   getLotteryArenaStats,
+  getRandomAvailableLotteryTicket,
+  getLotteryTicketSelectionProgress,
   readLotteryDrawState,
 } from "./lotteryPresentation";
 
@@ -69,5 +71,16 @@ describe("lotteryPresentation", () => {
         colors: { alpha: { trueWhite: { 70: "rgba(255,255,255,.7)", 100: "#fff" } } },
       }),
     ).toEqual({ value: "#fff", label: "rgba(255,255,255,.7)" });
+  });
+
+  test("getLotteryTicketSelectionProgress_ClampsSelectionToBoardSize", () => {
+    expect(getLotteryTicketSelectionProgress(0, 25)).toBe(0);
+    expect(getLotteryTicketSelectionProgress(5, 25)).toBe(20);
+    expect(getLotteryTicketSelectionProgress(30, 25)).toBe(100);
+  });
+
+  test("getRandomAvailableLotteryTicket_SkipsAlreadySelectedTickets", () => {
+    expect(getRandomAvailableLotteryTicket([11, 22, 33], [22], 0.99)).toBe(33);
+    expect(getRandomAvailableLotteryTicket([11], [11], 0.5)).toBeNull();
   });
 });

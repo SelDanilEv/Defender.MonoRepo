@@ -19,6 +19,37 @@ export const getLotteryArenaHeroTextColors = (theme: {
   label: theme.colors.alpha.trueWhite[70],
 });
 
+export const getLotteryTicketSelectionProgress = (
+  selectedCount: number,
+  boardSize: number,
+): number => {
+  if (boardSize <= 0 || selectedCount <= 0) {
+    return 0;
+  }
+
+  return Math.min(100, Math.round((selectedCount / boardSize) * 100));
+};
+
+export const getRandomAvailableLotteryTicket = (
+  availableTickets: number[],
+  selectedTickets: number[],
+  randomValue: number,
+): number | null => {
+  const candidates = availableTickets.filter(
+    (ticket) => !selectedTickets.includes(ticket),
+  );
+
+  if (!candidates.length) {
+    return null;
+  }
+
+  const safeRandomValue = Number.isFinite(randomValue)
+    ? Math.min(Math.max(randomValue, 0), 0.999999)
+    : 0;
+
+  return candidates[Math.floor(safeRandomValue * candidates.length)] ?? null;
+};
+
 const isLotteryDraw = (value: unknown): value is LotteryDraw => {
   if (!value || typeof value !== "object") {
     return false;

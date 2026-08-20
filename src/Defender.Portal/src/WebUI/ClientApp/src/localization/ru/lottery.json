@@ -68,6 +68,7 @@
   "draw_entry_selected_zero": "Выбери номера ниже",
   "draw_entry_ticket_count": "Выбрано",
   "draw_entry_ticket_hint": "Нажми на номер, чтобы добавить его в набор",
+  "draw_entry_ticket_progress": "ЗАРЯД НАБОРА",
 
   "_" : "_"
 }

@@ -61,11 +61,17 @@ const SelectAndPayPanel = (props: SelectAndPayPanelProps) => {
   }, []);
 
   const selectTicket = (ticket: number) => {
-    setSelectedTickets([...selectedTickets, ticket]);
+    setSelectedTickets((currentTickets) =>
+      currentTickets.includes(ticket)
+        ? currentTickets
+        : [...currentTickets, ticket],
+    );
   };
 
   const unselectTicket = (ticket: number) => {
-    setSelectedTickets(selectedTickets.filter((t) => t !== ticket));
+    setSelectedTickets((currentTickets) =>
+      currentTickets.filter((currentTicket) => currentTicket !== ticket),
+    );
   };
 
   const [purchaseTicketsRequest, setPurchaseTicketsRequest] =
