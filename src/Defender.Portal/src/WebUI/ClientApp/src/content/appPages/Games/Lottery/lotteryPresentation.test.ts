@@ -2,6 +2,7 @@ import LotteryDraw from "src/models/games/lottery/LotteryDraw";
 import LotteryTicket, { TicketStatus } from "src/models/games/lottery/LotteryTicket";
 import {
   getDrawMultiplier,
+  getLotteryArenaHeroTextColors,
   getLotteryArenaStats,
   readLotteryDrawState,
 } from "./lotteryPresentation";
@@ -60,5 +61,13 @@ describe("lotteryPresentation", () => {
         ticket(TicketStatus.PrizePaid),
       ]),
     ).toEqual({ activeDraws: 1, tickets: 3, wins: 2 });
+  });
+
+  test("getLotteryArenaHeroTextColors_UsesReadableLightTextOnDarkHero", () => {
+    expect(
+      getLotteryArenaHeroTextColors({
+        colors: { alpha: { trueWhite: { 70: "rgba(255,255,255,.7)", 100: "#fff" } } },
+      }),
+    ).toEqual({ value: "#fff", label: "rgba(255,255,255,.7)" });
   });
 });

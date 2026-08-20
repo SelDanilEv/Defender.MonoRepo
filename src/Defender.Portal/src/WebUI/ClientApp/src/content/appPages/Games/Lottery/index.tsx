@@ -8,7 +8,10 @@ import LotteryTicket from "src/models/games/lottery/LotteryTicket";
 import ActiveDraws from "./ActiveDraws";
 import HistoricalTickets from "./HistoricalTickets";
 import LatestTickets from "./LatestTickets";
-import { getLotteryArenaStats } from "./lotteryPresentation";
+import {
+  getLotteryArenaHeroTextColors,
+  getLotteryArenaStats,
+} from "./lotteryPresentation";
 
 const LotteryHomePage = () => {
   const u = useUtils();
@@ -16,6 +19,7 @@ const LotteryHomePage = () => {
   const [latestTickets, setLatestTicketsState] = useState<LotteryTicket[]>([]);
   const [activeDraws, setActiveDraws] = useState<LotteryDraw[]>([]);
   const stats = getLotteryArenaStats(activeDraws, latestTickets);
+  const heroTextColors = getLotteryArenaHeroTextColors(theme);
 
   const updateLatestTickets = (tickets: LotteryTicket[]) => {
     setLatestTicketsState(tickets.slice(0, 10));
@@ -98,26 +102,29 @@ const LotteryHomePage = () => {
             sx={{ alignContent: "flex-end", justifyContent: { xs: "flex-start", md: "flex-end" } }}
           >
             <Grid size={{ xs: 4 }}>
-              <Typography variant="h3" sx={{ fontWeight: 900 }}>
+              <Typography variant="h3" sx={{ color: heroTextColors.value, fontWeight: 900 }}>
                 {stats.activeDraws}
               </Typography>
-              <Typography variant="caption" sx={{ color: theme.colors.alpha.trueWhite[50] }}>
+              <Typography variant="caption" sx={{ color: heroTextColors.label, fontWeight: 700 }}>
                 {u.t("lottery:arena_active_draws")}
               </Typography>
             </Grid>
             <Grid size={{ xs: 4 }}>
-              <Typography variant="h3" sx={{ fontWeight: 900 }}>
+              <Typography variant="h3" sx={{ color: heroTextColors.value, fontWeight: 900 }}>
                 {stats.tickets}
               </Typography>
-              <Typography variant="caption" sx={{ color: theme.colors.alpha.trueWhite[50] }}>
+              <Typography variant="caption" sx={{ color: heroTextColors.label, fontWeight: 700 }}>
                 {u.t("lottery:arena_tickets")}
               </Typography>
             </Grid>
             <Grid size={{ xs: 4 }}>
-              <Typography variant="h3" sx={{ fontWeight: 900, color: theme.colors.warning.main }}>
+              <Typography
+                variant="h3"
+                sx={{ color: theme.colors.warning.main, fontWeight: 900 }}
+              >
                 {stats.wins}
               </Typography>
-              <Typography variant="caption" sx={{ color: theme.colors.alpha.trueWhite[50] }}>
+              <Typography variant="caption" sx={{ color: heroTextColors.label, fontWeight: 700 }}>
                 {u.t("lottery:arena_wins")}
               </Typography>
             </Grid>

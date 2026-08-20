@@ -7,6 +7,18 @@ export interface LotteryArenaStats {
   wins: number;
 }
 
+export interface LotteryArenaHeroTextColors {
+  value: string;
+  label: string;
+}
+
+export const getLotteryArenaHeroTextColors = (theme: {
+  colors: { alpha: { trueWhite: { 70: string; 100: string } } };
+}): LotteryArenaHeroTextColors => ({
+  value: theme.colors.alpha.trueWhite[100],
+  label: theme.colors.alpha.trueWhite[70],
+});
+
 const isLotteryDraw = (value: unknown): value is LotteryDraw => {
   if (!value || typeof value !== "object") {
     return false;
