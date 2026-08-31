@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.budget-tracker
-  tag: 20260819-317
+  tag: abdce20b8aa32067145985e8cf6003907dbc1a1d
   pullPolicy: Always
 ingress:
   enabled: true
