@@ -12,6 +12,8 @@ import GradingIcon from "@mui/icons-material/Grading";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 import MenuItem from "./MenuItem";
 import useUtils from "src/appUtils";
@@ -225,22 +227,55 @@ const RoleBasedMenu = (props: any) => {
             }
           >
             <SubMenuWrapper>
-              <List component="ul">
-                <MenuItem
-                  to="/budget-tracker/positions"
-                  icon={<AllInboxIcon style={{ fontSize: "1.1em" }} />}
-                  text={u.t("sidebar_menu:page_budget_tracker_positions")}
-                />
-                <MenuItem
-                  to="/budget-tracker/reviews"
-                  icon={<GradingIcon style={{ fontSize: "1.1em" }} />}
-                  text={u.t("sidebar_menu:page_budget_tracker_reviews")}
-                />
-                <MenuItem
-                  to="/budget-tracker/diagram"
-                  icon={<StackedLineChartIcon style={{ fontSize: "1.1em" }} />}
-                  text={u.t("sidebar_menu:page_budget_tracker_diagram")}
-                />
+              <List component="div">
+                <List
+                  component="ul"
+                  subheader={
+                    <ListSubheader component="div" disableSticky>
+                      {u.t("sidebar_menu:group_budget_tracker_balance")}
+                    </ListSubheader>
+                  }
+                >
+                  <MenuItem
+                    to="/budget-tracker/positions"
+                    icon={<AllInboxIcon style={{ fontSize: "1.1em" }} />}
+                    text={u.t("sidebar_menu:page_budget_tracker_positions")}
+                  />
+                  <MenuItem
+                    to="/budget-tracker/reviews"
+                    icon={<GradingIcon style={{ fontSize: "1.1em" }} />}
+                    text={u.t("sidebar_menu:page_budget_tracker_reviews")}
+                  />
+                  <MenuItem
+                    to="/budget-tracker/diagram"
+                    icon={<StackedLineChartIcon style={{ fontSize: "1.1em" }} />}
+                    text={u.t("sidebar_menu:page_budget_tracker_diagram")}
+                  />
+                </List>
+                <List
+                  component="ul"
+                  subheader={
+                    <ListSubheader component="div" disableSticky>
+                      {u.t("sidebar_menu:group_budget_tracker_regular_expenses")}
+                    </ListSubheader>
+                  }
+                >
+                  <MenuItem
+                    to="/budget-tracker/regular-expenses/expenses"
+                    icon={<ReceiptLongIcon style={{ fontSize: "1.1em" }} />}
+                    text={u.t("sidebar_menu:page_budget_tracker_regular_expenses")}
+                  />
+                  <MenuItem
+                    to="/budget-tracker/regular-expenses/reviews"
+                    icon={<CalendarMonthIcon style={{ fontSize: "1.1em" }} />}
+                    text={u.t("sidebar_menu:page_budget_tracker_regular_expenses_reviews")}
+                  />
+                  <MenuItem
+                    to="/budget-tracker/regular-expenses/diagram"
+                    icon={<StackedLineChartIcon style={{ fontSize: "1.1em" }} />}
+                    text={u.t("sidebar_menu:page_budget_tracker_regular_expenses_diagram")}
+                  />
+                </List>
               </List>
             </SubMenuWrapper>
           </List>

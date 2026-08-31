@@ -2,10 +2,12 @@
 using Defender.Portal.Application.DTOs.BudgetTracking.DiagramSetup;
 using Defender.Portal.Application.DTOs.BudgetTracking.Groups;
 using Defender.Portal.Application.DTOs.BudgetTracking.Positions;
+using Defender.Portal.Application.DTOs.BudgetTracking.RegularExpenses;
 using Defender.Portal.Application.DTOs.BudgetTracking.Reviews;
 using Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetGroups;
 using Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetReviews;
 using Defender.Portal.Application.Models.ApiRequests.BugetTracker.Positions;
+using Defender.Portal.Application.Models.ApiRequests.BugetTracker.RegularExpenses;
 
 namespace Defender.Portal.Application.Common.Interfaces.Wrappers;
 
@@ -29,4 +31,23 @@ public interface IBudgetTrackerWrapper
     Task<PortalBudgetGroup> CreateBudgetGroupAsync(CreateBudgetGroupRequest request);
     Task<PortalBudgetGroup> UpdateBudgetGroupAsync(UpdateBudgetGroupRequest request);
     Task<Guid> DeleteBudgetGroupAsync(Guid id);
+
+    Task<PagedResult<PortalRegularExpense>> GetRegularExpensesAsync(PaginationRequest paginationRequest);
+    Task<PortalRegularExpense> CreateRegularExpenseAsync(CreateRegularExpenseRequest request);
+    Task<PortalRegularExpense> UpdateRegularExpenseAsync(UpdateRegularExpenseRequest request);
+    Task<Guid> DeleteRegularExpenseAsync(Guid id);
+
+    Task<List<PortalRegularExpenseReview>> GetRegularExpenseReviewsByDateRangeAsync(
+        DateOnly startMonth,
+        DateOnly endMonth);
+    Task<PagedResult<PortalRegularExpenseReview>> GetRegularExpenseReviewsAsync(
+        PaginationRequest paginationRequest);
+    Task<PortalRegularExpenseReview> GetRegularExpenseReviewTemplateAsync(DateOnly? month);
+    Task<PortalRegularExpenseReview> PublishRegularExpenseReviewAsync(
+        PublishRegularExpenseReviewRequest request);
+    Task<Guid> DeleteRegularExpenseReviewAsync(Guid id);
+
+    Task<PortalRegularExpenseDiagramSetup> GetRegularExpenseDiagramSetupAsync();
+    Task<PortalRegularExpenseDiagramSetup> UpdateRegularExpenseDiagramSetupAsync(
+        UpdateRegularExpenseDiagramSetupRequest request);
 }

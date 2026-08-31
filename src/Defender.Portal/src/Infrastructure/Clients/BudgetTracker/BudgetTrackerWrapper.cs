@@ -8,10 +8,13 @@ using Defender.Portal.Application.Common.Interfaces.Wrappers;
 using Defender.Portal.Application.DTOs.BudgetTracking.DiagramSetup;
 using Defender.Portal.Application.DTOs.BudgetTracking.Groups;
 using Defender.Portal.Application.DTOs.BudgetTracking.Positions;
+using Defender.Portal.Application.DTOs.BudgetTracking.RegularExpenses;
 using Defender.Portal.Application.DTOs.BudgetTracking.Reviews;
 using Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetGroups;
 using Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetReviews;
 using Defender.Portal.Application.Models.ApiRequests.BugetTracker.Positions;
+using Defender.Portal.Application.Models.ApiRequests.BugetTracker.RegularExpenses;
+using CommonRegularExpenseReviewItemRequest = Defender.Common.Clients.BudgetTracker.RegularExpenseReviewItemRequest;
 
 namespace Defender.Portal.Infrastructure.Clients.BudgetTracker;
 
@@ -53,6 +56,181 @@ public class BudgetTrackerWrapper(
             var response = await serviceClient.DiagramSetupPOSTAsync(command);
 
             return mapper.Map<PortalMainDiagramSetup>(response);
+        }, AuthorizationType.User);
+    }
+
+    #endregion
+
+
+    #region Regular Expenses
+
+    public async Task<PagedResult<PortalRegularExpense>> GetRegularExpensesAsync(
+        PaginationRequest paginationRequest)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var response = await serviceClient.RegularExpenseGETAsync(
+                paginationRequest.Page,
+                paginationRequest.PageSize);
+
+            return mapper.Map<PagedResult<PortalRegularExpense>>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<PortalRegularExpense> CreateRegularExpenseAsync(
+        CreateRegularExpenseRequest request)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var command = new CreateRegularExpenseCommand
+            {
+                Name = request.Name,
+                Type = MappingHelper.MapEnum(
+                    request.Type,
+                    CreateRegularExpenseCommandType.Unknown),
+                Currency = MappingHelper.MapEnum(
+                    request.Currency,
+                    CreateRegularExpenseCommandCurrency.Unknown),
+                DefaultAmount = request.DefaultAmount,
+                OrderPriority = request.OrderPriority,
+            };
+
+            var response = await serviceClient.RegularExpensePOSTAsync(command);
+
+            return mapper.Map<PortalRegularExpense>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<PortalRegularExpense> UpdateRegularExpenseAsync(
+        UpdateRegularExpenseRequest request)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var command = new UpdateRegularExpenseCommand
+            {
+                Id = request.Id,
+                Name = request.Name,
+                Type = request.Type is null
+                    ? null
+                    : MappingHelper.MapEnum(
+                        request.Type.Value,
+                        UpdateRegularExpenseCommandType.Unknown),
+                Currency = request.Currency is null
+                    ? null
+                    : MappingHelper.MapEnum(
+                        request.Currency.Value,
+                        UpdateRegularExpenseCommandCurrency.Unknown),
+                DefaultAmount = request.DefaultAmount,
+                OrderPriority = request.OrderPriority,
+            };
+
+            var response = await serviceClient.RegularExpensePUTAsync(command);
+
+            return mapper.Map<PortalRegularExpense>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<Guid> DeleteRegularExpenseAsync(Guid id)
+    {
+        return await ExecuteSafelyAsync(
+            () => serviceClient.RegularExpenseDELETEAsync(id),
+            AuthorizationType.User);
+    }
+
+    public async Task<List<PortalRegularExpenseReview>> GetRegularExpenseReviewsByDateRangeAsync(
+        DateOnly startMonth,
+        DateOnly endMonth)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var response = await serviceClient.ByDateRange2Async(startMonth, endMonth);
+
+            return mapper.Map<List<PortalRegularExpenseReview>>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<PagedResult<PortalRegularExpenseReview>> GetRegularExpenseReviewsAsync(
+        PaginationRequest paginationRequest)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var response = await serviceClient.RegularExpenseReviewGETAsync(
+                paginationRequest.Page,
+                paginationRequest.PageSize);
+
+            return mapper.Map<PagedResult<PortalRegularExpenseReview>>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<PortalRegularExpenseReview> GetRegularExpenseReviewTemplateAsync(DateOnly? month)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var response = await serviceClient.Template2Async(month);
+
+            return mapper.Map<PortalRegularExpenseReview>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<PortalRegularExpenseReview> PublishRegularExpenseReviewAsync(
+        PublishRegularExpenseReviewRequest request)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var command = new PublishRegularExpenseReviewCommand
+            {
+                Id = request.Id,
+                Month = request.Month,
+                Expenses = request.Expenses
+                    .Select(item => new CommonRegularExpenseReviewItemRequest
+                    {
+                        RegularExpenseId = item.RegularExpenseId,
+                        Amount = item.Amount,
+                    })
+                    .ToList(),
+            };
+
+            var response = await serviceClient.RegularExpenseReviewPOSTAsync(command);
+
+            return mapper.Map<PortalRegularExpenseReview>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<Guid> DeleteRegularExpenseReviewAsync(Guid id)
+    {
+        return await ExecuteSafelyAsync(
+            () => serviceClient.RegularExpenseReviewDELETEAsync(id),
+            AuthorizationType.User);
+    }
+
+    public async Task<PortalRegularExpenseDiagramSetup> GetRegularExpenseDiagramSetupAsync()
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var response = await serviceClient.RegularExpenseDiagramSetupGETAsync(
+                new GetRegularExpenseDiagramSetupQuery());
+
+            return mapper.Map<PortalRegularExpenseDiagramSetup>(response);
+        }, AuthorizationType.User);
+    }
+
+    public async Task<PortalRegularExpenseDiagramSetup> UpdateRegularExpenseDiagramSetupAsync(
+        UpdateRegularExpenseDiagramSetupRequest request)
+    {
+        return await ExecuteSafelyAsync(async () =>
+        {
+            var command = new UpdateRegularExpenseDiagramSetupCommand
+            {
+                MainCurrency = MappingHelper.MapEnum(
+                    request.MainCurrency,
+                    UpdateRegularExpenseDiagramSetupCommandMainCurrency.Unknown),
+                LastMonths = request.LastMonths,
+                EndMonth = request.EndMonth,
+            };
+
+            var response = await serviceClient.RegularExpenseDiagramSetupPOSTAsync(command);
+
+            return mapper.Map<PortalRegularExpenseDiagramSetup>(response);
         }, AuthorizationType.User);
     }
 

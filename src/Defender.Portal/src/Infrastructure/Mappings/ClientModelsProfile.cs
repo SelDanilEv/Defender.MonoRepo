@@ -11,6 +11,7 @@ using Defender.Portal.Application.DTOs.Banking;
 using Defender.Portal.Application.DTOs.BudgetTracking.DiagramSetup;
 using Defender.Portal.Application.DTOs.BudgetTracking.Groups;
 using Defender.Portal.Application.DTOs.BudgetTracking.Positions;
+using Defender.Portal.Application.DTOs.BudgetTracking.RegularExpenses;
 using Defender.Portal.Application.DTOs.BudgetTracking.Reviews;
 using Defender.Portal.Application.Enums;
 
@@ -167,6 +168,50 @@ public class ClientModelsProfile : BaseMappingProfile
 
         CreateMap<GroupPagedResult, PagedResult<PortalBudgetGroup>>();
         CreateMap<Group, PortalBudgetGroup>();
+
+        CreateMap<RegularExpenseDtoPagedResult, PagedResult<PortalRegularExpense>>();
+        CreateMap<RegularExpenseDto, PortalRegularExpense>()
+            .ForMember(
+                dest => dest.Type,
+                opt => opt.MapFrom(
+                    src => MappingHelper.MapEnum(src.Type, Application.Enums.RegularExpenseType.Unknown)))
+            .ForMember(
+                dest => dest.Currency,
+                opt => opt.MapFrom(
+                    src => MappingHelper.MapEnum(src.Currency, Application.Enums.Currency.Unknown)));
+
+        CreateMap<ReviewedRegularExpenseDto, PortalReviewedRegularExpense>()
+            .ForMember(
+                dest => dest.Type,
+                opt => opt.MapFrom(
+                    src => MappingHelper.MapEnum(src.Type, Application.Enums.RegularExpenseType.Unknown)))
+            .ForMember(
+                dest => dest.Currency,
+                opt => opt.MapFrom(
+                    src => MappingHelper.MapEnum(src.Currency, Application.Enums.Currency.Unknown)))
+            .ForMember(
+                dest => dest.MonthlyContribution,
+                opt => opt.MapFrom(src => (decimal)src.MonthlyContribution));
+
+        CreateMap<RegularExpenseReviewDtoPagedResult, PagedResult<PortalRegularExpenseReview>>();
+        CreateMap<RegularExpenseReviewDto, PortalRegularExpenseReview>();
+        CreateMap<RatesModel, PortalRegularExpenseRatesModel>()
+            .ForMember(
+                dest => dest.BaseCurrency,
+                opt => opt.MapFrom(
+                    src => MappingHelper.MapEnum(src.BaseCurrency, Application.Enums.Currency.Unknown)))
+            .ForMember(
+                dest => dest.Rates,
+                opt => opt.MapFrom(
+                    src => src.Rates != null
+                        ? src.Rates.ToDictionary()
+                        : new Dictionary<Application.Enums.Currency, decimal>()));
+
+        CreateMap<RegularExpenseDiagramSetupDto, PortalRegularExpenseDiagramSetup>()
+            .ForMember(
+                dest => dest.MainCurrency,
+                opt => opt.MapFrom(
+                    src => MappingHelper.MapEnum(src.MainCurrency, Application.Enums.Currency.Unknown)));
     }
 
 }

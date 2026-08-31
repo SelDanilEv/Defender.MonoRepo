@@ -61,6 +61,16 @@ const APIEndpoints = {
 
     getGroups: "groups",
     group: "group",
+
+    regularExpenses: {
+      getExpenses: "regular-expenses/expenses",
+      expense: "regular-expenses/expense",
+      getReviews: "regular-expenses/reviews",
+      getReviewsByDateRange: "regular-expenses/reviews/by-date-range",
+      getReviewTemplate: "regular-expenses/review/template",
+      review: "regular-expenses/review",
+      diagramSetup: "regular-expenses/diagram-setup",
+    },
   },
   foodAdvisor: {
     getPreferences: "preferences",
@@ -88,12 +98,20 @@ const APIEndpoints = {
 const APIUrls = () => {
   let urls = APIEndpoints;
 
-  for (let controllerName in APIEndpoints) {
-    var controller = APIEndpoints[controllerName];
+  const mapControllerEndpoints = (controllerName: string, controller: any) => {
     for (let endpointName in controller) {
-      var endpoint = controller[endpointName];
-      urls[controllerName][endpointName] = `/api/${controllerName}/${endpoint}`;
+      const endpoint = controller[endpointName];
+
+      if (typeof endpoint === "object" && endpoint !== null) {
+        mapControllerEndpoints(controllerName, endpoint);
+      } else {
+        controller[endpointName] = `/api/${controllerName}/${endpoint}`;
+      }
     }
+  };
+
+  for (let controllerName in APIEndpoints) {
+    mapControllerEndpoints(controllerName, urls[controllerName]);
   }
 
   return urls;

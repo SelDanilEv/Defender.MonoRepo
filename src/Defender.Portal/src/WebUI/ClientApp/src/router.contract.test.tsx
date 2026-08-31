@@ -20,6 +20,9 @@ describe("critical route contract", () => {
     "/games/lottery/tickets",
     "/budget-tracker/positions",
     "/budget-tracker/reviews",
+    "/budget-tracker/regular-expenses/expenses",
+    "/budget-tracker/regular-expenses/reviews",
+    "/budget-tracker/regular-expenses/diagram",
     "/admin/users",
   ])("keeps journey route %s", (path) => expect(paths).toContain(path));
 

@@ -94,11 +94,14 @@ A service for managing and running risk-related games, currently supporting only
 
 ### [Defender.BudgetTracker](https://github.com/SelDanilEv/Defender.BudgetTracker)
 
-A service for tracking and managing budgets. It includes three types of entities:
+A service for tracking and managing balances and regular expenses. It includes separate balance and regular-expense tracking areas:
 
 - **Position**: Represents where your money is stored, e.g., **Bank PKO** or **Wallet**.
 - **Review**: Allows you to review all your positions and assign an amount of money to each position.
 - **Groups**: Enables you to filter, show/hide, or highlight specific groups of positions. You can create dedicated groups for these positions and mark them on the diagram.
+- **Regular Expense**: Represents a recurring, subscription, or annual expense. Annual amounts contribute one twelfth to each monthly snapshot.
+- **Regular Expense Review**: Stores an optional, user-entered monthly snapshot of the comfort level required for regular expenses.
+- **Regular Expense Diagram**: Shows monthly comfort-level history independently from the balance diagram.
 
 ## Libraries
 

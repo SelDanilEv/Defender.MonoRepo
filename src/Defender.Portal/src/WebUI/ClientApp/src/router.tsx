@@ -79,6 +79,15 @@ const BudgetTrackerPositionsPage = Loader(
 const BudgetTrackerReviewsPage = Loader(
   lazy(() => import("src/content/appPages/BudgetTracker/Review"))
 );
+const RegularExpensesPage = Loader(
+  lazy(() => import("src/content/appPages/BudgetTracker/RegularExpenses/Expenses"))
+);
+const RegularExpenseReviewsPage = Loader(
+  lazy(() => import("src/content/appPages/BudgetTracker/RegularExpenses/Reviews"))
+);
+const RegularExpensesDiagramPage = Loader(
+  lazy(() => import("src/content/appPages/BudgetTracker/RegularExpenses/Diagram"))
+);
 
 // Food Advisor
 
@@ -275,6 +284,27 @@ const routes: RouteObject[] = [
       {
         path: "reviews",
         element: <BudgetTrackerReviewsPage />,
+      },
+      {
+        path: "regular-expenses",
+        children: [
+          {
+            path: "expenses",
+            element: <RegularExpensesPage />,
+          },
+          {
+            path: "reviews",
+            element: <RegularExpenseReviewsPage />,
+          },
+          {
+            path: "diagram",
+            element: <RegularExpensesDiagramPage />,
+          },
+          {
+            path: "*",
+            element: <Status404 />,
+          },
+        ],
       },
       {
         path: "*",

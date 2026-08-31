@@ -61,6 +61,22 @@ const mockApi = async (page: Page, authenticated = false) => {
       await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: [], totalItemsCount: 0 }) });
       return;
     }
+    if (url.includes("/api/budgetTracker/regular-expenses/expenses")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: [], totalItemsCount: 0, currentPage: 0, pageSize: 10, totalPagesCount: 1 }) });
+      return;
+    }
+    if (url.includes("/api/budgetTracker/regular-expenses/reviews/by-date-range")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+      return;
+    }
+    if (url.includes("/api/budgetTracker/regular-expenses/reviews")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ items: [], totalItemsCount: 0, currentPage: 0, pageSize: 10, totalPagesCount: 1 }) });
+      return;
+    }
+    if (url.includes("/api/budgetTracker/regular-expenses/diagram-setup")) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ mainCurrency: "USD", lastMonths: 12, endMonth: "2026-07-01" }) });
+      return;
+    }
     await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
   });
 };
@@ -151,6 +167,9 @@ test.describe("authenticated journey shells", () => {
     ["budget diagram", "/budget-tracker/diagram", "/budget-tracker/diagram"],
     ["budget positions", "/budget-tracker/positions", "/budget-tracker/positions"],
     ["budget reviews", "/budget-tracker/reviews", "/budget-tracker/reviews"],
+    ["regular expenses", "/budget-tracker/regular-expenses/expenses", "/budget-tracker/regular-expenses/expenses"],
+    ["regular expense reviews", "/budget-tracker/regular-expenses/reviews", "/budget-tracker/regular-expenses/reviews"],
+    ["regular expense diagram", "/budget-tracker/regular-expenses/diagram", "/budget-tracker/regular-expenses/diagram"],
     ["lottery", "/games/lottery", "/games/lottery"],
     ["health care", "/health-care", "/health-care"],
     ["travel calendar", "/travel-calendar", "/travel-calendar"],

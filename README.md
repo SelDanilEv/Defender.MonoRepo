@@ -1,6 +1,6 @@
 # Defender.MonoRepo
 
-Last updated: 2026-07-18
+Last updated: 2026-08-31
 
 ## AI Agent Maintenance Rules
 
@@ -433,7 +433,7 @@ See [OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md) for details.
 5. Defender.WalletService - Wallets and transactions
 6. Defender.RiskGamesService - Lottery and gaming
 7. Defender.NotificationService - Outbound notifications
-8. Defender.BudgetTracker - Budget tracking and reviews
+8. Defender.BudgetTracker - Balance tracking, regular expenses, and monthly reviews
 9. Defender.PersonalFoodAdvisor - Menu parsing and food recommendations
 10. Defender.HealthCareService - Personal health timeline
 11. Defender.TravelCalendarService - Travel calendar and trip planning
@@ -505,8 +505,8 @@ Shared-library operational guarantees:
 
 #### Defender.BudgetTracker
 
-- Business purpose: personal-finance planning domain for organizing budgets and reviewing financial health.
-- Primary responsibilities: manage budget positions/groups, capture review snapshots over time, and support financial overview/reporting features.
+- Business purpose: personal-finance planning domain for organizing balances, recurring expenses, and financial comfort over time.
+- Primary responsibilities: manage budget positions/groups, capture independent balance and regular-expense monthly snapshots, and support financial overview/reporting features.
 - Key integrations: `Defender.Portal` for user interaction and wallet-linked data flows where budget context depends on transactional state.
 - Business value: helps users build better financial habits and increases long-term product stickiness.
 

@@ -1,5 +1,7 @@
 using Defender.BudgetTracker.Application.DTOs;
 using Defender.BudgetTracker.Application.Models.BudgetReview;
+using Defender.BudgetTracker.Domain.Entities.DiagramSetup;
+using Defender.BudgetTracker.Domain.Entities.RegularExpenses;
 using Defender.BudgetTracker.Domain.Entities.Reviews;
 using Defender.Common.Mapping;
 
@@ -12,5 +14,10 @@ public class MappingProfile : BaseMappingProfile
         CreateMap<PositionToPublish, Domain.Entities.Position.ReviewedPosition>();
 
         CreateMap<BudgetReview, BudgetReviewDto>();
+
+        CreateMap<RegularExpense, RegularExpenseDto>();
+        CreateMap<ReviewedRegularExpense, ReviewedRegularExpenseDto>();
+        CreateMap<RegularExpenseReview, RegularExpenseReviewDto>();
+        CreateMap<RegularExpenseDiagramSetup, RegularExpenseDiagramSetupDto>();
     }
 }

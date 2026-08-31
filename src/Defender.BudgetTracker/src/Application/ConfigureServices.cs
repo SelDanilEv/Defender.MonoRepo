@@ -28,6 +28,9 @@ public static class ConfigureServices
         services.AddTransient<IBudgetReviewService, BudgetReviewService>();
         services.AddTransient<IDiagramSetupService, DiagramSetupService>();
         services.AddTransient<IGroupService, GroupService>();
+        services.AddTransient<IRegularExpenseService, RegularExpenseService>();
+        services.AddTransient<IRegularExpenseReviewService, RegularExpenseReviewService>();
+        services.AddTransient<IRegularExpenseDiagramSetupService, RegularExpenseDiagramSetupService>();
 
         return services;
     }

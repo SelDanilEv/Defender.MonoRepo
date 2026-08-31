@@ -43,6 +43,9 @@ public static class ConfigureServices
         services.AddSingleton<IBudgetReviewRepository, BudgetReviewRepository>();
         services.AddSingleton<IGroupRepository, GroupRepository>();
         services.AddSingleton<IHistoricalExchangeRatesRepository, HistoricalExchangeRatesRepository>();
+        services.AddSingleton<IRegularExpenseRepository, RegularExpenseRepository>();
+        services.AddSingleton<IRegularExpenseReviewRepository, RegularExpenseReviewRepository>();
+        services.AddSingleton<IRegularExpenseDiagramSetupRepository, RegularExpenseDiagramSetupRepository>();
 
         return services;
     }
