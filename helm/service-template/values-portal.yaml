@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.portal
-  tag: 20260820-339_1.4.0
+  tag: 20260831-349_1.4.0
   pullPolicy: Always
 deploymentStrategy:
   type: RollingUpdate
