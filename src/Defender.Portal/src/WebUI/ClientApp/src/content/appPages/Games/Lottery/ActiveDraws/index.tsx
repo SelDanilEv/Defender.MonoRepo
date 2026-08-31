@@ -60,7 +60,11 @@ const ActiveDraws = (props: ActiveDrawsProps) => {
   reloadActiveDrawsRef.current = reloadActiveDraws;
 
   const renderDrawCard = (draw: LotteryDraw, index: number) => {
-    return <DrawCard key={draw.drawNumber || index} draw={draw} reloadActiveDraws={reloadActiveDraws} />;
+    return (
+      <Grid key={draw.drawNumber || index} size={{ xs: 12, md: 6 }} sx={{ display: "flex" }}>
+        <DrawCard draw={draw} reloadActiveDraws={reloadActiveDraws} />
+      </Grid>
+    );
   };
 
   return (
@@ -134,7 +138,7 @@ const ActiveDraws = (props: ActiveDrawsProps) => {
         </Grid>
         <Grid size={12}>
           {draws.length > 0 ? (
-            <Grid container spacing={1.5}>
+            <Grid container spacing={1.5} sx={{ alignItems: "stretch" }}>
               {draws.map(renderDrawCard)}
             </Grid>
           ) : (

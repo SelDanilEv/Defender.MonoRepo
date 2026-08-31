@@ -74,8 +74,10 @@ const DrawCard: React.FC<DrawCardProps> = ({
 
   return (
     <Card
+      data-testid="lottery-active-draw-card"
       sx={{
         height: "100%",
+        width: "100%",
         p: { xs: 1.5, md: 2 },
         position: "relative",
         overflow: "hidden",
@@ -142,8 +144,9 @@ const DrawCard: React.FC<DrawCardProps> = ({
         </Grid>
         <Grid size={{ xs: 5 }} container spacing={0.5} sx={{ justifyContent: "flex-end", alignItems: "center" }}>
           {draw.allowedCurrencies.map((currency) => (
-            <Grid key={currency} size={{ xs: 4 }}>
+            <Grid key={currency} size={{ xs: 6 }}>
               <Box
+                data-testid="lottery-currency-option"
                 sx={{
                   minWidth: 30,
                   py: 0.5,

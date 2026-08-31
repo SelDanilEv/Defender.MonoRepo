@@ -28,8 +28,9 @@ const LatestTickets = (props: LatestTicketsProps) => {
     >
       <Grid container spacing={1.5}>
         <Grid size={{ xs: 12 }} container spacing={1} sx={{ alignItems: "center" }}>
-          <Grid size={{ xs: 2, sm: 1 }}>
+          <Grid size="auto">
             <Box
+              data-testid="lottery-latest-tickets-heading-icon"
               sx={{
                 width: 40,
                 height: 40,
@@ -44,7 +45,7 @@ const LatestTickets = (props: LatestTicketsProps) => {
               <EmojiEventsIcon />
             </Box>
           </Grid>
-          <Grid size={{ xs: 10, sm: 11 }}>
+          <Grid size="grow" sx={{ minWidth: 0 }}>
             <Typography variant="overline" sx={{ color: theme.palette.warning.dark, fontWeight: 800 }}>
               {u.t("lottery:arena_ticket_board_kicker")}
             </Typography>
@@ -73,7 +74,7 @@ const LatestTickets = (props: LatestTicketsProps) => {
                     }}
                   >
                     <Grid container spacing={1} sx={{ alignItems: "center" }}>
-                      <Grid size={{ xs: 2 }}>
+                      <Grid size={{ xs: 2 }} sx={{ minWidth: 0 }}>
                         <Box
                           sx={{
                             width: 30,
@@ -88,7 +89,7 @@ const LatestTickets = (props: LatestTicketsProps) => {
                           <ConfirmationNumberIcon sx={{ fontSize: 17 }} />
                         </Box>
                       </Grid>
-                      <Grid size={{ xs: 6 }}>
+                      <Grid size={{ xs: 6 }} sx={{ minWidth: 0 }}>
                         <Typography variant="caption" color="text.secondary">
                           #{ticket.drawNumber}
                         </Typography>
@@ -96,14 +97,23 @@ const LatestTickets = (props: LatestTicketsProps) => {
                           {ticket.ticketNumber}
                         </Typography>
                       </Grid>
-                      <Grid size={{ xs: 4 }} sx={{ textAlign: "right" }}>
+                      <Grid size={{ xs: 4 }} sx={{ minWidth: 0, textAlign: "right" }}>
                         <Chip
+                          data-testid="lottery-ticket-status"
                           label={mapTicketStatus(u, ticket.status)}
                           size="small"
                           sx={{
                             maxWidth: "100%",
-                            color: theme.palette.text.primary,
+                            minWidth: 0,
+                            color:
+                              theme.palette.mode === "dark"
+                                ? theme.colors.alpha.white[100]
+                                : theme.palette.text.primary,
                             backgroundColor: theme.colors.alpha.trueWhite[70],
+                            "& .MuiChip-label": {
+                              overflow: "hidden",
+                              textOverflow: "ellipsis",
+                            },
                           }}
                         />
                         <Typography variant="caption" sx={{ display: "block" }} color="text.secondary">
