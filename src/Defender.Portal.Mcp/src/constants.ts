@@ -2,6 +2,8 @@ export const PortalMcpScopes = {
   Read: "mcp:portal:read",
   CalendarWrite: "mcp:calendar:write",
   CalendarDelete: "mcp:calendar:delete",
+  BudgetWrite: "mcp:budget:write",
+  BudgetDelete: "mcp:budget:delete",
 } as const;
 
 export const PortalReadResources = {

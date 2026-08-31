@@ -93,6 +93,31 @@ public class PortalOAuthOptionsTests
         Assert.Single(options.EncryptionCredentials);
     }
 
+    [Fact]
+    public void Configure_WhenCalled_RegistersBudgetScopesAlongsideExistingMcpScopes()
+    {
+        var options = new OpenIddictServerOptions();
+        var sut = new PortalOpenIddictServerOptions(
+            new TestHostEnvironment(),
+            Options.Create(new PortalOAuthOptions
+            {
+                Issuer = "https://portal.coded-by-danil.dev",
+                McpResourceUri = "https://mcp.coded-by-danil.dev/mcp",
+                McpAudience = "defender-mcp",
+                BffAudience = "defender-api",
+            }));
+
+        sut.Configure(options);
+
+        Assert.Contains("mcp:portal:read", options.Scopes);
+        Assert.Contains("mcp:calendar:write", options.Scopes);
+        Assert.Contains("mcp:calendar:delete", options.Scopes);
+        Assert.Contains("mcp:budget:write", options.Scopes);
+        Assert.Contains("mcp:budget:delete", options.Scopes);
+        Assert.Contains(PortalOAuthScopes.BudgetWrite, PortalOAuthScopes.All);
+        Assert.Contains(PortalOAuthScopes.BudgetDelete, PortalOAuthScopes.All);
+    }
+
     private static IConfiguration BuildConfiguration() => new ConfigurationBuilder()
         .AddInMemoryCollection(
         [

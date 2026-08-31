@@ -37,9 +37,11 @@ Add a remote Streamable HTTP server with the URL above. On first use, follow the
 
 ### What access means
 
-- `mcp:portal:read`: read your Calendar, wallet, and lottery data.
+- `mcp:portal:read`: read your Calendar, wallet, lottery, and BudgetTracker regular-expense data.
 - `mcp:calendar:write`: change your Travel Calendar.
 - `mcp:calendar:delete`: delete Calendar data. Delete operations require explicit confirmation.
+- `mcp:budget:write`: create or update regular expenses, monthly reviews, and regular-expense diagram setup.
+- `mcp:budget:delete`: delete regular expenses or monthly reviews. Delete operations also require explicit confirmation.
 
 Access is tied to the Portal account that approved it. Another person must connect and sign in with their own account; they cannot read or change your data. You can reconnect or reauthenticate if a client reports `401` or no longer lists the server as logged in.
 
@@ -60,11 +62,14 @@ Access is tied to the Portal account that approved it. Another person must conne
 - The MCP server validates Portal tokens for `defender-mcp`, then exchanges them at Portal for a 60-second BFF token.
 - Tools use `defender_portal_*` names, match Portal controller routes, and return structured JSON data.
 - `defender_portal_calendar_mutate` covers every mutation in `TravelCalendarController`. Deletes require `confirm: true` and the `mcp:calendar:delete` scope.
+- `defender_portal_regular_expenses_mutate` covers regular-expense mutations. Every mutation requires `mcp:budget:write`; deletes additionally require `confirm: true` and `mcp:budget:delete`.
 
 ## Tools
 
 - `defender_portal_calendar_get` and `defender_portal_calendar_search_users` read Calendar data.
 - `defender_portal_calendar_mutate` supports all Calendar mutations: theme, queued trips, events, auto-scheduling, points, participants, and packing items. Its operation names mirror `TravelCalendarController`.
+- `defender_portal_regular_expenses_list`, `defender_portal_regular_expenses_reviews_list`, `defender_portal_regular_expenses_review_template`, `defender_portal_regular_expenses_reviews_by_date_range`, and `defender_portal_regular_expenses_diagram_get` read BudgetTracker regular-expense data.
+- `defender_portal_regular_expenses_mutate` supports `create_expense`, `update_expense`, `delete_expense`, `save_review`, `delete_review`, and `update_diagram_setup`. Request bodies must match the corresponding Portal request model.
 - `defender_portal_read` exposes only current read routes from `BankingController` and `LotteryController`: wallet info, transaction history, active draws, user tickets, and available tickets.
 
 All write tools call the Portal BFF. Request `body` fields must match the corresponding Portal request model, including `expectedVersion` for Calendar optimistic concurrency.

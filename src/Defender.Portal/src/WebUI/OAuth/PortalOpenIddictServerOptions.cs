@@ -34,6 +34,8 @@ public sealed class PortalOpenIddictServerOptions(
         options.Scopes.Add(PortalOAuthScopes.Read);
         options.Scopes.Add(PortalOAuthScopes.CalendarWrite);
         options.Scopes.Add(PortalOAuthScopes.CalendarDelete);
+        options.Scopes.Add(PortalOAuthScopes.BudgetWrite);
+        options.Scopes.Add(PortalOAuthScopes.BudgetDelete);
         options.DisableAccessTokenEncryption = true;
         options.EncryptionCredentials.Add(
             new EncryptingCredentials(
