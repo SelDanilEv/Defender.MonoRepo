@@ -164,9 +164,6 @@ const UpdateUserInfo = (props: UpdateUserInfoProps) => {
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
-              slotProps={{
-                input: { style: { fontSize: "1.5em" } }
-              }}
             />
           </Grid>
           <Grid
@@ -183,9 +180,6 @@ const UpdateUserInfo = (props: UpdateUserInfoProps) => {
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
-              slotProps={{
-                input: { style: { fontSize: "1.5em" } }
-              }}
             />
           </Grid>
           <Grid
@@ -202,9 +196,6 @@ const UpdateUserInfo = (props: UpdateUserInfoProps) => {
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
-              slotProps={{
-                input: { style: { fontSize: "1.5em" } }
-              }}
             />
           </Grid>
           <Grid

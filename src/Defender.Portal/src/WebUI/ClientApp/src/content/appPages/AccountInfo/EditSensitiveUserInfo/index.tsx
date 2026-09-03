@@ -340,7 +340,6 @@ const EditSensitiveUserInfo = (props: any) => {
                 variant="standard"
                 fullWidth
                 slotProps={{
-                  input: { style: { fontSize: "1.1em" } },
                   htmlInput: { "aria-label": u.t("personal_info_page__email_field") },
                 }}
               />
@@ -374,7 +373,6 @@ const EditSensitiveUserInfo = (props: any) => {
                 variant="standard"
                 fullWidth
                 slotProps={{
-                  input: { style: { fontSize: "1.1em" } },
                   htmlInput: { "aria-label": u.t("personal_info_page__password_field") },
                 }}
               />

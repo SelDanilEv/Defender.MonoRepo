@@ -122,9 +122,6 @@ const SearchUserPannel = (props: SearchUserPannelProps) => {
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
-              slotProps={{
-                input: { style: { fontSize: "1.5em" } }
-              }}
             />
           </Grid>
           <Grid
@@ -141,9 +138,6 @@ const SearchUserPannel = (props: SearchUserPannelProps) => {
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
-              slotProps={{
-                input: { style: { fontSize: "1.5em" } }
-              }}
             />
           </Grid>
           <Grid
@@ -158,9 +152,6 @@ const SearchUserPannel = (props: SearchUserPannelProps) => {
               onChange={UpdateRequest}
               variant="outlined"
               fullWidth
-              slotProps={{
-                input: { style: { fontSize: "1.5em" } }
-              }}
             />
           </Grid>
           <Grid

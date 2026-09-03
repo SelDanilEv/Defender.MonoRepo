@@ -103,18 +103,7 @@ const GroupsTable = (props: GroupsTableProps) => {
         }}
       >
         {tags.map((tag, index) => (
-          <TagChip
-            sx={{
-              height: 28,
-              "& .MuiChip-label": {
-                px: 1,
-                fontSize: "0.82rem",
-              },
-            }}
-            key={index}
-            label={tag}
-            size="small"
-          />
+          <TagChip key={index} label={tag} />
         ))}
       </Box>
     );

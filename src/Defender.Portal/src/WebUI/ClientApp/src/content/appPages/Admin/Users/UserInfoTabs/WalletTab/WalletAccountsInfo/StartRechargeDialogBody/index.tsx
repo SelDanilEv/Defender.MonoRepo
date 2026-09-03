@@ -93,9 +93,6 @@ const StartRechargeDialogBody = (props: StartRechargeDialogBodyProps) => {
           onChange={handleUpdateAmount}
           variant="outlined"
           fullWidth
-          slotProps={{
-            input: { style: { fontSize: "1.5em" } }
-          }}
         />
       </Grid>
       <Grid
