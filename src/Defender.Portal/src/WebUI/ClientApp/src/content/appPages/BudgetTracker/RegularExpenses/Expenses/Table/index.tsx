@@ -115,7 +115,7 @@ const ExpensesTable = ({ expenses, pagination, applyPagination, refresh }: Expen
         }
       />
       <Divider />
-      <TableContainer sx={{ overflowX: "auto", "& .MuiTableCell-root": { fontSize: u.isMobile ? "0.78em" : "0.9em" } }}>
+      <TableContainer sx={{ overflowX: "auto" }}>
         <Table aria-label={u.t("budgetTracker:regular_expenses_table_title")}>
           <TableHead>
             <TableRow>
@@ -182,7 +182,7 @@ const ExpensesTable = ({ expenses, pagination, applyPagination, refresh }: Expen
         </Table>
       </TableContainer>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap", gap: 0.5, px: 1.5, pt: 0.5, pb: 0.75 }}>
-        <Typography variant="body2" sx={{ fontSize: u.isMobile ? "0.68rem" : "0.8rem" }}>
+        <Typography variant="body2">
           {u.t("table_rows_per_page_label")}
         </Typography>
         <TablePagination

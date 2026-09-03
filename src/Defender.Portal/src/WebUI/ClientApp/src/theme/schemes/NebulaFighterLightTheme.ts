@@ -256,6 +256,34 @@ export const NebulaFighterLightTheme = createTheme(NebulaFighterTheme, {
         },
       },
     },
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottomColor: alpha(textPrimary, 0.1),
+          fontSize: 13,
+          paddingTop: 10,
+          paddingBottom: 10,
+          paddingLeft: 12,
+          paddingRight: 12,
+          lineHeight: 1.3,
+        },
+        head: {
+          textTransform: "uppercase",
+          fontSize: 12,
+          fontWeight: "bold",
+          color: alpha(textPrimary, 0.7),
+          letterSpacing: "0.03em",
+          paddingTop: 12,
+          paddingBottom: 12,
+        },
+      },
+    },
+    MuiTablePagination: {
+      ...NebulaFighterTheme.components?.MuiTablePagination,
+    },
+    MuiTable: {
+      ...NebulaFighterTheme.components?.MuiTable,
+    },
     MuiListItem: {
       styleOverrides: {
         root: {

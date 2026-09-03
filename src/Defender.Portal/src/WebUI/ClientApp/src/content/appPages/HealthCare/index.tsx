@@ -568,7 +568,7 @@ const HealthCarePage = () => {
                 mb: 1
               }}>{u.t("healthCare:events_grid")}</Typography>
             <TableContainer>
-              <Table size="small">
+              <Table>
                 <TableHead>
                   <TableRow>
                     <TableCell>{u.t("healthCare:grid_started_at")}</TableCell>
@@ -629,8 +629,6 @@ const HealthCarePage = () => {
                   variant="body2"
                   sx={{
                     textAlign: "center",
-                    fontSize: { xs: "0.68rem", sm: "0.8rem" },
-                    lineHeight: 1.2,
                   }}
                 >
                   {u.t("table_rows_per_page_label")}

@@ -90,7 +90,7 @@ const ReviewsTable = ({ reviews, pagination, applyPagination, refresh }: Reviews
         title={<Typography sx={{ fontSize: "1.7em", fontWeight: "bold" }}>{u.t("budgetTracker:regular_expenses_create_review")}</Typography>}
       />
       <Divider />
-      <TableContainer sx={{ overflowX: "auto", "& .MuiTableCell-root": { fontSize: u.isMobile ? "0.78em" : "0.9em" } }}>
+      <TableContainer sx={{ overflowX: "auto" }}>
         <Table aria-label={u.t("budgetTracker:regular_expenses_create_review")}>
           <TableHead><TableRow>
             <TableCell>{u.t("budgetTracker:regular_expenses_month_column")}</TableCell>
@@ -120,7 +120,7 @@ const ReviewsTable = ({ reviews, pagination, applyPagination, refresh }: Reviews
         </Table>
       </TableContainer>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap", gap: 0.5, px: 1.5, pt: 0.5, pb: 0.75 }}>
-        <Typography variant="body2" sx={{ fontSize: u.isMobile ? "0.68rem" : "0.8rem" }}>{u.t("table_rows_per_page_label")}</Typography>
+        <Typography variant="body2">{u.t("table_rows_per_page_label")}</Typography>
         <TablePagination
           component="div"
           count={pagination.totalItemsCount}

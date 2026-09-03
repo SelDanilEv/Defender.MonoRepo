@@ -136,14 +136,7 @@ const HistoricalTicketsTable = (props: HistoricalTicketsTableProps) => {
         }}
       />
       <Divider />
-      <TableContainer
-        sx={{
-          fontSize: u.isMobile ? "0.9em" : "1.5em",
-          "& .MuiTableCell-root": {
-            fontSize: u.isMobile ? "0.8em" : "0.8em",
-          },
-        }}
-      >
+      <TableContainer>
         <Table>
           <TableHead>
             <TableRow>

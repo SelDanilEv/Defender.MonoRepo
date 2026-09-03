@@ -1161,13 +1161,26 @@ export const NebulaFighterTheme = createTheme({
         root: {
           borderBottomColor: colors.alpha.black[10],
           fontSize: 13,
+          paddingTop: 10,
+          paddingBottom: 10,
+          paddingLeft: 12,
+          paddingRight: 12,
+          lineHeight: 1.3,
         },
         head: {
           textTransform: "uppercase",
           fontSize: 12,
           fontWeight: "bold",
           color: colors.alpha.black[70],
+          letterSpacing: "0.03em",
+          paddingTop: 12,
+          paddingBottom: 12,
         },
+      },
+    },
+    MuiTable: {
+      defaultProps: {
+        size: "small",
       },
     },
     MuiAlert: {

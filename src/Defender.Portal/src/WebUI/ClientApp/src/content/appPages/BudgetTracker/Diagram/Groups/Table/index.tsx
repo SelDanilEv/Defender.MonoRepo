@@ -303,23 +303,8 @@ const GroupsTable = (props: GroupsTableProps) => {
         }}
       />
       <Divider />
-      <TableContainer
-        sx={{
-          "& .MuiTableCell-root": {
-            px: u.isMobile ? 1 : 1.5,
-            py: 1.25,
-            fontSize: "0.88rem",
-            lineHeight: 1.3,
-          },
-          "& .MuiTableHead-root .MuiTableCell-root": {
-            py: 1.5,
-            fontSize: "0.82rem",
-            fontWeight: 700,
-            letterSpacing: "0.03em",
-          },
-        }}
-      >
-        <Table size="small">
+      <TableContainer>
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell align="center">
@@ -359,8 +344,6 @@ const GroupsTable = (props: GroupsTableProps) => {
           variant="body2"
           sx={{
             textAlign: "center",
-            fontSize: u.isMobile ? "0.68rem" : "0.8rem",
-            lineHeight: 1.2,
           }}
         >
           {u.t("table_rows_per_page_label")}
@@ -374,32 +357,6 @@ const GroupsTable = (props: GroupsTableProps) => {
           rowsPerPage={tablePagination.pageSize}
           rowsPerPageOptions={[10, 25, 50, 100]}
           labelRowsPerPage=""
-          sx={{
-            "& .MuiTablePagination-toolbar": {
-              minHeight: 32,
-              pl: 0,
-              pr: 0,
-              py: 0,
-            },
-            "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-              fontSize: "0.78rem",
-              my: 0,
-            },
-            "& .MuiInputBase-root": {
-              fontSize: "0.78rem",
-              mr: 0.5,
-            },
-            "& .MuiTablePagination-select": {
-              py: 0.25,
-              minHeight: 0,
-            },
-            "& .MuiTablePagination-actions": {
-              ml: 0.5,
-            },
-            "& .MuiTablePagination-actions .MuiIconButton-root": {
-              p: 0.4,
-            },
-          }}
         />
       </Box>
       <CustomDialog
