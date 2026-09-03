@@ -11,9 +11,9 @@ export const getMainDiagramLayout = ({
 }: MainDiagramLayoutOptions) => ({
   height: (isLargeScreen ? 700 : isMobile ? 400 : 450) + additionalLegendMargin,
   margin: {
-    top: isMobile ? 0 : 10,
-    bottom: isMobile ? 0 : 65 + additionalLegendMargin,
-    left: isMobile ? 0 : 68,
-    right: isMobile ? 0 : 40,
+    top: isLargeScreen ? 10 : 0,
+    bottom: isLargeScreen ? 65 + additionalLegendMargin : additionalLegendMargin,
+    left: isLargeScreen ? 68 : 0,
+    right: isLargeScreen ? 40 : 0,
   },
 });

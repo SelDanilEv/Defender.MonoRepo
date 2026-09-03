@@ -159,7 +159,7 @@ const MainDiagram = (props: MainDiagramProps) => {
   return (
     <Box
       sx={{
-        paddingBottom: 3,
+        paddingBottom: { xs: 1.5, xl: 3 },
         width: "100%"
       }}>
       <LineChart

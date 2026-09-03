@@ -139,7 +139,7 @@ const DiagramConfig = (props: DiagramConfigProps) => {
 
   return (
     <Grid container spacing={2} sx={{
-      p: 3
+      p: { xs: 1.5, xl: 3 }
     }}>
       <Grid
         size={{

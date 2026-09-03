@@ -271,11 +271,11 @@ const RegularExpensesDiagramPage = () => {
               </Stack>
             </CardContent>
           )}
-          <Box role="img" aria-label={u.t("budgetTracker:regular_expenses_chart_title")} sx={{ width: "100%", overflowX: "auto", px: { xs: 0, sm: 2 } }}>
+          <Box role="img" aria-label={u.t("budgetTracker:regular_expenses_chart_title")} sx={{ width: "100%", overflowX: "auto", px: { xs: 0, xl: 2 } }}>
             <LineChart
               dataset={dataset as unknown as Record<string, unknown>[]}
-              height={u.isMobile ? 360 : 480}
-              margin={{ left: u.isMobile ? 60 : 80, right: u.isMobile ? 20 : 40, top: 24, bottom: 80 }}
+              height={u.isLargeScreen ? 480 : 360}
+              margin={{ left: u.isLargeScreen ? 80 : 60, right: u.isLargeScreen ? 40 : 20, top: u.isLargeScreen ? 24 : 16, bottom: u.isLargeScreen ? 80 : 56 }}
               series={chartSeries}
               xAxis={[{
                 scaleType: "point",

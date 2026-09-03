@@ -284,7 +284,7 @@ const GroupsTable = (props: GroupsTableProps) => {
             {u.t("budgetTracker:groups_table_title")}
           </Typography>
         }
-        sx={{ py: 1.25, px: 2 }}
+        sx={{ py: 1.25, px: { xs: 1, xl: 2 } }}
         slotProps={{
           title: {
             style: { fontSize: u.isMobile ? "1.3em" : "1.65em" },
@@ -324,7 +324,7 @@ const GroupsTable = (props: GroupsTableProps) => {
           alignItems: "center",
           justifyContent: "right",
           gap: 0.5,
-          px: 1.5,
+          px: { xs: 1, xl: 1.5 },
           pt: 0.5,
           pb: 0.75,
         }}
