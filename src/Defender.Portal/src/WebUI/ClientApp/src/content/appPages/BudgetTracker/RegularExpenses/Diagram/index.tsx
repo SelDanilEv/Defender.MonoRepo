@@ -275,7 +275,7 @@ const RegularExpensesDiagramPage = () => {
             <LineChart
               dataset={dataset as unknown as Record<string, unknown>[]}
               height={u.isLargeScreen ? 480 : 360}
-              margin={{ left: u.isLargeScreen ? 80 : 60, right: u.isLargeScreen ? 40 : 20, top: u.isLargeScreen ? 24 : 16, bottom: u.isLargeScreen ? 80 : 56 }}
+              margin={{ left: u.isLargeScreen ? 80 : 60, right: u.isLargeScreen ? 40 : 20, top: u.isLargeScreen ? 24 : 16, bottom: 0 }}
               series={chartSeries}
               xAxis={[{
                 scaleType: "point",
