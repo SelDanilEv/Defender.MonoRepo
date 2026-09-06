@@ -33,16 +33,26 @@ import type { RegularExpenseReview } from "src/models/budgetTracker/regularExpen
 import { DialogMode, OpenDialog } from "src/models/shared/DialogMode";
 
 import ReviewDialog from "../ReviewDialog";
-import { calculateReviewTotalMonthlyMajor } from "../reviewData";
+import {
+  calculateReviewTotalMonthlyMajor,
+  resolveReviewDisplayCurrency,
+} from "../reviewData";
 
 interface ReviewsTableProps {
   reviews: RegularExpenseReview[];
   pagination: CurrentPagination;
   applyPagination: (page: number, pageSize: number) => void;
   refresh: () => void;
+  displayCurrency?: string;
 }
 
-const ReviewsTable = ({ reviews, pagination, applyPagination, refresh }: ReviewsTableProps) => {
+const ReviewsTable = ({
+  reviews,
+  pagination,
+  applyPagination,
+  refresh,
+  displayCurrency,
+}: ReviewsTableProps) => {
   const u = useUtils();
   const theme = useTheme();
   const applyPaginationRef = useRef(applyPagination);
@@ -102,12 +112,16 @@ const ReviewsTable = ({ reviews, pagination, applyPagination, refresh }: Reviews
             {reviews.length === 0 ? (
               <TableRow><TableCell colSpan={u.isMobile ? 3 : 4} align="center"><Typography color="text.secondary" sx={{ py: 2 }}>{u.t("budgetTracker:regular_expenses_no_reviews")}</Typography></TableCell></TableRow>
             ) : reviews.map((review) => {
-              const currency = review.ratesModel?.baseCurrency;
-              const total = calculateReviewTotalMonthlyMajor(review);
+              const currency = resolveReviewDisplayCurrency(review, displayCurrency);
+              const total = calculateReviewTotalMonthlyMajor(review, displayCurrency);
+              const formattedTotal = total.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              });
               return (
                 <TableRow hover key={review.id}>
                   <TableCell><Typography sx={{ fontWeight: "bold" }}>{review.month.slice(0, 7)}</Typography></TableCell>
-                  <TableCell><Chip label={`${total} ${CurrencySymbolsMap[currency] || currency}`} size="small" /></TableCell>
+                  <TableCell><Chip label={`${formattedTotal} ${CurrencySymbolsMap[currency] || currency}`} size="small" /></TableCell>
                   {!u.isMobile && <TableCell>{review.expenses.length}</TableCell>}
                   <TableCell align="center">
                     <LockedIconButton aria-label={`${u.t("Update")} ${review.month.slice(0, 7)}`} sx={{ "&:hover": { background: theme.colors.warning.lighter }, color: theme.palette.warning.dark }} onClick={() => { setSelectedReview(review); setDialogMode(DialogMode.Update); }} size="small"><EditNoteIcon fontSize="small" /></LockedIconButton>

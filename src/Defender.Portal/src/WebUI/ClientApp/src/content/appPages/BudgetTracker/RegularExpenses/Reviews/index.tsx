@@ -3,16 +3,20 @@ import { useEffect, useRef, useState } from "react";
 
 import useUtils from "src/appUtils";
 import DefaultTableConsts from "src/consts/DefaultTableConsts";
+import type { Currency } from "src/models/shared/Currency";
 import type { CurrentPagination } from "src/models/base/CurrentPagination";
 import type { PaginationRequest } from "src/models/base/PaginationRequest";
 import type { RegularExpenseReview } from "src/models/budgetTracker/regularExpenses";
 
-import { getRegularExpenseReviews } from "../api";
+import { getRegularExpenseDiagramSetup, getRegularExpenseReviews } from "../api";
 import ReviewsTable from "./Table";
 
 const RegularExpenseReviewsPage = () => {
   const u = useUtils();
+  const utilsRef = useRef(u);
+  utilsRef.current = u;
   const [reviews, setReviews] = useState<RegularExpenseReview[]>([]);
+  const [displayCurrency, setDisplayCurrency] = useState<Currency>();
   const [paginationRequest, setPaginationRequest] = useState<PaginationRequest>({
     page: DefaultTableConsts.DefaultPage,
     pageSize: DefaultTableConsts.DefaultPageSize,
@@ -25,6 +29,22 @@ const RegularExpenseReviewsPage = () => {
   });
 
   const reloadItemsRef = useRef<() => void>(() => undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    getRegularExpenseDiagramSetup(utilsRef.current)
+      .then((setup) => {
+        if (!cancelled) setDisplayCurrency(setup?.mainCurrency);
+      })
+      .catch(() => {
+        if (!cancelled) setDisplayCurrency(undefined);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const load = () => {
     getRegularExpenseReviews(u, paginationRequest)
@@ -46,7 +66,13 @@ const RegularExpenseReviewsPage = () => {
 
   return (
     <Card>
-      <ReviewsTable reviews={reviews} pagination={pagination} applyPagination={applyPagination} refresh={load} />
+      <ReviewsTable
+        reviews={reviews}
+        pagination={pagination}
+        applyPagination={applyPagination}
+        refresh={load}
+        displayCurrency={displayCurrency}
+      />
     </Card>
   );
 };

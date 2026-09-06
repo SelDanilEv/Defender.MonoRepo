@@ -56,4 +56,71 @@ describe("regular expense review data", () => {
   test("Review_WhenExpensesUseMultipleCurrencies_ConvertsMonthlyContributionsToBaseCurrency", () => {
     expect(calculateReviewTotalMonthlyMajor(review)).toBe(210);
   });
+
+  test("Review_WhenDisplayCurrencySelected_RoundsFractionalConvertedTotalToCents", () => {
+    const fractionalReview: RegularExpenseReview = {
+      ...review,
+      expenses: [
+        {
+          ...review.expenses[0],
+          amount: 1_000,
+          monthlyContribution: 1_000,
+        },
+      ],
+      ratesModel: {
+        ...review.ratesModel,
+        rates: {
+          ...review.ratesModel.rates,
+          [Currency.PLN]: 3,
+          [Currency.USD]: 1.1,
+        },
+      },
+    };
+    expect(calculateReviewTotalMonthlyMajor(fractionalReview, Currency.USD)).toBe(3.67);
+  });
+
+  test("Review_WhenMonthlyContributionHasFractionalMinorUnits_RoundsTotalToCents", () => {
+    const annualReview: RegularExpenseReview = {
+      ...review,
+      expenses: [{
+        ...review.expenses[0],
+        type: RegularExpenseType.Annual,
+        amount: 1_000,
+        monthlyContribution: 1_000 / 12,
+      }],
+      ratesModel: {
+        ...review.ratesModel,
+        baseCurrency: Currency.PLN,
+        rates: { [Currency.PLN]: 1 },
+      },
+    };
+
+    expect(calculateReviewTotalMonthlyMajor(annualReview)).toBe(0.83);
+  });
+
+  test("Review_WhenDisplayCurrencyMissing_UsesReviewBaseCurrency", () => {
+    const fractionalReview: RegularExpenseReview = {
+      ...review,
+      expenses: [
+        {
+          ...review.expenses[0],
+          amount: 1_000,
+          monthlyContribution: 1_000,
+        },
+      ],
+      ratesModel: {
+        ...review.ratesModel,
+        rates: {
+          ...review.ratesModel.rates,
+          [Currency.PLN]: 3,
+        },
+      },
+    };
+
+    expect(calculateReviewTotalMonthlyMajor(fractionalReview)).toBe(3.33);
+  });
+
+  test("Review_WhenDisplayCurrencyUnknown_UsesReviewBaseCurrency", () => {
+    expect(calculateReviewTotalMonthlyMajor(review, "GBP")).toBe(210);
+  });
 });
