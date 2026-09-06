@@ -18,13 +18,15 @@ public class RegularExpenseReviewServiceTests
     private readonly Mock<IRegularExpenseService> _expenseService = new();
     private readonly Mock<ICurrentAccountAccessor> _currentAccountAccessor = new();
     private readonly Mock<IRatesModelService> _ratesModelService = new();
+    private readonly FakeTimeProvider _timeProvider = new();
 
     private RegularExpenseReviewService CreateSut()
         => new(
             _reviewRepository.Object,
             _expenseService.Object,
             _currentAccountAccessor.Object,
-            _ratesModelService.Object);
+            _ratesModelService.Object,
+            _timeProvider);
 
     [Fact]
     public async Task GetTemplateAsync_WhenLatestReviewExists_CarriesAmountByIdAndUsesCurrentMetadata()
@@ -91,6 +93,28 @@ public class RegularExpenseReviewServiceTests
         Assert.Equal("Rent now", result.Expenses.Single(x => x.RegularExpenseId == rentId).Name);
         Assert.Equal(20, result.Expenses.Single(x => x.RegularExpenseId == streamingId).Amount);
         Assert.Same(rates, result.RatesModel);
+    }
+
+    [Fact]
+    public async Task GetTemplateAsync_WhenMonthOmitted_UsesPreviousUtcDateForRates()
+    {
+        var userId = Guid.NewGuid();
+        _timeProvider.SetUtcNow(new DateTimeOffset(2026, 9, 6, 12, 0, 0, TimeSpan.Zero));
+        var expectedMonth = new DateOnly(2026, 9, 1);
+        var expectedRateDate = new DateOnly(2026, 9, 5);
+        var rates = new RatesModel { Date = expectedRateDate, BaseCurrency = Currency.EUR };
+        _currentAccountAccessor.Setup(x => x.GetAccountId()).Returns(userId);
+        _expenseService.Setup(x => x.GetCurrentUserRegularExpensesAsync(It.IsAny<PaginationRequest>()))
+            .ReturnsAsync(new PagedResult<RegularExpense>());
+        _reviewRepository.Setup(x => x.GetLatestRegularExpenseReviewAsync(userId))
+            .ReturnsAsync((RegularExpenseReview?)null);
+        _ratesModelService.Setup(x => x.GetRatesModelAsync(It.IsAny<DateOnly>())).ReturnsAsync(rates);
+
+        var result = await CreateSut().GetRegularExpenseReviewTemplateAsync(null);
+
+        Assert.Equal(expectedMonth, result.Month);
+        Assert.Same(rates, result.RatesModel);
+        _ratesModelService.Verify(x => x.GetRatesModelAsync(expectedRateDate), Times.Once);
     }
 
     [Fact]
@@ -338,5 +362,14 @@ public class RegularExpenseReviewServiceTests
 
         _reviewRepository.Verify(x => x.GetRegularExpenseReviewsAsync(
             It.IsAny<Guid>(), It.IsAny<DateOnly>(), It.IsAny<DateOnly>()), Times.Never);
+    }
+
+    private sealed class FakeTimeProvider : TimeProvider
+    {
+        private DateTimeOffset _utcNow = new(2026, 9, 6, 12, 0, 0, TimeSpan.Zero);
+
+        public override DateTimeOffset GetUtcNow() => _utcNow;
+
+        public void SetUtcNow(DateTimeOffset value) => _utcNow = value;
     }
 }

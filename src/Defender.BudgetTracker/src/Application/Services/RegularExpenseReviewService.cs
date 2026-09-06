@@ -12,7 +12,8 @@ public class RegularExpenseReviewService(
     IRegularExpenseReviewRepository regularExpenseReviewRepository,
     IRegularExpenseService regularExpenseService,
     ICurrentAccountAccessor currentAccountAccessor,
-    IRatesModelService ratesModelService) : IRegularExpenseReviewService
+    IRatesModelService ratesModelService,
+    TimeProvider timeProvider) : IRegularExpenseReviewService
 {
     public Task<PagedResult<RegularExpenseReview>> GetCurrentUserRegularExpenseReviewsAsync(
         PaginationRequest paginationRequest)
@@ -42,15 +43,16 @@ public class RegularExpenseReviewService(
 
     public async Task<RegularExpenseReview> GetRegularExpenseReviewTemplateAsync(DateOnly? month)
     {
-        var normalizedMonth = RegularExpenseReview.NormalizeMonth(
-            month ?? DateOnly.FromDateTime(DateTime.UtcNow));
+        var currentUtcDate = DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime);
+        var normalizedMonth = RegularExpenseReview.NormalizeMonth(month ?? currentUtcDate);
+        var rateDate = month.HasValue ? normalizedMonth : currentUtcDate.AddDays(-1);
         var userId = currentAccountAccessor.GetAccountId();
 
         var definitionsTask = regularExpenseService.GetCurrentUserRegularExpensesAsync(
             PaginationRequest.CreateWithoutPagination);
         var latestReviewTask = regularExpenseReviewRepository
             .GetLatestRegularExpenseReviewAsync(userId);
-        var ratesTask = ratesModelService.GetRatesModelAsync(normalizedMonth);
+        var ratesTask = ratesModelService.GetRatesModelAsync(rateDate);
 
         await Task.WhenAll(definitionsTask, latestReviewTask, ratesTask);
 

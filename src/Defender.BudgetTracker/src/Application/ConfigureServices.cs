@@ -23,6 +23,7 @@ public static class ConfigureServices
 
     private static IServiceCollection RegisterServices(this IServiceCollection services)
     {
+        services.AddSingleton(TimeProvider.System);
         services.AddTransient<IPositionService, PositionService>();
         services.AddTransient<IRatesModelService, RatesModelService>();
         services.AddTransient<IBudgetReviewService, BudgetReviewService>();
