@@ -2,7 +2,7 @@ import type {
   RegularExpenseReview,
   ReviewedRegularExpense,
 } from "src/models/budgetTracker/regularExpenses";
-import type { Currency } from "src/models/shared/Currency";
+import { Currency } from "src/models/shared/Currency";
 import { BudgetTrackerSupportedCurrencies } from "src/consts/SupportedCurrencies";
 
 import {
@@ -20,7 +20,7 @@ export const resolveReviewDisplayCurrency = (
   typeof displayCurrency === "string" &&
   BudgetTrackerSupportedCurrencies.includes(displayCurrency)
     ? (displayCurrency as Currency)
-    : review.ratesModel.baseCurrency;
+    : Currency.USD;
 
 export const calculateReviewTotalMonthlyMajor = (
   review: RegularExpenseReview,

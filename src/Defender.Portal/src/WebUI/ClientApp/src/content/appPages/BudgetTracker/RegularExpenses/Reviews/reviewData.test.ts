@@ -53,8 +53,8 @@ const review: RegularExpenseReview = {
 };
 
 describe("regular expense review data", () => {
-  test("Review_WhenExpensesUseMultipleCurrencies_ConvertsMonthlyContributionsToBaseCurrency", () => {
-    expect(calculateReviewTotalMonthlyMajor(review)).toBe(210);
+  test("Review_WhenDisplayCurrencyMatchesReviewBase_ConvertsMonthlyContributionsToBaseCurrency", () => {
+    expect(calculateReviewTotalMonthlyMajor(review, Currency.EUR)).toBe(210);
   });
 
   test("Review_WhenDisplayCurrencySelected_RoundsFractionalConvertedTotalToCents", () => {
@@ -95,10 +95,10 @@ describe("regular expense review data", () => {
       },
     };
 
-    expect(calculateReviewTotalMonthlyMajor(annualReview)).toBe(0.83);
+    expect(calculateReviewTotalMonthlyMajor(annualReview, Currency.PLN)).toBe(0.83);
   });
 
-  test("Review_WhenDisplayCurrencyMissing_UsesReviewBaseCurrency", () => {
+  test("Review_WhenDisplayCurrencyMissing_UsesDiagramDefaultUsd", () => {
     const fractionalReview: RegularExpenseReview = {
       ...review,
       expenses: [
@@ -117,10 +117,10 @@ describe("regular expense review data", () => {
       },
     };
 
-    expect(calculateReviewTotalMonthlyMajor(fractionalReview)).toBe(3.33);
+    expect(calculateReviewTotalMonthlyMajor(fractionalReview)).toBe(3.67);
   });
 
-  test("Review_WhenDisplayCurrencyUnknown_UsesReviewBaseCurrency", () => {
-    expect(calculateReviewTotalMonthlyMajor(review, "GBP")).toBe(210);
+  test("Review_WhenDisplayCurrencyUnknown_UsesDiagramDefaultUsd", () => {
+    expect(calculateReviewTotalMonthlyMajor(review, Currency.Unknown)).toBe(231);
   });
 });
