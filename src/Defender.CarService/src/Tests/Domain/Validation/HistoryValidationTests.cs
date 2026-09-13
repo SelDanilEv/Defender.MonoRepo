@@ -1,6 +1,7 @@
 using Defender.CarService.Domain.Entities;
 using Defender.CarService.Domain.Enums;
 using Defender.CarService.Domain.Exceptions;
+using Defender.CarService.Domain.ValueObjects;
 
 namespace Defender.CarService.Tests.Domain.Validation;
 
@@ -59,5 +60,25 @@ public sealed class HistoryValidationTests
 
         Assert.Equal("CAR_HISTORY_COST_INVALID", negative.Code);
         Assert.Equal("CAR_HISTORY_COST_INVALID", unknown.Code);
+    }
+
+    [Fact]
+    public void Create_RejectsUndefinedCurrencyValue()
+    {
+        var exception = Assert.Throws<CarDomainException>(() => Cost.Create(100, (Currency)999));
+
+        Assert.Equal("CAR_CURRENCY_INVALID", exception.Code);
+    }
+
+    [Fact]
+    public void Update_RejectsArchivedVehicleContext()
+    {
+        var vehicle = Vehicle.Create(Guid.NewGuid(), "Daily", "BMW", "320d", 2026, "ABC", null, Clock);
+        var history = ServiceHistoryRecord.Create(vehicle, new DateOnly(2026, 9, 13), 100, HistoryType.Repair, "Repair", timeProvider: Clock);
+        vehicle.Archive(Clock);
+
+        var exception = Assert.Throws<CarDomainException>(() => history.Update(vehicle, new DateOnly(2026, 9, 13), 110, HistoryType.Repair, "Repair 2", timeProvider: Clock));
+
+        Assert.Equal("CAR_VEHICLE_ARCHIVED", exception.Code);
     }
 }

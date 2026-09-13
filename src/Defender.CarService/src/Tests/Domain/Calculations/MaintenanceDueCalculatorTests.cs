@@ -53,7 +53,7 @@ public sealed class MaintenanceDueCalculatorTests
         var calculator = new MaintenanceDueCalculator(Clock);
 
         Assert.Equal(MaintenanceStatus.Upcoming, calculator.CalculateStatus(missingOdometer, (long?)null));
-        Assert.Equal(MaintenanceStatus.NotStarted, calculator.CalculateStatus(missingVehicleOdometer, (long?)null));
+        Assert.Equal(MaintenanceStatus.Upcoming, calculator.CalculateStatus(missingVehicleOdometer, (long?)null));
         Assert.Equal(MaintenanceStatus.NotStarted, calculator.CalculateStatus(noBaseline, 100_000));
     }
 

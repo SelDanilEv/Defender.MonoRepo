@@ -141,12 +141,19 @@ public sealed class Vehicle
         TimeProvider timeProvider,
         bool touch)
     {
-        DisplayName = DomainValidation.RequiredText(displayName, 100, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
-        Make = DomainValidation.RequiredText(make, 100, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
-        Model = DomainValidation.RequiredText(model, 100, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
-        Plate = DomainValidation.RequiredText(plate, 32, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
-        Year = DomainValidation.VehicleYear(year, timeProvider);
-        Vin = DomainValidation.Vin(vin);
+        var nextDisplayName = DomainValidation.RequiredText(displayName, 100, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
+        var nextMake = DomainValidation.RequiredText(make, 100, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
+        var nextModel = DomainValidation.RequiredText(model, 100, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
+        var nextPlate = DomainValidation.RequiredText(plate, 32, CarDomainErrorCodes.VehicleDisplayNameRequired, CarDomainErrorCodes.VehicleFieldTooLong);
+        var nextYear = DomainValidation.VehicleYear(year, timeProvider);
+        var nextVin = DomainValidation.Vin(vin);
+
+        DisplayName = nextDisplayName;
+        Make = nextMake;
+        Model = nextModel;
+        Plate = nextPlate;
+        Year = nextYear;
+        Vin = nextVin;
 
         if (touch)
         {

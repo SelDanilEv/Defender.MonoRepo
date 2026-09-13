@@ -7,6 +7,11 @@ public sealed record Cost
 {
     public Cost(long? amountMinor, Currency? currency)
     {
+        if (currency is not null && !Enum.IsDefined(currency.Value))
+        {
+            throw new CarDomainException(CarDomainErrorCodes.CurrencyInvalid, "Currency is not supported.");
+        }
+
         if (amountMinor is null != (currency is null))
         {
             throw new CarDomainException(CarDomainErrorCodes.HistoryCostPairInvalid, "Cost amount and currency must be provided together.");

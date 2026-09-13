@@ -24,4 +24,16 @@ public sealed class InsuranceValidationTests
 
         Assert.Equal("CAR_INSURANCE_FIELD_TOO_LONG", exception.Code);
     }
+
+    [Fact]
+    public void Update_RejectsArchivedVehicleContext()
+    {
+        var vehicle = Vehicle.Create(Guid.NewGuid(), "Daily", "BMW", "320d", 2026, "ABC", null, Clock);
+        var policy = InsurancePolicy.Create(vehicle, "Insurer", null, null, new DateOnly(2026, 1, 1), new DateOnly(2026, 2, 1), timeProvider: Clock);
+        vehicle.Archive(Clock);
+
+        var exception = Assert.Throws<CarDomainException>(() => policy.Update(vehicle, "Changed", null, null, new DateOnly(2026, 1, 1), new DateOnly(2026, 2, 1), timeProvider: Clock));
+
+        Assert.Equal("CAR_VEHICLE_ARCHIVED", exception.Code);
+    }
 }

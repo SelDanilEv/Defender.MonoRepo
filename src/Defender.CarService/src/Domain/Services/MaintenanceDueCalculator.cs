@@ -22,7 +22,7 @@ public sealed class MaintenanceDueCalculator
     {
         var nextDate = CalculateNextDate(item);
         var nextOdometerKm = CalculateNextOdometerKm(item);
-        var odometerDimensionKnown = nextOdometerKm is not null && currentOdometerKm is not null;
+        var odometerDimensionKnown = nextOdometerKm is not null;
         var dateOverdue = nextDate is not null && nextDate <= evaluationDate;
         var odometerOverdue = nextOdometerKm is { } nextOdometer && currentOdometerKm is { } currentOdometer && nextOdometer <= currentOdometer;
 

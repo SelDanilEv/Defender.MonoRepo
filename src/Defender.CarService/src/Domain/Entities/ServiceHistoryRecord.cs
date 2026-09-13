@@ -99,23 +99,49 @@ public sealed class ServiceHistoryRecord
         long odometerKm,
         HistoryType type,
         string title,
+        bool vehicleArchived,
         string? notes = null,
         IEnumerable<Guid>? linkedMaintenanceItemIds = null,
         long? costAmountMinor = null,
         Currency? costCurrency = null,
-        bool vehicleArchived = false,
         TimeProvider? timeProvider = null)
     {
         EnsureVehicleActive(vehicleArchived);
         SetDetails(date, odometerKm, type, title, notes, linkedMaintenanceItemIds, costAmountMinor, costCurrency, timeProvider ?? TimeProvider.System, true);
     }
 
-    public void EnsureVehicleActive(bool vehicleArchived = false)
+    public void Update(
+        Vehicle vehicle,
+        DateOnly date,
+        long odometerKm,
+        HistoryType type,
+        string title,
+        string? notes = null,
+        IEnumerable<Guid>? linkedMaintenanceItemIds = null,
+        long? costAmountMinor = null,
+        Currency? costCurrency = null,
+        TimeProvider? timeProvider = null)
+    {
+        EnsureVehicle(vehicle);
+        SetDetails(date, odometerKm, type, title, notes, linkedMaintenanceItemIds, costAmountMinor, costCurrency, timeProvider ?? TimeProvider.System, true);
+    }
+
+    public void EnsureVehicleActive(bool vehicleArchived)
     {
         if (vehicleArchived)
         {
             throw new CarDomainException(CarDomainErrorCodes.VehicleArchived, "Archived vehicle cannot be changed.");
         }
+    }
+
+    private void EnsureVehicle(Vehicle vehicle)
+    {
+        if (vehicle.Id != VehicleId || vehicle.UserId != UserId)
+        {
+            throw new CarDomainException(CarDomainErrorCodes.VehicleNotFound, "Vehicle does not own history record.");
+        }
+
+        vehicle.EnsureActive();
     }
 
     private void SetDetails(

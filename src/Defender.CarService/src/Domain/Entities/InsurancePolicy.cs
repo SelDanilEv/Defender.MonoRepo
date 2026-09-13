@@ -84,8 +84,8 @@ public sealed class InsurancePolicy
         string? coverageType,
         DateOnly startDate,
         DateOnly endDate,
+        bool vehicleArchived,
         string? notes = null,
-        bool vehicleArchived = false,
         TimeProvider? timeProvider = null)
     {
         if (vehicleArchived)
@@ -93,6 +93,20 @@ public sealed class InsurancePolicy
             throw new Exceptions.CarDomainException(Exceptions.CarDomainErrorCodes.VehicleArchived, "Archived vehicle cannot be changed.");
         }
 
+        SetDetails(provider, policyNumber, coverageType, startDate, endDate, notes, timeProvider ?? TimeProvider.System, true);
+    }
+
+    public void Update(
+        Vehicle vehicle,
+        string provider,
+        string? policyNumber,
+        string? coverageType,
+        DateOnly startDate,
+        DateOnly endDate,
+        string? notes = null,
+        TimeProvider? timeProvider = null)
+    {
+        EnsureVehicle(vehicle);
         SetDetails(provider, policyNumber, coverageType, startDate, endDate, notes, timeProvider ?? TimeProvider.System, true);
     }
 
@@ -111,6 +125,16 @@ public sealed class InsurancePolicy
     public InsuranceStatus CalculateStatus(DateOnly evaluationDate) => GetStatus(evaluationDate);
 
     public InsuranceStatus GetStatus(TimeProvider timeProvider) => GetStatus(DomainClock.Today(timeProvider));
+
+    private void EnsureVehicle(Vehicle vehicle)
+    {
+        if (vehicle.Id != VehicleId || vehicle.UserId != UserId)
+        {
+            throw new Exceptions.CarDomainException(Exceptions.CarDomainErrorCodes.VehicleNotFound, "Vehicle does not own insurance policy.");
+        }
+
+        vehicle.EnsureActive();
+    }
 
     private void SetDetails(
         string provider,

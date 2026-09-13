@@ -92,23 +92,98 @@ public sealed class MaintenanceItem
         string name,
         int? intervalMonths,
         int? intervalThousandKm,
-        bool vehicleArchived = false,
+        bool vehicleArchived,
         TimeProvider? timeProvider = null)
     {
         EnsureVehicleActive(vehicleArchived);
-        Name = ValidateName(name);
-        (IntervalMonths, IntervalThousandKm) = ValidateIntervals(intervalMonths, intervalThousandKm);
-        Touch(timeProvider ?? TimeProvider.System);
+        UpdateValues(name, intervalMonths, intervalThousandKm, timeProvider ?? TimeProvider.System);
+    }
+
+    public void Update(
+        Vehicle vehicle,
+        string name,
+        int? intervalMonths,
+        int? intervalThousandKm,
+        TimeProvider? timeProvider = null)
+    {
+        EnsureVehicle(vehicle);
+        UpdateValues(name, intervalMonths, intervalThousandKm, timeProvider ?? TimeProvider.System);
+    }
+
+    public void SetManualBaseline(
+        Vehicle vehicle,
+        DateOnly? date,
+        long? odometerKm,
+        bool linkedHistoryExists,
+        TimeProvider? timeProvider = null)
+    {
+        EnsureVehicle(vehicle);
+        SetManualBaselineValuesAndTouch(date, odometerKm, linkedHistoryExists, timeProvider ?? TimeProvider.System);
     }
 
     public void SetManualBaseline(
         DateOnly? date,
         long? odometerKm,
         bool linkedHistoryExists,
-        TimeProvider? timeProvider = null,
-        bool vehicleArchived = false)
+        TimeProvider? timeProvider,
+        bool vehicleArchived)
     {
         EnsureVehicleActive(vehicleArchived);
+        SetManualBaselineValuesAndTouch(date, odometerKm, linkedHistoryExists, timeProvider ?? TimeProvider.System);
+    }
+
+    public void ApplyEffectiveBaseline(EffectiveBaseline baseline, TimeProvider? timeProvider, bool vehicleArchived)
+    {
+        EnsureVehicleActive(vehicleArchived);
+        ApplyEffectiveBaselineValues(baseline, timeProvider ?? TimeProvider.System);
+    }
+
+    public void ApplyEffectiveBaseline(Vehicle vehicle, EffectiveBaseline baseline, TimeProvider? timeProvider = null)
+    {
+        EnsureVehicle(vehicle);
+        ApplyEffectiveBaselineValues(baseline, timeProvider ?? TimeProvider.System);
+    }
+
+    public void RecalculateEffectiveBaseline(IEnumerable<ServiceHistoryRecord> linkedRecords, TimeProvider? timeProvider, bool vehicleArchived)
+    {
+        EnsureVehicleActive(vehicleArchived);
+        ApplyEffectiveBaselineValues(EffectiveBaseline.FromHistory(linkedRecords, ManualBaseline), timeProvider ?? TimeProvider.System);
+    }
+
+    public void RecalculateEffectiveBaseline(Vehicle vehicle, IEnumerable<ServiceHistoryRecord> linkedRecords, TimeProvider? timeProvider = null)
+    {
+        EnsureVehicle(vehicle);
+        ApplyEffectiveBaselineValues(EffectiveBaseline.FromHistory(linkedRecords, ManualBaseline), timeProvider ?? TimeProvider.System);
+    }
+
+    public EffectiveBaseline CalculateEffectiveBaseline(IEnumerable<ServiceHistoryRecord> linkedRecords)
+        => EffectiveBaseline.FromHistory(linkedRecords, ManualBaseline);
+
+    public void EnsureVehicleActive(bool vehicleArchived)
+    {
+        if (vehicleArchived)
+        {
+            throw new CarDomainException(CarDomainErrorCodes.VehicleArchived, "Archived vehicle cannot be changed.");
+        }
+    }
+
+    private void UpdateValues(string name, int? intervalMonths, int? intervalThousandKm, TimeProvider timeProvider)
+    {
+        var nextName = ValidateName(name);
+        var (nextIntervalMonths, nextIntervalThousandKm) = ValidateIntervals(intervalMonths, intervalThousandKm);
+
+        Name = nextName;
+        IntervalMonths = nextIntervalMonths;
+        IntervalThousandKm = nextIntervalThousandKm;
+        Touch(timeProvider ?? TimeProvider.System);
+    }
+
+    private void SetManualBaselineValuesAndTouch(
+        DateOnly? date,
+        long? odometerKm,
+        bool linkedHistoryExists,
+        TimeProvider timeProvider)
+    {
         if (linkedHistoryExists && (date != ManualBaselineDate || odometerKm != ManualBaselineOdometerKm))
         {
             throw new CarDomainException(CarDomainErrorCodes.MaintenanceBaselineLocked, "Manual baseline cannot change while history is linked.");
@@ -121,29 +196,24 @@ public sealed class MaintenanceItem
             LastOdometerKm = odometerKm;
         }
 
-        Touch(timeProvider ?? TimeProvider.System);
+        Touch(timeProvider);
     }
 
-    public void ApplyEffectiveBaseline(EffectiveBaseline baseline, TimeProvider? timeProvider = null, bool vehicleArchived = false)
+    private void ApplyEffectiveBaselineValues(EffectiveBaseline baseline, TimeProvider timeProvider)
     {
-        EnsureVehicleActive(vehicleArchived);
         LastDate = baseline.Date;
         LastOdometerKm = baseline.OdometerKm;
-        Touch(timeProvider ?? TimeProvider.System);
+        Touch(timeProvider);
     }
 
-    public void RecalculateEffectiveBaseline(IEnumerable<ServiceHistoryRecord> linkedRecords, TimeProvider? timeProvider = null, bool vehicleArchived = false)
-        => ApplyEffectiveBaseline(EffectiveBaseline.FromHistory(linkedRecords, ManualBaseline), timeProvider, vehicleArchived);
-
-    public EffectiveBaseline CalculateEffectiveBaseline(IEnumerable<ServiceHistoryRecord> linkedRecords)
-        => EffectiveBaseline.FromHistory(linkedRecords, ManualBaseline);
-
-    public void EnsureVehicleActive(bool vehicleArchived = false)
+    private void EnsureVehicle(Vehicle vehicle)
     {
-        if (vehicleArchived)
+        if (vehicle.Id != VehicleId || vehicle.UserId != UserId)
         {
-            throw new CarDomainException(CarDomainErrorCodes.VehicleArchived, "Archived vehicle cannot be changed.");
+            throw new CarDomainException(CarDomainErrorCodes.VehicleNotFound, "Vehicle does not own maintenance item.");
         }
+
+        vehicle.EnsureActive();
     }
 
     private void SetManualBaselineValues(DateOnly? date, long? odometerKm)

@@ -94,4 +94,19 @@ public sealed class VehicleValidationTests
 
         Assert.Null(vehicle.CurrentOdometerKm);
     }
+
+    [Fact]
+    public void Update_InvalidYearLeavesPriorStateUnchanged()
+    {
+        var vehicle = Vehicle.Create(Guid.NewGuid(), "Daily", "BMW", "320d", 2026, "ABC", "WBAAAAAAAAAAAAAAA", Clock);
+
+        Assert.Throws<CarDomainException>(() => vehicle.Update("Changed", "Audi", "A4", 1885, "XYZ", "WBBBBBBBBBBBBBBBB", Clock));
+
+        Assert.Equal("Daily", vehicle.DisplayName);
+        Assert.Equal("BMW", vehicle.Make);
+        Assert.Equal("320d", vehicle.Model);
+        Assert.Equal(2026, vehicle.Year);
+        Assert.Equal("ABC", vehicle.Plate);
+        Assert.Equal("WBAAAAAAAAAAAAAAA", vehicle.Vin);
+    }
 }
