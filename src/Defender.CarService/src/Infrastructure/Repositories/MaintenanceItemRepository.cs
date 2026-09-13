@@ -86,25 +86,32 @@ public sealed class MaintenanceItemRepository : MongoRepositoryBase<MaintenanceI
         ICarTransactionContext? transactionContext = null,
         CancellationToken cancellationToken = default)
     {
-        await EnsureIndexesAsync(cancellationToken);
-        var historyCollection = database.GetCollection<ServiceHistoryRecord>(MongoCollections.ServiceHistoryRecords);
-        var referencesFilter = MongoRepositoryBase<ServiceHistoryRecord>.CreateUserVehicleFilter(userId, vehicleId)
-            & MongoRepositoryBase<ServiceHistoryRecord>.CreateGuidArrayContainsFilter(
-                nameof(ServiceHistoryRecord.LinkedMaintenanceItemIds),
-                maintenanceItemId);
-        var references = GetSession(transactionContext) is { } session
-            ? await historyCollection.CountDocumentsAsync(session, referencesFilter, cancellationToken: cancellationToken)
-            : await historyCollection.CountDocumentsAsync(referencesFilter, cancellationToken: cancellationToken);
-        if (references > 0)
+        try
         {
-            throw new CarDomainException(CarDomainErrorCodes.MaintenanceReferenced, "Maintenance item is referenced by service history.");
-        }
+            await EnsureIndexesAsync(cancellationToken);
+            var historyCollection = database.GetCollection<ServiceHistoryRecord>(MongoCollections.ServiceHistoryRecords);
+            var referencesFilter = MongoRepositoryBase<ServiceHistoryRecord>.CreateUserVehicleFilter(userId, vehicleId)
+                & MongoRepositoryBase<ServiceHistoryRecord>.CreateGuidArrayContainsFilter(
+                    nameof(ServiceHistoryRecord.LinkedMaintenanceItemIds),
+                    maintenanceItemId);
+            var references = GetSession(transactionContext) is { } session
+                ? await historyCollection.CountDocumentsAsync(session, referencesFilter, cancellationToken: cancellationToken)
+                : await historyCollection.CountDocumentsAsync(referencesFilter, cancellationToken: cancellationToken);
+            if (references > 0)
+            {
+                throw new CarDomainException(CarDomainErrorCodes.MaintenanceReferenced, "Maintenance item is referenced by service history.");
+            }
 
-        var result = await DeleteAsync(
-            CreateUserVehicleEntityFilter(userId, vehicleId, maintenanceItemId),
-            transactionContext,
-            cancellationToken);
-        return result.DeletedCount == 1;
+            var result = await DeleteAsync(
+                CreateUserVehicleEntityFilter(userId, vehicleId, maintenanceItemId),
+                transactionContext,
+                cancellationToken);
+            return result.DeletedCount == 1;
+        }
+        catch (Exception exception) when (exception is not ServiceException && exception is not CarDomainException)
+        {
+            throw new ServiceException(ErrorCode.CM_DatabaseIssue, exception);
+        }
     }
 
     public async Task<bool> ReplaceEffectiveBaselineAsync(

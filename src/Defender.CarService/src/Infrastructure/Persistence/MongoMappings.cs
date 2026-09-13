@@ -1,5 +1,6 @@
 using Defender.CarService.Domain.Entities;
 using Defender.CarService.Domain.Enums;
+using Defender.CarService.Domain.ValueObjects;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
@@ -115,6 +116,9 @@ public static class MongoMappings
             map.MapMember(item => item.UpdatedAtUtc).SetSerializer(DateTimeOffsetSerializer);
             map.SetIgnoreExtraElements(true);
         });
+
+        BsonSerializer.TryRegisterSerializer(
+            new ServiceHistoryRecordSerializer(BsonClassMap.LookupClassMap(typeof(ServiceHistoryRecord))));
     }
 
     private static void RegisterInsurancePolicy()
@@ -162,6 +166,29 @@ public static class MongoMappings
 
     private static IEnumerableDeserializingAsCollectionSerializer<IReadOnlyList<Guid>, Guid, List<Guid>> GuidListSerializer { get; } =
         new(GuidSerializer);
+
+    private sealed class ServiceHistoryRecordSerializer : SerializerBase<ServiceHistoryRecord>
+    {
+        private readonly BsonClassMapSerializer<ServiceHistoryRecord> classMapSerializer;
+
+        public ServiceHistoryRecordSerializer(BsonClassMap classMap)
+        {
+            classMapSerializer = new BsonClassMapSerializer<ServiceHistoryRecord>(classMap);
+        }
+
+        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, ServiceHistoryRecord value)
+        {
+            classMapSerializer.Serialize(context, args, value);
+        }
+
+        public override ServiceHistoryRecord Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
+        {
+            var history = classMapSerializer.Deserialize(context, args);
+            var costProperty = typeof(ServiceHistoryRecord).GetProperty(nameof(ServiceHistoryRecord.Cost))!;
+            costProperty.SetValue(history, new Cost(history.CostAmountMinor, history.CostCurrency));
+            return history;
+        }
+    }
 }
 
 public sealed class DateOnlyUtcMidnightSerializer : SerializerBase<DateOnly>

@@ -1,5 +1,6 @@
 using Defender.CarService.Domain.Entities;
 using Defender.CarService.Domain.Enums;
+using Defender.CarService.Domain.ValueObjects;
 using Defender.CarService.Infrastructure.Persistence;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
@@ -91,5 +92,74 @@ public sealed class MongoMappingsTests
         Assert.False(insuranceDocument.Contains(nameof(InsurancePolicy.Provider) + "Status"));
         Assert.False(insuranceDocument.Contains(nameof(InsurancePolicy.PolicyNumber)));
         Assert.False(insuranceDocument.Contains(nameof(InsurancePolicy.Notes)));
+    }
+
+    [Fact]
+    public void DateOnlyAndCostValues_WhenRoundTripped_RehydrateDomainProperties()
+    {
+        MongoMappings.Register();
+        var userId = Guid.NewGuid();
+        var vehicleId = Guid.NewGuid();
+        var maintenance = MaintenanceItem.Create(
+            userId,
+            vehicleId,
+            "Oil",
+            12,
+            null,
+            new DateOnly(2026, 1, 2),
+            10,
+            TimeProvider.System);
+        var historyWithCost = ServiceHistoryRecord.Create(
+            userId,
+            vehicleId,
+            new DateOnly(2026, 9, 13),
+            100,
+            HistoryType.Maintenance,
+            "Oil change",
+            costAmountMinor: 12_345,
+            costCurrency: Currency.PLN);
+        var historyWithZeroCost = ServiceHistoryRecord.Create(
+            userId,
+            vehicleId,
+            new DateOnly(2026, 9, 13),
+            100,
+            HistoryType.Repair,
+            "Warranty repair",
+            costAmountMinor: 0,
+            costCurrency: Currency.EUR);
+        var historyWithoutCost = ServiceHistoryRecord.Create(
+            userId,
+            vehicleId,
+            new DateOnly(2026, 9, 13),
+            100,
+            HistoryType.Other,
+            "Inspection");
+        var insurance = InsurancePolicy.Create(
+            userId,
+            vehicleId,
+            "Provider",
+            null,
+            null,
+            new DateOnly(2026, 2, 3),
+            new DateOnly(2027, 2, 3));
+
+        var maintenanceRoundTrip = BsonSerializer.Deserialize<MaintenanceItem>(maintenance.ToBsonDocument());
+        var historyRoundTrip = BsonSerializer.Deserialize<ServiceHistoryRecord>(historyWithCost.ToBsonDocument());
+        var zeroCostRoundTrip = BsonSerializer.Deserialize<ServiceHistoryRecord>(historyWithZeroCost.ToBsonDocument());
+        var nullCostRoundTrip = BsonSerializer.Deserialize<ServiceHistoryRecord>(historyWithoutCost.ToBsonDocument());
+        var insuranceRoundTrip = BsonSerializer.Deserialize<InsurancePolicy>(insurance.ToBsonDocument());
+
+        Assert.Equal(maintenance.ManualBaselineDate, maintenanceRoundTrip.ManualBaselineDate);
+        Assert.Equal(maintenance.LastDate, maintenanceRoundTrip.LastDate);
+        Assert.Equal(historyWithCost.Date, historyRoundTrip.Date);
+        Assert.Equal(historyWithCost.Cost, historyRoundTrip.Cost);
+        Assert.Equal(Currency.PLN, historyRoundTrip.Cost.Currency);
+        Assert.Equal(12_345, historyRoundTrip.Cost.AmountMinor);
+        Assert.Equal(historyWithZeroCost.Cost, zeroCostRoundTrip.Cost);
+        Assert.Equal(0, zeroCostRoundTrip.Cost.AmountMinor);
+        Assert.Equal(Currency.EUR, zeroCostRoundTrip.Cost.Currency);
+        Assert.Equal(Cost.None, nullCostRoundTrip.Cost);
+        Assert.Equal(insurance.StartDate, insuranceRoundTrip.StartDate);
+        Assert.Equal(insurance.EndDate, insuranceRoundTrip.EndDate);
     }
 }

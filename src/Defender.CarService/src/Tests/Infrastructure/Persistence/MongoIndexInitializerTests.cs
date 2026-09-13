@@ -63,6 +63,56 @@ public sealed class MongoIndexInitializerTests
             It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Fact]
+    public async Task InitializeAsync_WhenFirstAttemptFails_RetriesOnNextCall()
+    {
+        var database = new Mock<IMongoDatabase>();
+        var vehicleCollection = CreateCollection<Vehicle>(database, MongoCollections.Vehicles);
+        CreateCollection<MaintenanceItem>(database, MongoCollections.MaintenanceItems);
+        CreateCollection<ServiceHistoryRecord>(database, MongoCollections.ServiceHistoryRecords);
+        CreateCollection<InsurancePolicy>(database, MongoCollections.InsurancePolicies);
+        var attempts = 0;
+        vehicleCollection.Indexes
+            .Setup(item => item.CreateOneAsync(
+                It.IsAny<CreateIndexModel<Vehicle>>(),
+                It.IsAny<CreateOneIndexOptions>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(() => Interlocked.Increment(ref attempts) == 1
+                ? Task.FromException<string>(new InvalidOperationException("temporary"))
+                : Task.FromResult("created"));
+        var initializer = new MongoIndexInitializer(database.Object);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => initializer.InitializeAsync());
+        await initializer.InitializeAsync();
+
+        Assert.Equal(2, attempts);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_WhenFirstAttemptIsCanceled_RetriesOnNextCall()
+    {
+        var database = new Mock<IMongoDatabase>();
+        var vehicleCollection = CreateCollection<Vehicle>(database, MongoCollections.Vehicles);
+        CreateCollection<MaintenanceItem>(database, MongoCollections.MaintenanceItems);
+        CreateCollection<ServiceHistoryRecord>(database, MongoCollections.ServiceHistoryRecords);
+        CreateCollection<InsurancePolicy>(database, MongoCollections.InsurancePolicies);
+        var attempts = 0;
+        vehicleCollection.Indexes
+            .Setup(item => item.CreateOneAsync(
+                It.IsAny<CreateIndexModel<Vehicle>>(),
+                It.IsAny<CreateOneIndexOptions>(),
+                It.IsAny<CancellationToken>()))
+            .Returns(() => Interlocked.Increment(ref attempts) == 1
+                ? Task.FromCanceled<string>(new CancellationToken(true))
+                : Task.FromResult("created"));
+        var initializer = new MongoIndexInitializer(database.Object);
+
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => initializer.InitializeAsync());
+        await initializer.InitializeAsync();
+
+        Assert.Equal(2, attempts);
+    }
+
     private static (Mock<IMongoCollection<TEntity>> Collection, Mock<IMongoIndexManager<TEntity>> Indexes) CreateCollection<TEntity>(
         Mock<IMongoDatabase> database,
         string collectionName)

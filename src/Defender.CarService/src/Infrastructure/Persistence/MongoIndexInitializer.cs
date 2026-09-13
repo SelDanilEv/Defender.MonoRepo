@@ -26,12 +26,30 @@ public sealed class MongoIndexInitializer
         new(MongoCollections.InsurancePolicies, ["UserId:1", "VehicleId:1", "EndDate:-1"], "ix_insurance_user_vehicle_end"),
     ];
 
-    public Task InitializeAsync(CancellationToken cancellationToken = default)
+    public async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
+        Task currentInitialization;
         lock (sync)
         {
             initialization ??= CreateIndexesAsync(cancellationToken);
-            return initialization;
+            currentInitialization = initialization;
+        }
+
+        try
+        {
+            await currentInitialization;
+        }
+        catch
+        {
+            lock (sync)
+            {
+                if (ReferenceEquals(initialization, currentInitialization))
+                {
+                    initialization = null;
+                }
+            }
+
+            throw;
         }
     }
 
