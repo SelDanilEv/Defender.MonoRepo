@@ -2,6 +2,8 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json.Serialization;
 using Defender.CarService.Application.Common.Interfaces.Repositories;
+using Defender.CarService.Application.Common.Interfaces.Services;
+using Defender.CarService.Application.Services;
 using Defender.CarService.Infrastructure.Persistence;
 using Defender.CarService.Infrastructure.Repositories;
 using Defender.Common.Configuration.Options;
@@ -65,6 +67,9 @@ public static class ConfigureServices
         services.AddAutoMapper(configuration => configuration.AddMaps(applicationAssembly));
         services.AddValidatorsFromAssembly(applicationAssembly);
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(applicationAssembly));
+        services.AddScoped<MyGarageApplicationService>();
+        services.AddScoped<IMyGarageApplicationService>(serviceProvider =>
+            serviceProvider.GetRequiredService<MyGarageApplicationService>());
         services.AddSingleton(TimeProvider.System);
 
         return services;
