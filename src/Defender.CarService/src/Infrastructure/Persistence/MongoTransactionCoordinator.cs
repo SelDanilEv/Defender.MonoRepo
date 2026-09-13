@@ -43,11 +43,27 @@ public sealed class MongoTransactionCoordinator : ICarTransactionCoordinator
             {
                 session.StartTransaction();
             }
+            catch (OperationCanceledException)
+            {
+                try
+                {
+                    session.Dispose();
+                }
+                catch
+                {
+                }
+
+                throw;
+            }
             catch
             {
                 session.Dispose();
                 throw;
             }
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
         }
         catch (Exception exception)
         {
@@ -61,11 +77,27 @@ public sealed class MongoTransactionCoordinator : ICarTransactionCoordinator
             {
                 result = await operation(new MongoTransactionContext(session));
             }
+            catch (OperationCanceledException)
+            {
+                try
+                {
+                    await session.AbortTransactionAsync(cancellationToken);
+                }
+                catch
+                {
+                }
+
+                throw;
+            }
             catch
             {
                 try
                 {
                     await session.AbortTransactionAsync(cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
                 }
                 catch (Exception exception)
                 {
@@ -79,11 +111,27 @@ public sealed class MongoTransactionCoordinator : ICarTransactionCoordinator
             {
                 await session.CommitTransactionAsync(cancellationToken);
             }
+            catch (OperationCanceledException)
+            {
+                try
+                {
+                    await session.AbortTransactionAsync(cancellationToken);
+                }
+                catch
+                {
+                }
+
+                throw;
+            }
             catch (Exception exception)
             {
                 try
                 {
                     await session.AbortTransactionAsync(cancellationToken);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
                 }
                 catch (Exception abortException)
                 {
