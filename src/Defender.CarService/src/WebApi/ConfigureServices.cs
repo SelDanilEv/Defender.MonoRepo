@@ -1,6 +1,9 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json.Serialization;
+using Defender.CarService.Application.Common.Interfaces.Repositories;
+using Defender.CarService.Infrastructure.Persistence;
+using Defender.CarService.Infrastructure.Repositories;
 using Defender.Common.Configuration.Options;
 using Defender.Common.Enums;
 using Defender.Common.Errors;
@@ -78,6 +81,12 @@ public static class ConfigureServices
 
             return mongoClient.GetDatabase(mongoOptions.GetDatabaseName());
         });
+        services.AddSingleton<MongoIndexInitializer>();
+        services.AddSingleton<ICarTransactionCoordinator, MongoTransactionCoordinator>();
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
+        services.AddScoped<IMaintenanceItemRepository, MaintenanceItemRepository>();
+        services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
+        services.AddScoped<IInsurancePolicyRepository, InsurancePolicyRepository>();
 
         return services;
     }
