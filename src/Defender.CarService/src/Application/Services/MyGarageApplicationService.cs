@@ -117,21 +117,30 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
     public Task<MaintenanceItemDto> CreateMaintenanceItemAsync(CreateMaintenanceItemCommand request, CancellationToken cancellationToken)
     {
         var userId = currentAccountAccessor.GetAccountId();
-        return TranslateAsync(async () =>
-        {
-            var vehicle = await GetVehicleOrThrowAsync(userId, request.VehicleId, null, cancellationToken);
-            vehicle.EnsureActive();
-            var item = MaintenanceItem.Create(
-                vehicle,
-                request.Name,
-                request.IntervalMonths,
-                request.IntervalThousandKm,
-                request.LastDate,
-                request.LastOdometerKm,
-                timeProvider);
-            await maintenanceItemRepository.AddAsync(userId, request.VehicleId, item, cancellationToken: cancellationToken);
-            return MapMaintenance(item, vehicle);
-        });
+        return TranslateAsync(() => transactionCoordinator.ExecuteAsync(
+            async context =>
+            {
+                var vehicle = await GetVehicleOrThrowAsync(userId, request.VehicleId, context, cancellationToken);
+                vehicle.EnsureActive();
+                var expectedVehicleVersion = vehicle.Version;
+                var item = MaintenanceItem.Create(
+                    vehicle,
+                    request.Name,
+                    request.IntervalMonths,
+                    request.IntervalThousandKm,
+                    request.LastDate,
+                    request.LastOdometerKm,
+                    timeProvider);
+                await maintenanceItemRepository.AddAsync(userId, request.VehicleId, item, context, cancellationToken);
+                vehicle.Touch(timeProvider);
+                if (!await vehicleRepository.ReplaceAsync(userId, vehicle, expectedVehicleVersion, context, cancellationToken))
+                {
+                    throw new CarApplicationException(CarDomainErrorCodes.ConcurrencyConflict);
+                }
+
+                return MapMaintenance(item, vehicle);
+            },
+            cancellationToken));
     }
 
     public Task<MaintenanceItemDto> UpdateMaintenanceItemAsync(UpdateMaintenanceItemCommand request, CancellationToken cancellationToken)
@@ -156,9 +165,16 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
                     throw new CarApplicationException(CarDomainErrorCodes.MaintenanceNotFound);
                 }
 
+                var expectedVehicleVersion = vehicle.Version;
                 if (!await maintenanceItemRepository.DeleteAsync(userId, request.VehicleId, item.Id, context, cancellationToken))
                 {
                     throw new CarApplicationException(CarDomainErrorCodes.MaintenanceNotFound);
+                }
+
+                vehicle.Touch(timeProvider);
+                if (!await vehicleRepository.ReplaceAsync(userId, vehicle, expectedVehicleVersion, context, cancellationToken))
+                {
+                    throw new CarApplicationException(CarDomainErrorCodes.ConcurrencyConflict);
                 }
 
                 return Unit.Value;
@@ -177,13 +193,14 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
         return TranslateAsync(async () =>
         {
             await GetVehicleOrThrowAsync(userId, request.VehicleId, null, cancellationToken);
-            var history = await serviceHistoryRepository.GetForVehicleAsync(userId, request.VehicleId, cancellationToken: cancellationToken);
-            var totalItems = history.Count;
-            var items = history
-                .Skip(request.Page * request.PageSize)
-                .Take(request.PageSize)
-                .Select(MapHistory)
-                .ToArray();
+            var page = await serviceHistoryRepository.GetPageForVehicleAsync(
+                userId,
+                request.VehicleId,
+                request.Page,
+                request.PageSize,
+                cancellationToken: cancellationToken);
+            var totalItems = page.TotalItemsCount;
+            var items = page.Items.Select(MapHistory).ToArray();
             return new ServiceHistoryPageDto
             {
                 Items = items,
@@ -233,35 +250,59 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
     public Task<InsurancePolicyDto> CreateInsurancePolicyAsync(CreateInsurancePolicyCommand request, CancellationToken cancellationToken)
     {
         var userId = currentAccountAccessor.GetAccountId();
-        return TranslateAsync(async () =>
-        {
-            var vehicle = await GetVehicleOrThrowAsync(userId, request.VehicleId, null, cancellationToken);
-            var policy = InsurancePolicy.Create(vehicle, request.Provider, request.PolicyNumber, request.CoverageType, request.StartDate, request.EndDate, request.Notes, timeProvider);
-            await insurancePolicyRepository.AddAsync(userId, request.VehicleId, policy, cancellationToken: cancellationToken);
-            return MapInsurance(policy);
-        });
+        return TranslateAsync(() => transactionCoordinator.ExecuteAsync(
+            async context =>
+            {
+                var vehicle = await GetVehicleOrThrowAsync(userId, request.VehicleId, context, cancellationToken);
+                var expectedVehicleVersion = vehicle.Version;
+                var policy = InsurancePolicy.Create(vehicle, request.Provider, request.PolicyNumber, request.CoverageType, request.StartDate, request.EndDate, request.Notes, timeProvider);
+                await insurancePolicyRepository.AddAsync(userId, request.VehicleId, policy, context, cancellationToken);
+                vehicle.Touch(timeProvider);
+                if (!await vehicleRepository.ReplaceAsync(userId, vehicle, expectedVehicleVersion, context, cancellationToken))
+                {
+                    throw new CarApplicationException(CarDomainErrorCodes.ConcurrencyConflict);
+                }
+
+                return MapInsurance(policy);
+            },
+            cancellationToken));
     }
 
     public Task<InsurancePolicyDto> UpdateInsurancePolicyAsync(UpdateInsurancePolicyCommand request, CancellationToken cancellationToken)
     {
         var userId = currentAccountAccessor.GetAccountId();
-        return TranslateAsync(async () =>
+        return TranslateAsync(() => transactionCoordinator.ExecuteAsync(
+            context => UpdateInsurancePolicyInTransactionAsync(userId, request, context, cancellationToken),
+            cancellationToken));
+    }
+
+    private async Task<InsurancePolicyDto> UpdateInsurancePolicyInTransactionAsync(
+        Guid userId,
+        UpdateInsurancePolicyCommand request,
+        ICarTransactionContext context,
+        CancellationToken cancellationToken)
+    {
+        var vehicle = await GetVehicleOrThrowAsync(userId, request.VehicleId, context, cancellationToken);
+        var policy = await insurancePolicyRepository.GetByIdAsync(userId, request.VehicleId, request.InsurancePolicyId, context, cancellationToken);
+        if (policy is null)
         {
-            var vehicle = await GetVehicleOrThrowAsync(userId, request.VehicleId, null, cancellationToken);
-            var policy = await insurancePolicyRepository.GetByIdAsync(userId, request.VehicleId, request.InsurancePolicyId, cancellationToken: cancellationToken);
-            if (policy is null)
-            {
-                throw new CarApplicationException(CarDomainErrorCodes.InsuranceNotFound);
-            }
+            throw new CarApplicationException(CarDomainErrorCodes.InsuranceNotFound);
+        }
 
-            policy.Update(vehicle, request.Provider, request.PolicyNumber, request.CoverageType, request.StartDate, request.EndDate, request.Notes, timeProvider);
-            if (!await insurancePolicyRepository.ReplaceAsync(userId, request.VehicleId, policy, cancellationToken: cancellationToken))
-            {
-                throw new CarApplicationException(CarDomainErrorCodes.InsuranceNotFound);
-            }
+        var expectedVehicleVersion = vehicle.Version;
+        policy.Update(vehicle, request.Provider, request.PolicyNumber, request.CoverageType, request.StartDate, request.EndDate, request.Notes, timeProvider);
+        if (!await insurancePolicyRepository.ReplaceAsync(userId, request.VehicleId, policy, context, cancellationToken))
+        {
+            throw new CarApplicationException(CarDomainErrorCodes.InsuranceNotFound);
+        }
 
-            return MapInsurance(policy);
-        });
+        vehicle.Touch(timeProvider);
+        if (!await vehicleRepository.ReplaceAsync(userId, vehicle, expectedVehicleVersion, context, cancellationToken))
+        {
+            throw new CarApplicationException(CarDomainErrorCodes.ConcurrencyConflict);
+        }
+
+        return MapInsurance(policy);
     }
 
     private async Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesCoreAsync(Guid userId, bool includeArchived, CancellationToken cancellationToken)
@@ -522,9 +563,9 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
         return vehicle ?? throw new CarApplicationException(CarDomainErrorCodes.VehicleNotFound);
     }
 
-    private static IReadOnlyList<Guid> ValidateLinks(IReadOnlyList<Guid> links)
+    private static IReadOnlyList<Guid> ValidateLinks(IReadOnlyList<Guid>? links)
     {
-        if (links.Any(link => link == Guid.Empty) || links.Distinct().Count() != links.Count)
+        if (links is null || links.Any(link => link == Guid.Empty) || links.Distinct().Count() != links.Count)
         {
             throw new CarApplicationException(CarDomainErrorCodes.HistoryLinkInvalid);
         }

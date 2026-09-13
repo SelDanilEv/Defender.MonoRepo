@@ -21,7 +21,7 @@ public sealed record UpdateHistoryCommand : IRequest<ServiceHistoryRecordDto>
 
     public string? Notes { get; init; }
 
-    public IReadOnlyList<Guid> LinkedMaintenanceItemIds { get; init; } = [];
+    public IReadOnlyList<Guid>? LinkedMaintenanceItemIds { get; init; } = [];
 
     public long? CostAmountMinor { get; init; }
 
@@ -49,7 +49,7 @@ internal static class HistoryRequestValidation
         System.Linq.Expressions.Expression<Func<T, HistoryType>> type,
         System.Linq.Expressions.Expression<Func<T, string>> title,
         System.Linq.Expressions.Expression<Func<T, string?>> notes,
-        System.Linq.Expressions.Expression<Func<T, IReadOnlyList<Guid>>> links,
+        System.Linq.Expressions.Expression<Func<T, IReadOnlyList<Guid>?>> links,
         System.Linq.Expressions.Expression<Func<T, long?>> costAmount,
         System.Linq.Expressions.Expression<Func<T, Currency?>> costCurrency)
     {
@@ -77,7 +77,7 @@ internal static class HistoryRequestValidation
             .When(value => value is not null)
             .WithMessage("CAR_HISTORY_TITLE_REQUIRED");
         validator.RuleFor(links)
-            .Must(values => values.All(value => value != Guid.Empty) && values.Distinct().Count() == values.Count)
+            .Must(values => values is not null && values.All(value => value != Guid.Empty) && values.Distinct().Count() == values.Count)
             .WithMessage("CAR_HISTORY_LINK_INVALID");
         validator.RuleFor(context => context)
             .Must(context => costAmount.Compile()(context) is null == (costCurrency.Compile()(context) is null))

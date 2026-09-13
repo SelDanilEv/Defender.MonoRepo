@@ -1,4 +1,6 @@
 using Defender.CarService.Application.Common.Interfaces.Repositories;
+using Defender.Common.Errors;
+using Defender.Common.Exceptions;
 using MongoDB.Driver;
 
 namespace Defender.CarService.Infrastructure.Persistence;
@@ -28,31 +30,70 @@ public sealed class MongoTransactionCoordinator : ICarTransactionCoordinator
         Func<ICarTransactionContext, Task<T>> operation,
         CancellationToken cancellationToken = default)
     {
-        if (indexInitializer is not null)
-        {
-            await indexInitializer.InitializeAsync(cancellationToken);
-        }
-
-        using var session = await client.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
-        session.StartTransaction();
-
+        IClientSessionHandle session;
         try
         {
-            var result = await operation(new MongoTransactionContext(session));
-            await session.CommitTransactionAsync(cancellationToken);
-            return result;
-        }
-        catch
-        {
+            if (indexInitializer is not null)
+            {
+                await indexInitializer.InitializeAsync(cancellationToken);
+            }
+
+            session = await client.StartSessionAsync(new ClientSessionOptions(), cancellationToken);
             try
             {
-                await session.AbortTransactionAsync(cancellationToken);
+                session.StartTransaction();
             }
             catch
             {
+                session.Dispose();
+                throw;
+            }
+        }
+        catch (Exception exception)
+        {
+            throw ToDatabaseException(exception);
+        }
+
+        using (session)
+        {
+            T result;
+            try
+            {
+                result = await operation(new MongoTransactionContext(session));
+            }
+            catch
+            {
+                try
+                {
+                    await session.AbortTransactionAsync(cancellationToken);
+                }
+                catch (Exception exception)
+                {
+                    throw ToDatabaseException(exception);
+                }
+
+                throw;
             }
 
-            throw;
+            try
+            {
+                await session.CommitTransactionAsync(cancellationToken);
+            }
+            catch (Exception exception)
+            {
+                try
+                {
+                    await session.AbortTransactionAsync(cancellationToken);
+                }
+                catch (Exception abortException)
+                {
+                    throw ToDatabaseException(abortException);
+                }
+
+                throw ToDatabaseException(exception);
+            }
+
+            return result;
         }
     }
 
@@ -66,4 +107,7 @@ public sealed class MongoTransactionCoordinator : ICarTransactionCoordinator
                 return true;
             },
             cancellationToken);
+
+    private static ServiceException ToDatabaseException(Exception exception)
+        => exception as ServiceException ?? new ServiceException(ErrorCode.CM_DatabaseIssue, exception);
 }

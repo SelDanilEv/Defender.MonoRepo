@@ -19,7 +19,7 @@ public sealed record CreateHistoryCommand : IRequest<ServiceHistoryRecordDto>
 
     public string? Notes { get; init; }
 
-    public IReadOnlyList<Guid> LinkedMaintenanceItemIds { get; init; } = [];
+    public IReadOnlyList<Guid>? LinkedMaintenanceItemIds { get; init; } = [];
 
     public long? CostAmountMinor { get; init; }
 

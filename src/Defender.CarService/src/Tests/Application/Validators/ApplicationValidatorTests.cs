@@ -88,4 +88,20 @@ public sealed class ApplicationValidatorTests
 
         Assert.Contains(result.Errors, error => error.ErrorMessage == "CAR_INSURANCE_DATE_RANGE_INVALID");
     }
+
+    [Fact]
+    public async Task CreateHistory_WhenLinkedMaintenanceIdsAreNull_ReturnsStableCode()
+    {
+        var result = await new CreateHistoryCommandValidator().ValidateAsync(new CreateHistoryCommand
+        {
+            VehicleId = Guid.NewGuid(),
+            Date = new DateOnly(2026, 1, 1),
+            OdometerKm = 1,
+            Type = HistoryType.Maintenance,
+            Title = "Service",
+            LinkedMaintenanceItemIds = null!,
+        });
+
+        Assert.Contains(result.Errors, error => error.ErrorMessage == "CAR_HISTORY_LINK_INVALID");
+    }
 }

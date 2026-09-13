@@ -2,6 +2,8 @@ using Defender.CarService.Application.Common.Interfaces.Repositories;
 using Defender.CarService.Domain.Entities;
 using Defender.CarService.Infrastructure.Persistence;
 using Defender.Common.Configuration.Options;
+using Defender.Common.Errors;
+using Defender.Common.Exceptions;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -42,6 +44,49 @@ public sealed class ServiceHistoryRepository : MongoRepositoryBase<ServiceHistor
                 Builders<ServiceHistoryRecord>.Sort.Descending(nameof(ServiceHistoryRecord.OdometerKm))),
             transactionContext,
             cancellationToken);
+
+    public async Task<(IReadOnlyList<ServiceHistoryRecord> Items, int TotalItemsCount)> GetPageForVehicleAsync(
+        Guid userId,
+        Guid vehicleId,
+        int page,
+        int pageSize,
+        ICarTransactionContext? transactionContext = null,
+        CancellationToken cancellationToken = default)
+    {
+        var filter = CreateUserVehicleFilter(userId, vehicleId);
+        var sort = Builders<ServiceHistoryRecord>.Sort.Combine(
+            Builders<ServiceHistoryRecord>.Sort.Descending(nameof(ServiceHistoryRecord.Date)),
+            Builders<ServiceHistoryRecord>.Sort.Descending(nameof(ServiceHistoryRecord.OdometerKm)));
+
+        try
+        {
+            await EnsureIndexesAsync(cancellationToken);
+            var session = GetSession(transactionContext);
+            var total = session is null
+                ? await Collection.CountDocumentsAsync(filter, cancellationToken: cancellationToken)
+                : await Collection.CountDocumentsAsync(session, filter, cancellationToken: cancellationToken);
+            var totalItemsCount = total > int.MaxValue ? int.MaxValue : (int)total;
+            var offset = (long)page * pageSize;
+            if (offset >= total || offset > int.MaxValue)
+            {
+                return (Array.Empty<ServiceHistoryRecord>(), totalItemsCount);
+            }
+
+            var query = session is null
+                ? Collection.Find(filter)
+                : Collection.Find(session, filter);
+            var items = await query
+                .Sort(sort)
+                .Skip((int)offset)
+                .Limit(pageSize)
+                .ToListAsync(cancellationToken);
+            return (items, totalItemsCount);
+        }
+        catch (Exception exception) when (exception is not ServiceException)
+        {
+            throw new ServiceException(ErrorCode.CM_DatabaseIssue, exception);
+        }
+    }
 
     public Task<IReadOnlyList<ServiceHistoryRecord>> GetLinkedToMaintenanceAsync(
         Guid userId,

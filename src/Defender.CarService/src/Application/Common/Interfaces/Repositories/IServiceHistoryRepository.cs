@@ -17,6 +17,14 @@ public interface IServiceHistoryRepository
         ICarTransactionContext? transactionContext = null,
         CancellationToken cancellationToken = default);
 
+    Task<(IReadOnlyList<ServiceHistoryRecord> Items, int TotalItemsCount)> GetPageForVehicleAsync(
+        Guid userId,
+        Guid vehicleId,
+        int page,
+        int pageSize,
+        ICarTransactionContext? transactionContext = null,
+        CancellationToken cancellationToken = default);
+
     Task<IReadOnlyList<ServiceHistoryRecord>> GetLinkedToMaintenanceAsync(
         Guid userId,
         Guid vehicleId,
