@@ -7,6 +7,7 @@ using Defender.Common.Extension;
 using Defender.Common.Helpers;
 using Defender.Portal.Application.Configuration.Extension;
 using Defender.Portal.Application.Modules.Telegram;
+using Defender.Portal.Infrastructure.Clients.CarService;
 using Defender.Portal.Infrastructure.Clients.TravelCalendar;
 using Defender.Portal.WebUI.ErrorMapping;
 using Defender.Portal.WebUI.OAuth;
@@ -174,6 +175,21 @@ public static class ConfigureServices
             {
                 problemDetails.Extensions["code"] = exception.Code;
             }
+            return problemDetails;
+        });
+
+        options.Map<CarServiceUpstreamException>(exception =>
+        {
+            var problemDetails = new ProblemDetails
+            {
+                Detail = exception.Detail,
+                Status = exception.Status,
+            };
+            if (exception.Code != null)
+            {
+                problemDetails.Extensions["code"] = exception.Code;
+            }
+
             return problemDetails;
         });
 
