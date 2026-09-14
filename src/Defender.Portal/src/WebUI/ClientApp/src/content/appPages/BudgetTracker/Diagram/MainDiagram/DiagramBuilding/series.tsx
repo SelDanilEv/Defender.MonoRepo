@@ -16,7 +16,6 @@ import { hasData } from "./dataset";
 export const generateSeries = (
   dataset: DatasetItem[],
   groups: BudgetDiagramGroup[],
-  extendedPeriods: number = 0,
   u: IUtils
 ): any[] => {
   const series: any[] = [];
@@ -50,29 +49,13 @@ export const generateSeries = (
       currenciesWithData.forEach((currency, index) => {
         const dataKey = buildDatasetItemId(currency, group.id);
 
-        const historicalOnlyDataset = dataset.filter((record) =>
-          dayjs(record.date).isBefore(dayjs().startOf("day"))
-        );
-
-        let dataPoints = historicalOnlyDataset
-          .filter((record) => record[dataKey])
-          .map((record) => {
-            return record[dataKey] as number;
-          });
-
-        dataPoints = expandPartialData(
-          dataPoints,
-          historicalOnlyDataset.length
-        );
-
-        const trendLineData = calculateTrendLine(dataPoints, extendedPeriods);
-
         series.push({
           label: getTrendLineName(currency, group.name, u),
           type: "line",
-          data: trendLineData.slice(0, dataset.length),
+          data: calculateTrendLine(dataset, dataKey),
           color: chroma(trendLineColors[index]).alpha(0.4).css(),
           connectNulls: true,
+          curve: "linear",
           showMark: false,
         });
       });
@@ -93,57 +76,61 @@ const generateSimilarColors = (
     .colors(numColors);
 };
 
-const calculateTrendLine = (data: number[], extendBy: number = 0): number[] => {
-  const n = data.length;
-  const sumX = data.reduce((sum, _, index) => sum + index, 0);
-  const sumY = data.reduce((sum, value) => sum + value, 0);
-  const sumXY = data.reduce((sum, value, index) => sum + index * value, 0);
-  const sumX2 = data.reduce((sum, _, index) => sum + index * index, 0);
+type TrendFitPoint = { timestampMs: number; value: number };
 
-  if (n === 0 || n * sumX2 - sumX * sumX === 0) {
+// Least-squares fit on the actual record date (ms since epoch), not the
+// array index, so the trend line stays straight even when records are
+// irregularly spaced along the time axis.
+const calculateTrendLine = (
+  dataset: DatasetItem[],
+  dataKey: string
+): number[] => {
+  const startOfToday = dayjs().startOf("day");
+
+  const fitPoints: TrendFitPoint[] = dataset
+    .filter((record) => dayjs(record.date).isBefore(startOfToday))
+    .filter(
+      (record) => record[dataKey] !== null && record[dataKey] !== undefined
+    )
+    .map((record) => ({
+      timestampMs: dayjs(record.date).valueOf(),
+      value: record[dataKey] as number,
+    }));
+
+  if (fitPoints.length < 2) {
     return [];
   }
 
-  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const intercept = (sumY - slope * sumX) / n;
+  // Normalize x around the first fitting point's timestamp to avoid
+  // float precision loss when squaring raw millisecond epoch values.
+  const originMs = fitPoints[0].timestampMs;
 
-  const trendLineData = data.map((_, index) => slope * index + intercept);
-
-  // Extend the trendline into the future
-  for (let i = n; i < n + extendBy + 1; i++) {
-    trendLineData.push(slope * i + intercept);
-  }
-
-  return trendLineData;
-};
-
-const expandPartialData = (
-  trendLineData: number[],
-  desiredSize: number
-): number[] => {
-  const expandedData: number[] = [];
-  const nullInterval = Math.floor(
-    (desiredSize - trendLineData.length) / (trendLineData.length - 1)
+  const n = fitPoints.length;
+  const sumX = fitPoints.reduce(
+    (sum, p) => sum + (p.timestampMs - originMs),
+    0
+  );
+  const sumY = fitPoints.reduce((sum, p) => sum + p.value, 0);
+  const sumXY = fitPoints.reduce(
+    (sum, p) => sum + (p.timestampMs - originMs) * p.value,
+    0
+  );
+  const sumX2 = fitPoints.reduce(
+    (sum, p) => sum + (p.timestampMs - originMs) * (p.timestampMs - originMs),
+    0
   );
 
-  for (let i = 0; i < trendLineData.length - 1; i++) {
-    const currentValue = trendLineData[i];
-    const nextValue = trendLineData[i + 1];
-    expandedData.push(currentValue);
+  const denominator = n * sumX2 - sumX * sumX;
 
-    const step = (nextValue - currentValue) / (nullInterval + 1);
-    for (let j = 1; j <= nullInterval; j++) {
-      expandedData.push(currentValue + step * j);
-    }
+  if (denominator === 0) {
+    return [];
   }
 
-  // Push the last value
-  expandedData.push(trendLineData[trendLineData.length - 1]);
+  const slope = (n * sumXY - sumX * sumY) / denominator;
+  const intercept = (sumY - slope * sumX) / n;
 
-  // If the expandedData size is less than desiredSize, add the last value repeatedly
-  while (expandedData.length < desiredSize) {
-    expandedData.push(trendLineData[trendLineData.length - 1]);
-  }
-
-  return expandedData;
+  return dataset.map(
+    (record) =>
+      slope * (dayjs(record.date).valueOf() - originMs) + intercept
+  );
 };

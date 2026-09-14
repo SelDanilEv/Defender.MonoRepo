@@ -46,7 +46,6 @@ const MainDiagram = (props: MainDiagramProps) => {
     {} as BudgetHistory
   );
 
-  const [extendedPeriods, setExtendedPeriods] = useState<number>(0);
   const [additionalMargin, setAdditionalMargin] = useState<number>(0);
 
   useEffect(() => {
@@ -125,12 +124,7 @@ const MainDiagram = (props: MainDiagramProps) => {
   const reloadHistory = (budgetHistory: BudgetHistory) => {
     const { endDate } = diagramConfig;
 
-    const { dataset: updatedDataset, periods } = addFutureRecords(
-      budgetHistory,
-      endDate
-    );
-
-    setExtendedPeriods(periods);
+    const updatedDataset = addFutureRecords(budgetHistory, endDate);
 
     setBudgetHistory(updatedDataset);
 
@@ -166,12 +160,7 @@ const MainDiagram = (props: MainDiagramProps) => {
         margin={chartLayout.margin}
         height={chartLayout.height}
         dataset={dataset}
-        series={generateSeries(
-          dataset,
-          groups.getActiveGroups(),
-          extendedPeriods,
-          u
-        )}
+        series={generateSeries(dataset, groups.getActiveGroups(), u)}
         xAxis={[
           {
             scaleType: "time",
@@ -198,9 +187,7 @@ const isValidDiagramConfig = (config: MainDiagramSetup): boolean => {
 const addFutureRecords = (
   dataset: BudgetHistory,
   endDate: Date
-): { dataset: BudgetHistory; periods: number } => {
-  let periods = 0;
-
+): BudgetHistory => {
   if (dataset.history.length) {
     const averageDaysDiff = Math.ceil(
       dayjs(dataset.history[dataset.history.length - 1].date).diff(
@@ -217,7 +204,6 @@ const addFutureRecords = (
     latestDate.setDate(latestDate.getDate() + averageDaysDiff);
 
     while (latestDate < endDate) {
-      periods++;
       dataset.history.push({
         date: new Date(latestDate),
         positions: lastRecord.positions.map(
@@ -231,7 +217,7 @@ const addFutureRecords = (
     }
   }
 
-  return { dataset, periods };
+  return dataset;
 };
 
 const recalculateHistoryWithMainCurrency = (
