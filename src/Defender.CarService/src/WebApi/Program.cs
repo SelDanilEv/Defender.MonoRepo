@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Prometheus;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +50,14 @@ app.UseCors(CorsExtensions.DefenderCorsPolicy);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseProblemDetails();
+
+var metricsEnabled = builder.Configuration.GetValue("Defender:Observability:Metrics:Enabled", false);
+if (metricsEnabled)
+{
+    app.UseHttpMetrics();
+    app.MapMetrics("/metrics");
+}
+
 app.MapControllers();
 app.MapDefenderHealthChecks();
 

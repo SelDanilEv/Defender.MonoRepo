@@ -1,14 +1,17 @@
 using System.Net.Http;
 using System.Text;
-using System.Text.Json.Serialization;
+using Defender.CarService.Application.Common.Exceptions;
 using Defender.CarService.Application.Common.Interfaces.Repositories;
 using Defender.CarService.Application.Common.Interfaces.Services;
 using Defender.CarService.Application.Services;
+using Defender.CarService.Domain.Exceptions;
 using Defender.CarService.Infrastructure.Persistence;
 using Defender.CarService.Infrastructure.Repositories;
+using Defender.CarService.WebApi.Errors;
+using Defender.CarService.WebApi.Mapping;
+using Defender.CarService.WebApi.Observability;
 using Defender.Common.Configuration.Options;
 using Defender.Common.Enums;
-using Defender.Common.Errors;
 using Defender.Common.Exceptions;
 using Defender.Common.Extension;
 using Defender.Common.Helpers;
@@ -40,6 +43,7 @@ public static class ConfigureServices
         IWebHostEnvironment environment,
         IConfiguration configuration)
     {
+        CarServiceMetrics.Initialize();
         services.AddCommonServices(configuration);
         services.AddHttpContextAccessor();
         services.AddProblemDetails(options => ConfigureProblemDetails(options, environment));
@@ -50,11 +54,15 @@ public static class ConfigureServices
             .AddControllers()
             .AddJsonOptions(options =>
             {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                CarJsonOptions.Configure(options.JsonSerializerOptions);
             });
         services.Configure<ApiBehaviorOptions>(options =>
-            options.SuppressModelStateInvalidFilter = true);
+        {
+            options.SuppressModelStateInvalidFilter = false;
+            options.InvalidModelStateResponseFactory = context =>
+                new UnprocessableEntityObjectResult(
+                    CarProblemDetailsMapper.FromModelState(context.HttpContext, context.ModelState));
+        });
         services.AddAuthorization();
 
         return services;
@@ -64,7 +72,11 @@ public static class ConfigureServices
     {
         var applicationAssembly = typeof(Defender.CarService.Application.AssemblyMarker).Assembly;
 
-        services.AddAutoMapper(configuration => configuration.AddMaps(applicationAssembly));
+        services.AddAutoMapper(configuration =>
+        {
+            configuration.AddMaps(applicationAssembly);
+            configuration.AddProfile<CarApiMappingProfile>();
+        });
         services.AddValidatorsFromAssembly(applicationAssembly);
         services.AddMediatR(configuration => configuration.RegisterServicesFromAssembly(applicationAssembly));
         services.AddScoped<MyGarageApplicationService>();
@@ -193,35 +205,13 @@ public static class ConfigureServices
     {
         options.IncludeExceptionDetails = (_, _) => environment.IsLocalOrDevelopment();
 
-        options.Map<CommonValidationException>(exception =>
-        {
-            var validationProblemDetails = new ValidationProblemDetails(exception.Errors)
-            {
-                Detail = exception.Message,
-                Status = StatusCodes.Status422UnprocessableEntity,
-            };
-
-            return validationProblemDetails;
-        });
-
-        options.Map<ForbiddenAccessException>(exception => new ProblemDetails
-        {
-            Detail = exception.Message,
-            Status = StatusCodes.Status403Forbidden,
-        });
-
-        options.Map<ServiceException>(exception => new ProblemDetails
-        {
-            Detail = exception.Message,
-            Status = StatusCodes.Status400BadRequest,
-        });
-
+        options.Map<CommonValidationException>(CarProblemDetailsMapper.Map);
+        options.Map<CarApplicationException>(CarProblemDetailsMapper.Map);
+        options.Map<CarDomainException>(CarProblemDetailsMapper.Map);
+        options.Map<ForbiddenAccessException>(CarProblemDetailsMapper.Map);
+        options.Map<ServiceException>(CarProblemDetailsMapper.Map);
         options.MapToStatusCode<NotImplementedException>(StatusCodes.Status501NotImplemented);
-        options.MapToStatusCode<HttpRequestException>(StatusCodes.Status503ServiceUnavailable);
-        options.Map<Exception>(_ => new ProblemDetails
-        {
-            Detail = ErrorCodeHelper.GetErrorCode(ErrorCode.UnhandledError),
-            Status = StatusCodes.Status500InternalServerError,
-        });
+        options.Map<HttpRequestException>(CarProblemDetailsMapper.Map);
+        options.Map<Exception>(CarProblemDetailsMapper.Map);
     }
 }
