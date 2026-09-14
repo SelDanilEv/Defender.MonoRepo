@@ -424,7 +424,8 @@ Two shared Dockerfiles using multi-stage Alpine-based builds:
 - **Application manifests** in `helm/argocd-applications/dev/` -- one per service.
 - **Config** in `helm/argocd-config/` -- projects, RBAC, ArgoCD server settings.
 - **Sync**: ArgoCD watches the `helm/service-template/` chart with per-service value files and
-  auto-syncs enabled apps on changes. CarService remains manual until immutable image promotion.
+  auto-syncs enabled apps on changes. CarService always remains manual; immutable image promotion
+  updates values only and does not enable auto-sync.
 
 ---
 

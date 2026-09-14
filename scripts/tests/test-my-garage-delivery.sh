@@ -28,4 +28,13 @@ for document in "$operations" "$workflow_readme" "$root_readme" "$project_overvi
     grep -Fq 'deployment approval' "$document"
 done
 
+if grep -Eiq 'CarService remains manual until|promotion (enables|turns on|activates) .*auto-sync|promotion.*auto-sync (enabled|on)' "$project_overview"; then
+    echo "FAIL CarService promotion wording implies automated sync" >&2
+    exit 1
+fi
+
+grep -Fq 'CarService always remains manual' "$project_overview"
+grep -Fq 'immutable image promotion' "$project_overview"
+grep -Fq 'updates values only and does not enable auto-sync' "$project_overview"
+
 echo "MY_GARAGE_DELIVERY_PASS"
