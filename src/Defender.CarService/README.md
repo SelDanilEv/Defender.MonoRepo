@@ -1,6 +1,17 @@
 # Defender CarService
 
-Standalone backend for the My Garage feature. This first shell provides the Clean Architecture projects, common platform registration, JWT authentication, MongoDB health readiness, and local development settings. Domain contracts and route handlers are added by later tasks.
+Standalone backend for My Garage. Provides Clean Architecture projects, JWT authentication, MongoDB readiness, optional metrics, and the user-owned HTTP API.
+
+## API
+
+Base route: `/api/V1/car`. Every route requires a bearer JWT with the `User` role. Account ownership comes from the authenticated JWT account and is never accepted from request data.
+
+- Vehicles: `GET /vehicles`, `POST /vehicles` (201), `GET /vehicles/{vehicleId}`, `PUT /vehicles/{vehicleId}`, `POST /vehicles/{vehicleId}/archive`, and `POST /vehicles/{vehicleId}/unarchive`.
+- Maintenance: `GET` and `POST /vehicles/{vehicleId}/maintenance`, `PUT` and `DELETE /vehicles/{vehicleId}/maintenance/{maintenanceId}` (204 delete).
+- History: `GET` and `POST /vehicles/{vehicleId}/history`, `PUT` and `DELETE /vehicles/{vehicleId}/history/{historyId}` (204 delete). `GET` defaults to `page=0&pageSize=25`.
+- Insurance: `GET` and `POST /vehicles/{vehicleId}/insurance`, and `PUT /vehicles/{vehicleId}/insurance/{insuranceId}`.
+
+Errors use ProblemDetails with stable `CAR_*` codes and status mapping for validation, ownership-scoped not found, conflicts, database unavailability, and unexpected failures. There is no insurance delete, tax, import, migration, or notification route.
 
 ## Local commands
 

@@ -16,6 +16,13 @@ namespace Defender.CarService.WebApi.Controllers;
 [ApiController]
 [Route("api/V1/car")]
 [Auth(Roles.User)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status403Forbidden)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 public sealed class CarController(IMediator mediator, IMapper mapper) : ControllerBase
 {
     [HttpGet("vehicles")]

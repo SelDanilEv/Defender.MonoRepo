@@ -142,6 +142,7 @@ public static class CarProblemDetailsMapper
         var leafPropertyName = propertyName.Split('.').Last();
         return leafPropertyName.ToLowerInvariant() switch
         {
+            "page" or "pagesize" => CarApplicationErrorCodes.HistoryPaginationInvalid,
             "displayname" or "make" or "model" or "plate" => CarDomainErrorCodes.VehicleDisplayNameRequired,
             "year" => CarDomainErrorCodes.VehicleYearInvalid,
             "vin" => CarDomainErrorCodes.VehicleVinInvalid,
