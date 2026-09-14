@@ -111,6 +111,7 @@
     "concurrency": "Запись изменилась. Обновите страницу и повторите попытку."
   },
   "errors": {
+    "CAR_HISTORY_PAGINATION_INVALID": "Выберите корректные страницу и размер страницы истории.",
     "CAR_VEHICLE_NOT_FOUND": "Автомобиль не найден.",
     "CAR_MAINTENANCE_NOT_FOUND": "Обслуживание не найдено.",
     "CAR_HISTORY_NOT_FOUND": "Запись истории не найдена.",

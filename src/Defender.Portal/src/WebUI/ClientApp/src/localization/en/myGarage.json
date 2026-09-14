@@ -111,6 +111,7 @@
     "concurrency": "The record changed elsewhere. Reload and try again."
   },
   "errors": {
+    "CAR_HISTORY_PAGINATION_INVALID": "Choose a valid history page and page size.",
     "CAR_VEHICLE_NOT_FOUND": "Vehicle was not found.",
     "CAR_MAINTENANCE_NOT_FOUND": "Maintenance item was not found.",
     "CAR_HISTORY_NOT_FOUND": "Service record was not found.",
