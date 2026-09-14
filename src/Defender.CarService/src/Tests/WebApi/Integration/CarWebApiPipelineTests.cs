@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
 
@@ -245,6 +246,41 @@ public sealed class CarWebApiPipelineTests
         Assert.True(serverToken.IsCancellationRequested);
     }
 
+    [Fact]
+    public void WebApplicationFactory_PreservesExistingMongoEnvironmentVariable()
+    {
+        const string preservedConnectionString = "mongodb://preserved-host:27017";
+        var previousConnectionString = Environment.GetEnvironmentVariable(
+            CarWebApplicationFactory.MongoConnectionStringEnvironmentVariable,
+            EnvironmentVariableTarget.Process);
+
+        Environment.SetEnvironmentVariable(
+            CarWebApplicationFactory.MongoConnectionStringEnvironmentVariable,
+            preservedConnectionString,
+            EnvironmentVariableTarget.Process);
+
+        try
+        {
+            using (var factory = new CarWebApplicationFactory())
+            using (factory.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false }))
+            {
+            }
+
+            Assert.Equal(
+                preservedConnectionString,
+                Environment.GetEnvironmentVariable(
+                    CarWebApplicationFactory.MongoConnectionStringEnvironmentVariable,
+                    EnvironmentVariableTarget.Process));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(
+                CarWebApplicationFactory.MongoConnectionStringEnvironmentVariable,
+                previousConnectionString,
+                EnvironmentVariableTarget.Process);
+        }
+    }
+
     private static async Task<IReadOnlyList<VehicleSummaryDto>> WaitForCancellationAsync(
         CancellationToken cancellationToken,
         TaskCompletionSource<CancellationToken> started)
@@ -272,14 +308,12 @@ public sealed class CarWebApiPipelineTests
 internal sealed class CarWebApplicationFactory : WebApplicationFactory<Program>
 {
     private const string JwtKey = "Defender.CarService.Local.Development.Key.2026";
-    private const string MongoConnectionStringEnvironmentVariable = "Defender_App_MongoDBConnectionString";
+    private const string TestMongoConnectionString = "mongodb://localhost:27017";
+    private static readonly object MongoEnvironmentLock = new();
+    internal const string MongoConnectionStringEnvironmentVariable = "Defender_App_MongoDBConnectionString";
 
     public CarWebApplicationFactory()
     {
-        Environment.SetEnvironmentVariable(
-            MongoConnectionStringEnvironmentVariable,
-            "mongodb://localhost:27017",
-            EnvironmentVariableTarget.Process);
         ApplicationService = new Mock<IMyGarageApplicationService>(MockBehavior.Strict);
     }
 
@@ -307,6 +341,32 @@ internal sealed class CarWebApplicationFactory : WebApplicationFactory<Program>
             services.RemoveAll<IMyGarageApplicationService>();
             services.AddSingleton(ApplicationService.Object);
         });
+    }
+
+    protected override IHost CreateHost(IHostBuilder builder)
+    {
+        lock (MongoEnvironmentLock)
+        {
+            var previousConnectionString = Environment.GetEnvironmentVariable(
+                MongoConnectionStringEnvironmentVariable,
+                EnvironmentVariableTarget.Process);
+
+            try
+            {
+                Environment.SetEnvironmentVariable(
+                    MongoConnectionStringEnvironmentVariable,
+                    TestMongoConnectionString,
+                    EnvironmentVariableTarget.Process);
+                return base.CreateHost(builder);
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable(
+                    MongoConnectionStringEnvironmentVariable,
+                    previousConnectionString,
+                    EnvironmentVariableTarget.Process);
+            }
+        }
     }
 
     private static string CreateToken(Guid userId)
