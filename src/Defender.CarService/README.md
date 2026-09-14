@@ -24,6 +24,17 @@ dotnet run --project src/Defender.CarService/src/WebApi/Defender.CarService.WebA
 
 The local HTTP port is `47065`. Health endpoints are `/health` and `/health/ready`.
 
+## Ownership and delivery
+
+CarService owns user-scoped vehicles, maintenance schedules, service history, and insurance. It
+does not own tax, import, migration, notification, scheduler, or insurer integrations. Local
+Compose maps `47065:8080`; Dev Compose maps `49065:8080`. Both use the shared service network and
+Mongo replica set `rs0`.
+
+Helm values are in `helm/service-template/values-car.yaml`. The release is `car-service` in the
+`defender` namespace and publishes `defendersd/defender.car`. Image publication, promotion, and
+ArgoCD deployment require explicit approval.
+
 ## Project layout
 
 - `src/Domain` contains domain contracts and rules.

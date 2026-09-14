@@ -124,6 +124,7 @@ Defender.MonoRepo/
 |   |-- Defender.BudgetTracker/
 |   |-- Defender.PersonalFoodAdvisor/
 |   |-- Defender.GeneralTestingService/
+|   |-- Defender.CarService/       # My Garage vehicle, maintenance, history, insurance API
 |   |-- Defender.Common/
 |   |-- Defender.Kafka/
 |   |-- Defender.DistributedCache/
@@ -248,6 +249,7 @@ Minimal end-to-end bootstrap for a new local environment:
 | Defender.PersonalFoodAdvisor | `LocalPersonalFoodAdvisorService` | `http://localhost:47062` | `http://localhost:47062/swagger` |
 | Defender.HealthCareService | `LocalHealthCareService` | `http://localhost:47063` | `http://localhost:47063/swagger` |
 | Defender.TravelCalendarService | `LocalTravelCalendarService` | `http://localhost:47064` | `http://localhost:47064/swagger` |
+| Defender.CarService | `LocalCarService` | `http://localhost:47065` | `http://localhost:47065/swagger` |
 
 #### Local Infrastructure Services
 
@@ -259,6 +261,20 @@ Minimal end-to-end bootstrap for a new local environment:
 | Kafka broker | `local-kafka-service` | `localhost:9092` |
 | Kafka UI | `local-kafka-ui` | `http://localhost:8080` |
 | pgAdmin | `local-pgadmin` | `http://localhost:5050` (`admin@example.com` / `admin`) |
+
+#### My Garage checks
+
+```powershell
+dotnet test src/Defender.CarService/Defender.CarService.sln -c Debug
+powershell -NoProfile -File scripts/verify-portal.ps1
+docker compose -f src/docker-compose.yml config --quiet
+helm lint helm/service-template
+helm template car-service helm/service-template -f helm/service-template/values-car.yaml
+helm template portal helm/service-template -f helm/service-template/values-portal.yaml
+```
+
+CarService owns user-scoped vehicle, maintenance, history, and insurance data. Local Compose uses
+`47065`; Dev Compose uses `49065`. Mongo runs with existing replica set `rs0` for transactions.
 
 ### Testing and Quality
 
@@ -376,12 +392,14 @@ docker ps --filter "name=Local" --format "table {{.Names}}\t{{.Status}}\t{{.Port
 - Helm chart template: `helm/service-template/`
 - Service values files: `helm/service-template/values-*.yaml`
 - ArgoCD app definitions: `helm/argocd-applications/`
+- CarService values: `helm/service-template/values-car.yaml`; ArgoCD app: `car-service` in `defender`.
 - Portal uses a no-surge rolling strategy (`maxSurge: 0`, `maxUnavailable: 1`)
   because the single-node home-server cluster has no spare CPU for a second
   Portal Pod during an update, and requests `20m` CPU while keeping its
   `250m` CPU limit.
 - Travel Calendar uses the same no-surge strategy and `5m` CPU request so
   its image updates remain schedulable on that node.
+- CarService uses `defendersd/defender.car` and `/health` plus `/health/ready` probes.
 
 #### ArgoCD Integration
 
@@ -420,6 +438,9 @@ See [OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md) for details.
 3. Image tags include branch/SHA/date-based variants.
 4. Promotion to ArgoCD values is handled by a separate workflow.
 
+Image publication, image promotion, ArgoCD mutation, and deployment require explicit approval in
+the current task.
+
 ---
 
 ## Services Overview
@@ -437,6 +458,7 @@ See [OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md) for details.
 9. Defender.PersonalFoodAdvisor - Menu parsing and food recommendations
 10. Defender.HealthCareService - Personal health timeline
 11. Defender.TravelCalendarService - Travel calendar and trip planning
+12. Defender.CarService - User-owned My Garage vehicles and service records
 
 ### Supporting Services
 

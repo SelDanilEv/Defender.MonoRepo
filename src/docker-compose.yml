@@ -360,6 +360,30 @@ services:
     ports:
       - "49064:8080"
 
+  local-car-service:
+    <<: [*service-base, *service-local]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.CarService
+    image: local-car-service
+    container_name: LocalCarService
+    ports:
+      - "47065:8080"
+
+  dev-car-service:
+    <<: [*service-base, *service-dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.Service
+      args:
+        SERVICE_DIR: Defender.CarService
+    image: local-car-service
+    container_name: DevCarService
+    ports:
+      - "49065:8080"
+
   mongo_local:
     container_name: "mongo_local"
     image: mongo:7.0

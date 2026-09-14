@@ -10,6 +10,8 @@ deploymentStrategy:
 resources:
   requests:
     cpu: "20m"
+configMapData:
+  CarServiceOptions__Url: "http://car-service.defender.svc.cluster.local/"
 extraSecretEnv:
   Telegram__BotToken: Telegram__BotToken
   Telegram__WebhookSecret: Telegram__WebhookSecret

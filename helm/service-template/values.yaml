@@ -1,4 +1,8 @@
 replicaCount: 1
+image:
+  repository: defendersd/defender.service
+  tag: latest
+  pullPolicy: IfNotPresent
 autoscaling:
   minReplicaCount: 0
   maxReplicaCount: 1
@@ -85,6 +89,11 @@ configMapData:
   JwtTokenAudience: "defender-api"
 
 secretName: basic-secret
+
+ingress:
+  enabled: false
+  ingressClassName: traefik
+  hosts: []
 
 # Additional environment variables sourced from secretName. Services opt in
 # through their own values file so shared secrets are never exposed by default.
