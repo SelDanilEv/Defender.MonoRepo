@@ -2,6 +2,7 @@
   "title": "My Garage",
   "subtitle": "Manage vehicles, maintenance, service history, and insurance",
   "retry": "Retry",
+  "loading": "Loading",
   "unavailable": "My Garage is temporarily unavailable",
   "units": {
     "km": "km",

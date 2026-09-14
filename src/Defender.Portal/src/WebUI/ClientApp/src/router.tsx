@@ -124,7 +124,7 @@ const TravelCalendarPage = Loader(
 
 export const MY_GARAGE_PLACEHOLDER_MODULE = "src/content/basePages/Status/ComingSoon";
 const MyGaragePage = Loader(
-  lazy(() => import("src/content/basePages/Status/ComingSoon"))
+  lazy(() => import("src/content/appPages/MyGarage"))
 );
 
 export const MyGarageRouteGuard = ({ role }: { role: string }) =>
