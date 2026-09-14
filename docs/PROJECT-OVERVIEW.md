@@ -22,7 +22,7 @@
 
 ## Introduction
 
-Defender is a multi-service platform built as a .NET monorepo. It consists of 10 microservices, 3 shared libraries, a React SPA portal, and a full GitOps deployment pipeline. The platform provides identity management, wallet/banking, budget tracking, risk-based games (lotteries), notifications, personal food advising via AI, and job scheduling -- all orchestrated through a Backend-For-Frontend (BFF) portal.
+Defender is a multi-service platform built as a .NET monorepo. It consists of 11 backend microservices, the Portal and Portal MCP services, a local-only GeneralTestingService, 3 shared libraries, and a full GitOps deployment pipeline. The platform provides identity management, wallet/banking, budgeting, risk-based games (lotteries), notifications, personal food advising via AI, scheduling, health timelines, travel planning, and My Garage vehicle records through a Backend-For-Frontend (BFF) portal.
 
 ---
 
@@ -52,6 +52,7 @@ graph TB
         BudgetTracker["BudgetTracker"]
         FoodAdvisor["PersonalFoodAdvisor"]
         TravelCalendar["TravelCalendarService"]
+        CarService["CarService"]
     end
 
     subgraph infra [Infrastructure Services]
@@ -77,6 +78,8 @@ graph TB
     Portal --> Identity
     Portal --> TravelCalendar
     TravelCalendar --> MongoDB
+    Portal --> CarService
+    CarService --> MongoDB
     Portal --> UserMgmt
     Portal --> Wallet
     Portal --> Notification
@@ -179,6 +182,7 @@ Defender.MonoRepo/
 ├── secrets/                     # Secret templates (gitignored)
 ├── src/
 │   ├── Defender.BudgetTracker/
+│   ├── Defender.CarService/
 │   ├── Defender.Common/         # Shared library
 │   ├── Defender.DistributedCache/  # Shared library
 │   ├── Defender.GeneralTestingService/
@@ -188,6 +192,7 @@ Defender.MonoRepo/
 │   ├── Defender.NotificationService/
 │   ├── Defender.PersonalFoodAdvisor/
 │   ├── Defender.Portal/         # BFF + React SPA
+│   ├── Defender.Portal.Mcp/     # Portal MCP service
 │   ├── Defender.RiskGamesService/
 │   ├── Defender.UserManagementService/
 │   ├── Defender.WalletService/
@@ -221,6 +226,7 @@ Defender.MonoRepo/
 | **Defender.PersonalFoodAdvisor** | 47062 | AI-powered menu parsing, dish extraction, personalized food recommendations | Gemini AI, HuggingFace, Kafka |
 | **Defender.HealthCareService** | 47063 | User health timeline and shareable charts | MongoDB |
 | **Defender.TravelCalendarService** | 47064 | Travel planning, event calendar, budgets, POIs and packing list | MongoDB, Portal BFF |
+| **Defender.CarService** | 47065 | User-scoped vehicles, maintenance, service history, and insurance | MongoDB, Portal BFF |
 
 ---
 
@@ -393,6 +399,9 @@ Infrastructure services (always running):
 - **Kafka UI** -- Web UI on port 8080
 - **pgAdmin** -- Database admin on port 5050
 
+CarService uses port `47065` in local profile and `49065` in dev profile. Validate profiles separately;
+enabling both profiles can bind colliding application host ports.
+
 ### Docker Images
 
 Two shared Dockerfiles using multi-stage Alpine-based builds:
@@ -407,6 +416,8 @@ Two shared Dockerfiles using multi-stage Alpine-based builds:
 - **HPA**: Min 1, Max 2 replicas, target CPU 90%.
 - **ConfigMap**: `ASPNETCORE_ENVIRONMENT: Prod` and service-specific settings.
 - **Secrets**: `Defender_App_MongoDBConnectionString` and `Defender_App_SecretsEncryptionKey` from Kubernetes secrets.
+- **CarService**: `values-car.yaml`, release `car-service`, health paths `/health` and `/health/ready`.
+  ArgoCD auto-sync stays disabled until CI promotes an immutable image tag.
 
 ### ArgoCD (GitOps)
 
@@ -431,7 +442,7 @@ graph LR
 
     subgraph pipeline [Pipeline]
         ChangeDetect["Change Detection<br/>(skip if src/ unchanged)"]
-        TestMatrix["Test Matrix<br/>(9 services, xUnit + coverage)"]
+        TestMatrix["Test Matrix<br/>(13 service entries, xUnit + coverage)"]
         BuildMatrix["Build Matrix<br/>(Docker multi-stage)"]
         Publish["Publish to Docker Hub"]
     end
@@ -442,9 +453,11 @@ graph LR
     BuildMatrix --> Publish
 ```
 
-- **Matrix**: 9 services built and tested independently (GeneralTestingService excluded).
+- **Matrix**: 13 service entries built and tested independently. This includes Portal and Portal MCP;
+  GeneralTestingService remains local-only and excluded.
 - **Tests**: `dotnet test` with XPlat Code Coverage per service.
 - **Images**: Published to Docker Hub as `defender.<service-name>`.
+- **CarService**: Published as `defender.car`; promotion updates `values-car.yaml` after approval.
 - **Tags**: Branch name, PR number, semver, SHA, `latest`, timestamped.
 
 ### Image Promotion (`promote-image-tag.yml`)

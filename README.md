@@ -268,10 +268,15 @@ Minimal end-to-end bootstrap for a new local environment:
 dotnet test src/Defender.CarService/Defender.CarService.sln -c Debug
 powershell -NoProfile -File scripts/verify-portal.ps1
 docker compose -f src/docker-compose.yml config --quiet
+docker compose -f src/docker-compose.yml --profile local config --quiet
+docker compose -f src/docker-compose.yml --profile dev config --quiet
 helm lint helm/service-template
 helm template car-service helm/service-template -f helm/service-template/values-car.yaml
 helm template portal helm/service-template -f helm/service-template/values-portal.yaml
 ```
+
+Run Compose config checks separately. Local and dev profiles publish overlapping host ports;
+enabling both profiles together can cause port collisions.
 
 CarService owns user-scoped vehicle, maintenance, history, and insurance data. Local Compose uses
 `47065`; Dev Compose uses `49065`. Mongo runs with existing replica set `rs0` for transactions.

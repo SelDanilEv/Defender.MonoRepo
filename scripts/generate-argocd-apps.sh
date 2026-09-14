@@ -7,7 +7,7 @@
 set -e
 
 # Configuration
-ARGOCD_APPS_DIR="helm/argocd-applications"
+ARGOCD_APPS_DIR="${ARGOCD_APPS_DIR:-helm/argocd-applications}"
 GITHUB_REPO="SelDanilEv/Defender.MonoRepo"
 K8S_NAMESPACE="defender"
 ARGOCD_NAMESPACE="argocd"
@@ -22,8 +22,10 @@ generate_argocd_app() {
     local service_name=$1
     local clean_name=$2
     local values_file=$3
+    local auto_sync="${4:-true}"
     
-    cat > "$ARGOCD_APPS_DIR/${ENVIRONMENT}/${clean_name}-app.yaml" << EOF
+    {
+        cat << EOF
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -47,14 +49,39 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: ${K8S_NAMESPACE}
+EOF
+
+        if [[ "$clean_name" == "car-service" ]]; then
+            cat << EOF
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
+EOF
+        fi
+
+        cat << EOF
   syncPolicy:
+EOF
+
+        if [[ "$auto_sync" == "true" ]]; then
+            cat << EOF
     automated:
       prune: true
       selfHeal: true
+EOF
+        fi
+
+        cat << EOF
     syncOptions:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - PruneLast=true
+EOF
+
+        if [[ "$auto_sync" == "true" ]]; then
+            cat << EOF
     retry:
       limit: 5
       backoff:
@@ -62,6 +89,8 @@ spec:
         factor: 2
         maxDuration: 3m
 EOF
+        fi
+    } > "$ARGOCD_APPS_DIR/${ENVIRONMENT}/${clean_name}-app.yaml"
 
     echo "Generated ArgoCD Application for ${clean_name}"
 }
@@ -96,6 +125,7 @@ generate_argocd_app "Defender.BudgetTracker" "budget-tracker" "values-budget-tra
 # Health Care service
 generate_argocd_app "Defender.HealthCareService" "health-care" "values-health-care.yaml"
 generate_argocd_app "Defender.TravelCalendarService" "travel-calendar" "values-travel-calendar.yaml"
+generate_argocd_app "Defender.CarService" "car-service" "values-car.yaml" "false"
 
 # Personal Food Advisor service
 generate_argocd_app "Defender.PersonalFoodAdvisor" "personal-food-advisor" "values-personal-food-advisor.yaml"

@@ -27,9 +27,6 @@ spec:
       jsonPointers:
         - /spec/replicas
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
