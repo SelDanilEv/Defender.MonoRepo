@@ -446,6 +446,13 @@ See [OPERATIONS-GUIDE.md](./docs/OPERATIONS-GUIDE.md) for details.
 Image publication, image promotion, ArgoCD mutation, and deployment require explicit approval in
 the current task.
 
+### CarService manual-sync exception
+
+CarService bootstrap keeps mutable `latest` with automated ArgoCD sync disabled. Required flow:
+publish an immutable CarService tag, then promotion commits values-car.yaml. After current-task
+deployment approval, run manual ArgoCD sync for `car-service`. Promotion does not auto-deploy
+CarService.
+
 ---
 
 ## Services Overview

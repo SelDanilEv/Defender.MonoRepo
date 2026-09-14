@@ -423,7 +423,8 @@ Two shared Dockerfiles using multi-stage Alpine-based builds:
 
 - **Application manifests** in `helm/argocd-applications/dev/` -- one per service.
 - **Config** in `helm/argocd-config/` -- projects, RBAC, ArgoCD server settings.
-- **Sync**: ArgoCD watches the `helm/service-template/` chart with per-service value files and auto-syncs on changes.
+- **Sync**: ArgoCD watches the `helm/service-template/` chart with per-service value files and
+  auto-syncs enabled apps on changes. CarService remains manual until immutable image promotion.
 
 ---
 
@@ -462,7 +463,13 @@ graph LR
 
 ### Image Promotion (`promote-image-tag.yml`)
 
-Manual workflow that updates `helm/service-template/values-*.yaml` with a specific image tag, commits, and pushes -- triggering ArgoCD sync. After the promotion commit, ArgoCD can take up to 3 minutes to detect and deploy the new version.
+Manual workflow that updates `helm/service-template/values-*.yaml` with a specific image tag, commits,
+and pushes. Enabled apps can then sync.
+
+### CarService manual-sync exception
+
+publish an immutable CarService tag, then promotion commits values-car.yaml. After current-task deployment approval, run
+manual ArgoCD sync for `car-service`; promotion does not auto-deploy CarService.
 
 ---
 

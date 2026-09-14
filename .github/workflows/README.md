@@ -86,6 +86,13 @@ promote both services to their newly published build tags. Resolve and commit an
 promoting a service that requires immutable delivery. The promote workflow commits the updated
 `helm/service-template/values-*.yaml` file, and ArgoCD deploys that pinned reference from git.
 
+### CarService manual-sync exception
+
+CarService bootstrap keeps mutable `latest` with automated ArgoCD sync disabled. Required flow:
+publish an immutable CarService tag, then promotion commits values-car.yaml. After current-task
+deployment approval, run manual ArgoCD sync for `car-service`. Promotion does not auto-deploy
+CarService.
+
 ## Usage Examples
 
 ### Build All Services
