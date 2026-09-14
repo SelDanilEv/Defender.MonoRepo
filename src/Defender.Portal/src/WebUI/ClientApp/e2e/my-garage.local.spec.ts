@@ -1,6 +1,7 @@
 import { expect, test, type Locator, type Page, type Route } from "@playwright/test";
 
 const baseUrl = process.env.PLAYWRIGHT_BASE_URL?.trim();
+const portalOrigin = baseUrl ? new URL(baseUrl).origin : null;
 const email = process.env.MY_GARAGE_E2E_EMAIL?.trim();
 const password = process.env.MY_GARAGE_E2E_PASSWORD;
 const allowUnavailableSkip = process.env.MY_GARAGE_E2E_ALLOW_SKIP === "1";
@@ -12,13 +13,21 @@ const vehicleBName = "Task 10 garage B " + runId;
 const vehicleBEditedName = vehicleBName + " edited";
 const maintenanceAName = "Task 10 oil " + runId;
 const maintenanceBName = "Task 10 tires " + runId;
-const maintenanceDate = new Date().toISOString().slice(0, 10);
+const referenceDate = new Date();
+const referenceUtcMidnight = Date.UTC(referenceDate.getUTCFullYear(), referenceDate.getUTCMonth(), referenceDate.getUTCDate());
+const dateAtUtcOffset = (days: number) => new Date(referenceUtcMidnight + days * 86_400_000).toISOString().slice(0, 10);
+const maintenanceDate = dateAtUtcOffset(0);
+const insuranceDates = {
+  active: { startDate: dateAtUtcOffset(-30), endDate: dateAtUtcOffset(365) },
+  overlapping: { startDate: dateAtUtcOffset(-10), endDate: dateAtUtcOffset(180) },
+  expired: { startDate: dateAtUtcOffset(-730), endDate: dateAtUtcOffset(-30) },
+};
 
 const createdVehicleIds: string[] = [];
 let trackingEnabled = false;
 let unexpectedApiRequests: string[] = [];
 let directCarServiceRequests: string[] = [];
-let myGarageRequests: string[] = [];
+let myGarageRequests: Array<{ method: string; origin: string; path: string }> = [];
 
 const localApiProblem = (code: string) => ({
   title: code,
@@ -30,6 +39,10 @@ const localApiProblem = (code: string) => ({
 const apiPath = (requestUrl: string) => new URL(requestUrl).pathname;
 const isAllowedPortalInfrastructurePath = (path: string) =>
   path.startsWith("/api/home/") || path.startsWith("/api/authorization/");
+const isDirectCarServiceOrigin = (origin: string) => {
+  const url = new URL(origin);
+  return ["47065", "49065"].includes(url.port) || /carservice|internal-car/i.test(url.hostname);
+};
 
 const getVehicleIdFromUrl = (page: Page) => {
   const match = page.url().match(/\/my-garage\/vehicles\/([0-9a-f-]+)(?:\/|$)/i);
@@ -37,9 +50,11 @@ const getVehicleIdFromUrl = (page: Page) => {
   return match[1];
 };
 
-const selectOption = async (container: Locator, label: string, option: string) => {
+const selectOption = async (page: Page, container: Locator, label: string, option: string) => {
   await container.getByRole("combobox", { name: label }).click();
-  await container.getByRole("option", { name: new RegExp("^" + option + "\\s*$") }).click();
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
+  await listbox.getByRole("option", { name: new RegExp("^" + option + "\\s*$") }).click();
 };
 
 const selectLanguage = async (page: Page, language: "en" | "ru") => {
@@ -85,9 +100,20 @@ const createVehicle = async (page: Page, data: { displayName: string; make: stri
   await dialog.getByRole("textbox", { name: "Model" }).fill(data.model);
   await dialog.getByRole("spinbutton", { name: "Year" }).fill(data.year);
   await dialog.getByRole("textbox", { name: "Plate" }).fill(data.plate);
+  const responsePromise = page.waitForResponse((response) =>
+    response.request().method() === "POST" && apiPath(response.url()) === "/api/my-garage/vehicles",
+  );
   await dialog.getByRole("button", { name: "Save", exact: true }).click();
+  const response = await responsePromise;
+  expect(response.status()).toBe(201);
+  const body = await response.json() as { id?: unknown };
+  if (typeof body.id !== "string" || body.id.length === 0) {
+    throw new Error("Vehicle create response did not contain a vehicle id.");
+  }
+  createdVehicleIds.push(body.id);
   await expect(dialog).toBeHidden();
   await expectToast(page, "Vehicle added.");
+  return body.id;
 };
 
 const editVehicle = async (page: Page, oldName: string, newName: string) => {
@@ -100,12 +126,14 @@ const editVehicle = async (page: Page, oldName: string, newName: string) => {
   await expectToast(page, "Vehicle updated.");
 };
 
-const openVehicle = async (page: Page, displayName: string) => {
+const openVehicle = async (page: Page, displayName: string, expectedVehicleId?: string) => {
   const row = page.getByRole("row").filter({ hasText: displayName }).last();
   await row.getByRole("button", { name: "Open vehicle: " + displayName, exact: true }).click();
   await expect(page).toHaveURL(/\/my-garage\/vehicles\/[0-9a-f-]+$/i);
   await expect(page.getByRole("heading", { name: displayName, exact: true })).toBeVisible();
-  return getVehicleIdFromUrl(page);
+  const vehicleId = getVehicleIdFromUrl(page);
+  if (expectedVehicleId) expect(vehicleId).toBe(expectedVehicleId);
+  return vehicleId;
 };
 
 const createMaintenance = async (page: Page, data: { name: string; months?: string; thousandKm?: string }) => {
@@ -142,7 +170,7 @@ const createHistory = async (
   const dialog = page.getByRole("dialog");
   await dialog.locator('input[type="date"]').fill(maintenanceDate);
   await dialog.getByRole("spinbutton", { name: "Odometer" }).fill(data.odometer);
-  await selectOption(dialog, "Type", data.type);
+  await selectOption(page, dialog, "Type", data.type);
   await dialog.getByRole("textbox", { name: "Title" }).fill(data.title);
 
   for (const maintenanceName of data.linkedMaintenance ?? []) {
@@ -151,7 +179,7 @@ const createHistory = async (
 
   if (data.cost) {
     await dialog.getByRole("spinbutton", { name: "Amount" }).fill(data.cost);
-    await selectOption(dialog, "Currency", "PLN");
+    await selectOption(page, dialog, "Currency", "PLN");
   }
 
   const requestPromise = page.waitForRequest((request) =>
@@ -238,18 +266,22 @@ test.describe("My Garage local integration", () => {
 
     page.on("request", (request) => {
       if (!trackingEnabled) return;
-      const path = apiPath(request.url());
       const url = new URL(request.url());
-      if (!path.startsWith("/api/")) return;
+      const path = url.pathname;
 
-      if (/47065|49065|internal-car|carservice/i.test(url.host + path)) {
-        directCarServiceRequests.push(request.method() + " " + url.host + path);
+      if (isDirectCarServiceOrigin(url.origin)) {
+        directCarServiceRequests.push(request.method() + " " + url.origin + path);
       }
 
+      if (!path.startsWith("/api/")) return;
+
       if (path.startsWith("/api/my-garage")) {
-        myGarageRequests.push(request.method() + " " + path);
+        myGarageRequests.push({ method: request.method(), origin: url.origin, path });
+        if (url.origin !== portalOrigin) {
+          unexpectedApiRequests.push(request.method() + " " + url.origin + path);
+        }
       } else if (!isAllowedPortalInfrastructurePath(path)) {
-        unexpectedApiRequests.push(request.method() + " " + path);
+        unexpectedApiRequests.push(request.method() + " " + url.origin + path);
       }
     });
 
@@ -265,23 +297,41 @@ test.describe("My Garage local integration", () => {
     await openVehicles(page);
   });
 
-  test.afterEach(async ({ page }) => {
+  test.afterEach(async ({ page }, testInfo) => {
     if (!baseUrl) return;
 
+    const cleanupFailures: string[] = [];
     for (const vehicleId of createdVehicleIds) {
       try {
         const response = await page.request.post(new URL("/api/my-garage/vehicles/" + vehicleId + "/archive", baseUrl).toString());
-        if (![200, 404, 409].includes(response.status())) {
-          throw new Error("Cleanup archive returned HTTP " + response.status() + ".");
+        if (response.status() === 200) {
+          const body = await response.json() as { id?: unknown; archived?: unknown };
+          if (body.id !== vehicleId || body.archived !== true) {
+            cleanupFailures.push("Cleanup archive returned an invalid archived vehicle response for " + vehicleId + ".");
+          }
+          continue;
         }
-      } catch {
-        // Runtime cleanup is best effort. No secrets or response bodies are logged.
+
+        if (response.status() === 409) {
+          const body = await response.json().catch(() => null) as { code?: unknown } | null;
+          if (body?.code === "CAR_VEHICLE_ARCHIVED") continue;
+        }
+
+        cleanupFailures.push("Cleanup archive returned HTTP " + response.status() + " for " + vehicleId + ".");
+      } catch (error) {
+        cleanupFailures.push("Cleanup archive failed for " + vehicleId + ": " + (error instanceof Error ? error.message : String(error)));
       }
+    }
+
+    if (cleanupFailures.length > 0) {
+      const message = cleanupFailures.join(" ");
+      await testInfo.attach("my-garage-cleanup-failure", { body: message, contentType: "text/plain" });
+      throw new Error(message);
     }
   });
 
   test("completes vehicle, maintenance, history, insurance, error, localization, and responsive journey", async ({ page }) => {
-    await expect(page.getByText("No vehicles yet.", { exact: false })).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Add vehicle", exact: true })).toBeEnabled();
 
     await page.getByRole("button", { name: "Add vehicle", exact: true }).click();
     const invalidVehicleDialog = page.getByRole("dialog");
@@ -289,14 +339,14 @@ test.describe("My Garage local integration", () => {
     await expect(invalidVehicleDialog.getByRole("alert")).toContainText("This field is required.");
     await invalidVehicleDialog.getByRole("button", { name: "Cancel", exact: true }).click();
 
-    await createVehicle(page, {
+    const vehicleAId = await createVehicle(page, {
       displayName: vehicleAName,
       make: "TaskMake",
       model: "TaskModel A",
       year: "2020",
       plate: "TASK-A-" + runId,
     });
-    await createVehicle(page, {
+    const vehicleBId = await createVehicle(page, {
       displayName: vehicleBName,
       make: "TaskMake",
       model: "TaskModel B",
@@ -308,14 +358,12 @@ test.describe("My Garage local integration", () => {
     await expect(page.getByRole("row").filter({ hasText: vehicleBName })).toBeVisible();
 
     await editVehicle(page, vehicleAName, vehicleAEditedName);
-    const vehicleAId = await openVehicle(page, vehicleAEditedName);
-    createdVehicleIds.push(vehicleAId);
+    await openVehicle(page, vehicleAEditedName, vehicleAId);
     await page.goto("/my-garage/vehicles");
     await expect(page.getByRole("heading", { name: "My Garage", exact: true })).toBeVisible();
 
     await editVehicle(page, vehicleBName, vehicleBEditedName);
-    const vehicleBId = await openVehicle(page, vehicleBEditedName);
-    createdVehicleIds.push(vehicleBId);
+    await openVehicle(page, vehicleBEditedName, vehicleBId);
     await page.goto("/my-garage/vehicles");
     await expect(page.getByRole("row").filter({ hasText: vehicleAEditedName })).toBeVisible();
     await expect(page.getByRole("row").filter({ hasText: vehicleBEditedName })).toBeVisible();
@@ -382,17 +430,19 @@ test.describe("My Garage local integration", () => {
 
     await openHistory(page, vehicleAId);
     const tireRow = page.getByRole("row").filter({ hasText: "Task 10 tire service " + runId }).last();
-    await page.once("dialog", (dialog) => dialog.accept());
     await tireRow.getByRole("button", { name: "Delete history record: Task 10 tire service " + runId, exact: true }).click();
+    const deleteHistoryDialog = page.getByRole("dialog");
+    await expect(deleteHistoryDialog).toContainText("Task 10 tire service " + runId);
+    await deleteHistoryDialog.getByRole("button", { name: "Delete history record", exact: true }).click();
     await expectToast(page, "Service record deleted.");
 
     const detailAfterDelete = await fetchVehicleDetailThroughUi(page, vehicleAId);
     expect(detailAfterDelete.vehicle.currentOdometerKm).toBe(18000);
 
     await openInsurance(page, vehicleAId);
-    await createInsurance(page, { provider: "Task 10 long cover " + runId, startDate: "2026-01-01", endDate: "2027-12-31" });
-    await createInsurance(page, { provider: "Task 10 overlapping cover " + runId, startDate: "2026-06-01", endDate: "2026-12-31" });
-    await createInsurance(page, { provider: "Task 10 expired cover " + runId, startDate: "2024-01-01", endDate: "2024-12-31" });
+    await createInsurance(page, { provider: "Task 10 long cover " + runId, ...insuranceDates.active });
+    await createInsurance(page, { provider: "Task 10 overlapping cover " + runId, ...insuranceDates.overlapping });
+    await createInsurance(page, { provider: "Task 10 expired cover " + runId, ...insuranceDates.expired });
     await expect(page.getByRole("row").filter({ hasText: "Task 10 long cover " + runId }).getByText("Active", { exact: true })).toBeVisible();
     await expect(page.getByRole("row").filter({ hasText: "Task 10 overlapping cover " + runId }).getByText("Active", { exact: true })).toBeVisible();
     await expect(page.getByRole("row").filter({ hasText: "Task 10 expired cover " + runId }).getByText("Expired", { exact: true })).toBeVisible();
@@ -448,7 +498,7 @@ test.describe("My Garage local integration", () => {
       scrollWidth: element.scrollWidth,
     }));
     expect(mobileTableMetrics.overflowX).toBe("auto");
-    expect(mobileTableMetrics.scrollWidth).toBeGreaterThanOrEqual(mobileTableMetrics.clientWidth);
+    expect(mobileTableMetrics.scrollWidth).toBeGreaterThan(mobileTableMetrics.clientWidth);
     await page.setViewportSize({ width: 1280, height: 900 });
 
     await openVehicles(page);
@@ -465,6 +515,7 @@ test.describe("My Garage local integration", () => {
     )).toBe(0);
 
     expect(myGarageRequests.length).toBeGreaterThan(0);
+    expect(myGarageRequests.every((request) => request.origin === portalOrigin && request.path.startsWith("/api/my-garage"))).toBe(true);
     expect(unexpectedApiRequests).toEqual([]);
     expect(directCarServiceRequests).toEqual([]);
   });
