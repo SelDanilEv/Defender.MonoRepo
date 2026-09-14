@@ -119,6 +119,10 @@ const TravelCalendarPage = Loader(
   lazy(() => import("src/content/appPages/TravelCalendar"))
 );
 
+const MyGaragePage = Loader(
+  lazy(() => import("src/content/basePages/Status/ComingSoon"))
+);
+
 // Home
 
 const HomePage = Loader(lazy(() => import("src/content/appPages/HomePage")));
@@ -358,6 +362,22 @@ const routes: RouteObject[] = [
     element: <SidebarLayout />,
     children: [
       { path: "", element: <TravelCalendarPage /> },
+      { path: "*", element: <Status404 /> },
+    ],
+  },
+  {
+    path: "my-garage",
+    element: <SidebarLayout />,
+    children: [
+      {
+        path: "",
+        element: <Navigate to="/my-garage/vehicles" replace />,
+      },
+      { path: "vehicles", element: <MyGaragePage /> },
+      { path: "vehicles/:vehicleId", element: <MyGaragePage /> },
+      { path: "vehicles/:vehicleId/maintenance", element: <MyGaragePage /> },
+      { path: "vehicles/:vehicleId/history", element: <MyGaragePage /> },
+      { path: "vehicles/:vehicleId/insurance", element: <MyGaragePage /> },
       { path: "*", element: <Status404 /> },
     ],
   },

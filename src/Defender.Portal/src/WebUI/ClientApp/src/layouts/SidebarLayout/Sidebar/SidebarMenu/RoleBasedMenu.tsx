@@ -14,6 +14,7 @@ import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import GarageIcon from "@mui/icons-material/Garage";
 
 import MenuItem from "./MenuItem";
 import useUtils from "src/appUtils";
@@ -296,6 +297,27 @@ const RoleBasedMenu = (props: any) => {
                   to="/banking"
                   icon={<AccountBalanceIcon style={{ fontSize: "1.1em" }} />}
                   text={u.t("sidebar_menu:page_banking")}
+                />
+              </List>
+            </SubMenuWrapper>
+          </List>
+        );
+        result.push(
+          <List
+            key={"my_garage"}
+            component="div"
+            subheader={
+              <ListSubheader component="div" disableSticky>
+                {u.t("sidebar_menu:header_my_garage")}
+              </ListSubheader>
+            }
+          >
+            <SubMenuWrapper>
+              <List component="ul">
+                <MenuItem
+                  to="/my-garage/vehicles"
+                  icon={<GarageIcon style={{ fontSize: "1.1em" }} />}
+                  text={u.t("sidebar_menu:page_my_garage")}
                 />
               </List>
             </SubMenuWrapper>
