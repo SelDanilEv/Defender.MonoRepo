@@ -17,6 +17,8 @@ export interface CreateMaintenanceItemRequest {
   intervalThousandKm?: number | null;
   lastDate?: DateOnly | null;
   lastOdometerKm?: number | null;
+  manualBaselineDate?: DateOnly | null;
+  manualBaselineOdometerKm?: number | null;
 }
 
 export type UpdateMaintenanceItemRequest = CreateMaintenanceItemRequest;

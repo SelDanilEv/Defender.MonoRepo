@@ -22,7 +22,6 @@ import { getVehicle, getInsurancePolicies, createInsurancePolicy, updateInsuranc
 import type { APICallFailure } from "src/api/APIWrapper/interfaces/APICallProps";
 import type { CreateInsurancePolicyRequest } from "src/models/myGarage/CarRequests";
 import type { InsurancePolicy, VehicleDetail } from "src/models/myGarage/CarModels";
-import useUtils from "src/appUtils";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 
 import GarageTable from "../components/GarageTable";
@@ -35,7 +34,6 @@ const formatDate = (value: string, locale: string) => new Intl.DateTimeFormat(lo
 export default function InsurancePage() {
   const { vehicleId } = useParams();
   const { t, i18n } = useTranslation("myGarage");
-  const u = useUtils();
   const navigate = useNavigate();
   const [detail, setDetail] = useState<VehicleDetail | null>(null);
   const [policies, setPolicies] = useState<InsurancePolicy[]>([]);
@@ -116,18 +114,18 @@ export default function InsurancePage() {
   return (
     <Box sx={{ p: { xs: 2, sm: 3, lg: 4 } }}>
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { sm: "center" }, mb: 3 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(`/my-garage/vehicles/${vehicleId}`)}>{detail.vehicle.displayName}</Button>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(`/my-garage/vehicles/${vehicleId}`)} disabled={mutating}>{detail.vehicle.displayName}</Button>
         <Box sx={{ flex: 1 }}><Typography component="h1" variant="h4">{t("actions.addInsurance")}</Typography><Typography color="text.secondary">{detail.vehicle.make} {detail.vehicle.model}</Typography></Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disabled={mutating || readOnly} aria-label={t("actions.addInsurance")}>{t("actions.addInsurance")}</Button>
       </Stack>
       {readOnly ? <Alert severity="info" sx={{ mb: 2 }}>{t("conflicts.vehicleArchived")}</Alert> : null}
       {error ? <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert> : null}
       <Card><CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
-        <GarageTable ariaLabel={t("actions.addInsurance")} headers={[t("fields.provider"), !u.isMobile ? t("fields.policyNumber") : null, !u.isMobile ? t("fields.coverageType") : null, t("fields.startDate"), t("fields.endDate"), t("statuses.Active"), t("table_actions_column", { defaultValue: "Actions" })]} empty={sortedPolicies.length === 0} emptyMessage={t("empty.insurance")}>
+        <GarageTable ariaLabel={t("actions.addInsurance")} headers={[t("fields.provider"), t("fields.policyNumber"), t("fields.coverageType"), t("fields.startDate"), t("fields.endDate"), t("fields.status"), t("table_actions_column")]} empty={sortedPolicies.length === 0} emptyMessage={t("empty.insurance")}>
           {sortedPolicies.map((policy) => <TableRow hover key={policy.id}>
             <TableCell><Typography sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>{policy.provider}</Typography>{policy.notes ? <Typography variant="caption" color="text.secondary" sx={{ display: "block", overflowWrap: "anywhere" }}>{policy.notes}</Typography> : null}</TableCell>
-            {!u.isMobile ? <TableCell>{policy.policyNumber || "-"}</TableCell> : null}
-            {!u.isMobile ? <TableCell>{policy.coverageType || "-"}</TableCell> : null}
+            <TableCell>{policy.policyNumber || "-"}</TableCell>
+            <TableCell>{policy.coverageType || "-"}</TableCell>
             <TableCell>{formatDate(policy.startDate, locale)}</TableCell>
             <TableCell>{formatDate(policy.endDate, locale)}</TableCell>
             <TableCell><StatusBadge status={policy.status} /></TableCell>

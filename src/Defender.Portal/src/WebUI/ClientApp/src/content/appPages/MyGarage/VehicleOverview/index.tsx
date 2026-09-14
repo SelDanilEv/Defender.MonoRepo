@@ -18,10 +18,9 @@ import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined";
 import HistoryOutlinedIcon from "@mui/icons-material/HistoryOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 
-import useUtils from "src/appUtils";
 import { getVehicle, getHistory } from "src/api/myGarage";
 import type { APICallFailure } from "src/api/APIWrapper/interfaces/APICallProps";
-import { InsuranceStatus, type ServiceHistoryPage, type VehicleDetail } from "src/models/myGarage/CarModels";
+import { InsuranceStatus, MaintenanceStatus, type ServiceHistoryPage, type VehicleDetail } from "src/models/myGarage/CarModels";
 
 import StatusBadge from "../components/StatusBadge";
 import { getGarageFailureMessage } from "../helpers/status";
@@ -32,7 +31,6 @@ const formatDate = (value: string, locale: string) => new Intl.DateTimeFormat(lo
 export default function VehicleOverviewPage() {
   const { vehicleId } = useParams();
   const { t, i18n } = useTranslation("myGarage");
-  const u = useUtils();
   const navigate = useNavigate();
   const [detail, setDetail] = useState<VehicleDetail | null>(null);
   const [history, setHistory] = useState<ServiceHistoryPage | null>(null);
@@ -71,7 +69,12 @@ export default function VehicleOverviewPage() {
 
   const { vehicle, maintenanceItems, insurancePolicies } = detail;
   const historyItems = history?.items ?? [];
-  const counts = maintenanceItems.reduce((result, item) => ({ ...result, [item.status]: result[item.status] + 1 }), { Overdue: 0, DueSoon: 0, Upcoming: 0, NotStarted: 0 });
+  const counts = maintenanceItems.reduce<Record<MaintenanceStatus, number>>((result, item) => ({ ...result, [item.status]: result[item.status] + 1 }), {
+    [MaintenanceStatus.Overdue]: 0,
+    [MaintenanceStatus.DueSoon]: 0,
+    [MaintenanceStatus.Upcoming]: 0,
+    [MaintenanceStatus.NotStarted]: 0,
+  });
   const insuranceStatus = insurancePolicies.find((policy) => policy.status === InsuranceStatus.Active)?.status
     ?? insurancePolicies.find((policy) => policy.status === InsuranceStatus.ExpiringSoon)?.status
     ?? insurancePolicies[0]?.status;
@@ -85,10 +88,12 @@ export default function VehicleOverviewPage() {
       </Stack>
 
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid size={{ xs: 12, sm: 6, lg: 3 }}><Card><CardContent><Typography color="text.secondary">{t("fields.currentOdometerKm")}</Typography><Typography variant="h5">{vehicle.currentOdometerKm === null ? "-" : `${vehicle.currentOdometerKm.toLocaleString(locale)} ${t("units.km")}`}</Typography></CardContent></Card></Grid>
-        <Grid size={{ xs: 6, lg: 3 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.Overdue")}</Typography><Typography variant="h5">{counts.Overdue}</Typography></CardContent></Card></Grid>
-        <Grid size={{ xs: 6, lg: 3 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.DueSoon")}</Typography><Typography variant="h5">{counts.DueSoon}</Typography></CardContent></Card></Grid>
-        <Grid size={{ xs: 12, lg: 3 }}><Card><CardContent><Typography color="text.secondary">{t("fields.provider")}</Typography>{insuranceStatus ? <StatusBadge status={insuranceStatus} /> : <Typography>{t("empty.insurance")}</Typography>}</CardContent></Card></Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("fields.currentOdometerKm")}</Typography><Typography variant="h5">{vehicle.currentOdometerKm === null ? "-" : `${vehicle.currentOdometerKm.toLocaleString(locale)} ${t("units.km")}`}</Typography></CardContent></Card></Grid>
+        <Grid size={{ xs: 6, sm: 3, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.Overdue")}</Typography><Typography variant="h5">{counts[MaintenanceStatus.Overdue]}</Typography></CardContent></Card></Grid>
+        <Grid size={{ xs: 6, sm: 3, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.DueSoon")}</Typography><Typography variant="h5">{counts[MaintenanceStatus.DueSoon]}</Typography></CardContent></Card></Grid>
+        <Grid size={{ xs: 6, sm: 3, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.Upcoming")}</Typography><Typography variant="h5">{counts[MaintenanceStatus.Upcoming]}</Typography></CardContent></Card></Grid>
+        <Grid size={{ xs: 6, sm: 3, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.NotStarted")}</Typography><Typography variant="h5">{counts[MaintenanceStatus.NotStarted]}</Typography></CardContent></Card></Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("fields.provider")}</Typography>{insuranceStatus ? <StatusBadge status={insuranceStatus} /> : <Typography>{t("empty.insurance")}</Typography>}</CardContent></Card></Grid>
       </Grid>
 
       <Grid container spacing={2}>

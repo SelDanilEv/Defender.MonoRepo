@@ -23,7 +23,6 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import OpenInNewOutlinedIcon from "@mui/icons-material/OpenInNewOutlined";
 import UnarchiveOutlinedIcon from "@mui/icons-material/UnarchiveOutlined";
 
-import useUtils from "src/appUtils";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 import { getVehicles, createVehicle, updateVehicle, archiveVehicle, unarchiveVehicle } from "src/api/myGarage";
 import type { APICallFailure } from "src/api/APIWrapper/interfaces/APICallProps";
@@ -40,7 +39,6 @@ const formatKm = (value: number | null, locale: string, unit: string) =>
 
 export default function VehiclesPage() {
   const { t, i18n } = useTranslation("myGarage");
-  const u = useUtils();
   const navigate = useNavigate();
   const [vehicles, setVehicles] = useState<VehicleSummary[]>([]);
   const [includeArchived, setIncludeArchived] = useState(false);
@@ -136,7 +134,7 @@ export default function VehiclesPage() {
           <Typography color="text.secondary">{t("subtitle")}</Typography>
         </Box>
         <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ alignItems: { sm: "center" } }}>
-          <FormControlLabel control={<Switch checked={includeArchived} onChange={(event) => setIncludeArchived(event.target.checked)} slotProps={{ input: { "aria-label": t("actions.includeArchived") } }} />} label={t("actions.includeArchived")} />
+          <FormControlLabel control={<Switch checked={includeArchived} onChange={(event) => setIncludeArchived(event.target.checked)} disabled={mutating} slotProps={{ input: { "aria-label": t("actions.includeArchived") } }} />} label={t("actions.includeArchived")} />
           <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disabled={mutating} aria-label={t("actions.addVehicle")}>{t("actions.addVehicle")}</Button>
         </Stack>
       </Stack>
@@ -150,12 +148,12 @@ export default function VehiclesPage() {
             ariaLabel={t("title")}
             headers={[
               t("fields.displayName"),
-              !u.isMobile ? t("fields.make") : null,
-              !u.isMobile ? t("fields.model") : null,
-              t("fields.currentOdometerKm"),
-              !u.isMobile ? t("statuses.Overdue") : null,
-              !u.isMobile ? t("fields.provider") : null,
-              t("table_actions_column", { defaultValue: "Actions" }),
+               t("fields.make"),
+               t("fields.model"),
+               t("fields.currentOdometerKm"),
+               t("fields.status"),
+               t("fields.provider"),
+               t("table_actions_column"),
             ]}
             empty={!loading && vehicles.length === 0}
             emptyMessage={t("empty.vehicles")}
@@ -168,15 +166,15 @@ export default function VehiclesPage() {
                   <Typography variant="caption" color="text.secondary">{vehicle.year} · {vehicle.plate}</Typography>
                   {vehicle.archived ? <Chip size="small" label={t("actions.includeArchived")} sx={{ ml: 1 }} /> : null}
                 </TableCell>
-                {!u.isMobile ? <TableCell>{vehicle.make}</TableCell> : null}
-                {!u.isMobile ? <TableCell>{vehicle.model}</TableCell> : null}
+                <TableCell>{vehicle.make}</TableCell>
+                <TableCell>{vehicle.model}</TableCell>
                 <TableCell>{formatKm(vehicle.currentOdometerKm, locale, t("units.km"))}</TableCell>
-                {!u.isMobile ? <TableCell><Stack direction="row" spacing={0.5} sx={{ flexWrap: "wrap" }}><Chip size="small" color="error" label={vehicle.maintenanceCounts.overdue} /><Chip size="small" color="warning" label={vehicle.maintenanceCounts.dueSoon} /><Chip size="small" color="success" label={vehicle.maintenanceCounts.upcoming} /></Stack></TableCell> : null}
-                {!u.isMobile ? <TableCell>{vehicle.insuranceStatus ? <StatusBadge status={vehicle.insuranceStatus} /> : "-"}</TableCell> : null}
+                <TableCell><Stack direction="row" spacing={0.5} sx={{ flexWrap: "wrap" }}><Chip size="small" color="error" label={`${t("statuses.Overdue")}: ${vehicle.maintenanceCounts.overdue}`} /><Chip size="small" color="warning" label={`${t("statuses.DueSoon")}: ${vehicle.maintenanceCounts.dueSoon}`} /><Chip size="small" color="success" label={`${t("statuses.Upcoming")}: ${vehicle.maintenanceCounts.upcoming}`} /><Chip size="small" label={`${t("statuses.NotStarted")}: ${vehicle.maintenanceCounts.notStarted}`} /></Stack></TableCell>
+                <TableCell>{vehicle.insuranceStatus ? <StatusBadge status={vehicle.insuranceStatus} /> : "-"}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={0.25}>
-                    <Button size="small" startIcon={<OpenInNewOutlinedIcon />} onClick={() => navigate(`/my-garage/vehicles/${vehicle.id}`)} aria-label={`${t("actions.openVehicle")}: ${vehicle.displayName}`}>{u.isMobile ? null : t("actions.openVehicle")}</Button>
-                    <Button size="small" onClick={() => openEdit(vehicle)} aria-label={`${t("actions.editVehicle")}: ${vehicle.displayName}`}><EditOutlinedIcon fontSize="small" /></Button>
+                    <Button size="small" startIcon={<OpenInNewOutlinedIcon />} onClick={() => navigate(`/my-garage/vehicles/${vehicle.id}`)} disabled={mutating} aria-label={`${t("actions.openVehicle")}: ${vehicle.displayName}`}>{t("actions.openVehicle")}</Button>
+                    <Button size="small" onClick={() => openEdit(vehicle)} disabled={mutating} aria-label={`${t("actions.editVehicle")}: ${vehicle.displayName}`}><EditOutlinedIcon fontSize="small" /></Button>
                     <Button size="small" color={vehicle.archived ? "success" : "warning"} onClick={() => void toggleArchive(vehicle)} disabled={mutating} aria-label={`${vehicle.archived ? t("actions.unarchiveVehicle") : t("actions.archiveVehicle")}: ${vehicle.displayName}`}>{vehicle.archived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />}</Button>
                   </Stack>
                 </TableCell>

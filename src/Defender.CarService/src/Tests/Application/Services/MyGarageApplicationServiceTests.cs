@@ -39,6 +39,67 @@ public sealed class MyGarageApplicationServiceTests
     }
 
     [Fact]
+    public async Task GetVehicle_WhenLinkedHistoryAppearsAfterFirstHundred_ReturnsManualAndEffectiveBaselinesSeparately()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var maintenance = MaintenanceItem.Create(
+            UserId,
+            VehicleId,
+            "Oil",
+            12,
+            null,
+            new DateOnly(2025, 1, 2),
+            40_000,
+            FixedTimeProvider(),
+            FirstMaintenanceId);
+        var history = ServiceHistoryRecord.Create(
+            UserId,
+            VehicleId,
+            new DateOnly(2026, 1, 3),
+            50_000,
+            HistoryType.Maintenance,
+            "Oil change",
+            linkedMaintenanceItemIds: [FirstMaintenanceId],
+            timeProvider: FixedTimeProvider());
+        maintenance.ApplyEffectiveBaseline(
+            vehicle,
+            new EffectiveBaseline(history.Date, history.OdometerKm),
+            FixedTimeProvider());
+        var vehicles = new Mock<IVehicleRepository>();
+        var maintenanceRepository = new Mock<IMaintenanceItemRepository>();
+        var histories = new Mock<IServiceHistoryRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        vehicles.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehicle);
+        maintenanceRepository.Setup(repository => repository.GetForVehicleAsync(UserId, VehicleId, null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([maintenance]);
+        var unlinkedHistory = Enumerable.Range(0, 100)
+            .Select(index => ServiceHistoryRecord.Create(
+                UserId,
+                VehicleId,
+                new DateOnly(2024, 1, 1),
+                index,
+                HistoryType.Other,
+                $"Other {index}",
+                timeProvider: FixedTimeProvider()))
+            .ToArray();
+        histories.Setup(repository => repository.GetForVehicleAsync(UserId, VehicleId, null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(unlinkedHistory.Append(history).ToArray());
+        insurance.Setup(repository => repository.GetForVehicleAsync(UserId, VehicleId, null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+        var service = CreateService(vehicles, maintenanceRepository, histories, insurance: insurance);
+
+        var result = await service.GetVehicleAsync(VehicleId, CancellationToken.None);
+
+        var item = Assert.Single(result.MaintenanceItems);
+        Assert.Equal(new DateOnly(2025, 1, 2), item.ManualBaselineDate);
+        Assert.Equal(40_000, item.ManualBaselineOdometerKm);
+        Assert.Equal(new DateOnly(2026, 1, 3), item.LastDate);
+        Assert.Equal(50_000, item.LastOdometerKm);
+        Assert.True(item.HasLinkedHistory);
+    }
+
+    [Fact]
     public async Task CreateHistory_WithManyLinks_RecalculatesOdometerAndBothBaselinesInOneTransaction()
     {
         var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
@@ -407,6 +468,68 @@ public sealed class MyGarageApplicationServiceTests
 
         Assert.Null(result.LastDate);
         Assert.Null(result.LastOdometerKm);
+    }
+
+    [Fact]
+    public async Task UpdateMaintenance_WithLinkedHistory_PreservesManualBaselineAndReportsReference()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var item = MaintenanceItem.Create(
+            UserId,
+            VehicleId,
+            "Oil",
+            12,
+            null,
+            new DateOnly(2025, 1, 2),
+            40_000,
+            FixedTimeProvider(),
+            FirstMaintenanceId);
+        var history = ServiceHistoryRecord.Create(
+            UserId,
+            VehicleId,
+            new DateOnly(2026, 1, 3),
+            50_000,
+            HistoryType.Maintenance,
+            "Oil change",
+            linkedMaintenanceItemIds: [FirstMaintenanceId],
+            timeProvider: FixedTimeProvider());
+        item.ApplyEffectiveBaseline(vehicle, new EffectiveBaseline(history.Date, history.OdometerKm), FixedTimeProvider());
+        var context = new Mock<ICarTransactionContext>().Object;
+        var vehicles = new Mock<IVehicleRepository>();
+        var maintenance = new Mock<IMaintenanceItemRepository>();
+        var histories = new Mock<IServiceHistoryRepository>();
+        var coordinator = new Mock<ICarTransactionCoordinator>();
+        vehicles.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehicle);
+        vehicles.Setup(repository => repository.ReplaceAsync(UserId, vehicle, 0, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        maintenance.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, FirstMaintenanceId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(item);
+        maintenance.Setup(repository => repository.ReplaceAsync(UserId, VehicleId, item, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        histories.Setup(repository => repository.GetLinkedToMaintenanceAsync(UserId, VehicleId, FirstMaintenanceId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([history]);
+        coordinator.Setup(transaction => transaction.ExecuteAsync(It.IsAny<Func<ICarTransactionContext, Task<MaintenanceItemDto>>>(), It.IsAny<CancellationToken>()))
+            .Returns((Func<ICarTransactionContext, Task<MaintenanceItemDto>> operation, CancellationToken _) => operation(context));
+        var service = CreateService(vehicles: vehicles, maintenance: maintenance, histories: histories, coordinator: coordinator);
+
+        var result = await service.UpdateMaintenanceItemAsync(
+            new UpdateMaintenanceItemCommand
+            {
+                VehicleId = VehicleId,
+                MaintenanceItemId = FirstMaintenanceId,
+                Name = "Oil updated",
+                IntervalMonths = 12,
+                ManualBaselineDate = new DateOnly(2025, 1, 2),
+                ManualBaselineOdometerKm = 40_000,
+            },
+            CancellationToken.None);
+
+        Assert.Equal(new DateOnly(2025, 1, 2), result.ManualBaselineDate);
+        Assert.Equal(40_000, result.ManualBaselineOdometerKm);
+        Assert.Equal(new DateOnly(2026, 1, 3), result.LastDate);
+        Assert.Equal(50_000, result.LastOdometerKm);
+        Assert.True(result.HasLinkedHistory);
     }
 
     [Fact]

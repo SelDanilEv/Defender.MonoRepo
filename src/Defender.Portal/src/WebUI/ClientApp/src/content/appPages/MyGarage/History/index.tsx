@@ -33,7 +33,6 @@ import { getVehicle, getHistory, createHistory, updateHistory, deleteHistory } f
 import type { APICallFailure } from "src/api/APIWrapper/interfaces/APICallProps";
 import type { CreateServiceHistoryRequest } from "src/models/myGarage/CarRequests";
 import { HistoryType, type ServiceHistoryPage, type ServiceHistoryRecord, type VehicleDetail } from "src/models/myGarage/CarModels";
-import useUtils from "src/appUtils";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 
 import GarageTable from "../components/GarageTable";
@@ -47,7 +46,6 @@ const formatDate = (value: string, locale: string) => new Intl.DateTimeFormat(lo
 export default function HistoryPage() {
   const { vehicleId } = useParams();
   const { t, i18n } = useTranslation("myGarage");
-  const u = useUtils();
   const navigate = useNavigate();
   const [detail, setDetail] = useState<VehicleDetail | null>(null);
   const [history, setHistory] = useState<ServiceHistoryPage | null>(null);
@@ -157,7 +155,7 @@ export default function HistoryPage() {
   return (
     <Box sx={{ p: { xs: 2, sm: 3, lg: 4 } }}>
       <Stack direction={{ xs: "column", sm: "row" }} spacing={2} sx={{ alignItems: { sm: "center" }, mb: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(`/my-garage/vehicles/${vehicleId}`)}>{detail.vehicle.displayName}</Button>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(`/my-garage/vehicles/${vehicleId}`)} disabled={mutating}>{detail.vehicle.displayName}</Button>
         <Box sx={{ flex: 1 }}><Typography component="h1" variant="h4">{t("actions.recordService")}</Typography><Typography color="text.secondary">{detail.vehicle.make} {detail.vehicle.model}</Typography></Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disabled={mutating || readOnly} aria-label={t("actions.recordService")}>{t("actions.recordService")}</Button>
       </Stack>
@@ -165,28 +163,28 @@ export default function HistoryPage() {
       {error ? <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert> : null}
 
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid size={{ xs: 12, sm: 4 }}><FormControl fullWidth><InputLabel>{t("fields.type")}</InputLabel><Select label={t("fields.type")} value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as HistoryType | "")}><MenuItem value="">-</MenuItem>{Object.values(HistoryType).map((type) => <MenuItem key={type} value={type}>{t(`types.${type}`)}</MenuItem>)}</Select></FormControl></Grid>
-        <Grid size={{ xs: 12, sm: 4 }}><TextField fullWidth type="date" label={t("fields.startDate")} value={fromDate} onChange={(event) => setFromDate(event.target.value)} slotProps={{ inputLabel: { shrink: true } }} /></Grid>
-        <Grid size={{ xs: 12, sm: 4 }}><TextField fullWidth type="date" label={t("fields.endDate")} value={toDate} onChange={(event) => setToDate(event.target.value)} slotProps={{ inputLabel: { shrink: true } }} /></Grid>
+        <Grid size={{ xs: 12, sm: 4 }}><FormControl fullWidth disabled={mutating}><InputLabel>{t("fields.type")}</InputLabel><Select label={t("fields.type")} value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as HistoryType | "")}><MenuItem value="">-</MenuItem>{Object.values(HistoryType).map((type) => <MenuItem key={type} value={type}>{t(`types.${type}`)}</MenuItem>)}</Select></FormControl></Grid>
+        <Grid size={{ xs: 12, sm: 4 }}><TextField fullWidth type="date" label={t("fields.startDate")} value={fromDate} onChange={(event) => setFromDate(event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={mutating} /></Grid>
+        <Grid size={{ xs: 12, sm: 4 }}><TextField fullWidth type="date" label={t("fields.endDate")} value={toDate} onChange={(event) => setToDate(event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={mutating} /></Grid>
       </Grid>
 
       <Card><CardContent sx={{ p: 0, "&:last-child": { pb: 0 } }}>
-        <GarageTable ariaLabel={t("actions.recordService")} headers={[t("fields.date"), t("fields.type"), t("fields.title"), t("fields.odometerKm"), !u.isMobile ? t("fields.cost") : null, !u.isMobile ? t("fields.name") : null, t("table_actions_column", { defaultValue: "Actions" })]} empty={filteredItems.length === 0} emptyMessage={t("empty.history")}>
+        <GarageTable ariaLabel={t("actions.recordService")} headers={[t("fields.date"), t("fields.type"), t("fields.title"), t("fields.odometerKm"), t("fields.cost"), t("fields.linkedMaintenance"), t("table_actions_column")]} empty={filteredItems.length === 0} emptyMessage={t("empty.history")}>
           {filteredItems.map((record) => <TableRow hover key={record.id}>
             <TableCell>{formatDate(record.date, locale)}</TableCell>
             <TableCell>{t(`types.${record.type}`)}</TableCell>
             <TableCell><Typography sx={{ fontWeight: 700, overflowWrap: "anywhere" }}>{record.title}</Typography></TableCell>
             <TableCell>{record.odometerKm.toLocaleString(locale)} {t("units.km")}</TableCell>
-            {!u.isMobile ? <TableCell>{formatMinorCost(record.costAmountMinor, record.costCurrency)}</TableCell> : null}
-            {!u.isMobile ? <TableCell>{getLinkedMaintenanceLabels(record.linkedMaintenanceItemIds, detail.maintenanceItems).join(", ") || "-"}</TableCell> : null}
+            <TableCell>{formatMinorCost(record.costAmountMinor, record.costCurrency)}</TableCell>
+            <TableCell>{getLinkedMaintenanceLabels(record.linkedMaintenanceItemIds, detail.maintenanceItems).join(", ") || "-"}</TableCell>
             <TableCell><Stack direction="row" spacing={0.5}><Button size="small" onClick={() => openEdit(record)} disabled={mutating || readOnly} aria-label={`${t("actions.editHistory")}: ${record.title}`}><EditOutlinedIcon fontSize="small" /></Button><Button size="small" color="error" onClick={() => setDeleteTarget(record)} disabled={mutating || readOnly} aria-label={`${t("actions.deleteHistory")}: ${record.title}`}><DeleteOutlineIcon fontSize="small" /></Button></Stack></TableCell>
           </TableRow>)}
         </GarageTable>
-        <TablePagination component="div" count={history.totalItemsCount} page={history.currentPage} rowsPerPage={Math.min(history.pageSize, 100)} rowsPerPageOptions={[25, 50, 100]} onPageChange={(_, nextPage) => setPage(nextPage)} onRowsPerPageChange={(event) => { setPage(0); setPageSize(Math.min(Number(event.target.value), 100)); }} labelRowsPerPage="" slotProps={{ select: { inputProps: { "aria-label": t("fields.odometerKm") } } }} />
+        <TablePagination component="div" count={history.totalItemsCount} page={history.currentPage} rowsPerPage={Math.min(history.pageSize, 100)} rowsPerPageOptions={[25, 50, 100]} onPageChange={(_, nextPage) => setPage(nextPage)} onRowsPerPageChange={(event) => { setPage(0); setPageSize(Math.min(Number(event.target.value), 100)); }} labelRowsPerPage={t("table_rows_per_page_label")} disabled={mutating} slotProps={{ select: { inputProps: { "aria-label": t("table_rows_per_page_label") } } }} />
       </CardContent></Card>
 
       <HistoryDialog open={dialogOpen} record={selectedRecord} maintenanceItems={detail.maintenanceItems} busy={mutating} submitError={submitError} onClose={() => setDialogOpen(false)} onSubmit={submit} />
-      <Dialog open={Boolean(deleteTarget)} onClose={() => setDeleteTarget(null)}>
+      <Dialog open={Boolean(deleteTarget)} onClose={mutating ? undefined : () => setDeleteTarget(null)}>
         <DialogTitle>{t("actions.deleteHistory")}</DialogTitle>
         <DialogContent><Typography>{deleteTarget?.title}</Typography></DialogContent>
         <DialogActions><Button onClick={() => setDeleteTarget(null)} disabled={mutating}>{t("actions.cancel")}</Button><Button color="error" variant="contained" onClick={() => void remove()} disabled={mutating}>{t("actions.deleteHistory")}</Button></DialogActions>

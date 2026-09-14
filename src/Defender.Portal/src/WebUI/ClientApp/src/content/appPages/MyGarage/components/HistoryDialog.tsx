@@ -8,7 +8,9 @@ import {
   DialogTitle,
   FormControl,
   FormControlLabel,
+  FormGroup,
   FormHelperText,
+  FormLabel,
   Grid,
   InputLabel,
   MenuItem,
@@ -125,13 +127,13 @@ export default function HistoryDialog({
         <DialogContent>
           <Grid container spacing={2} sx={{ pt: 1 }}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth required type="date" label={t("fields.date")} value={form.date} onChange={(event) => update("date", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} />
+              <TextField fullWidth required type="date" label={t("fields.date")} value={form.date} onChange={(event) => update("date", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth required type="number" label={t("fields.odometerKm")} value={form.odometerKm} onChange={(event) => update("odometerKm", event.target.value)} slotProps={{ htmlInput: { min: 0, step: 1 } }} />
+              <TextField fullWidth required type="number" label={t("fields.odometerKm")} value={form.odometerKm} onChange={(event) => update("odometerKm", event.target.value)} slotProps={{ htmlInput: { min: 0, step: 1 } }} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth>
+              <FormControl fullWidth disabled={busy}>
                 <InputLabel>{t("fields.type")}</InputLabel>
                 <Select label={t("fields.type")} value={form.type} onChange={(event) => update("type", event.target.value as HistoryType)}>
                   {Object.values(HistoryType).map((type) => <MenuItem key={type} value={type}>{t(`types.${type}`)}</MenuItem>)}
@@ -139,22 +141,25 @@ export default function HistoryDialog({
               </FormControl>
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth required label={t("fields.title")} value={form.title} onChange={(event) => update("title", event.target.value)} />
+              <TextField fullWidth required label={t("fields.title")} value={form.title} onChange={(event) => update("title", event.target.value)} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField fullWidth multiline minRows={2} label={t("fields.notes")} value={form.notes} onChange={(event) => update("notes", event.target.value)} />
+              <TextField fullWidth multiline minRows={2} label={t("fields.notes")} value={form.notes} onChange={(event) => update("notes", event.target.value)} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <FormControl component="fieldset" fullWidth>
-                <FormHelperText>{t("fields.name")}</FormHelperText>
-                {maintenanceItems.map((item) => <FormControlLabel key={item.id} control={<Checkbox checked={form.linkedMaintenanceItemIds.includes(item.id)} onChange={() => update("linkedMaintenanceItemIds", toggleMaintenanceSelection(form.linkedMaintenanceItemIds, item.id))} />} label={item.name} />)}
+              <FormControl component="fieldset" fullWidth disabled={busy} aria-describedby="linked-maintenance-help">
+                <FormLabel component="legend">{t("fields.linkedMaintenance")}</FormLabel>
+                <FormGroup>
+                  {maintenanceItems.map((item) => <FormControlLabel key={item.id} control={<Checkbox checked={form.linkedMaintenanceItemIds.includes(item.id)} onChange={() => update("linkedMaintenanceItemIds", toggleMaintenanceSelection(form.linkedMaintenanceItemIds, item.id))} />} label={item.name} />)}
+                </FormGroup>
+                <FormHelperText id="linked-maintenance-help">{t("fields.linkedMaintenanceHelp")}</FormHelperText>
               </FormControl>
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth type="number" label={t("fields.costAmount")} value={form.costAmount} onChange={(event) => update("costAmount", event.target.value)} slotProps={{ htmlInput: { min: 0, step: "0.01" } }} />
+              <TextField fullWidth type="number" label={t("fields.costAmount")} value={form.costAmount} onChange={(event) => update("costAmount", event.target.value)} slotProps={{ htmlInput: { min: 0, step: "0.01" } }} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <FormControl fullWidth>
+              <FormControl fullWidth disabled={busy}>
                 <InputLabel>{t("fields.costCurrency")}</InputLabel>
                 <Select label={t("fields.costCurrency")} value={form.costCurrency} onChange={(event) => update("costCurrency", event.target.value as Currency | "")}>
                   <MenuItem value="">-</MenuItem>

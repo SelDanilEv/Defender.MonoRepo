@@ -36,7 +36,11 @@
     "policyNumber": "Policy number",
     "coverageType": "Coverage",
     "startDate": "Start date",
-    "endDate": "End date"
+    "endDate": "End date",
+    "status": "Status",
+    "actions": "Actions",
+    "linkedMaintenance": "Linked maintenance",
+    "linkedMaintenanceHelp": "Select maintenance items linked to this service record."
   },
   "actions": {
     "addVehicle": "Add vehicle",
@@ -57,6 +61,11 @@
     "close": "Close",
     "includeArchived": "Include archived vehicles"
   },
+  "pagination": {
+    "rowsPerPage": "Rows per page:"
+  },
+  "table_actions_column": "Actions",
+  "table_rows_per_page_label": "Rows per page:",
   "statuses": {
     "Upcoming": "Upcoming",
     "DueSoon": "Due soon",

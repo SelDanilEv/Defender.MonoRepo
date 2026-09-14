@@ -83,12 +83,12 @@ export default function InsuranceDialog({
         <DialogTitle>{t(editing ? "actions.editInsurance" : "actions.addInsurance")}</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ pt: 1 }}>
-            <Grid size={{ xs: 12 }}><TextField autoFocus fullWidth required label={t("fields.provider")} value={form.provider} onChange={(event) => update("provider", event.target.value)} /></Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth label={t("fields.policyNumber")} value={form.policyNumber} onChange={(event) => update("policyNumber", event.target.value)} /></Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth label={t("fields.coverageType")} value={form.coverageType} onChange={(event) => update("coverageType", event.target.value)} /></Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth required type="date" label={t("fields.startDate")} value={form.startDate} onChange={(event) => update("startDate", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} /></Grid>
-            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth required type="date" label={t("fields.endDate")} value={form.endDate} onChange={(event) => update("endDate", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} /></Grid>
-            <Grid size={{ xs: 12 }}><TextField fullWidth multiline minRows={2} label={t("fields.notes")} value={form.notes} onChange={(event) => update("notes", event.target.value)} /></Grid>
+            <Grid size={{ xs: 12 }}><TextField autoFocus fullWidth required label={t("fields.provider")} value={form.provider} onChange={(event) => update("provider", event.target.value)} disabled={busy} /></Grid>
+            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth label={t("fields.policyNumber")} value={form.policyNumber} onChange={(event) => update("policyNumber", event.target.value)} disabled={busy} /></Grid>
+            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth label={t("fields.coverageType")} value={form.coverageType} onChange={(event) => update("coverageType", event.target.value)} disabled={busy} /></Grid>
+            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth required type="date" label={t("fields.startDate")} value={form.startDate} onChange={(event) => update("startDate", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={busy} /></Grid>
+            <Grid size={{ xs: 12, sm: 6 }}><TextField fullWidth required type="date" label={t("fields.endDate")} value={form.endDate} onChange={(event) => update("endDate", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={busy} /></Grid>
+            <Grid size={{ xs: 12 }}><TextField fullWidth multiline minRows={2} label={t("fields.notes")} value={form.notes} onChange={(event) => update("notes", event.target.value)} disabled={busy} /></Grid>
             {error || submitError ? <Grid size={{ xs: 12 }}><div role="alert">{submitError || error}</div></Grid> : null}
           </Grid>
         </DialogContent>

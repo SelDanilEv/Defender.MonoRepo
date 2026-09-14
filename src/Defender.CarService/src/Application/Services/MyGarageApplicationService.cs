@@ -110,7 +110,8 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
         {
             var vehicle = await GetVehicleOrThrowAsync(userId, vehicleId, null, cancellationToken);
             var items = await maintenanceItemRepository.GetForVehicleAsync(userId, vehicleId, cancellationToken: cancellationToken);
-            return items.Select(item => MapMaintenance(item, vehicle)).ToArray();
+            var linkedIds = await GetLinkedMaintenanceIdsAsync(userId, vehicleId, cancellationToken);
+            return items.Select(item => MapMaintenance(item, vehicle, linkedIds.Contains(item.Id))).ToArray();
         });
     }
 
@@ -128,8 +129,8 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
                     request.Name,
                     request.IntervalMonths,
                     request.IntervalThousandKm,
-                    request.LastDate,
-                    request.LastOdometerKm,
+                    request.ManualBaselineDate ?? request.LastDate,
+                    request.ManualBaselineOdometerKm ?? request.LastOdometerKm,
                     timeProvider);
                 await maintenanceItemRepository.AddAsync(userId, request.VehicleId, item, context, cancellationToken);
                 vehicle.Touch(timeProvider);
@@ -324,10 +325,11 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
         var vehicle = await GetVehicleOrThrowAsync(userId, vehicleId, null, cancellationToken);
         var items = await maintenanceItemRepository.GetForVehicleAsync(userId, vehicleId, cancellationToken: cancellationToken);
         var policies = await insurancePolicyRepository.GetForVehicleAsync(userId, vehicleId, cancellationToken: cancellationToken);
+        var linkedIds = await GetLinkedMaintenanceIdsAsync(userId, vehicleId, cancellationToken);
         return new VehicleDetailDto
         {
             Vehicle = MapVehicle(vehicle),
-            MaintenanceItems = items.Select(item => MapMaintenance(item, vehicle)).ToArray(),
+            MaintenanceItems = items.Select(item => MapMaintenance(item, vehicle, linkedIds.Contains(item.Id))).ToArray(),
             InsurancePolicies = policies.Select(MapInsurance).ToArray(),
         };
     }
@@ -373,7 +375,12 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
 
         var linkedHistory = await serviceHistoryRepository.GetLinkedToMaintenanceAsync(userId, request.VehicleId, item.Id, context, cancellationToken);
         var expectedVehicleVersion = vehicle.Version;
-        item.SetManualBaseline(vehicle, request.LastDate, request.LastOdometerKm, linkedHistory.Count > 0, timeProvider);
+        item.SetManualBaseline(
+            vehicle,
+            request.ManualBaselineDate ?? request.LastDate,
+            request.ManualBaselineOdometerKm ?? request.LastOdometerKm,
+            linkedHistory.Count > 0,
+            timeProvider);
         item.Update(vehicle, request.Name, request.IntervalMonths, request.IntervalThousandKm, timeProvider);
         if (!await maintenanceItemRepository.ReplaceAsync(userId, request.VehicleId, item, context, cancellationToken))
         {
@@ -386,7 +393,7 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
             throw new CarApplicationException(CarDomainErrorCodes.ConcurrencyConflict);
         }
 
-        return MapMaintenance(item, vehicle);
+        return MapMaintenance(item, vehicle, linkedHistory.Count > 0);
     }
 
     private async Task<ServiceHistoryRecordDto> CreateHistoryInTransactionAsync(
@@ -573,7 +580,15 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
         return links.ToArray();
     }
 
-    private MaintenanceItemDto MapMaintenance(MaintenanceItem item, Vehicle vehicle)
+    private async Task<HashSet<Guid>> GetLinkedMaintenanceIdsAsync(Guid userId, Guid vehicleId, CancellationToken cancellationToken)
+    {
+        var history = await serviceHistoryRepository.GetForVehicleAsync(userId, vehicleId, cancellationToken: cancellationToken) ?? [];
+        return history
+            .SelectMany(record => record.LinkedMaintenanceItemIds)
+            .ToHashSet();
+    }
+
+    private MaintenanceItemDto MapMaintenance(MaintenanceItem item, Vehicle vehicle, bool hasLinkedHistory = false)
         => new()
         {
             Id = item.Id,
@@ -583,9 +598,12 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
             IntervalThousandKm = item.IntervalThousandKm,
             LastDate = item.LastDate,
             LastOdometerKm = item.LastOdometerKm,
+            ManualBaselineDate = item.ManualBaselineDate,
+            ManualBaselineOdometerKm = item.ManualBaselineOdometerKm,
             NextDate = dueCalculator.CalculateNextDate(item),
             NextOdometerKm = dueCalculator.CalculateNextOdometerKm(item),
             Status = dueCalculator.CalculateStatusForVehicle(item, vehicle),
+            HasLinkedHistory = hasLinkedHistory,
         };
 
     private InsurancePolicyDto MapInsurance(InsurancePolicy policy)

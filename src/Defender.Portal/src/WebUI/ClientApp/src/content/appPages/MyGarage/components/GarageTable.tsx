@@ -34,7 +34,7 @@ export default function GarageTable({
 
   return (
     <TableContainer sx={{ overflowX: "auto" }}>
-      <Table aria-label={ariaLabel} size="small">
+      <Table aria-label={ariaLabel} size="small" sx={{ minWidth: { xs: 760, sm: "auto" } }}>
         <TableHead>
           <TableRow>
             {visibleHeaders.map((header, index) => <TableCell key={index}>{header}</TableCell>)}

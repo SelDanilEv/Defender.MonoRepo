@@ -133,6 +133,44 @@ public sealed class CarServiceClientTests
     }
 
     [Fact]
+    public async Task MaintenanceMethods_WhenBaselineFieldsAreProvided_SerializesManualBaselineContract()
+    {
+        var vehicleId = Guid.NewGuid();
+        var maintenanceId = Guid.NewGuid();
+        var handler = new CapturingHandler(Json("{\"id\":\"" + maintenanceId + "\"}"));
+        var sut = CreateClient(handler, CreateAuthenticationMock().Object);
+        var baselineDate = new DateOnly(2025, 1, 2);
+
+        await sut.CreateMaintenanceItemAsync(
+            vehicleId,
+            new CreateMaintenanceItemRequest
+            {
+                Name = "Oil change",
+                ManualBaselineDate = baselineDate,
+                ManualBaselineOdometerKm = 40_000,
+            },
+            CancellationToken.None);
+
+        Assert.Contains("\"manualBaselineDate\":\"2025-01-02\"", handler.Body, StringComparison.Ordinal);
+        Assert.Contains("\"manualBaselineOdometerKm\":40000", handler.Body, StringComparison.Ordinal);
+
+        handler.Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("{\"id\":\"" + maintenanceId + "\"}") };
+        await sut.UpdateMaintenanceItemAsync(
+            vehicleId,
+            maintenanceId,
+            new UpdateMaintenanceItemRequest
+            {
+                ManualBaselineDate = baselineDate,
+                ManualBaselineOdometerKm = 40_000,
+            },
+            CancellationToken.None);
+
+        Assert.Contains("\"manualBaselineDate\":\"2025-01-02\"", handler.Body, StringComparison.Ordinal);
+        Assert.Contains("\"manualBaselineOdometerKm\":40000", handler.Body, StringComparison.Ordinal);
+        Assert.DoesNotContain("\"lastDate\"", handler.Body, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task HistoryMethods_WhenCalled_UsePaginationAndIds()
     {
         var vehicleId = Guid.NewGuid();

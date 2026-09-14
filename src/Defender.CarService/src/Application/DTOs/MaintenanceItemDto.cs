@@ -18,9 +18,15 @@ public sealed class MaintenanceItemDto
 
     public long? LastOdometerKm { get; init; }
 
+    public DateOnly? ManualBaselineDate { get; init; }
+
+    public long? ManualBaselineOdometerKm { get; init; }
+
     public DateOnly? NextDate { get; init; }
 
     public long? NextOdometerKm { get; init; }
 
     public MaintenanceStatus Status { get; init; }
+
+    public bool HasLinkedHistory { get; init; }
 }

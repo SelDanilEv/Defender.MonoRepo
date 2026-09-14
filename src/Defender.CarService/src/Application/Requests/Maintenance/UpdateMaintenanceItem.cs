@@ -19,6 +19,10 @@ public sealed record UpdateMaintenanceItemCommand : IRequest<MaintenanceItemDto>
     public DateOnly? LastDate { get; init; }
 
     public long? LastOdometerKm { get; init; }
+
+    public DateOnly? ManualBaselineDate { get; init; }
+
+    public long? ManualBaselineOdometerKm { get; init; }
 }
 
 public sealed class UpdateMaintenanceItemCommandValidator : AbstractValidator<UpdateMaintenanceItemCommand>
@@ -28,7 +32,7 @@ public sealed class UpdateMaintenanceItemCommandValidator : AbstractValidator<Up
         RuleFor(request => request.MaintenanceItemId)
             .NotEmpty()
             .WithMessage("CAR_MAINTENANCE_NOT_FOUND");
-        MaintenanceRequestValidation.AddRules(this, request => request.VehicleId, request => request.Name, request => request.IntervalMonths, request => request.IntervalThousandKm, request => request.LastDate, request => request.LastOdometerKm);
+        MaintenanceRequestValidation.AddRules(this, request => request.VehicleId, request => request.Name, request => request.IntervalMonths, request => request.IntervalThousandKm, request => request.ManualBaselineDate, request => request.ManualBaselineOdometerKm);
     }
 }
 

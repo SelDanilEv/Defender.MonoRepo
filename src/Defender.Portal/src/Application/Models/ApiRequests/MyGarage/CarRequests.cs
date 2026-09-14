@@ -44,6 +44,10 @@ public sealed class CreateMaintenanceItemRequest
     public DateOnly? LastDate { get; init; }
 
     public long? LastOdometerKm { get; init; }
+
+    public DateOnly? ManualBaselineDate { get; init; }
+
+    public long? ManualBaselineOdometerKm { get; init; }
 }
 
 public sealed class UpdateMaintenanceItemRequest
@@ -57,6 +61,10 @@ public sealed class UpdateMaintenanceItemRequest
     public DateOnly? LastDate { get; init; }
 
     public long? LastOdometerKm { get; init; }
+
+    public DateOnly? ManualBaselineDate { get; init; }
+
+    public long? ManualBaselineOdometerKm { get; init; }
 }
 
 public sealed class CreateServiceHistoryRequest

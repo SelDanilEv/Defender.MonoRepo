@@ -75,22 +75,22 @@ export default function VehicleDialog({
         <DialogContent>
           <Grid container spacing={2} sx={{ pt: 1 }}>
             <Grid size={{ xs: 12 }}>
-              <TextField autoFocus fullWidth required label={t("fields.displayName")} value={form.displayName} onChange={(event) => update("displayName", event.target.value)} error={Boolean(fieldError)} />
+              <TextField autoFocus fullWidth required label={t("fields.displayName")} value={form.displayName} onChange={(event) => update("displayName", event.target.value)} error={Boolean(fieldError)} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth required label={t("fields.make")} value={form.make} onChange={(event) => update("make", event.target.value)} />
+              <TextField fullWidth required label={t("fields.make")} value={form.make} onChange={(event) => update("make", event.target.value)} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth required label={t("fields.model")} value={form.model} onChange={(event) => update("model", event.target.value)} />
+              <TextField fullWidth required label={t("fields.model")} value={form.model} onChange={(event) => update("model", event.target.value)} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth required type="number" label={t("fields.year")} value={form.year} onChange={(event) => update("year", Number(event.target.value))} error={Boolean(fieldError && (form.year < 1886 || form.year > currentYear + 1))} />
+              <TextField fullWidth required type="number" label={t("fields.year")} value={form.year} onChange={(event) => update("year", Number(event.target.value))} error={Boolean(fieldError && (form.year < 1886 || form.year > currentYear + 1))} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth required label={t("fields.plate")} value={form.plate} onChange={(event) => update("plate", event.target.value)} />
+              <TextField fullWidth required label={t("fields.plate")} value={form.plate} onChange={(event) => update("plate", event.target.value)} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12 }}>
-              <TextField fullWidth label={t("fields.vin")} value={form.vin ?? ""} onChange={(event) => update("vin", event.target.value)} slotProps={{ htmlInput: { maxLength: 17 } }} />
+              <TextField fullWidth label={t("fields.vin")} value={form.vin ?? ""} onChange={(event) => update("vin", event.target.value)} slotProps={{ htmlInput: { maxLength: 17 } }} disabled={busy} />
             </Grid>
             {fieldError || submitError ? <Grid size={{ xs: 12 }}><div role="alert">{submitError || fieldError}</div></Grid> : null}
           </Grid>

@@ -36,7 +36,11 @@
     "policyNumber": "Номер полиса",
     "coverageType": "Покрытие",
     "startDate": "Дата начала",
-    "endDate": "Дата окончания"
+    "endDate": "Дата окончания",
+    "status": "Статус",
+    "actions": "Действия",
+    "linkedMaintenance": "Связанные обслуживания",
+    "linkedMaintenanceHelp": "Выберите обслуживания, связанные с этой записью истории."
   },
   "actions": {
     "addVehicle": "Добавить автомобиль",
@@ -57,6 +61,11 @@
     "close": "Закрыть",
     "includeArchived": "Показывать архивные автомобили"
   },
+  "pagination": {
+    "rowsPerPage": "Строк на странице:"
+  },
+  "table_actions_column": "Действия",
+  "table_rows_per_page_label": "Строк на странице:",
   "statuses": {
     "Upcoming": "Предстоящее",
     "DueSoon": "Скоро срок",

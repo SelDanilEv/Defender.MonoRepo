@@ -74,9 +74,12 @@ export interface MaintenanceItem {
   intervalThousandKm: number | null;
   lastDate: DateOnly | null;
   lastOdometerKm: number | null;
+  manualBaselineDate: DateOnly | null;
+  manualBaselineOdometerKm: number | null;
   nextDate: DateOnly | null;
   nextOdometerKm: number | null;
   status: MaintenanceStatus;
+  hasLinkedHistory: boolean;
 }
 
 export interface ServiceHistoryRecord {

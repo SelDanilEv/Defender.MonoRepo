@@ -52,8 +52,8 @@ export default function MaintenanceDialog({
       name: item?.name ?? "",
       intervalMonths: item?.intervalMonths?.toString() ?? "",
       intervalThousandKm: item?.intervalThousandKm?.toString() ?? "",
-      lastDate: item?.lastDate ?? "",
-      lastOdometerKm: item?.lastOdometerKm?.toString() ?? "",
+      lastDate: item?.manualBaselineDate ?? "",
+      lastOdometerKm: item?.manualBaselineOdometerKm?.toString() ?? "",
     });
     setError(null);
   }, [item, open]);
@@ -94,8 +94,8 @@ export default function MaintenanceDialog({
       name: form.name.trim(),
       intervalMonths,
       intervalThousandKm,
-      lastDate: baselineLocked ? (item?.lastDate ?? null) : form.lastDate || null,
-      lastOdometerKm: baselineLocked ? (item?.lastOdometerKm ?? null) : lastOdometerKm,
+      manualBaselineDate: baselineLocked ? (item?.manualBaselineDate ?? null) : form.lastDate || null,
+      manualBaselineOdometerKm: baselineLocked ? (item?.manualBaselineOdometerKm ?? null) : lastOdometerKm,
     });
   };
 
@@ -108,19 +108,19 @@ export default function MaintenanceDialog({
         <DialogContent>
           <Grid container spacing={2} sx={{ pt: 1 }}>
             <Grid size={{ xs: 12 }}>
-              <TextField autoFocus fullWidth required label={t("fields.name")} value={form.name} onChange={(event) => update("name", event.target.value)} />
+              <TextField autoFocus fullWidth required label={t("fields.name")} value={form.name} onChange={(event) => update("name", event.target.value)} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth type="number" label={t("fields.intervalMonths")} value={form.intervalMonths} onChange={(event) => update("intervalMonths", event.target.value)} slotProps={{ htmlInput: { min: 1, step: 1 } }} />
+              <TextField fullWidth type="number" label={t("fields.intervalMonths")} value={form.intervalMonths} onChange={(event) => update("intervalMonths", event.target.value)} slotProps={{ htmlInput: { min: 1, step: 1 } }} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth type="number" label={t("fields.intervalThousandKm")} value={form.intervalThousandKm} onChange={(event) => update("intervalThousandKm", event.target.value)} slotProps={{ htmlInput: { min: 1, step: 1 } }} />
+              <TextField fullWidth type="number" label={t("fields.intervalThousandKm")} value={form.intervalThousandKm} onChange={(event) => update("intervalThousandKm", event.target.value)} slotProps={{ htmlInput: { min: 1, step: 1 } }} disabled={busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth type="date" label={t("fields.lastDate")} value={form.lastDate} onChange={(event) => update("lastDate", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={baselineLocked} />
+              <TextField fullWidth type="date" label={t("fields.lastDate")} value={form.lastDate} onChange={(event) => update("lastDate", event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={baselineLocked || busy} />
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TextField fullWidth type="number" label={t("fields.lastOdometerKm")} value={form.lastOdometerKm} onChange={(event) => update("lastOdometerKm", event.target.value)} slotProps={{ htmlInput: { min: 0, step: 1 } }} disabled={baselineLocked} />
+              <TextField fullWidth type="number" label={t("fields.lastOdometerKm")} value={form.lastOdometerKm} onChange={(event) => update("lastOdometerKm", event.target.value)} slotProps={{ htmlInput: { min: 0, step: 1 } }} disabled={baselineLocked || busy} />
             </Grid>
             {baselineLocked ? <Grid size={{ xs: 12 }}><FormHelperText>{t("conflicts.baselineLocked")}</FormHelperText></Grid> : null}
             {error || submitError ? <Grid size={{ xs: 12 }}><div role="alert">{submitError || error}</div></Grid> : null}

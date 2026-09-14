@@ -1,6 +1,7 @@
 using System.Reflection;
 using AutoMapper;
 using Defender.CarService.Application.DTOs;
+using Defender.CarService.Application.Requests.Maintenance;
 using Defender.CarService.Application.Requests.Vehicles;
 using Defender.CarService.WebApi.Controllers;
 using Defender.CarService.WebApi.Contracts;
@@ -101,6 +102,31 @@ public sealed class CarControllerTests
         var result = await controller.DeleteHistoryAsync(Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None);
 
         Assert.IsType<NoContentResult>(result);
+    }
+
+    [Fact]
+    public void MaintenanceRequestMapping_PreservesManualBaselineFields()
+    {
+        var mapper = new MapperConfiguration(
+            configuration => configuration.AddProfile<CarApiMappingProfile>(),
+            NullLoggerFactory.Instance).CreateMapper();
+        var date = new DateOnly(2025, 1, 2);
+
+        var create = mapper.Map<CreateMaintenanceItemCommand>(new CreateMaintenanceItemRequest
+        {
+            ManualBaselineDate = date,
+            ManualBaselineOdometerKm = 40_000,
+        });
+        var update = mapper.Map<UpdateMaintenanceItemCommand>(new UpdateMaintenanceItemRequest
+        {
+            ManualBaselineDate = date,
+            ManualBaselineOdometerKm = 40_000,
+        });
+
+        Assert.Equal(date, create.ManualBaselineDate);
+        Assert.Equal(40_000, create.ManualBaselineOdometerKm);
+        Assert.Equal(date, update.ManualBaselineDate);
+        Assert.Equal(40_000, update.ManualBaselineOdometerKm);
     }
 
 }
