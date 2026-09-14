@@ -24,7 +24,7 @@ public sealed class CarServiceClient(
 
     static CarServiceClient()
     {
-        JsonOptions.Converters.Add(new JsonStringEnumConverter());
+        JsonOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
     }
 
     public Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesAsync(
@@ -247,7 +247,7 @@ public sealed class CarServiceClient(
             code = ReadString(root, "code") ?? ReadNestedExtension(root, "code");
             detail = ReadString(root, "detail") ?? detail;
         }
-        catch (JsonException)
+        catch (Exception exception) when (exception is JsonException or InvalidOperationException)
         {
         }
 
@@ -256,14 +256,16 @@ public sealed class CarServiceClient(
 
     private static string? ReadNestedExtension(JsonElement root, string propertyName)
     {
-        return root.TryGetProperty("extensions", out var extensions)
+        return root.ValueKind == JsonValueKind.Object && root.TryGetProperty("extensions", out var extensions)
             ? ReadString(extensions, propertyName)
             : null;
     }
 
     private static string? ReadString(JsonElement element, string propertyName)
     {
-        return element.TryGetProperty(propertyName, out var value) && value.ValueKind == JsonValueKind.String
+        return element.ValueKind == JsonValueKind.Object
+            && element.TryGetProperty(propertyName, out var value)
+            && value.ValueKind == JsonValueKind.String
             ? value.GetString()
             : null;
     }

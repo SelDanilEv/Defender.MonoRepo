@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using Defender.Common.Interfaces;
 using Defender.Common.Wrapper.Internal;
 using Defender.Portal.Application.Configuration.Options;
@@ -112,8 +113,13 @@ public sealed class CarServiceClientTests
         Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/maintenance", handler.Request!.RequestUri!.AbsolutePath);
 
         handler.Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("{\"id\":\"" + maintenanceId + "\"}") };
-        await sut.CreateMaintenanceItemAsync(vehicleId, new CreateMaintenanceItemRequest(), CancellationToken.None);
+        await sut.CreateMaintenanceItemAsync(
+            vehicleId,
+            new CreateMaintenanceItemRequest { Name = "Oil change" },
+            CancellationToken.None);
         Assert.Equal(HttpMethod.Post, handler.Request.Method);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/maintenance", handler.Request.RequestUri!.AbsolutePath);
+        Assert.Contains("\"name\":\"Oil change\"", handler.Body, StringComparison.Ordinal);
 
         handler.Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("{\"id\":\"" + maintenanceId + "\"}") };
         await sut.UpdateMaintenanceItemAsync(vehicleId, maintenanceId, new UpdateMaintenanceItemRequest(), CancellationToken.None);
@@ -123,6 +129,7 @@ public sealed class CarServiceClientTests
         handler.Response = new HttpResponseMessage(HttpStatusCode.NoContent);
         await sut.DeleteMaintenanceItemAsync(vehicleId, maintenanceId, CancellationToken.None);
         Assert.Equal(HttpMethod.Delete, handler.Request.Method);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/maintenance/{maintenanceId}", handler.Request.RequestUri!.AbsolutePath);
     }
 
     [Fact]
@@ -137,8 +144,13 @@ public sealed class CarServiceClientTests
         Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/history?page=2&pageSize=10", handler.Request!.RequestUri!.PathAndQuery);
 
         handler.Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("{\"id\":\"" + historyId + "\"}") };
-        await sut.CreateHistoryAsync(vehicleId, new CreateServiceHistoryRequest(), CancellationToken.None);
+        await sut.CreateHistoryAsync(
+            vehicleId,
+            new CreateServiceHistoryRequest { Type = HistoryType.Repair, Title = "Repair" },
+            CancellationToken.None);
         Assert.Equal(HttpMethod.Post, handler.Request.Method);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/history", handler.Request.RequestUri!.AbsolutePath);
+        Assert.Contains("\"type\":\"Repair\"", handler.Body, StringComparison.Ordinal);
 
         handler.Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("{\"id\":\"" + historyId + "\"}") };
         await sut.UpdateHistoryAsync(vehicleId, historyId, new UpdateServiceHistoryRequest(), CancellationToken.None);
@@ -148,6 +160,7 @@ public sealed class CarServiceClientTests
         handler.Response = new HttpResponseMessage(HttpStatusCode.NoContent);
         await sut.DeleteHistoryAsync(vehicleId, historyId, CancellationToken.None);
         Assert.Equal(HttpMethod.Delete, handler.Request.Method);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/history/{historyId}", handler.Request.RequestUri!.AbsolutePath);
     }
 
     [Fact]
@@ -162,8 +175,13 @@ public sealed class CarServiceClientTests
         Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/insurance", handler.Request!.RequestUri!.AbsolutePath);
 
         handler.Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("{\"id\":\"" + policyId + "\"}") };
-        await sut.CreateInsurancePolicyAsync(vehicleId, new CreateInsurancePolicyRequest(), CancellationToken.None);
+        await sut.CreateInsurancePolicyAsync(
+            vehicleId,
+            new CreateInsurancePolicyRequest { Provider = "Example Insurance" },
+            CancellationToken.None);
         Assert.Equal(HttpMethod.Post, handler.Request.Method);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/insurance", handler.Request.RequestUri!.AbsolutePath);
+        Assert.Contains("\"provider\":\"Example Insurance\"", handler.Body, StringComparison.Ordinal);
 
         handler.Response = new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("{\"id\":\"" + policyId + "\"}") };
         await sut.UpdateInsurancePolicyAsync(vehicleId, policyId, new UpdateInsurancePolicyRequest(), CancellationToken.None);
@@ -194,6 +212,23 @@ public sealed class CarServiceClientTests
     }
 
     [Fact]
+    public async Task GetVehiclesAsync_WhenProblemDetailsUsesExtensions_PreservesCarCode()
+    {
+        var handler = new CapturingHandler(new HttpResponseMessage(HttpStatusCode.Conflict)
+        {
+            Content = Json("{\"status\":409,\"detail\":\"conflict\",\"extensions\":{\"code\":\"CAR_CONCURRENCY_CONFLICT\"}}"),
+        });
+        var sut = CreateClient(handler, CreateAuthenticationMock().Object);
+
+        var exception = await Assert.ThrowsAsync<CarServiceUpstreamException>(
+            () => sut.GetVehiclesAsync(false, CancellationToken.None));
+
+        Assert.Equal((int)HttpStatusCode.Conflict, exception.Status);
+        Assert.Equal("CAR_CONCURRENCY_CONFLICT", exception.Code);
+        Assert.Equal("conflict", exception.Detail);
+    }
+
+    [Fact]
     public async Task GetVehiclesAsync_WhenErrorBodyRead_ConsumesBodyOnce()
     {
         var content = new CountingContent("{\"code\":\"CAR_UNHANDLED_ERROR\",\"detail\":\"failure\"}");
@@ -203,6 +238,73 @@ public sealed class CarServiceClientTests
         await Assert.ThrowsAsync<CarServiceUpstreamException>(() => sut.GetVehiclesAsync(false, CancellationToken.None));
 
         Assert.Equal(1, content.ReadCount);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("{")]
+    [InlineData("[]")]
+    [InlineData("null")]
+    [InlineData("\"text\"")]
+    [InlineData("123")]
+    [InlineData("{\"extensions\":null}")]
+    public async Task GetVehiclesAsync_WhenErrorBodyIsNotAProblemObject_UsesStableFallback(string body)
+    {
+        var handler = new CapturingHandler(new HttpResponseMessage(HttpStatusCode.InternalServerError)
+        {
+            Content = Json(body),
+        });
+        var sut = CreateClient(handler, CreateAuthenticationMock().Object);
+
+        var exception = await Assert.ThrowsAsync<CarServiceUpstreamException>(
+            () => sut.GetVehiclesAsync(false, CancellationToken.None));
+
+        Assert.Equal((int)HttpStatusCode.InternalServerError, exception.Status);
+        Assert.Null(exception.Code);
+        Assert.Equal(nameof(HttpStatusCode.InternalServerError), exception.Detail);
+    }
+
+    [Fact]
+    public async Task GetHistoryAsync_WhenResponseUsesStringEnum_DeserializesHistoryType()
+    {
+        var vehicleId = Guid.NewGuid();
+        var handler = new CapturingHandler(Json(
+            "{\"items\":[{\"type\":\"Maintenance\"}],\"totalItemsCount\":1,\"currentPage\":0,\"pageSize\":25,\"totalPagesCount\":1}"));
+        var sut = CreateClient(handler, CreateAuthenticationMock().Object);
+
+        var result = await sut.GetHistoryAsync(vehicleId, cancellationToken: CancellationToken.None);
+
+        Assert.Equal(HistoryType.Maintenance, result.Items.Single().Type);
+    }
+
+    [Fact]
+    public async Task GetHistoryAsync_WhenResponseUsesNumericEnum_RejectsIntegerValue()
+    {
+        var vehicleId = Guid.NewGuid();
+        var handler = new CapturingHandler(Json(
+            "{\"items\":[{\"type\":1}],\"totalItemsCount\":1,\"currentPage\":0,\"pageSize\":25,\"totalPagesCount\":1}"));
+        var sut = CreateClient(handler, CreateAuthenticationMock().Object);
+
+        await Assert.ThrowsAsync<JsonException>(
+            () => sut.GetHistoryAsync(vehicleId, cancellationToken: CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task GetVehiclesAsync_WhenHttpHandlerCancels_PropagatesCancellation()
+    {
+        var handler = new CancellingHandler();
+        var sut = CreateClient(handler, CreateAuthenticationMock().Object);
+        using var source = new CancellationTokenSource();
+        var task = sut.GetVehiclesAsync(false, source.Token);
+
+        await handler.Entered.Task;
+        source.Cancel();
+
+        var exception = await Assert.ThrowsAnyAsync<OperationCanceledException>(
+            () => task);
+
+        Assert.IsNotType<CarServiceUpstreamException>(exception);
+        Assert.True(handler.RequestCancellationToken.IsCancellationRequested);
     }
 
     private static Mock<IAuthenticationHeaderAccessor> CreateAuthenticationMock()
@@ -237,11 +339,29 @@ public sealed class CarServiceClientTests
 
         public string Body { get; private set; } = string.Empty;
 
+        public CancellationToken RequestCancellationToken { get; private set; }
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             Request = request;
+            RequestCancellationToken = cancellationToken;
             Body = request.Content is null ? string.Empty : await request.Content.ReadAsStringAsync(cancellationToken);
             return Response;
+        }
+    }
+
+    private sealed class CancellingHandler : HttpMessageHandler
+    {
+        public TaskCompletionSource<bool> Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        public CancellationToken RequestCancellationToken { get; private set; }
+
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            RequestCancellationToken = cancellationToken;
+            Entered.SetResult(true);
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            return new HttpResponseMessage(HttpStatusCode.OK) { Content = Json("[]") };
         }
     }
 

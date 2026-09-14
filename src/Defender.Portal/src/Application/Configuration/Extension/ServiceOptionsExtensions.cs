@@ -20,6 +20,7 @@ public static class ServiceOptionsExtensions
             .AddOptions<CarServiceOptions>()
             .Bind(configuration.GetSection(nameof(CarServiceOptions)))
             .Validate(options => Uri.TryCreate(options.Url, UriKind.Absolute, out _), "CarServiceOptions:Url must be an absolute URI.")
+            .Validate(options => options.TimeoutSeconds > 0, "CarServiceOptions:TimeoutSeconds must be positive.")
             .ValidateOnStart();
         services.PostConfigure<CarServiceOptions>(options => options.Url = options.Url.TrimEnd('/') + "/");
 

@@ -101,5 +101,64 @@ public sealed class MyGarageControllerTests
         Assert.Equal(expected, routes);
     }
 
+    [Fact]
+    public async Task AllActions_WhenCalled_DelegateEveryRouteAndPreserveStatuses()
+    {
+        var wrapper = new Mock<ICarServiceWrapper>(MockBehavior.Strict);
+        var token = new CancellationTokenSource().Token;
+        var vehicleId = Guid.NewGuid();
+        var maintenanceId = Guid.NewGuid();
+        var historyId = Guid.NewGuid();
+        var insuranceId = Guid.NewGuid();
+        var vehicleRequest = new CreateVehicleRequest();
+        var updateVehicleRequest = new UpdateVehicleRequest();
+        var maintenanceRequest = new CreateMaintenanceItemRequest();
+        var updateMaintenanceRequest = new UpdateMaintenanceItemRequest();
+        var historyRequest = new CreateServiceHistoryRequest();
+        var updateHistoryRequest = new UpdateServiceHistoryRequest();
+        var insuranceRequest = new CreateInsurancePolicyRequest();
+        var updateInsuranceRequest = new UpdateInsurancePolicyRequest();
+
+        wrapper.Setup(item => item.GetVehiclesAsync(true, token)).ReturnsAsync([]);
+        wrapper.Setup(item => item.CreateVehicleAsync(vehicleRequest, token)).ReturnsAsync(new VehicleDto());
+        wrapper.Setup(item => item.GetVehicleAsync(vehicleId, token)).ReturnsAsync(new VehicleDetailDto());
+        wrapper.Setup(item => item.UpdateVehicleAsync(vehicleId, updateVehicleRequest, token)).ReturnsAsync(new VehicleDto());
+        wrapper.Setup(item => item.ArchiveVehicleAsync(vehicleId, token)).ReturnsAsync(new VehicleDto());
+        wrapper.Setup(item => item.UnarchiveVehicleAsync(vehicleId, token)).ReturnsAsync(new VehicleDto());
+        wrapper.Setup(item => item.GetMaintenanceItemsAsync(vehicleId, token)).ReturnsAsync([]);
+        wrapper.Setup(item => item.CreateMaintenanceItemAsync(vehicleId, maintenanceRequest, token)).ReturnsAsync(new MaintenanceItemDto());
+        wrapper.Setup(item => item.UpdateMaintenanceItemAsync(vehicleId, maintenanceId, updateMaintenanceRequest, token)).ReturnsAsync(new MaintenanceItemDto());
+        wrapper.Setup(item => item.DeleteMaintenanceItemAsync(vehicleId, maintenanceId, token)).Returns(Task.CompletedTask);
+        wrapper.Setup(item => item.GetHistoryAsync(vehicleId, 2, 10, token)).ReturnsAsync(new ServiceHistoryPageDto());
+        wrapper.Setup(item => item.CreateHistoryAsync(vehicleId, historyRequest, token)).ReturnsAsync(new ServiceHistoryRecordDto());
+        wrapper.Setup(item => item.UpdateHistoryAsync(vehicleId, historyId, updateHistoryRequest, token)).ReturnsAsync(new ServiceHistoryRecordDto());
+        wrapper.Setup(item => item.DeleteHistoryAsync(vehicleId, historyId, token)).Returns(Task.CompletedTask);
+        wrapper.Setup(item => item.GetInsurancePoliciesAsync(vehicleId, token)).ReturnsAsync([]);
+        wrapper.Setup(item => item.CreateInsurancePolicyAsync(vehicleId, insuranceRequest, token)).ReturnsAsync(new InsurancePolicyDto());
+        wrapper.Setup(item => item.UpdateInsurancePolicyAsync(vehicleId, insuranceId, updateInsuranceRequest, token)).ReturnsAsync(new InsurancePolicyDto());
+
+        var sut = CreateController(wrapper.Object);
+
+        Assert.IsType<OkObjectResult>(await sut.GetVehiclesAsync(true, token));
+        Assert.Equal(StatusCodes.Status201Created, Assert.IsType<ObjectResult>(await sut.CreateVehicleAsync(vehicleRequest, token)).StatusCode);
+        Assert.IsType<OkObjectResult>(await sut.GetVehicleAsync(vehicleId, token));
+        Assert.IsType<OkObjectResult>(await sut.UpdateVehicleAsync(vehicleId, updateVehicleRequest, token));
+        Assert.IsType<OkObjectResult>(await sut.ArchiveVehicleAsync(vehicleId, token));
+        Assert.IsType<OkObjectResult>(await sut.UnarchiveVehicleAsync(vehicleId, token));
+        Assert.IsType<OkObjectResult>(await sut.GetMaintenanceItemsAsync(vehicleId, token));
+        Assert.Equal(StatusCodes.Status201Created, Assert.IsType<ObjectResult>(await sut.CreateMaintenanceItemAsync(vehicleId, maintenanceRequest, token)).StatusCode);
+        Assert.IsType<OkObjectResult>(await sut.UpdateMaintenanceItemAsync(vehicleId, maintenanceId, updateMaintenanceRequest, token));
+        Assert.IsType<NoContentResult>(await sut.DeleteMaintenanceItemAsync(vehicleId, maintenanceId, token));
+        Assert.IsType<OkObjectResult>(await sut.GetHistoryAsync(vehicleId, 2, 10, token));
+        Assert.Equal(StatusCodes.Status201Created, Assert.IsType<ObjectResult>(await sut.CreateHistoryAsync(vehicleId, historyRequest, token)).StatusCode);
+        Assert.IsType<OkObjectResult>(await sut.UpdateHistoryAsync(vehicleId, historyId, updateHistoryRequest, token));
+        Assert.IsType<NoContentResult>(await sut.DeleteHistoryAsync(vehicleId, historyId, token));
+        Assert.IsType<OkObjectResult>(await sut.GetInsurancePoliciesAsync(vehicleId, token));
+        Assert.Equal(StatusCodes.Status201Created, Assert.IsType<ObjectResult>(await sut.CreateInsurancePolicyAsync(vehicleId, insuranceRequest, token)).StatusCode);
+        Assert.IsType<OkObjectResult>(await sut.UpdateInsurancePolicyAsync(vehicleId, insuranceId, updateInsuranceRequest, token));
+
+        wrapper.VerifyAll();
+    }
+
     private static MyGarageController CreateController(ICarServiceWrapper wrapper) => new(wrapper);
 }

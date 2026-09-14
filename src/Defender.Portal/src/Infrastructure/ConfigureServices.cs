@@ -116,7 +116,9 @@ public static class ConfigureServices
 
         services.AddHttpClient<ICarServiceClient, CarServiceClient>((serviceProvider, client) =>
         {
-            client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<CarServiceOptions>>().Value.Url);
+            var options = serviceProvider.GetRequiredService<IOptions<CarServiceOptions>>().Value;
+            client.BaseAddress = new Uri(options.Url);
+            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
         });
 
         services.AddHttpClient<ITelegramBotClient, TelegramBotClient>(client =>
