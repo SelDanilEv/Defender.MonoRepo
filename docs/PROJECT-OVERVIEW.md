@@ -417,7 +417,8 @@ Two shared Dockerfiles using multi-stage Alpine-based builds:
 - **ConfigMap**: `ASPNETCORE_ENVIRONMENT: Prod` and service-specific settings.
 - **Secrets**: `Defender_App_MongoDBConnectionString` and `Defender_App_SecretsEncryptionKey` from Kubernetes secrets.
 - **CarService**: `values-car.yaml`, release `car-service`, health paths `/health` and `/health/ready`.
-  ArgoCD auto-sync stays disabled until CI promotes an immutable image tag.
+  CarService always uses manual ArgoCD sync. Immutable promoted tags remain manual; promotion updates
+  values only, and explicit approved manual sync stays separate.
 
 ### ArgoCD (GitOps)
 
@@ -469,7 +470,7 @@ and pushes. Enabled apps can then sync.
 
 ### CarService manual-sync exception
 
-publish an immutable CarService tag, then promotion commits values-car.yaml. After current-task deployment approval, run
+CarService always uses manual ArgoCD sync. Immutable promoted tags remain manual. Required flow: publish an immutable CarService tag, then promotion commits values-car.yaml. After current-task deployment approval, run
 manual ArgoCD sync for `car-service`; promotion does not auto-deploy CarService.
 
 ---

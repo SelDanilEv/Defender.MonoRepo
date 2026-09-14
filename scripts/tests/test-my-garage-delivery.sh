@@ -20,12 +20,18 @@ fi
 grep -Eq 'generate_argocd_app "Defender\.CarService" "car-service" "values-car\.yaml" "false"' "$generator"
 
 for document in "$operations" "$workflow_readme" "$root_readme" "$project_overview" "$car_readme"; do
+    if grep -Eiq 'CarService.*(manual|sync).*until|auto-sync.*disabled until|latest.*manual until|after promotion.*(sync|auto-sync)|promotion.*(enables|turns on|activates) .*sync' "$document"; then
+        echo "FAIL conditional CarService sync wording in $document" >&2
+        exit 1
+    fi
     grep -Fq 'CarService manual-sync exception' "$document"
     grep -Fq 'publish an immutable CarService tag' "$document"
     grep -Fq 'promotion commits values-car.yaml' "$document"
     grep -Fq 'manual ArgoCD sync' "$document"
     grep -Fq 'current-task' "$document"
     grep -Fq 'deployment approval' "$document"
+    grep -Fq 'CarService always uses manual ArgoCD sync' "$document"
+    grep -Fiq 'immutable promoted tags remain manual' "$document"
 done
 
 if grep -Eiq 'CarService remains manual until|promotion (enables|turns on|activates) .*auto-sync|promotion.*auto-sync (enabled|on)' "$project_overview"; then

@@ -33,13 +33,14 @@ Mongo replica set `rs0`.
 
 Helm values are in `helm/service-template/values-car.yaml`. The release is `car-service` in the
 `defender` namespace and publishes `defendersd/defender.car`. Image publication, promotion, and
-ArgoCD deployment require explicit approval. Controlled flow: publish an immutable CarService tag,
+ArgoCD deployment require explicit approval. CarService always uses manual ArgoCD sync. Mutable
+`latest` bootstrap and immutable promoted tags remain manual. Controlled flow: publish an immutable CarService tag,
 then promotion commits values-car.yaml. After current-task deployment approval, run manual ArgoCD sync
 for `car-service`; promotion does not auto-deploy CarService.
 
 ### CarService manual-sync exception
 
-The `latest` bootstrap tag stays manual until an immutable promoted tag exists.
+The mutable `latest` bootstrap tag and every immutable promoted tag stay manual.
 
 ## Project layout
 

@@ -26,7 +26,8 @@ promotion commit, then allow up to three minutes for ArgoCD detection and sync.
 
 ### CarService manual-sync exception
 
-CarService bootstrap keeps mutable `latest` with ArgoCD automated sync disabled. Required flow:
+CarService always uses manual ArgoCD sync. Mutable `latest` bootstrap and immutable promoted tags remain manual.
+Required flow:
 publish an immutable CarService tag, then promotion commits values-car.yaml. After current-task
 deployment approval, run manual ArgoCD sync for `car-service`. Promotion does not auto-deploy
 CarService.
