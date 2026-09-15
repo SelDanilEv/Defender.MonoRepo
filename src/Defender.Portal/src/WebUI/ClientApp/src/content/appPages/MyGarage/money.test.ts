@@ -16,10 +16,13 @@ describe("My Garage money helpers", () => {
   test("majorToMinor_WhenBlank_ReturnsNullPairValue", () => {
     expect(majorToMinor("  ")).toBeNull();
     expect(formatMinorCost(null, null)).toBe("");
+    expect(formatMinorCost(undefined, undefined)).toBe("");
   });
 
   test("minorToMajor_WhenGivenOneUnit_UsesTwoDecimalPlaces", () => {
     expect(minorToMajor(100)).toBe("1.00");
     expect(formatMinorCost(1234, Currency.PLN)).toBe("12.34 zł");
+    expect(minorToMajor(undefined)).toBe("");
+    expect(formatMinorCost(0, Currency.PLN)).toBe("0.00 zł");
   });
 });

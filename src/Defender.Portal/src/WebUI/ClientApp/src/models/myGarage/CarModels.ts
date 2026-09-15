@@ -33,7 +33,7 @@ export interface Vehicle {
   plate: string;
   vin: string | null;
   archived: boolean;
-  currentOdometerKm: number | null;
+  currentOdometerKm?: number | null;
   version: number;
   createdAtUtc: string;
   updatedAtUtc: string;
@@ -55,7 +55,7 @@ export interface VehicleSummary {
   plate: string;
   vin: string | null;
   archived: boolean;
-  currentOdometerKm: number | null;
+  currentOdometerKm?: number | null;
   maintenanceCounts: MaintenanceStatusCounts;
   insuranceStatus: InsuranceStatus | null;
 }
@@ -73,11 +73,11 @@ export interface MaintenanceItem {
   intervalMonths: number | null;
   intervalThousandKm: number | null;
   lastDate: DateOnly | null;
-  lastOdometerKm: number | null;
+  lastOdometerKm?: number | null;
   manualBaselineDate: DateOnly | null;
-  manualBaselineOdometerKm: number | null;
+  manualBaselineOdometerKm?: number | null;
   nextDate: DateOnly | null;
-  nextOdometerKm: number | null;
+  nextOdometerKm?: number | null;
   status: MaintenanceStatus;
   hasLinkedHistory: boolean;
 }
@@ -91,8 +91,8 @@ export interface ServiceHistoryRecord {
   title: string;
   notes: string | null;
   linkedMaintenanceItemIds: string[];
-  costAmountMinor: number | null;
-  costCurrency: Currency | null;
+  costAmountMinor?: number | null;
+  costCurrency?: Currency | null;
 }
 
 export interface ServiceHistoryPage {

@@ -73,7 +73,7 @@ export default function HistoryDialog({
       title: record.title,
       notes: record.notes ?? "",
       linkedMaintenanceItemIds: normalizeMaintenanceSelection(record.linkedMaintenanceItemIds),
-      costAmount: record.costAmountMinor === null ? "" : (record.costAmountMinor / 100).toString(),
+      costAmount: record.costAmountMinor == null ? "" : (record.costAmountMinor / 100).toString(),
       costCurrency: record.costCurrency ?? "",
     } : emptyForm());
     setError(null);

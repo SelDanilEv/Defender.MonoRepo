@@ -10,7 +10,10 @@ using Defender.CarService.Application.Common.Exceptions;
 using Defender.CarService.Application.Common.Interfaces.Services;
 using Defender.CarService.Application.DTOs;
 using Defender.CarService.Application.Requests.Maintenance;
+using Defender.CarService.Application.Requests.History;
+using Defender.CarService.Application.Requests.Insurance;
 using Defender.CarService.Application.Requests.Vehicles;
+using Defender.CarService.Domain.Enums;
 using Defender.CarService.Domain.Exceptions;
 using Defender.Common.Consts;
 using Defender.Common.Interfaces;
@@ -131,6 +134,113 @@ public sealed class CarWebApiPipelineTests
 
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/maintenance", response.Headers.Location?.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task CreateHistory_ReturnsCreatedResponseWithHistoryLocationAndBody()
+    {
+        using var factory = new CarWebApplicationFactory();
+        var vehicleId = Guid.NewGuid();
+        var historyId = Guid.NewGuid();
+        factory.ApplicationService
+            .Setup(service => service.CreateHistoryAsync(
+                It.IsAny<CreateHistoryCommand>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ServiceHistoryRecordDto
+            {
+                Id = historyId,
+                VehicleId = vehicleId,
+                Date = new DateOnly(2026, 9, 15),
+                OdometerKm = 51_000,
+                Type = HistoryType.Repair,
+                Title = "Brake repair",
+                LinkedMaintenanceItemIds = [],
+                CostAmountMinor = 0,
+                CostCurrency = Currency.PLN,
+            });
+
+        using var client = factory.CreateAuthenticatedClient(UserId);
+        using var response = await client.PostAsJsonAsync(
+            $"/api/V1/car/vehicles/{vehicleId}/history",
+            new
+            {
+                date = "2026-09-15",
+                odometerKm = 51_000,
+                type = "Repair",
+                title = "Brake repair",
+                costAmountMinor = 0,
+                costCurrency = "PLN",
+            });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/history", response.Headers.Location?.AbsolutePath);
+        Assert.Equal("?page=0&pageSize=25", response.Headers.Location?.Query);
+        using var document = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        Assert.Equal(historyId, document.RootElement.GetProperty("id").GetGuid());
+        Assert.Equal(vehicleId, document.RootElement.GetProperty("vehicleId").GetGuid());
+        Assert.Equal("Brake repair", document.RootElement.GetProperty("title").GetString());
+        Assert.Equal(0, document.RootElement.GetProperty("costAmountMinor").GetInt64());
+        Assert.Equal("PLN", document.RootElement.GetProperty("costCurrency").GetString());
+        factory.ApplicationService.Verify(service => service.CreateHistoryAsync(
+            It.Is<CreateHistoryCommand>(command =>
+                command.VehicleId == vehicleId
+                && command.OdometerKm == 51_000
+                && command.Type == HistoryType.Repair
+                && command.CostAmountMinor == 0
+                && command.CostCurrency == Currency.PLN),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task CreateInsurancePolicy_ReturnsCreatedResponseWithInsuranceLocationAndBody()
+    {
+        using var factory = new CarWebApplicationFactory();
+        var vehicleId = Guid.NewGuid();
+        var policyId = Guid.NewGuid();
+        factory.ApplicationService
+            .Setup(service => service.CreateInsurancePolicyAsync(
+                It.IsAny<CreateInsurancePolicyCommand>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new InsurancePolicyDto
+            {
+                Id = policyId,
+                VehicleId = vehicleId,
+                Provider = "Safe Cover",
+                PolicyNumber = "P-1",
+                CoverageType = "OC",
+                StartDate = new DateOnly(2026, 9, 1),
+                EndDate = new DateOnly(2027, 9, 1),
+                Status = InsuranceStatus.Active,
+            });
+
+        using var client = factory.CreateAuthenticatedClient(UserId);
+        using var response = await client.PostAsJsonAsync(
+            $"/api/V1/car/vehicles/{vehicleId}/insurance",
+            new
+            {
+                provider = "Safe Cover",
+                policyNumber = "P-1",
+                coverageType = "OC",
+                startDate = "2026-09-01",
+                endDate = "2027-09-01",
+            });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/insurance", response.Headers.Location?.AbsolutePath);
+        Assert.Equal("", response.Headers.Location?.Query);
+        using var document = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+        Assert.Equal(policyId, document.RootElement.GetProperty("id").GetGuid());
+        Assert.Equal(vehicleId, document.RootElement.GetProperty("vehicleId").GetGuid());
+        Assert.Equal("Safe Cover", document.RootElement.GetProperty("provider").GetString());
+        Assert.Equal("P-1", document.RootElement.GetProperty("policyNumber").GetString());
+        factory.ApplicationService.Verify(service => service.CreateInsurancePolicyAsync(
+            It.Is<CreateInsurancePolicyCommand>(command =>
+                command.VehicleId == vehicleId
+                && command.Provider == "Safe Cover"
+                && command.PolicyNumber == "P-1"),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     [Fact]

@@ -164,7 +164,11 @@ describe("My Garage review round 1", () => {
     renderRoute("/my-garage/vehicles/:vehicleId/maintenance", <MaintenancePage />);
 
     await waitFor(() => expect(screen.getByText("Oil")).toBeTruthy());
-    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+    const row = screen.getAllByRole("row").find((candidate) => candidate.textContent?.includes("Oil"));
+    expect(row).toBeTruthy();
+    const nextDateCell = within(row!).getAllByRole("cell")[4];
+    expect(nextDateCell.textContent?.trim()).toBe("1/1/2027");
+    expect(nextDateCell.textContent ?? "").not.toMatch(/NaN|undefined/);
   });
 
   test("maintenance_WhenCreatingWithoutBaseline_SendsBlankManualBaseline", async () => {
@@ -208,7 +212,9 @@ describe("My Garage review round 1", () => {
     renderRoute("/my-garage/vehicles/:vehicleId", <VehicleOverviewPage />);
 
     await waitFor(() => expect(screen.getByText("Daily")).toBeTruthy());
-    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+    const currentOdometerLabel = screen.getByText("Current odometer");
+    expect(currentOdometerLabel.parentElement).toBeTruthy();
+    expect(within(currentOdometerLabel.parentElement!).getByText("-")).toBeTruthy();
   });
 
   test("overview_WhenVehicleIsMissing_ShowsLocalizedNotFoundState", async () => {
@@ -241,7 +247,9 @@ describe("My Garage review round 1", () => {
     renderRoute("/my-garage/vehicles", <VehiclesPage />);
 
     await waitFor(() => expect(screen.getByText("Daily")).toBeTruthy());
-    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+    const row = screen.getAllByRole("row").find((candidate) => candidate.textContent?.includes("Daily"));
+    expect(row).toBeTruthy();
+    expect(within(row!).getAllByRole("cell")[3].textContent?.trim()).toBe("-");
   });
 
   test("vehicles_WhenCreateEditArchiveActionsRun_UsesVehicleMutationEndpointsAndConfirmation", async () => {
@@ -309,6 +317,100 @@ describe("My Garage review round 1", () => {
     fireEvent.click(screen.getByRole("button", { name: /Record service/i }));
     expect(screen.getByRole("combobox", { name: "Type" })).toBeTruthy();
     expect(screen.getByRole("combobox", { name: "Currency" })).toBeTruthy();
+  });
+
+  test("history_WhenFilterSelectRenders_HasExactAccessibleName", async () => {
+    renderRoute("/my-garage/vehicles/:vehicleId/history", <HistoryPage />);
+
+    await waitFor(() => expect(screen.getByText("Brake repair")).toBeTruthy());
+    expect(screen.getByRole("combobox", { name: "Type" })).toBeTruthy();
+  });
+
+  test.each([HistoryType.Repair, HistoryType.Tire])("history_WhenCreatingCostless%s_SendsNullCostPair", async (type) => {
+    renderRoute("/my-garage/vehicles/:vehicleId/history", <HistoryPage />);
+
+    await waitFor(() => expect(screen.getByText("Brake repair")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: /Record service/i }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.change(within(dialog).getByRole("spinbutton", { name: "Odometer" }), { target: { value: "51000" } });
+    fireEvent.change(within(dialog).getByRole("textbox", { name: "Title" }), { target: { value: `${type} without cost` } });
+    fireEvent.mouseDown(within(dialog).getByRole("combobox", { name: "Type" }));
+    fireEvent.click(await screen.findByRole("option", { name: type }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(api.createHistory).toHaveBeenCalledWith("vehicle-1", expect.objectContaining({
+      type,
+      costAmountMinor: null,
+      costCurrency: null,
+    }), null));
+  });
+
+  test.each([
+    [HistoryType.Repair, undefined, undefined, ""],
+    [HistoryType.Tire, null, null, ""],
+    [HistoryType.Repair, 0, Currency.PLN, "0.00 zł"],
+  ] as const)("history_WhenDisplaying%sCost_IsSafe", async (type, costAmountMinor, costCurrency, expectedCost) => {
+    const record = {
+      ...historyPage.items[0],
+      id: `history-${type}-${String(costAmountMinor)}`,
+      type,
+      title: `${type} cost state`,
+      costAmountMinor,
+      costCurrency,
+    };
+    api.getHistory.mockResolvedValue({ ...historyPage, items: [record] });
+    renderRoute("/my-garage/vehicles/:vehicleId/history", <HistoryPage />);
+
+    await waitFor(() => expect(screen.getByText(`${type} cost state`)).toBeTruthy());
+    const row = screen.getAllByRole("row").find((candidate) => candidate.textContent?.includes(`${type} cost state`));
+    expect(row).toBeTruthy();
+    const costCell = within(row!).getAllByRole("cell")[4];
+    expect(costCell.textContent?.trim()).toBe(expectedCost);
+    expect(costCell.textContent ?? "").not.toMatch(/NaN|undefined/);
+  });
+
+  test.each([HistoryType.Repair, HistoryType.Tire])("history_WhenEditingCostless%s_LoadsBlankCostFields", async (type) => {
+    const record = {
+      ...historyPage.items[0],
+      id: `history-edit-${type}`,
+      type,
+      title: `${type} costless edit`,
+      costAmountMinor: undefined,
+      costCurrency: undefined,
+    };
+    api.getHistory.mockResolvedValue({ ...historyPage, items: [record] });
+    api.updateHistory.mockResolvedValue(record);
+    renderRoute("/my-garage/vehicles/:vehicleId/history", <HistoryPage />);
+
+    await waitFor(() => expect(screen.getByText(`${type} costless edit`)).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: `Edit history record: ${type} costless edit` }));
+    const dialog = screen.getByRole("dialog");
+    expect((within(dialog).getByRole("spinbutton", { name: "Amount" }) as HTMLInputElement).value).toBe("");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(api.updateHistory).toHaveBeenCalledWith("vehicle-1", record.id, expect.objectContaining({
+      costAmountMinor: null,
+      costCurrency: null,
+    }), null));
+  });
+
+  test("history_WhenCreatingZeroCost_SendsZeroMinorAndCurrency", async () => {
+    renderRoute("/my-garage/vehicles/:vehicleId/history", <HistoryPage />);
+
+    await waitFor(() => expect(screen.getByText("Brake repair")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: /Record service/i }));
+    const dialog = screen.getByRole("dialog");
+    fireEvent.change(within(dialog).getByRole("spinbutton", { name: "Odometer" }), { target: { value: "51000" } });
+    fireEvent.change(within(dialog).getByRole("textbox", { name: "Title" }), { target: { value: "Zero cost repair" } });
+    fireEvent.change(within(dialog).getByRole("spinbutton", { name: "Amount" }), { target: { value: "0" } });
+    fireEvent.mouseDown(within(dialog).getByRole("combobox", { name: "Currency" }));
+    fireEvent.click(await screen.findByRole("option", { name: Currency.PLN }));
+    fireEvent.click(within(dialog).getByRole("button", { name: "Save" }));
+
+    await waitFor(() => expect(api.createHistory).toHaveBeenCalledWith("vehicle-1", expect.objectContaining({
+      costAmountMinor: 0,
+      costCurrency: Currency.PLN,
+    }), null));
   });
 
   test("history_WhenPageSizeChanges_RequestsTheSelectedPageSize", async () => {

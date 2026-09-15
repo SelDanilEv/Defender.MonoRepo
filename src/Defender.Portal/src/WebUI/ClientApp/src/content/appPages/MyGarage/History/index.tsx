@@ -163,7 +163,7 @@ export default function HistoryPage() {
       {error ? <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert> : null}
 
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid size={{ xs: 12, sm: 4 }}><FormControl fullWidth disabled={mutating}><InputLabel>{t("fields.type")}</InputLabel><Select label={t("fields.type")} value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as HistoryType | "")}><MenuItem value="">-</MenuItem>{Object.values(HistoryType).map((type) => <MenuItem key={type} value={type}>{t(`types.${type}`)}</MenuItem>)}</Select></FormControl></Grid>
+        <Grid size={{ xs: 12, sm: 4 }}><FormControl fullWidth disabled={mutating}><InputLabel id="history-filter-type-label">{t("fields.type")}</InputLabel><Select id="history-filter-type" labelId="history-filter-type-label" label={t("fields.type")} value={typeFilter} onChange={(event) => setTypeFilter(event.target.value as HistoryType | "")}><MenuItem value="">-</MenuItem>{Object.values(HistoryType).map((type) => <MenuItem key={type} value={type}>{t(`types.${type}`)}</MenuItem>)}</Select></FormControl></Grid>
         <Grid size={{ xs: 12, sm: 4 }}><TextField fullWidth type="date" label={t("fields.startDate")} value={fromDate} onChange={(event) => setFromDate(event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={mutating} /></Grid>
         <Grid size={{ xs: 12, sm: 4 }}><TextField fullWidth type="date" label={t("fields.endDate")} value={toDate} onChange={(event) => setToDate(event.target.value)} slotProps={{ inputLabel: { shrink: true } }} disabled={mutating} /></Grid>
       </Grid>

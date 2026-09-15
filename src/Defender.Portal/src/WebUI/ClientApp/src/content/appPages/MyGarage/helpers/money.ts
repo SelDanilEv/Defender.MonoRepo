@@ -13,11 +13,11 @@ export const majorToMinor = (value: string | number): number | null => {
   return Number.isFinite(parsed) && parsed >= 0 ? Math.round(parsed * 100) : null;
 };
 
-export const minorToMajor = (amount: number | null): string =>
-  amount === null || !Number.isFinite(amount) ? "" : (amount / 100).toFixed(2);
+export const minorToMajor = (amount: number | null | undefined): string =>
+  amount == null || !Number.isFinite(amount) ? "" : (amount / 100).toFixed(2);
 
-export const formatMinorCost = (amount: number | null, currency: Currency | null): string => {
-  if (amount === null || currency === null) return "";
+export const formatMinorCost = (amount: number | null | undefined, currency: Currency | null | undefined): string => {
+  if (amount == null || currency == null) return "";
   const symbol = CurrencySymbolsMap[currency] || currency;
   return `${minorToMajor(amount)} ${symbol}`;
 };
