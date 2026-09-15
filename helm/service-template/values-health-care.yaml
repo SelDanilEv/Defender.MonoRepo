@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.health-care
-  tag: 20260807-312
+  tag: sha-1d37718
   pullPolicy: Always
 deploymentStrategy:
   rollingUpdate:
