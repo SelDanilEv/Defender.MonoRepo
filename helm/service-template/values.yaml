@@ -82,11 +82,11 @@ resources:
 configMapData:
   ASPNETCORE_ENVIRONMENT: "Prod"
   Defender__Observability__Metrics__Enabled: "false"
-  # Keep JWT validation and token issuance configuration explicit at deployment
-  # level. This prevents missing/empty audience values when appsettings files
-  # are overridden or omitted from a production image.
-  JwtTokenIssuer: "Defender"
-  JwtTokenAudience: "defender-api"
+
+# Keep JWT validation and token issuance configuration explicit at deployment
+# level. These are public validation identifiers, not signing credentials.
+jwtTokenIssuer: "Defender"
+jwtTokenAudience: "defender-api"
 
 secretName: basic-secret
 

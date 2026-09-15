@@ -107,6 +107,10 @@ spec:
             - configMapRef:
                 name: {{ .Release.Name }}-env
           env:
+            - name: JwtTokenIssuer
+              value: {{ .Values.jwtTokenIssuer | quote }}
+            - name: JwtTokenAudience
+              value: {{ .Values.jwtTokenAudience | quote }}
             - name: Defender_App_MongoDBConnectionString
               valueFrom:
                 secretKeyRef:
