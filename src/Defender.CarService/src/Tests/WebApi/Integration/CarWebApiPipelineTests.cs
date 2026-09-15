@@ -82,6 +82,58 @@ public sealed class CarWebApiPipelineTests
     }
 
     [Fact]
+    public async Task CreateVehicle_ReturnsCreatedResponseWithVehicleLocation()
+    {
+        using var factory = new CarWebApplicationFactory();
+        var vehicleId = Guid.NewGuid();
+        factory.ApplicationService
+            .Setup(service => service.CreateVehicleAsync(
+                It.IsAny<CreateVehicleCommand>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new VehicleDto { Id = vehicleId, DisplayName = "Daily" });
+
+        using var client = factory.CreateAuthenticatedClient(UserId);
+        using var response = await client.PostAsJsonAsync(
+            "/api/V1/car/vehicles",
+            new
+            {
+                displayName = "Daily",
+                make = "Make",
+                model = "Model",
+                year = 2026,
+                plate = "ABC",
+            });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}", response.Headers.Location?.AbsolutePath);
+    }
+
+    [Fact]
+    public async Task CreateMaintenanceItem_ReturnsCreatedResponseWithMaintenanceLocation()
+    {
+        using var factory = new CarWebApplicationFactory();
+        var vehicleId = Guid.NewGuid();
+        var maintenanceId = Guid.NewGuid();
+        factory.ApplicationService
+            .Setup(service => service.CreateMaintenanceItemAsync(
+                It.IsAny<CreateMaintenanceItemCommand>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new MaintenanceItemDto { Id = maintenanceId, VehicleId = vehicleId, Name = "Oil" });
+
+        using var client = factory.CreateAuthenticatedClient(UserId);
+        using var response = await client.PostAsJsonAsync(
+            $"/api/V1/car/vehicles/{vehicleId}/maintenance",
+            new
+            {
+                name = "Oil",
+                intervalMonths = 12,
+            });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/maintenance", response.Headers.Location?.AbsolutePath);
+    }
+
+    [Fact]
     public async Task VehicleForOtherAccount_ReturnsOwnershipScopedNotFoundProblem()
     {
         using var factory = new CarWebApplicationFactory();

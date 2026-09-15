@@ -56,7 +56,7 @@ public sealed class CarControllerTests
     }
 
     [Fact]
-    public async Task CreateVehicle_ReturnsCreatedAtActionAndUsesRouteFreeRequest()
+    public async Task CreateVehicle_ReturnsCreatedRouteAndUsesRouteFreeRequest()
     {
         var vehicle = new VehicleDto { Id = Guid.NewGuid(), DisplayName = "Daily" };
         var mediator = new Mock<IMediator>();
@@ -79,8 +79,8 @@ public sealed class CarControllerTests
             },
             CancellationToken.None);
 
-        var created = Assert.IsType<CreatedAtActionResult>(result.Result);
-        Assert.Equal(nameof(CarController.GetVehicleAsync), created.ActionName);
+        var created = Assert.IsType<CreatedAtRouteResult>(result.Result);
+        Assert.Equal("Car_GetVehicle", created.RouteName);
         Assert.Equal(vehicle, created.Value);
         mediator.Verify(item => item.Send(
             It.Is<CreateVehicleCommand>(command => command.DisplayName == "Daily" && command.GetType().GetProperties().All(property => property.Name != "UserId")),

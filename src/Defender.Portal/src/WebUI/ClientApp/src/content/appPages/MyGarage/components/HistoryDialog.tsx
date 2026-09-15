@@ -134,8 +134,8 @@ export default function HistoryDialog({
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth disabled={busy}>
-                <InputLabel>{t("fields.type")}</InputLabel>
-                <Select label={t("fields.type")} value={form.type} onChange={(event) => update("type", event.target.value as HistoryType)}>
+                <InputLabel id="history-type-label">{t("fields.type")}</InputLabel>
+                <Select id="history-type" labelId="history-type-label" label={t("fields.type")} value={form.type} onChange={(event) => update("type", event.target.value as HistoryType)}>
                   {Object.values(HistoryType).map((type) => <MenuItem key={type} value={type}>{t(`types.${type}`)}</MenuItem>)}
                 </Select>
               </FormControl>
@@ -160,8 +160,8 @@ export default function HistoryDialog({
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth disabled={busy}>
-                <InputLabel>{t("fields.costCurrency")}</InputLabel>
-                <Select label={t("fields.costCurrency")} value={form.costCurrency} onChange={(event) => update("costCurrency", event.target.value as Currency | "")}>
+                <InputLabel id="history-currency-label">{t("fields.costCurrency")}</InputLabel>
+                <Select id="history-currency" labelId="history-currency-label" label={t("fields.costCurrency")} value={form.costCurrency} onChange={(event) => update("costCurrency", event.target.value as Currency | "")}>
                   <MenuItem value="">-</MenuItem>
                   {AllAvailableCurrencies.map((currency) => <MenuItem key={currency} value={currency}>{currency}</MenuItem>)}
                 </Select>

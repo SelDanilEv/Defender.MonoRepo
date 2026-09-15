@@ -65,7 +65,7 @@ const selectLanguage = async (page: Page, language: "en" | "ru") => {
 };
 
 const expectToast = async (page: Page, text: string) => {
-  await expect(page.getByText(text, { exact: true })).toBeVisible({ timeout: 10_000 });
+  await expect(page.getByText(text, { exact: true }).last()).toBeVisible({ timeout: 10_000 });
 };
 
 const openVehicles = async (page: Page) => {
@@ -373,12 +373,12 @@ test.describe("My Garage local integration", () => {
     await vehicleARow.getByRole("button", { name: "Archive vehicle: " + vehicleAEditedName, exact: true }).click();
     await expectToast(page, "Vehicle archived.");
 
-    const includeArchived = page.getByRole("checkbox", { name: "Include archived vehicles" });
-    await includeArchived.check();
+    const includeArchived = page.getByRole("switch", { name: "Include archived vehicles" });
+    await includeArchived.click();
     const archivedRow = page.getByRole("row").filter({ hasText: vehicleAEditedName }).last();
     await expect(archivedRow.getByText("Include archived vehicles", { exact: true })).toBeVisible();
     await page.once("dialog", (dialog) => dialog.accept());
-    await archivedRow.getByRole("button", { name: "Restore vehicle: " + vehicleAEditedName, exact: true }).click();
+    await archivedRow.getByRole("button", { name: "Unarchive vehicle: " + vehicleAEditedName, exact: true }).click();
     await expectToast(page, "Vehicle restored.");
 
     await openMaintenance(page, vehicleAId);
@@ -414,8 +414,8 @@ test.describe("My Garage local integration", () => {
     });
 
     const maintenanceRow = page.getByRole("row").filter({ hasText: "Task 10 scheduled maintenance " + runId }).last();
-    await expect(maintenanceRow.getByText(maintenanceAName, { exact: true })).toBeVisible();
-    await expect(maintenanceRow.getByText(maintenanceBName, { exact: true })).toBeVisible();
+    await expect(maintenanceRow).toContainText(maintenanceAName);
+    await expect(maintenanceRow).toContainText(maintenanceBName);
     await expect(page.getByText("Repair", { exact: true })).toBeVisible();
     await expect(page.getByText("Tire", { exact: true })).toBeVisible();
 

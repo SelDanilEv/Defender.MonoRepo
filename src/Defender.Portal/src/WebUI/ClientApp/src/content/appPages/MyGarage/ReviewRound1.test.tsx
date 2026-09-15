@@ -155,6 +155,18 @@ describe("My Garage review round 1", () => {
     expect((screen.getByRole("button", { name: /Delete maintenance item: Oil/i }) as HTMLButtonElement).disabled).toBe(true);
   });
 
+  test("maintenance_WhenNextOdometerIsMissing_RendersPlaceholder", async () => {
+    api.getVehicle.mockResolvedValue({
+      ...detail,
+      maintenanceItems: [{ ...maintenance, nextOdometerKm: undefined }],
+    });
+
+    renderRoute("/my-garage/vehicles/:vehicleId/maintenance", <MaintenancePage />);
+
+    await waitFor(() => expect(screen.getByText("Oil")).toBeTruthy());
+    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+  });
+
   test("maintenance_WhenCreatingWithoutBaseline_SendsBlankManualBaseline", async () => {
     api.createMaintenanceItem.mockResolvedValue(maintenance);
     api.deleteMaintenanceItem.mockResolvedValue(undefined);
@@ -190,6 +202,15 @@ describe("My Garage review round 1", () => {
     expect(screen.getAllByText("Not started").length).toBeGreaterThan(0);
   });
 
+  test("overview_WhenCurrentOdometerIsMissing_RendersPlaceholder", async () => {
+    api.getVehicle.mockResolvedValue({ ...detail, vehicle: { ...vehicle, currentOdometerKm: undefined } });
+
+    renderRoute("/my-garage/vehicles/:vehicleId", <VehicleOverviewPage />);
+
+    await waitFor(() => expect(screen.getByText("Daily")).toBeTruthy());
+    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
+  });
+
   test("overview_WhenVehicleIsMissing_ShowsLocalizedNotFoundState", async () => {
     api.getVehicle.mockRejectedValue({ status: 404, code: "CAR_VEHICLE_NOT_FOUND" });
     api.getHistory.mockRejectedValue({ status: 404, code: "CAR_VEHICLE_NOT_FOUND" });
@@ -207,6 +228,20 @@ describe("My Garage review round 1", () => {
     expect(screen.getByText("Focus")).toBeTruthy();
     expect(screen.getByText(/Not started: 1/)).toBeTruthy();
     expect(screen.getByText("Status")).toBeTruthy();
+  });
+
+  test("vehicles_WhenCurrentOdometerIsMissing_RendersPlaceholder", async () => {
+    api.getVehicles.mockResolvedValue([{
+      ...vehicle,
+      currentOdometerKm: undefined,
+      maintenanceCounts: { overdue: 0, dueSoon: 0, upcoming: 0, notStarted: 0 },
+      insuranceStatus: null,
+    }]);
+
+    renderRoute("/my-garage/vehicles", <VehiclesPage />);
+
+    await waitFor(() => expect(screen.getByText("Daily")).toBeTruthy());
+    expect(screen.getAllByText("-").length).toBeGreaterThan(0);
   });
 
   test("vehicles_WhenCreateEditArchiveActionsRun_UsesVehicleMutationEndpointsAndConfirmation", async () => {
@@ -265,6 +300,15 @@ describe("My Garage review round 1", () => {
     fireEvent.click(screen.getByRole("button", { name: /Record service/i }));
     expect(screen.getByRole("group", { name: "Linked maintenance" })).toBeTruthy();
     expect(screen.getByText("Select maintenance items linked to this service record.")).toBeTruthy();
+  });
+
+  test("history_WhenDialogOpens_LabelsTypeAndCurrencySelects", async () => {
+    renderRoute("/my-garage/vehicles/:vehicleId/history", <HistoryPage />);
+
+    await waitFor(() => expect(screen.getByText("Brake repair")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: /Record service/i }));
+    expect(screen.getByRole("combobox", { name: "Type" })).toBeTruthy();
+    expect(screen.getByRole("combobox", { name: "Currency" })).toBeTruthy();
   });
 
   test("history_WhenPageSizeChanges_RequestsTheSelectedPageSize", async () => {

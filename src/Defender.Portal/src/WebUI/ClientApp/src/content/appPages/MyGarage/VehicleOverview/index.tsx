@@ -88,7 +88,7 @@ export default function VehicleOverviewPage() {
       </Stack>
 
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid size={{ xs: 12, sm: 6, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("fields.currentOdometerKm")}</Typography><Typography variant="h5">{vehicle.currentOdometerKm === null ? "-" : `${vehicle.currentOdometerKm.toLocaleString(locale)} ${t("units.km")}`}</Typography></CardContent></Card></Grid>
+        <Grid size={{ xs: 12, sm: 6, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("fields.currentOdometerKm")}</Typography><Typography variant="h5">{vehicle.currentOdometerKm == null ? "-" : `${vehicle.currentOdometerKm.toLocaleString(locale)} ${t("units.km")}`}</Typography></CardContent></Card></Grid>
         <Grid size={{ xs: 6, sm: 3, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.Overdue")}</Typography><Typography variant="h5">{counts[MaintenanceStatus.Overdue]}</Typography></CardContent></Card></Grid>
         <Grid size={{ xs: 6, sm: 3, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.DueSoon")}</Typography><Typography variant="h5">{counts[MaintenanceStatus.DueSoon]}</Typography></CardContent></Card></Grid>
         <Grid size={{ xs: 6, sm: 3, lg: 2 }}><Card><CardContent><Typography color="text.secondary">{t("statuses.Upcoming")}</Typography><Typography variant="h5">{counts[MaintenanceStatus.Upcoming]}</Typography></CardContent></Card></Grid>

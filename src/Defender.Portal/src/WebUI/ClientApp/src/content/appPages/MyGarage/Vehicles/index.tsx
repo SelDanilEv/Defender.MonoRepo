@@ -34,8 +34,8 @@ import VehicleDialog from "../components/VehicleDialog";
 import StatusBadge from "../components/StatusBadge";
 import { getGarageFailureMessage } from "../helpers/status";
 
-const formatKm = (value: number | null, locale: string, unit: string) =>
-  value === null ? "-" : `${value.toLocaleString(locale)} ${unit}`;
+const formatKm = (value: number | null | undefined, locale: string, unit: string) =>
+  value == null ? "-" : `${value.toLocaleString(locale)} ${unit}`;
 
 export default function VehiclesPage() {
   const { t, i18n } = useTranslation("myGarage");

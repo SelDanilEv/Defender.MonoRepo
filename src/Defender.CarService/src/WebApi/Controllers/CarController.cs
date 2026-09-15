@@ -43,10 +43,10 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
     {
         var command = mapper.Map<CreateVehicleCommand>(request);
         var result = await mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetVehicleAsync), new { vehicleId = result.Id }, result);
+        return CreatedAtRoute("Car_GetVehicle", new { vehicleId = result.Id }, result);
     }
 
-    [HttpGet("vehicles/{vehicleId:guid}")]
+    [HttpGet("vehicles/{vehicleId:guid}", Name = "Car_GetVehicle")]
     [ProducesResponseType(typeof(VehicleDetailDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<VehicleDetailDto>> GetVehicleAsync(
         Guid vehicleId,
@@ -88,7 +88,7 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
         return Ok(result);
     }
 
-    [HttpGet("vehicles/{vehicleId:guid}/maintenance")]
+    [HttpGet("vehicles/{vehicleId:guid}/maintenance", Name = "Car_GetMaintenanceItems")]
     [ProducesResponseType(typeof(IReadOnlyList<MaintenanceItemDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<MaintenanceItemDto>>> GetMaintenanceItemsAsync(
         Guid vehicleId,
@@ -107,7 +107,7 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
     {
         var command = mapper.Map<CreateMaintenanceItemCommand>(request) with { VehicleId = vehicleId };
         var result = await mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetMaintenanceItemsAsync), new { vehicleId }, result);
+        return CreatedAtRoute("Car_GetMaintenanceItems", new { vehicleId }, result);
     }
 
     [HttpPut("vehicles/{vehicleId:guid}/maintenance/{maintenanceId:guid}")]
@@ -144,7 +144,7 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
         return NoContent();
     }
 
-    [HttpGet("vehicles/{vehicleId:guid}/history")]
+    [HttpGet("vehicles/{vehicleId:guid}/history", Name = "Car_GetHistory")]
     [ProducesResponseType(typeof(ServiceHistoryPageDto), StatusCodes.Status200OK)]
     public async Task<ActionResult<ServiceHistoryPageDto>> GetHistoryAsync(
         Guid vehicleId,
@@ -172,7 +172,7 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
     {
         var command = mapper.Map<CreateHistoryCommand>(request) with { VehicleId = vehicleId };
         var result = await mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetHistoryAsync), new { vehicleId, page = 0, pageSize = 25 }, result);
+        return CreatedAtRoute("Car_GetHistory", new { vehicleId, page = 0, pageSize = 25 }, result);
     }
 
     [HttpPut("vehicles/{vehicleId:guid}/history/{historyId:guid}")]
@@ -209,7 +209,7 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
         return NoContent();
     }
 
-    [HttpGet("vehicles/{vehicleId:guid}/insurance")]
+    [HttpGet("vehicles/{vehicleId:guid}/insurance", Name = "Car_GetInsurancePolicies")]
     [ProducesResponseType(typeof(IReadOnlyList<InsurancePolicyDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<InsurancePolicyDto>>> GetInsurancePoliciesAsync(
         Guid vehicleId,
@@ -228,7 +228,7 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
     {
         var command = mapper.Map<CreateInsurancePolicyCommand>(request) with { VehicleId = vehicleId };
         var result = await mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetInsurancePoliciesAsync), new { vehicleId }, result);
+        return CreatedAtRoute("Car_GetInsurancePolicies", new { vehicleId }, result);
     }
 
     [HttpPut("vehicles/{vehicleId:guid}/insurance/{insuranceId:guid}")]

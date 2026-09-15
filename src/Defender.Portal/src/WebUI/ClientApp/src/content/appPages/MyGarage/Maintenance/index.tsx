@@ -146,7 +146,7 @@ export default function MaintenancePage() {
               <TableCell>{item.intervalMonths ?? "-"}</TableCell>
               <TableCell>{item.intervalThousandKm ?? "-"}</TableCell>
               <TableCell>{formatDate(item.lastDate, locale)}</TableCell>
-              <TableCell>{formatDate(item.nextDate, locale)}{item.nextOdometerKm === null ? "" : ` · ${item.nextOdometerKm.toLocaleString(locale)} ${t("units.km")}`}</TableCell>
+              <TableCell>{formatDate(item.nextDate, locale)}{item.nextOdometerKm == null ? "" : ` · ${item.nextOdometerKm.toLocaleString(locale)} ${t("units.km")}`}</TableCell>
               <TableCell><StatusBadge status={item.status} /></TableCell>
               <TableCell><Stack direction="row" spacing={0.5}><Button size="small" onClick={() => openEdit(item)} disabled={mutating || readOnly} aria-label={`${t("actions.editMaintenance")}: ${item.name}`}><EditOutlinedIcon fontSize="small" /></Button><Button size="small" color="error" onClick={() => setDeleteTarget(item)} disabled={mutating || readOnly || referenced} title={referenced ? t("conflicts.maintenanceReferenced") : undefined} aria-label={`${t("actions.deleteMaintenance")}: ${item.name}`}><DeleteOutlineIcon fontSize="small" /></Button></Stack></TableCell>
             </TableRow>;

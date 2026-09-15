@@ -100,10 +100,22 @@ public static class ConfigureServices
         });
         services.AddSingleton<MongoIndexInitializer>();
         services.AddSingleton<ICarTransactionCoordinator, MongoTransactionCoordinator>();
-        services.AddScoped<IVehicleRepository, VehicleRepository>();
-        services.AddScoped<IMaintenanceItemRepository, MaintenanceItemRepository>();
-        services.AddScoped<IServiceHistoryRepository, ServiceHistoryRepository>();
-        services.AddScoped<IInsurancePolicyRepository, InsurancePolicyRepository>();
+        services.AddScoped<IVehicleRepository>(serviceProvider =>
+            new VehicleRepository(
+                serviceProvider.GetRequiredService<IMongoDatabase>(),
+                serviceProvider.GetRequiredService<MongoIndexInitializer>()));
+        services.AddScoped<IMaintenanceItemRepository>(serviceProvider =>
+            new MaintenanceItemRepository(
+                serviceProvider.GetRequiredService<IMongoDatabase>(),
+                serviceProvider.GetRequiredService<MongoIndexInitializer>()));
+        services.AddScoped<IServiceHistoryRepository>(serviceProvider =>
+            new ServiceHistoryRepository(
+                serviceProvider.GetRequiredService<IMongoDatabase>(),
+                serviceProvider.GetRequiredService<MongoIndexInitializer>()));
+        services.AddScoped<IInsurancePolicyRepository>(serviceProvider =>
+            new InsurancePolicyRepository(
+                serviceProvider.GetRequiredService<IMongoDatabase>(),
+                serviceProvider.GetRequiredService<MongoIndexInitializer>()));
 
         return services;
     }

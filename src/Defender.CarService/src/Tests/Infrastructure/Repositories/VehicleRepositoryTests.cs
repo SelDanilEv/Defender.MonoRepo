@@ -1,16 +1,38 @@
 using System.Reflection;
+using Defender.CarService.Application.Common.Interfaces.Repositories;
 using Defender.CarService.Domain.Entities;
 using Defender.CarService.Infrastructure.Persistence;
 using Defender.CarService.Infrastructure.Repositories;
+using Defender.CarService.WebApi;
+using Defender.Common.Configuration.Options;
 using Moq;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Defender.CarService.Tests.Infrastructure.Repositories;
 
 public sealed class VehicleRepositoryTests
 {
+    [Fact]
+    public void InfrastructureServices_CanResolveVehicleRepository()
+    {
+        var database = new Mock<IMongoDatabase>();
+        var services = new ServiceCollection();
+        services.AddOptions<MongoDbOptions>();
+        services.AddInfrastructureServices(new ConfigurationBuilder().Build());
+        services.AddSingleton(database.Object);
+
+        using var provider = services.BuildServiceProvider();
+
+        Assert.IsType<VehicleRepository>(provider.GetRequiredService<IVehicleRepository>());
+        Assert.IsType<MaintenanceItemRepository>(provider.GetRequiredService<IMaintenanceItemRepository>());
+        Assert.IsType<ServiceHistoryRepository>(provider.GetRequiredService<IServiceHistoryRepository>());
+        Assert.IsType<InsurancePolicyRepository>(provider.GetRequiredService<IInsurancePolicyRepository>());
+    }
+
     [Fact]
     public async Task ReplaceAsync_WhenExpectedVersionDoesNotMatch_ReturnsFalse()
     {
