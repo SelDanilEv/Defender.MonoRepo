@@ -1,16 +1,16 @@
-# Graph Report - Defender.MonoRepo  (2026-09-14)
+# Graph Report - Defender.MonoRepo  (2026-09-15)
 
 ## Corpus Check
-- 2125 files · ~581,115 words
+- 2126 files · ~584,703 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 40478 nodes · 67637 edges · 2676 communities (2611 shown, 48 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 3964 edges (avg confidence: 0.84)
+- 40505 nodes · 67710 edges · 2697 communities (2630 shown, 50 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 3976 edges (avg confidence: 0.84)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `39859a0f`
+- Built from commit: `833ecd85`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -28,21 +28,21 @@
 - ApiException
 - Microsoft.IdentityModel.Tokens
 - Defender.Common.Errors
-- IWalletManagementService
+- WalletManagementService
 - IAccessCodeService
 - dependencies
 - net10.0
-- GetAggregatedReport
-- Transaction
+- Portal/GeneratedCode.cs
+- TransactionManagementService
 - net10.0
 - AccountInfo
 - net10.0
 - sessionActions.tsx
-- Defender.Common.Enums
+- Defender.Common.Consts
 - useUtils
 - LotteryModel
 - travelCalendar.ts
-- Defender.Portal.Application.Modules.Telegram
+- Defender.Portal.Application.Common.Interfaces.Wrappers
 - LotteryDrawDto
 - ScheduledJob
 - FluentValidation.AspNetCore
@@ -62,14 +62,14 @@
 - MainDiagram/index.tsx
 - net10.0
 - Defender.PersonalFoodAdvisor.Domain.Entities
-- StringContent
+- IdentityServiceClient
 - net10.0
 - net10.0
 - DateTime
-- Review/Table/index.tsx
+- Sessions/index.tsx
 - .SetAuthCookie
 - Defender.TravelCalendarService.Domain.Entities
-- Position
+- PagedResult
 - IUtils
 - dependencies
 - net10.0
@@ -85,7 +85,7 @@
 - MenuSession
 - dependencies
 - Microsoft.Extensions.Logging.Abstractions
-- .CreateOrUpdateSecret
+- IIdentityWrapper
 - net10.0
 - dependencies
 - dependencies
@@ -102,7 +102,7 @@
 - dependencies
 - xunit.core
 - dependencies
-- MenuSessionService
+- RequestMenuSessionParsingCommand
 - dependencies
 - Wallet/GeneratedCode.cs
 - net10.0
@@ -113,7 +113,7 @@
 - BudgetTrackerApplicationCoverageSmokeTests
 - net10.0
 - net10.0
-- Defender.Portal.Application.Common.Interfaces.Wrappers
+- BudgetTrackerSupportedCurrency
 - BaseSwaggerWrapper
 - FluentValidation.AspNetCore
 - RiskGames/GeneratedCode.cs
@@ -123,7 +123,7 @@
 - FluentValidation.AspNetCore
 - Defender.GeneralTestingService.Application.Models
 - dependencies
-- UserInfoTabs/index.tsx
+- PortalAccountDto
 - ExceptionsAndWrappersTests
 - PortalBudgetGroup
 - dependencies
@@ -152,17 +152,17 @@
 - VehicleDto
 - Defender.CarService.Domain.Entities
 - Microsoft.IdentityModel.JsonWebTokens
-- AGENTS Guide: Defender.PersonalFoodAdvisor
+- AGENTS Guide: Defender.IdentityService
 - PortalMenuSessionDto
 - TravelCalendarController
 - Microsoft.IdentityModel.Protocols.OpenIdConnect
-- IBudgetTrackerWrapper
+- BudgetTrackerWrapper
 - RecommendationsRequestedEvent
 - TransactionToTrack
-- GeminiClient
+- GeminiClientTests
 - Vehicle
-- Notification
-- Currency
+- NotificationResponse
+- api.ts
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - Defender.IdentityService/src/WebApi/WebApi.csproj
 - System.IdentityModel.Tokens.Jwt
@@ -193,14 +193,14 @@
 - CarDomainException
 - PortalBudgetReview
 - Swashbuckle.AspNetCore.Swagger
-- IUserManagementWrapper
+- IAccountManagementService
 - net10.0
 - Microsoft.Extensions.Logging.Abstractions
 - RecommendationsOutboxMessage
 - PortalHealthChartShareDto
 - AutoMapper
 - TransactionModel
-- .RegisterApiClients
+- DomainModel
 - MenuIntelligenceClientHelper
 - ServiceRegistrationAndModelsTests
 - Defender.Core.sln
@@ -215,8 +215,8 @@
 - TravelEvent
 - net10.0
 - Microsoft.Extensions.Logging.Abstractions
-- .GetVisibleAsync
-- .GetRankedRecommendationsAsync
+- TravelEventRepository
+- MenuSessionServiceTests
 - OpenIddict.Validation
 - dependencies
 - Serilog
@@ -245,7 +245,7 @@
 - xunit.extensibility.core
 - net10.0
 - net10.0
-- HealthEvent
+- HealthChartShare
 - AutoMapper
 - Microsoft.IdentityModel.JsonWebTokens
 - AutoMapper
@@ -269,7 +269,7 @@
 - dependencies
 - PersonalFoodAdvisorClient
 - MenuParsingRequestedEvent
-- ServiceHistoryRecord
+- MongoMappings
 - dependencies
 - BudgetTrackerController
 - AutoMapper
@@ -281,7 +281,7 @@
 - AGENTS Guide: Defender.Portal
 - PortalMainDiagramSetup
 - .RegisterApiClients
-- PagedResult
+- Notification
 - BasePosition
 - TransactionStatusUpdatedEvent
 - FluentValidation.AspNetCore
@@ -290,13 +290,13 @@
 - net10.0
 - UserPreferences
 - Microsoft.Extensions.Primitives
-- TravelCalendarDto
-- Share.tsx
+- .SendAsync
+- dateRange.ts
 - net10.0
 - MediatR
 - Helm Base Values (service-template)
-- IMenuSessionRepository
-- ICarTransactionContext
+- .UploadAsync
+- ServiceException
 - ClientAndDtoCoverageSmokeTests
 - Defender.SecretManagementService/src/WebApi/WebApi.csproj
 - WebApi
@@ -311,8 +311,8 @@
 - dependencies
 - net10.0
 - ServiceHistoryRecordDto
-- HealthChartShare
-- .RegisterServices
+- HealthChartShareTests
+- GoogleUser
 - dependencies
 - net10.0
 - AutoMapper
@@ -333,10 +333,10 @@
 - Defender.WalletService/src/WebApi/WebApi.csproj
 - Microsoft.Extensions.Logging.Abstractions
 - Serilog
-- BaseApiController
+- Role
 - CarController
 - IIdentityWrapper
-- Defender.Portal.WebUI.OAuth
+- WalletDto
 - MaintenanceItemDto
 - net10.0
 - AutoMapper
@@ -374,7 +374,7 @@
 - TelegramController
 - service-template Helm Chart (.NET API chart)
 - BaseApiController
-- SendSmtpEmail
+- .RegisterApiClients
 - PortalRegularExpense
 - .PublicTypes_WhenConstructedAndSafeMethodsInvoked_IncreaseCoverage
 - IKafkaEnvPrefixer
@@ -400,7 +400,7 @@
 - Microsoft.Extensions.Logging.Abstractions
 - dependencies
 - Notifications
-- IService
+- service-template/src/Application/Modules/Module/Commands/BlockUserCommand.cs
 - Defender.DistributedCache.Configuration.Options
 - GetMenuSessionByIdQuery
 - Microsoft.Extensions.Logging.Abstractions
@@ -418,7 +418,7 @@
 - Microsoft.IdentityModel.JsonWebTokens
 - net10.0
 - net10.0
-- Status2
+- ResetPassword/Form/index.tsx
 - net10.0
 - HealthCare/chartData.ts
 - net10.0
@@ -431,7 +431,7 @@
 - CheckIsEmailTakenQuery
 - AutoMapper
 - Microsoft.IdentityModel.JsonWebTokens
-- IRequestHandler
+- Transaction
 - RegularExpenseDiagramSetup
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - net10.0
@@ -439,9 +439,9 @@
 - dependencies
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - dependencies
-- InsurancePolicyDto
+- VehicleSummaryDto
 - SubmitUserRatingCommand
-- IService
+- Defender.HealthCareService/src/Application/Modules/Module/Commands/BlockUserCommand.cs
 - Swashbuckle.AspNetCore
 - dependencies
 - System.IdentityModel.Tokens.Jwt
@@ -463,7 +463,7 @@
 - Microsoft.IdentityModel.JsonWebTokens
 - scripts
 - PortalAccountDto
-- SelectAndPayPanel/index.tsx
+- Currency
 - VerificationController
 - Microsoft.Extensions.Options
 - Microsoft.Extensions.Options
@@ -472,9 +472,9 @@
 - .CreateEventAsync
 - Microsoft.IdentityModel.JsonWebTokens
 - Microsoft.Extensions.Primitives
-- GetUserByLoginQuery
-- CreateUserCommand
 - IUserManagementService
+- CreateUserCommand
+- GetUserByIdQuery
 - Microsoft.Extensions.Configuration.Abstractions
 - Microsoft.Extensions.Configuration.Abstractions
 - Microsoft.Extensions.Primitives
@@ -502,7 +502,7 @@
 - net10.0
 - net10.0
 - GetExtendedCampaignOverview
-- MappingProfileTests
+- MongoDB (Data Store)
 - BaseLotteryRequest
 - AccessCodeService
 - CarWebApplicationFactory
@@ -510,23 +510,23 @@
 - KafkaEvent
 - WhatsappCampTemplate
 - .GetSecretAsync
-- Defender.HealthCareService/src/Application/Modules/Module/Commands/BlockUserCommand.cs
+- JobManagementService
 - IAccountAccessor
 - PortalOAuthOptions
 - FakeHostEnvironment
-- LoginRecord
+- .RegisterServices
 - GetConfigurationQuery
 - Microsoft.AspNetCore.Authentication.JwtBearer
 - Defender.Utils
 - MediatR
-- JwtSecurityTokenHandler
+- .GetSecretAsync
 - MediatR
 - .CreateController
 - Confluent.Kafka
 - Microsoft.Extensions.Logging.Abstractions
 - dependencies
 - Microsoft.Extensions.Configuration.Abstractions
-- PortalBudgetPosition
+- IBudgetTrackerWrapper
 - .RegisterAsync
 - WebUI
 - Event2
@@ -535,13 +535,13 @@
 - EventListenerService
 - CreateEmailCampaign
 - UpdateEmailCampaign
-- .RegisterSteps
+- TestController
 - KafkaEvent
 - TravelCalendarDto
-- Defender.Common.Interfaces
+- Defender.Common.DB.SharedStorage.Enums
 - CarServiceClient
 - my-garage.local.spec.ts
-- LotteryProcessingService
+- EventListenerService
 - RiskGamesConfigurationAndBackgroundTests
 - Microsoft.Extensions.Options
 - net10.0
@@ -571,7 +571,7 @@
 - net10.0
 - Microsoft.Extensions.Logging.Abstractions
 - Microsoft.Extensions.Logging.Abstractions
-- InsurancePolicyDto
+- VehicleDto
 - Microsoft.Extensions.Logging.Abstractions
 - Microsoft.Extensions.Logging.Abstractions
 - AutoMapper
@@ -600,19 +600,19 @@
 - Microsoft.Extensions.Logging.Abstractions
 - AutoMapper
 - Microsoft.Extensions.Logging.Abstractions
-- TestController
+- Defender.NotificationService/src/Infrastructure/ConfigureServices.cs
 - .CreateShareAsync_WhenRangeModeAndAnalysisAreReturned_PreservesContractMetadata
-- DomainModel
+- TelegramLinkHandoffService
 - Microsoft.Extensions.Hosting
 - dependencies
-- .RegisterApiClients
+- .AddApplicationOptions
 - Defender.DistributedCache.csproj
 - Microsoft.Extensions.Logging.Abstractions
 - Microsoft.Extensions.Configuration.Binder
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - Microsoft.Extensions.Configuration.Binder
-- CreateRegularExpenseCommand
-- Notification/GeneratedCode.cs
+- AbstractValidator
+- Notification
 - Microsoft.Extensions.DependencyInjection
 - Microsoft.Extensions.Logging.Abstractions
 - Microsoft.Extensions.Logging.Abstractions
@@ -639,7 +639,7 @@
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - Microsoft.Extensions.Logging.Abstractions
 - Microsoft.Extensions.Configuration.Binder
-- ServiceException
+- .ExecuteWithAuthCheckAsync
 - WebApi
 - dependencies
 - Microsoft.Extensions.DependencyInjection.Abstractions
@@ -647,7 +647,7 @@
 - Brevo/GeneratedCode.cs
 - .AllActions_WhenCalled_DelegateEveryRouteAndPreserveStatuses
 - TravelCalendarClient
-- EnsureTopicsCreatedService
+- .ExecuteAsync_WhenCreateTopicsFails_ThrowsCreateTopicsException
 - net10.0
 - xunit.core
 - Defender.Portal.Application.Modules.FoodAdvisor.Commands
@@ -669,13 +669,13 @@
 - KafkaHelpersTests
 - xunit.core
 - dependencies
-- BackgroundService
+- IGeminiModelFallbackService
 - AutoMapper
 - xunit.core
 - dependencies
 - TelegramBotClient
 - .AllMethods_WhenCalled_DelegateEveryRouteWithAllArguments
-- GeminiOptions
+- GeminiClient
 - dependencies
 - dependencies
 - Microsoft.Extensions.Logging.Abstractions
@@ -696,7 +696,7 @@
 - dependencies
 - PortalTransactionDto
 - dependencies
-- UpdateUserPreferencesCommand
+- Plan: Run the whole platform locally with .NET Aspire
 - dependencies
 - Defender.Kafka.csproj
 - compilerOptions
@@ -728,13 +728,13 @@
 - System.IdentityModel.Tokens.Jwt
 - Microsoft.IdentityModel.JsonWebTokens
 - Microsoft.IdentityModel.JsonWebTokens
-- .RegisterRepositories
+- IBaseModel
 - Microsoft.IdentityModel.JsonWebTokens
 - Microsoft.IdentityModel.JsonWebTokens
 - Microsoft.IdentityModel.JsonWebTokens
 - Serilog
 - PortalDishRatingDto
-- Campaigns3
+- Share.tsx
 - Microsoft.IdentityModel.JsonWebTokens
 - Microsoft.IdentityModel.JsonWebTokens
 - TelegramLinkHandoffRepository
@@ -745,7 +745,7 @@
 - Microsoft.IdentityModel.JsonWebTokens
 - Microsoft.IdentityModel.JsonWebTokens
 - Microsoft.IdentityModel.JsonWebTokens
-- HotelDetails
+- UpdateUserInfoCommand
 - Microsoft.Extensions.Configuration.Abstractions
 - Microsoft.IdentityModel.JsonWebTokens
 - System.IdentityModel.Tokens.Jwt
@@ -789,13 +789,13 @@
 - dependencies
 - .PublicTypes_WhenConstructedAndSafeMethodsInvoked_IncreaseCoverage
 - BudgetReviewDto
-- ReviewedRegularExpense
+- HealthCareChart.tsx
 - dependencies
 - dependencies
 - TelegramWebhookReceiptRepository
 - dependencies
 - react-app-env.d.ts
-- .ResolveAndForward
+- TelegramSessionCookieHelper
 - net10.0
 - dependencies
 - dependencies
@@ -814,38 +814,38 @@
 - dependencies
 - dependencies
 - dependencies
-- Free API Options for PersonalFoodAdvisor
+- GetSmtpTemplateOverview
 - LogLevel
 - .AddApplicationOptions
 - dependencies
 - AccountDto
-- .AddInfrastructureServices
+- AnonymousTransactionDto
 - .AddApplicationOptions
 - .Log
-- .AddApplicationOptions
+- Defender.Portal.Application.DTOs.HealthCare
 - PortalApplicationCoverageSmokeTests
 - .Log
-- IJobManagementService
-- .RegisterRepositories
-- PersonalFoodAdvisorApplicationCoverageSmokeTests
+- GetJobsQuery
+- DeleteBudgetReviewCommand
+- Defender.PersonalFoodAdvisor/src/Application/Modules/Module/Commands/BlockUserCommand.cs
 - JobSchedulerApplicationCoverageSmokeTests
 - Microsoft.Extensions.Logging.Abstractions
 - .Log
 - .Log
 - NotificationApplicationCoverageSmokeTests
-- UserDtoPagedResult
+- UserManagement/GeneratedCode.cs
 - .ConfigureProblems
 - Microsoft.Extensions.Primitives
 - CustomContactFilter
 - development
 - dependencies
-- ForbiddenAccessException
+- .AuthorizationCheckAsync
 - dependencies
-- BaseApiController
-- ROAccountInfoRepository
+- AuthCheckQuery
+- ROSecretRepository
 - xunit
 - xunit
-- ValidationException
+- BasePortalPosition
 - xunit
 - xunit
 - dependencies
@@ -859,15 +859,15 @@
 - dependencies
 - xunit
 - .ConfigureProblemDetails
-- UploadMenuSessionImagesCommand
+- ConfirmMenuSessionCommand
 - dependencies
 - xunit
-- .GetErrorCode
+- ValidationException
 - TelegramSessionTokenIssuer
 - Roslynator.Analyzers
 - .Get_WhenCalendarContainsSharedEvent_AddsOrganizerDisplayNameBeforeCaching
 - xunit
-- .Handle
+- IRequest
 - dependencies
 - dependencies
 - Microsoft.Extensions.ObjectPool
@@ -877,16 +877,16 @@
 - .ConfigureProblemDetails
 - xunit
 - xunit
-- .ConfigureProblemDetails
+- BaseApiController
 - WebApi.Controllers
 - xunit
-- .ConfigureProblemDetails
+- TravelCalendarDto
 - dependencies
-- TokenValidationParameters
+- .ConfigureProblemDetails
 - .ConfigureProblemDetails
 - Roslynator.Analyzers
 - net10.0
-- Shared NuGet Library Distribution
+- AGENTS Guide: Defender.DistributedCache
 - KafkaExtensionsTests
 - RiskGamesCommonExtensionsTests
 - .Log
@@ -895,7 +895,7 @@
 - dependencies
 - Microsoft.NET.Test.Sdk
 - ICarServiceWrapper
-- ServiceHistoryRecordDto
+- Currency
 - Microsoft.NET.Test.Sdk
 - Microsoft.NET.Test.Sdk
 - dependencies
@@ -919,32 +919,32 @@
 - dependencies
 - Microsoft.NET.Test.Sdk
 - Microsoft.Extensions.DependencyInjection.Abstractions
-- .GetSecretAsync
+- UpdateMainDiagramSetupRequest
 - Microsoft.NET.Test.Sdk
 - dependencies
 - dependencies
 - Microsoft.NET.Test.Sdk
 - dependencies
 - dependencies
-- .FromModelState
+- .ConfigureProblemDetails
 - MenuSessionController
 - dependencies
 - ReviewedRegularExpenseDto
-- .AddSchedule
+- TravelCalendar/TravelCalendarRequests.cs
 - UpdateModelRequest
 - dependencies
 - Microsoft.Extensions.Configuration.Abstractions
 - Microsoft.Extensions.Configuration.Abstractions
 - portal-tools.ts
 - OpenIddict.Client
-- .RegisterRepositories
+- PositionToPublish
 - UserTicketDto
 - .ReplaceAsync_WhenExpectedVersionDoesNotMatch_ReturnsFalse
 - RegularExpenseReviewItemRequest
 - dependencies
 - MediatR
 - Microsoft.AspNetCore.Authentication.JwtBearer
-- IAccountManagementService
+- ReviewedPosition
 - Microsoft.AspNetCore.Authentication.JwtBearer
 - Defender.Utils
 - Microsoft.AspNetCore.Authentication.JwtBearer
@@ -955,7 +955,7 @@
 - dependencies
 - dependencies
 - .RegisterNotificationClient
-- .RegisterUserManagementClient
+- IHealthCareWrapper
 - Microsoft.AspNetCore.Authentication.JwtBearer
 - Microsoft.AspNetCore.Authentication.JwtBearer
 - Microsoft.AspNetCore.Authentication.JwtBearer
@@ -998,7 +998,7 @@
 - Moq
 - dependencies
 - Microsoft.AspNetCore.Authentication.JwtBearer
-- IRequest
+- LoginResponse
 - dependencies
 - dependencies
 - Microsoft.AspNetCore.Authentication.JwtBearer
@@ -1144,7 +1144,7 @@
 - .Log
 - .Log
 - NotificationServiceClient
-- Defender.PersonalFoodAdvisor/src/Tests/ArchitectureTests.cs
+- ArchitectureTests
 - dependencies
 - .Log
 - MediatR
@@ -1173,7 +1173,7 @@
 - Microsoft.IdentityModel.Logging
 - dependencies
 - Microsoft.IdentityModel.Logging
-- HealthEventTests
+- GetUserTicketsQuery
 - Microsoft.IdentityModel.Logging
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - Serilog.Settings.Configuration
@@ -1266,7 +1266,7 @@
 - Microsoft.IdentityModel.Logging
 - Microsoft.Extensions.Logging.Abstractions
 - Microsoft.IdentityModel.Logging
-- LotterySchedule
+- deploy-portal.ps1
 - dependencies
 - Microsoft.IdentityModel.Logging
 - Castle.Core
@@ -1288,7 +1288,7 @@
 - Microsoft.IdentityModel.Logging
 - Serilog.Extensions.Hosting
 - Microsoft.Extensions.Primitives
-- BaseInternalSwaggerWrapper
+- GetMainDiagramSetupQuery
 - Defender.IdentityService/src/Application/Modules/ValidationConstants.cs
 - Defender.SecretManagementService/src/Application/Common/Interfaces/Wrapper/IServiceWrapper.cs
 - Defender.GeneralTestingService/src/Application/Common/Interfaces/Wrapper/IServiceWrapper.cs
@@ -1301,7 +1301,7 @@
 - Newtonsoft.Json
 - Roslynator.Analyzers
 - FluentValidation
-- CreateInsurancePolicyRequest
+- PublishRegularExpenseReviewRequest
 - dependencies
 - dependencies
 - Serilog
@@ -1370,7 +1370,7 @@
 - Serilog
 - Swashbuckle.AspNetCore.SwaggerUI
 - xunit.runner.visualstudio
-- BaseApiController
+- .RechargeAsync
 - Microsoft.Extensions.Options
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - Microsoft.OpenApi
@@ -1394,7 +1394,7 @@
 - dependencies
 - Newtonsoft.Json
 - Roslynator.Analyzers
-- INotificationServiceClient
+- SendVerificationCodeCommand
 - FluentValidation
 - dependencies
 - Newtonsoft.Json
@@ -1404,7 +1404,7 @@
 - FluentValidation
 - Hellang.Middleware.ProblemDetails
 - CreateChild
-- VehicleDto
+- UpdateMainDiagramSetupCommand
 - Microsoft.Extensions.Http.Polly
 - Newtonsoft.Json
 - CreateKafkaTopicsService
@@ -1424,7 +1424,7 @@
 - Roslynator.Analyzers
 - Serilog
 - FluentValidation
-- Defender.IdentityService.Application.Models.Google
+- Defender.IdentityService.Application.Common.Interfaces.Services
 - dependencies
 - Newtonsoft.Json
 - dependencies
@@ -1460,7 +1460,7 @@
 - dependencies
 - Newtonsoft.Json
 - Roslynator.Analyzers
-- .ConfigureProblemDetails
+- SessionDto
 - coverlet.collector
 - FluentValidation
 - dependencies
@@ -1563,7 +1563,7 @@
 - Newtonsoft.Json
 - Roslynator.Analyzers
 - FluentValidation
-- HealthEventType
+- HealthEvent
 - Newtonsoft.Json
 - Roslynator.Analyzers
 - coverlet.collector
@@ -1616,7 +1616,7 @@
 - Dapper
 - FluentValidation
 - Microsoft.NET.Test.Sdk
-- CacheForService
+- .RegisterApiClients
 - Serilog
 - FluentValidation
 - Microsoft.NET.Test.Sdk
@@ -1645,7 +1645,7 @@
 - Roslynator.Analyzers
 - Serilog
 - ReasonCode
-- DeleteMenuSessionCommand
+- BaseTransactionCommand
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - dependencies
 - dependencies
@@ -1665,7 +1665,7 @@
 - Newtonsoft.Json
 - Roslynator.Analyzers
 - Serilog
-- UserLotteryTicketStatus
+- all_systems.sh
 - .Log
 - Microsoft.OpenApi
 - Microsoft.IdentityModel.Tokens
@@ -1700,7 +1700,7 @@
 - Defender.JobSchedulerService/src/Application/Modules/ValidationConstants.cs
 - Defender.PersonalFoodAdvisor/src/Application/Modules/ValidationConstants.cs
 - Defender.BudgetTracker/src/Application/Modules/ValidationConstants.cs
-- Graphify Query: Portal UI Components and Styling
+- HealthCarePage
 - Microsoft.IdentityModel.Tokens
 - DnsClient
 - Microsoft.IdentityModel.Protocols.OpenIdConnect
@@ -1904,7 +1904,7 @@
 - Rates
 - DnsClient
 - MediatR.Contracts
-- AuthCheckDto
+- NotificationWrapper
 - Microsoft.Extensions.Primitives
 - Microsoft.IdentityModel.Abstractions
 - Microsoft.IdentityModel.Protocols.OpenIdConnect
@@ -2035,7 +2035,7 @@
 - Snappier
 - System.Diagnostics.EventLog
 - xunit.abstractions
-- .RegisterApiClients
+- AppEnvironment
 - Swashbuckle.AspNetCore.Swagger
 - DnsClient
 - librdkafka.redist
@@ -2044,8 +2044,8 @@
 - Microsoft.Extensions.DependencyModel
 - Env
 - dependencies
-- AuthAttribute
-- CheckAccountVerificationQueryHandler
+- .GetConfigurationAsync
+- IdentityServiceApplicationCoverageSmokeTests
 - Microsoft.IdentityModel.Logging
 - DnsClient
 - Serilog.Settings.Configuration
@@ -2061,7 +2061,7 @@
 - Microsoft.IdentityModel.Logging
 - Microsoft.Bcl.Cryptography
 - Microsoft.Extensions.DependencyInjection.Abstractions
-- EffectiveBaseline
+- ServiceHistoryRecord
 - Microsoft.IdentityModel.Protocols.OpenIdConnect
 - SharpCompress
 - ZstdSharp.Port
@@ -2102,7 +2102,7 @@
 - ZstdSharp.Port
 - librdkafka.redist
 - MediatR.Contracts
-- LocalSecret
+- .AuthorizationCheckAsync
 - Currency
 - Microsoft.Extensions.Primitives
 - Microsoft.IdentityModel.Abstractions
@@ -2137,7 +2137,7 @@
 - Microsoft.IdentityModel.Tokens
 - MongoDB.Bson
 - SharpCompress
-- TopicExtensionsTests
+- AccountManagementServiceTests
 - DnsClient
 - Microsoft.TestPlatform.TestHost
 - Microsoft.Bcl.Cryptography
@@ -2151,14 +2151,14 @@
 - .CreateAsync
 - Defender.TravelCalendarService.Domain
 - DnsClient
-- CreateKafkaTopicsService
+- EnsureTopicsCreatedService
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - Microsoft.IdentityModel.Abstractions
 - Microsoft.IdentityModel.Protocols.OpenIdConnect
 - Microsoft.IdentityModel.Tokens
 - BaseApiController
 - SharpCompress
-- CreateInsurancePolicyRequest
+- .AuthorizationCheckAsync
 - Defender.TravelCalendarService.Domain
 - DnsClient
 - MediatR.Contracts
@@ -2234,7 +2234,7 @@
 - Microsoft.IdentityModel.Protocols.OpenIdConnect
 - MongoDB.Bson
 - Microsoft.IdentityModel.Logging
-- ServiceWrapper
+- .AuthorizationCheckAsync
 - Snappier
 - ZstdSharp.Port
 - DnsClient
@@ -2250,13 +2250,13 @@
 - SharpCompress
 - Unit-test audit and cleanup
 - DnsClient
-- .EmailAsync
+- .AuthorizationCheckAsync
 - Microsoft.Bcl.Cryptography
 - Microsoft.Extensions.DependencyInjection.Abstractions
 - Microsoft.Extensions.Primitives
 - Microsoft.IdentityModel.Abstractions
 - Microsoft.IdentityModel.Tokens
-- PortalTransactionDtoTransactionType
+- .AuthorizationCheckAsync
 - SharpCompress
 - Microsoft.Extensions.Logging.Abstractions
 - MongoDB.Driver
@@ -2264,7 +2264,7 @@
 - Microsoft.Extensions.Primitives
 - Microsoft.IdentityModel.Protocols.OpenIdConnect
 - Microsoft.Extensions.Logging.Abstractions
-- KafkaTopic
+- .AuthorizationCheckAsync
 - Roslynator.Analyzers
 - Snappier
 - ZstdSharp.Port
@@ -2411,11 +2411,11 @@
 - Roslynator.Analyzers
 - Roslynator.Analyzers
 - Serilog
-- PortalRegularExpenseRatesModel
+- PortalRegularExpenseReview
 - Defender.Portal.Domain
-- PortalWrapper
+- .AuthorizationCheckAsync
 - FluentValidation
-- IBaseModel
+- DiagramSetupCurrency
 - Newtonsoft.Json
 - Roslynator.Analyzers
 - xunit.runner.visualstudio
@@ -2450,7 +2450,7 @@
 - MongoDB.Bson
 - SharpCompress
 - Snappier
-- JobManagementController
+- DeleteJobCommand
 - Microsoft.IdentityModel.Abstractions
 - System.Diagnostics.EventLog
 - MongoDB.Bson
@@ -2692,6 +2692,27 @@
   createInsurancePolicy,
   updateInsurancePolicy,
 }
+- DiagramSetupServiceTests
+- .Create
+- PortalTransactionDtoTransactionStatus
+- telegramSignInHandoff.ts
+- .RegisterServices
+- .RegisterServices
+- Schedule
+- MenuSessionStatus
+- UpdateVehicleRequest
+- TemperatureSlider.tsx
+- BaseApiController
+- CreateKafkaTopicsService
+- BaseApiController
+- .ReadObjectResponseAsync
+- CreateCurrencyAccountCommandCurrency
+- PortalTransactionDtoPagedResult
+- generate-main-sln.sh
+- PublicUserInfoDto
+- TransactionTypeActionMapper
+- ObjectResponseResult
+- .SetAuthorizationHeader
 
 ## God Nodes (most connected - your core abstractions)
 1. `ApiException` - 259 edges
@@ -2712,34 +2733,34 @@
   .claude/agents/create-new-service.md → docs/DEVELOPMENT-GUIDE.md
 - `FoodAdvisorController (Portal BFF)` --implements--> `Backend-For-Frontend (BFF) Pattern`  [INFERRED]
   src/Defender.Portal/src/WebUI/Controllers/V1/FoodAdvisorController.cs → README.md
+- `PostgresDistributedCache` --references--> `PostgreSQL / Npgsql (Relational Store)`  [INFERRED]
+  src/Defender.DistributedCache/src/Defender.DistributedCache/Postgres/PostgresDistributedCache.cs → src/Defender.DistributedCache/AGENTS.md
 - `GeminiModelFallbackService` --implements--> `Gemini Model Fallback / Rate-Limit Loop`  [INFERRED]
   src/Defender.PersonalFoodAdvisor/src/Infrastructure/Clients/Gemini/GeminiModelFallbackService.cs → src/Defender.PersonalFoodAdvisor/AGENTS.md
-- `Graphify Query: HealthCare Page Implementation` --references--> `HealthCareSharePage()`  [EXTRACTED]
-  graphify-out/memory/query_20260807_120334_how_does_defender_portal_implement_the_health_care.md → src/Defender.Portal/src/WebUI/ClientApp/src/content/appPages/HealthCare/Share.tsx
 
 ## Import Cycles
 - None detected.
 
 ## Hyperedges (group relationships)
-- **Explicit Approval Required Before Production/Deployment Actions** — agents, readme, docs_development_guide, docs_operations_guide, github_workflows_readme [INFERRED 0.85]
 - **Uniform ArgoCD Application Manifest Pattern (dev)** — helm_argocd_applications_dev_budget_tracker_app, helm_argocd_applications_dev_health_care_app, helm_argocd_applications_dev_identity_app, helm_argocd_applications_dev_job_scheduler_app, helm_argocd_applications_dev_notification_app, helm_argocd_applications_dev_personal_food_advisor_app, helm_argocd_applications_dev_portal_app [EXTRACTED 1.00]
-- **KEDA HTTP scale-to-zero + cron autoscaling flow across service-template templates** — helm_service_template_templates_deployment, helm_service_template_templates_ingress, helm_service_template_templates_keda_http_interceptor_service, helm_service_template_templates_keda_http_interceptorroute, helm_service_template_templates_keda_scaledobject [INFERRED 0.85]
-- **Dev-environment auto-deploy ArgoCD Application instances of service-template chart** — helm_argocd_applications_dev_risk_games_app, helm_argocd_applications_dev_travel_calendar_app, helm_argocd_applications_dev_user_management_app, helm_argocd_applications_dev_wallet_app [INFERRED 0.85]
-- **ArgoCD control-plane configuration bundle (RBAC, ConfigMap, Projects, NetworkPolicy) sharing app.kubernetes.io/part-of: argocd label** — helm_argocd_config_argocd_cm, helm_argocd_config_argocd_repo_server_network_policy, helm_argocd_config_argocd_ci_rbac_role_argocd_ci_role, helm_argocd_config_argocd_projects_appproject_default [INFERRED 0.75]
-- **Per-Service Helm Values Override Pattern** — helm_service_template_values_budget_tracker, helm_service_template_values_health_care, helm_service_template_values_identity, helm_service_template_values_job_scheduler, helm_service_template_values_notification [INFERRED 0.85]
-- **Defender.BudgetTracker Documentation & Landing Set** — src_defender_budgettracker_agents, src_defender_budgettracker_readme, src_defender_budgettracker_src_webapi_wwwroot_index [INFERRED 0.75]
-- **Shared AGENTS.md Service Guide Structure (purpose, Program.cs entry, V1 controllers, Application services, Infrastructure repositories, HomeController)** — src_defender_generaltestingservice_agents, src_defender_healthcareservice_agents, src_defender_identityservice_agents, src_defender_jobschedulerservice_agents, src_defender_notificationservice_agents, src_defender_personalfoodadvisor_agents [INFERRED 0.85]
-- **Shared Swagger wwwroot Landing Page Template** — src_defender_generaltestingservice_src_webapi_wwwroot_index, src_defender_healthcareservice_src_webapi_wwwroot_index, src_defender_identityservice_src_webapi_wwwroot_index, src_defender_jobschedulerservice_src_webapi_wwwroot_index, src_defender_notificationservice_src_webapi_wwwroot_index, swagger_ui [INFERRED 0.95]
 - **Food Advisor Menu Parsing Pipeline (enqueue, outbox publish, consume, process)** — src_defender_personalfoodadvisor_src_application_services_menusessionservice_defender_personalfoodadvisor_application_services_menusessionservice, src_defender_personalfoodadvisor_src_application_services_background_kafka_menuparsingoutboxpublisherservice_defender_personalfoodadvisor_application_services_background_kafka_menuparsingoutboxpublisherservice, src_defender_personalfoodadvisor_src_application_services_background_kafka_foodadvisoreventlistenerservice_defender_personalfoodadvisor_application_services_background_kafka_foodadvisoreventlistenerservice, src_defender_personalfoodadvisor_src_application_services_menuparsingprocessor_defender_personalfoodadvisor_application_services_menuparsingprocessor, concept_outbox_publish_pattern [EXTRACTED 1.00]
-- **Shared Swagger Landing Page Template Across Defender Services** — src_defender_personalfoodadvisor_src_webapi_wwwroot_index, src_defender_riskgamesservice_src_webapi_wwwroot_index, src_defender_usermanagementservice_src_webapi_wwwroot_index, src_defender_walletservice_src_webapi_wwwroot_index, swagger_ui [INFERRED 0.95]
-- **Shared AGENTS Guide Structure (Purpose / Entry Points / Controllers / Dependencies / Commands)** — src_defender_portal_agents, src_defender_riskgamesservice_agents, src_defender_usermanagementservice_agents, src_defender_walletservice_agents, src_defender_travelcalendarservice_agents [INFERRED 0.85]
 - **PersonalFoodAdvisor Menu-Intelligence Provider Options Behind IMenuIntelligenceClient** — src_defender_personalfoodadvisor_docs_free_api_options, src_defender_personalfoodadvisor_src_application_common_interfaces_services_imenuintelligenceclient_imenuintelligenceclient, concept_huggingface_inference_api, concept_gemini_api, concept_ocr_space_api, concept_together_ai_api [EXTRACTED 1.00]
-- **Local Observability Pipeline Containers (Prometheus, Loki, Promtail, Grafana)** — src_docker_compose_local_prometheus, src_docker_compose_local_loki, src_docker_compose_local_promtail, src_docker_compose_local_grafana [INFERRED 0.85]
-- **Shared AGENTS.md Documentation Template (Purpose / Entry points / Where to change / Playbook / Commands)** — src_service_template_agents, tools_defender_secretmanagementservice_agents, tools_defender_simplemongomigrator_agents, concept_agents_guide_template [INFERRED 0.85]
+- **ArgoCD control-plane configuration bundle (RBAC, ConfigMap, Projects, NetworkPolicy) sharing app.kubernetes.io/part-of: argocd label** — helm_argocd_config_argocd_cm, helm_argocd_config_argocd_repo_server_network_policy, helm_argocd_config_argocd_ci_rbac_role_argocd_ci_role, helm_argocd_config_argocd_projects_appproject_default [INFERRED 0.75]
+- **Defender.BudgetTracker Documentation & Landing Set** — src_defender_budgettracker_agents, src_defender_budgettracker_readme, src_defender_budgettracker_src_webapi_wwwroot_index [INFERRED 0.75]
 - **Canonical Local/Dev Port Allocation Reflected Across Compose and Tool Docs** — src_service_template_readme, src_docker_compose, tools_readme, concept_defender_port_allocation [INFERRED 0.75]
+- **Shared AGENTS.md Documentation Template (Purpose / Entry points / Where to change / Playbook / Commands)** — src_service_template_agents, tools_defender_secretmanagementservice_agents, tools_defender_simplemongomigrator_agents, concept_agents_guide_template [INFERRED 0.85]
+- **Explicit Approval Required Before Production/Deployment Actions** — agents, readme, docs_development_guide, docs_operations_guide, github_workflows_readme [INFERRED 0.85]
+- **Shared AGENTS Guide Structure (Purpose / Entry Points / Controllers / Dependencies / Commands)** — src_defender_portal_agents, src_defender_riskgamesservice_agents, src_defender_usermanagementservice_agents, src_defender_walletservice_agents, src_defender_travelcalendarservice_agents [INFERRED 0.85]
+- **Shared AGENTS.md Service Guide Structure (purpose, Program.cs entry, V1 controllers, Application services, Infrastructure repositories, HomeController)** — src_defender_generaltestingservice_agents, src_defender_healthcareservice_agents, src_defender_identityservice_agents, src_defender_jobschedulerservice_agents, src_defender_notificationservice_agents, src_defender_personalfoodadvisor_agents [INFERRED 0.85]
+- **Dev-environment auto-deploy ArgoCD Application instances of service-template chart** — helm_argocd_applications_dev_risk_games_app, helm_argocd_applications_dev_travel_calendar_app, helm_argocd_applications_dev_user_management_app, helm_argocd_applications_dev_wallet_app [INFERRED 0.85]
+- **Per-Service Helm Values Override Pattern** — helm_service_template_values_budget_tracker, helm_service_template_values_health_care, helm_service_template_values_identity, helm_service_template_values_job_scheduler, helm_service_template_values_notification [INFERRED 0.85]
+- **KEDA HTTP scale-to-zero + cron autoscaling flow across service-template templates** — helm_service_template_templates_deployment, helm_service_template_templates_ingress, helm_service_template_templates_keda_http_interceptor_service, helm_service_template_templates_keda_http_interceptorroute, helm_service_template_templates_keda_scaledobject [INFERRED 0.85]
+- **Local Observability Pipeline Containers (Prometheus, Loki, Promtail, Grafana)** — src_docker_compose_local_prometheus, src_docker_compose_local_loki, src_docker_compose_local_promtail, src_docker_compose_local_grafana [INFERRED 0.85]
 - **Status Page Illustration Set** — src_defender_portal_src_webui_clientapp_public_static_images_status_404_image, src_defender_portal_src_webui_clientapp_public_static_images_status_500_image, src_defender_portal_src_webui_clientapp_public_static_images_status_coming_soon_image, src_defender_portal_src_webui_clientapp_public_static_images_status_maintenance_image [INFERRED 0.85]
+- **Shared Swagger Landing Page Template Across Defender Services** — src_defender_personalfoodadvisor_src_webapi_wwwroot_index, src_defender_riskgamesservice_src_webapi_wwwroot_index, src_defender_usermanagementservice_src_webapi_wwwroot_index, src_defender_walletservice_src_webapi_wwwroot_index, swagger_ui [INFERRED 0.95]
+- **Shared Swagger wwwroot Landing Page Template** — src_defender_generaltestingservice_src_webapi_wwwroot_index, src_defender_healthcareservice_src_webapi_wwwroot_index, src_defender_identityservice_src_webapi_wwwroot_index, src_defender_jobschedulerservice_src_webapi_wwwroot_index, src_defender_notificationservice_src_webapi_wwwroot_index, swagger_ui [INFERRED 0.95]
 
-## Communities (2676 total, 48 thin omitted)
+## Communities (2697 total, 50 thin omitted)
 
 ### Community 0 - "Microsoft.IdentityModel.Protocols.OpenIdConnect"
 Cohesion: 0.22
@@ -2750,16 +2771,16 @@ Cohesion: 0.15
 Nodes (13): dependencies, AutoMapper, FluentValidation, MediatR, Microsoft.AspNetCore.Authentication.JwtBearer, MongoDB.Driver, Newtonsoft.Json, AutoMapper (+5 more)
 
 ### Community 2 - "SessionDto"
-Cohesion: 0.07
-Nodes (33): Task, IAuthorizationService, Guid, Task, IIdentityWrapper, SessionDto, IsAuthenticated, Language (+25 more)
+Cohesion: 0.09
+Nodes (30): Task, IAuthorizationService, SessionDto, IsAuthenticated, Language, Token, User, CancellationToken (+22 more)
 
 ### Community 3 - "PortalWalletInfoDto"
 Cohesion: 0.05
-Nodes (42): Defender.Portal.Application.Modules.Wallet.Commands, Guid, Task, IAdminWalletManagementService, Currency, Task, IWalletManagementService, Guid (+34 more)
+Nodes (41): Guid, Task, IAdminWalletManagementService, Currency, Task, IWalletManagementService, Guid, Task (+33 more)
 
 ### Community 4 - "Generated/GeneratedCode.cs"
 Cohesion: 0.01
-Nodes (425): Collection, IsoDateTimeConverter, ICollection, IDictionary, AbTestVersionClicks, Address, City, Country (+417 more)
+Nodes (413): Collection, IsoDateTimeConverter, ICollection, IDictionary, AbTestVersionClicks, Address, City, Country (+405 more)
 
 ### Community 5 - "dependencies"
 Cohesion: 0.12
@@ -2767,23 +2788,23 @@ Nodes (16): DnsClient, MongoDB.Bson, SharpCompress, Snappier, ZstdSharp.Port, Dn
 
 ### Community 6 - "Defender.Common.DB.Pagination"
 Cohesion: 0.03
-Nodes (63): Defender.BudgetTracker.Application.Common.Interfaces.Repositories, Defender.BudgetTracker.Domain.Entities.DiagramSetup, Defender.BudgetTracker.Application.Mappings, Defender.Common.DB.Model, Defender.JobSchedulerService.Application.Common.Interfaces.Repositories, Defender.PersonalFoodAdvisor.Infrastructure.Repositories, Defender.BudgetTracker.Tests.Infrastructure, Defender.BudgetTracker.Application.Models.DiagramSetups (+55 more)
+Nodes (63): Defender.BudgetTracker.Application.Common.Interfaces.Repositories, Defender.BudgetTracker.Domain.Entities.DiagramSetup, Defender.BudgetTracker.Application.Mappings, Defender.Common.DB.Model, Defender.BudgetTracker.Application.Modules.RegularExpenses, Defender.BudgetTracker.Tests.Infrastructure, Defender.BudgetTracker.Application.Models.DiagramSetups, Defender.BudgetTracker.Tests.Domain (+55 more)
 
 ### Community 7 - "BudgetReview"
 Cohesion: 0.04
-Nodes (64): List, Task, IBudgetReviewRepository, Guid, List, Task, IBudgetReviewService, CancellationToken (+56 more)
+Nodes (62): List, Task, IBudgetReviewRepository, Guid, List, Task, IBudgetReviewService, CancellationToken (+54 more)
 
 ### Community 8 - "Defender.RiskGamesService.Domain.Enums"
-Cohesion: 0.03
-Nodes (65): Defender.RiskGamesService.Domain.Entities.Lottery.TicketsSettings, Defender.RiskGamesService.Application.Models.Lottery, Defender.RiskGamesService.Application.Services.Transaction, Defender.RiskGamesService.Domain.Helpers, Defender.RiskGamesService.Application.Common.Interfaces.Wrapper, Defender.RiskGamesService.Application.Models.Transaction, Defender.RiskGamesService.Application.Handlers.Transaction, Defender.RiskGamesService.Application.Common.Interfaces.Repositories.Transactions (+57 more)
+Cohesion: 0.04
+Nodes (58): Defender.RiskGamesService.Domain.Entities.Lottery.TicketsSettings, Defender.RiskGamesService.Application.Models.Lottery, Defender.RiskGamesService.Application.Services.Transaction, WebApi.Controllers.V1.Lottery, Defender.RiskGamesService.Domain.Helpers, Defender.RiskGamesService.Application.Common.Interfaces.Wrapper, Defender.RiskGamesService.Application.Models.Transaction, Defender.RiskGamesService.Application.Handlers.Transaction (+50 more)
 
 ### Community 9 - "AccessCode"
-Cohesion: 0.03
-Nodes (77): Defender.IdentityService.Tests.Handlers, NotFoundException, Guid, Task, IAccessCodeRepository, Guid, Task, IAccessCodeService (+69 more)
+Cohesion: 0.06
+Nodes (43): NotFoundException, Guid, Task, IAccessCodeRepository, Guid, Task, IAccessCodeService, Guid (+35 more)
 
 ### Community 10 - "ApiException"
 Cohesion: 0.02
-Nodes (229): ObjectResponseResult, Obsolete, Exception, IEnumerable, IReadOnlyDictionary, ApiException, Headers, Response (+221 more)
+Nodes (223): ObjectResponseResult, Obsolete, Exception, IEnumerable, IReadOnlyDictionary, ApiException, Headers, Response (+215 more)
 
 ### Community 11 - "Microsoft.IdentityModel.Tokens"
 Cohesion: 0.22
@@ -2791,15 +2812,15 @@ Nodes (9): Microsoft.Bcl.Cryptography, Microsoft.IdentityModel.Logging, Microsof
 
 ### Community 12 - "Defender.Common.Errors"
 Cohesion: 0.02
-Nodes (65): Defender.RiskGamesService.Application.Common.Exceptions, Defender.Portal.Application.DTOs.Auth, Defender.BudgetTracker.Application.Modules.RegularExpenses, Defender.IdentityService.Domain.Entities, Defender.IdentityService.Tests.Services, Defender.GeneralTestingService.Application.Common.Exceptions, Defender.IdentityService.Application.Models.ApiRequests, Defender.TravelCalendarService.Infrastructure.Repositories (+57 more)
+Nodes (65): Defender.RiskGamesService.Application.Common.Exceptions, Defender.WalletService.Application.Modules.Transactions.Commands, Defender.SecretManagementService.Application.Common.Interfaces.Services, Defender.GeneralTestingService.Application.Common.Exceptions, Defender.BudgetTracker.Application.Configuration.Exstension, Defender.CarService.Tests.Infrastructure, Defender.TravelCalendarService.WebApi, Defender.IdentityService.Application.Common.Exceptions (+57 more)
 
-### Community 13 - "IWalletManagementService"
-Cohesion: 0.07
-Nodes (32): Guid, HashSet, IClientSessionHandle, Task, IWalletRepository, Currency, Guid, HashSet (+24 more)
+### Community 13 - "WalletManagementService"
+Cohesion: 0.12
+Nodes (19): Guid, HashSet, IClientSessionHandle, Task, IWalletRepository, Currency, CurrencyAccount, Guid (+11 more)
 
 ### Community 14 - "IAccessCodeService"
 Cohesion: 0.07
-Nodes (32): Guid, Task, IAccessCodeService, AccessCodeType, Default, EmailVerification, ResetPassword, UpdateAccount (+24 more)
+Nodes (35): Defender.Portal.Application.Modules.Verification.Commands, Guid, Task, IAccessCodeService, CancellationToken, Task, Unit, SendEmailVerificationCodeCommand (+27 more)
 
 ### Community 15 - "dependencies"
 Cohesion: 0.09
@@ -2809,37 +2830,37 @@ Nodes (22): dependencies, dependencies, type, AutoMapper, Confluent.Kafka, Micro
 Cohesion: 0.04
 Nodes (47): type, dependencies, net10.0, contentHash, resolved, type, contentHash, requested (+39 more)
 
-### Community 17 - "GetAggregatedReport"
-Cohesion: 0.09
-Nodes (23): GetAggregatedReport, Blocked, Clicks, Delivered, HardBounces, Invalid, Opens, Range (+15 more)
+### Community 17 - "Portal/GeneratedCode.cs"
+Cohesion: 0.04
+Nodes (51): AccountVerificationDto, IsVerified, AuthCheckDto, HighestRole, UserId, AuthCheckDtoHighestRole, Admin, Guest (+43 more)
 
-### Community 18 - "Transaction"
-Cohesion: 0.06
-Nodes (45): CancellationToken, Task, IDefaultKafkaProducer, Task, ITransactionRepository, CreateTransactionRequest, Task, CreateTransactionRequest (+37 more)
+### Community 18 - "TransactionManagementService"
+Cohesion: 0.13
+Nodes (13): Task, ITransactionRepository, CreateTransactionRequest, Task, TransactionStatus, TransactionManagementService, IHostEnvironment, IOptions (+5 more)
 
 ### Community 19 - "net10.0"
 Cohesion: 0.05
 Nodes (37): dependencies, net10.0, contentHash, resolved, type, contentHash, resolved, type (+29 more)
 
 ### Community 20 - "AccountInfo"
-Cohesion: 0.05
-Nodes (48): HashAlgorithmName, Guid, Task, IAccountInfoRepository, Guid, Task, IAccountManagementService, Task (+40 more)
+Cohesion: 0.09
+Nodes (28): HashAlgorithmName, Guid, Task, IAccountInfoRepository, Guid, Task, IAccountManagementService, Task (+20 more)
 
 ### Community 21 - "net10.0"
 Cohesion: 0.04
 Nodes (53): contentHash, requested, resolved, type, dependencies, net10.0, contentHash, resolved (+45 more)
 
 ### Community 22 - "sessionActions.tsx"
-Cohesion: 0.02
-Nodes (105): logout(), updateLanguage(), HeaderPreferences(), LanguageSwitcher(), mapDispatchToProps(), LoadingBarProps, WarningToast(), mapDispatchToProps() (+97 more)
-
-### Community 23 - "Defender.Common.Enums"
 Cohesion: 0.03
-Nodes (40): Defender.PersonalFoodAdvisor.Application.DTOs, WebApi.Controllers.V1.Lottery, Defender.Common.Modules.Home.Queries, Defender.TravelCalendarService.WebApi, Defender.Common.Helpers, Defender.NotificationService.Application.Helpers.LocalSecretHelper, Defender.Portal.Application.Modules.Admin.Users.Queries, Defender.HealthCareService.Domain.Entities (+32 more)
+Nodes (92): logout(), LoadingBarProps, WarningToast(), mapDispatchToProps(), getProtectedRedirectPath(), isBoolean(), logoutPortal(), HeaderUserbox() (+84 more)
+
+### Community 23 - "Defender.Common.Consts"
+Cohesion: 0.04
+Nodes (33): AuthorizeAttribute, Defender.PersonalFoodAdvisor.Application.DTOs, Defender.Common.Modules.Home.Queries, Defender.Portal.Application.Modules.Admin.Users.Queries, Defender.HealthCareService.Domain.Entities, Defender.HealthCareService.Tests.Domain, Defender.Portal.WebUI.Controllers.V1.Admin, WebApi.Controllers.V1 (+25 more)
 
 ### Community 24 - "useUtils"
 Cohesion: 0.03
-Nodes (83): DishRatingDto, PreferencesDto, useUtils(), DishRatingDialog(), DishRatingDialogProps, Label(), LabelProps, LabelWrapper (+75 more)
+Nodes (88): useUtils(), Label(), LabelProps, LabelWrapper, AdminRoleLable(), SuperAdminRoleLable(), UserRoleLable(), ErrorStatusLabel() (+80 more)
 
 ### Community 25 - "LotteryModel"
 Cohesion: 0.05
@@ -2849,17 +2870,17 @@ Nodes (48): Guid, List, Task, ILotteryRepository, Guid, Task, ILotteryManagement
 Cohesion: 0.06
 Nodes (65): CalendarTheme, call(), HotelDetails, MutationResult, PackingItem, PointOfInterest, TravelCalendar, travelCalendarApi (+57 more)
 
-### Community 27 - "Defender.Portal.Application.Modules.Telegram"
-Cohesion: 0.03
-Nodes (45): Defender.Portal.Application.Modules.Telegram, Defender.Portal.Infrastructure.Clients.CarService, Defender.Portal.Infrastructure.Clients.PersonalFoodAdvisor, Defender.IdentityService.Application.Common.Interfaces.Wrapper, Defender.HealthCareService.Infrastructure.Clients.Service, Defender.Common.Clients.UserManagement, Defender.Portal.Application.Models.ApiRequests.MyGarage, Defender.Portal.Application.Services.Background (+37 more)
+### Community 27 - "Defender.Portal.Application.Common.Interfaces.Wrappers"
+Cohesion: 0.02
+Nodes (77): Defender.Portal.Application.Modules.Telegram, Defender.Portal.Infrastructure.Clients.CarService, Defender.Portal.Application.DTOs.Auth, Defender.Portal.Infrastructure.Clients.PersonalFoodAdvisor, Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetReviews, Defender.Portal.Application.DTOs.BudgetTracking.DiagramSetup, Defender.Portal.Infrastructure.Clients.BudgetTracker, Defender.Portal.Application.Models.ApiRequests.MyGarage (+69 more)
 
 ### Community 28 - "LotteryDrawDto"
-Cohesion: 0.03
-Nodes (95): Guid, List, Task, ILotteryService, Guid, HashSet, List, Task (+87 more)
+Cohesion: 0.02
+Nodes (106): Defender.Portal.Application.Models.ApiRequests.RiskGames.Lottery, Defender.Portal.Application.Enums.RiskGames.Lottery, Defender.Portal.Application.Modules.RiskGames.Lottery.Queries, Defender.Portal.Application.Modules.RiskGames.Lottery.Commands, Guid, List, Task, ILotteryService (+98 more)
 
 ### Community 29 - "ScheduledJob"
-Cohesion: 0.08
-Nodes (30): Guid, Task, IScheduledJobRepository, Guid, ICollection, Task, JobManagementService, DateTime (+22 more)
+Cohesion: 0.10
+Nodes (20): Defender.JobSchedulerService.Tests.Domain, Guid, Task, IScheduledJobRepository, DateTime, Guid, ScheduledJob, Event (+12 more)
 
 ### Community 30 - "FluentValidation.AspNetCore"
 Cohesion: 0.09
@@ -2887,7 +2908,7 @@ Nodes (31): dependencies, type, dependencies, type, Defender.Common, Defender.He
 
 ### Community 36 - "APICallWrapper"
 Cohesion: 0.03
-Nodes (82): updateUserInfo(), APIEndpoints, myGarageApiUrls, APICallWrapper(), createRequestSignal(), getErrorDetail(), getRequestOptions(), parseFailure() (+74 more)
+Nodes (87): setMainDiagramGroups(), APIEndpoints, myGarageApiUrls, APICallWrapper(), createRequestSignal(), getErrorDetail(), getRequestOptions(), parseFailure() (+79 more)
 
 ### Community 37 - "net10.0"
 Cohesion: 0.07
@@ -2899,7 +2920,7 @@ Nodes (37): dependencies, dependencies, type, dependencies, type, AutoMapper, De
 
 ### Community 39 - "src/docker-compose.yml Local & Dev Stack"
 Cohesion: 0.05
-Nodes (72): AGENTS.md Guide Template Structure, Docker Compose local/dev Profile Split, Defender Port Allocation Scheme (47050-47064 local / 49050-49064 dev), Shared external-network Docker Network, Local Observability Pipeline (Prometheus + Loki + Promtail + Grafana), Local JWT Secret Bootstrap Workflow, Environment-Prefixed Mongo Database Migration (local_/dev_/prod_), Swagger Landing Page Convention for WebApi wwwroot (+64 more)
+Nodes (74): AGENTS.md Guide Template Structure, Docker Compose local/dev Profile Split, Defender Port Allocation Scheme (47050-47064 local / 49050-49064 dev), Shared external-network Docker Network, Local Observability Pipeline (Prometheus + Loki + Promtail + Grafana), Local JWT Secret Bootstrap Workflow, Environment-Prefixed Mongo Database Migration (local_/dev_/prod_), Swagger Landing Page Convention for WebApi wwwroot (+66 more)
 
 ### Community 40 - "net10.0"
 Cohesion: 0.09
@@ -2914,12 +2935,12 @@ Cohesion: 0.04
 Nodes (81): Guid, Task, IGroupRepository, Guid, Task, IGroupService, Guid, List (+73 more)
 
 ### Community 43 - "AuthPageShell.tsx"
-Cohesion: 0.07
-Nodes (26): Logo(), LogoInnerStyled, LogoWrapper, Scrollbar(), ScrollbarProps, MainContent, MainContent, AuthPageShellProps (+18 more)
+Cohesion: 0.04
+Nodes (38): updateLanguage(), HeaderPreferences(), LanguageSwitcher(), mapDispatchToProps(), Logo(), LogoInnerStyled, LogoWrapper, Scrollbar() (+30 more)
 
 ### Community 44 - "MainDiagram/index.tsx"
 Cohesion: 0.05
-Nodes (47): Currency, Rates, RatesExtensions, setMainDiagramSetup(), LockedDatePickerProps, LockedSelectProps, DiagramConfig(), DiagramConfigProps (+39 more)
+Nodes (46): setMainDiagramSetup(), LockedDatePickerProps, LockedSelectProps, DiagramConfig(), DiagramConfigProps, getNewStartDate(), mapDispatchToProps(), getMainDiagramLayout() (+38 more)
 
 ### Community 45 - "net10.0"
 Cohesion: 0.11
@@ -2927,11 +2948,11 @@ Nodes (17): type, dependencies, net10.0, contentHash, resolved, type, contentHas
 
 ### Community 46 - "Defender.PersonalFoodAdvisor.Domain.Entities"
 Cohesion: 0.07
-Nodes (20): Defender.PersonalFoodAdvisor.Application.Common.Interfaces.Wrapper, Defender.PersonalFoodAdvisor.Infrastructure.Configuration.Options, Defender.PersonalFoodAdvisor.Application.Helpers.LocalSecretHelper, Defender.PersonalFoodAdvisor.Infrastructure.Clients.HuggingFace, Defender.PersonalFoodAdvisor.Application.Services, Defender.PersonalFoodAdvisor.Infrastructure.Clients.Service, Defender.PersonalFoodAdvisor.Domain.Enums, Defender.PersonalFoodAdvisor.Application.Common.Interfaces.Services (+12 more)
+Nodes (21): Defender.PersonalFoodAdvisor.Infrastructure.Repositories, Defender.PersonalFoodAdvisor.Infrastructure.Configuration.Options, Defender.PersonalFoodAdvisor.Application.Helpers.LocalSecretHelper, Defender.PersonalFoodAdvisor.Tests, Defender.PersonalFoodAdvisor.Infrastructure.Clients.HuggingFace, Defender.PersonalFoodAdvisor.Application.Services, Defender.PersonalFoodAdvisor.Infrastructure.Clients.Service, Defender.PersonalFoodAdvisor.Domain.Enums (+13 more)
 
-### Community 47 - "StringContent"
-Cohesion: 0.03
-Nodes (122): Guid, Action, HttpClient, IServiceCollection, IServiceProvider, ConfigureIdentityClient, CancellationToken, CultureInfo (+114 more)
+### Community 47 - "IdentityServiceClient"
+Cohesion: 0.02
+Nodes (118): Action, HttpClient, IServiceCollection, IServiceProvider, ConfigureIdentityClient, CancellationToken, CultureInfo, DateTime (+110 more)
 
 ### Community 48 - "net10.0"
 Cohesion: 0.09
@@ -2943,27 +2964,27 @@ Nodes (21): type, dependencies, net10.0, contentHash, resolved, type, contentHas
 
 ### Community 50 - "DateTime"
 Cohesion: 0.01
-Nodes (174): DateTime, AdminUnsubscription, AdminUnsubscription2, EventTime, Ip, EventTime, Ip, Complaints (+166 more)
+Nodes (200): DateTime, AdminUnsubscription, AdminUnsubscription2, EventTime, Ip, EventTime, Ip, Clicked2 (+192 more)
 
-### Community 51 - "Review/Table/index.tsx"
-Cohesion: 0.05
-Nodes (61): setMainDiagramGroups(), compactIconButtonLayout, CustomDialog(), DialogProps, Transition, LockedChipListProps, LockedIconButtonProps, TagChip() (+53 more)
+### Community 51 - "Sessions/index.tsx"
+Cohesion: 0.07
+Nodes (27): DishRatingDto, foodAdvisorApi, MenuSessionDto, PreferencesDto, DishRatingDialog(), DishRatingDialogProps, LockedChipListProps, TagChip() (+19 more)
 
 ### Community 52 - ".SetAuthCookie"
 Cohesion: 0.16
 Nodes (13): CookieOptions, HttpRequest, HttpResponse, AuthCookieHelper, Fact, AuthCookieHelperTests, ActionResult, HttpPost (+5 more)
 
 ### Community 53 - "Defender.TravelCalendarService.Domain.Entities"
-Cohesion: 0.05
-Nodes (37): Defender.TravelCalendarService.Domain.Exceptions, Defender.TravelCalendarService.Application.Services, Defender.TravelCalendarService.Domain.ValueObjects, Defender.TravelCalendarService.Application.DTOs, Defender.TravelCalendarService.Domain.Entities, Defender.TravelCalendarService.Application.Common.Interfaces.Services, Defender.TravelCalendarService.Application.Common.Interfaces.Repositories, Defender.TravelCalendarService.Domain.Services (+29 more)
-
-### Community 54 - "Position"
 Cohesion: 0.04
-Nodes (73): Guid, Task, IPositionRepository, Guid, Task, IPositionService, Currency, List (+65 more)
+Nodes (45): Defender.TravelCalendarService.Domain.Exceptions, Defender.TravelCalendarService.Application.Services, Defender.TravelCalendarService.Domain.ValueObjects, Defender.TravelCalendarService.Application.DTOs, Defender.TravelCalendarService.Domain.Entities, Defender.TravelCalendarService.Application.Common.Interfaces.Services, Defender.TravelCalendarService.Domain.Services, Defender.TravelCalendarService.Tests.Domain (+37 more)
+
+### Community 54 - "PagedResult"
+Cohesion: 0.03
+Nodes (93): Guid, Task, IPositionRepository, Guid, Task, Currency, List, CreatePositionRequest (+85 more)
 
 ### Community 55 - "IUtils"
-Cohesion: 0.09
-Nodes (29): IUtils, DateLocales, HistoricalTransactionsProps, HistoricalTransactionsTable(), HistoricalTransactionsTableProps, HorizontalDivider(), TransactionInfoDialogBody(), mapTransactionPurpose() (+21 more)
+Cohesion: 0.08
+Nodes (31): APICallProps, IUtils, DateLocales, HistoricalTransactions(), HistoricalTransactionsProps, HistoricalTransactionsTable(), HistoricalTransactionsTableProps, HorizontalDivider() (+23 more)
 
 ### Community 56 - "dependencies"
 Cohesion: 0.12
@@ -2978,8 +2999,8 @@ Cohesion: 0.14
 Nodes (13): type, dependencies, net10.0, contentHash, resolved, type, defender.kafka, Microsoft.CodeCoverage (+5 more)
 
 ### Community 59 - "TravelCalendarController"
-Cohesion: 0.22
-Nodes (11): ActionResult, CancellationToken, Guid, HttpDelete, HttpGet, HttpPatch, HttpPost, HttpPut (+3 more)
+Cohesion: 0.14
+Nodes (20): Guid, AddPackingItemRequest, AddParticipantRequest, AddPointRequest, CreateEventFromDateRequest, CreateQueuedTripRequest, SetThemeRequest, UpdateMyParticipationRequest (+12 more)
 
 ### Community 60 - "Moq"
 Cohesion: 0.25
@@ -2999,19 +3020,19 @@ Nodes (34): dependencies, type, dependencies, type, dependencies, type, Defender
 
 ### Community 64 - "BaseMappingProfile"
 Cohesion: 0.04
-Nodes (50): Defender.NotificationService.Application.Mappings, Defender.UserManagementService.Application.Mappings, Defender.Common.Mapping, Defender.JobSchedulerService.Application.Mappings, Defender.GeneralTestingService.Infrastructure.Mappings, Defender.Portal.Application.Mappings, Defender.SecretManagementService.Infrastructure.Mappings, Defender.WalletService.Infrastructure.Mappings (+42 more)
+Nodes (48): Defender.UserManagementService.Application.Mappings, Defender.Common.Mapping, Defender.JobSchedulerService.Application.Mappings, Defender.GeneralTestingService.Infrastructure.Mappings, Defender.Portal.Application.Mappings, Defender.SecretManagementService.Infrastructure.Mappings, Defender.WalletService.Infrastructure.Mappings, Defender.PersonalFoodAdvisor.Infrastructure.Mappings (+40 more)
 
 ### Community 65 - "DiagramSetup"
-Cohesion: 0.05
-Nodes (57): Guid, Task, IDiagramSetupRepository, Task, IDiagramSetupService, Guid, UpdateMainDiagramSetupRequest, DefaultRequest (+49 more)
+Cohesion: 0.18
+Nodes (13): Guid, Task, IDiagramSetupRepository, Guid, DiagramSetup, EndDate, Id, LastMonths (+5 more)
 
 ### Community 66 - "ErrorCode"
 Cohesion: 0.02
 Nodes (101): ErrorCode, BR_ACC, BR_ACC_AccessCodeWasAlreadyUsed, BR_ACC_AccessCodeWasExpired, BR_ACC_AdminCannotBlockAdmins, BR_ACC_AdminCannotChangeAdminPassword, BR_ACC_CodeTypeMismatch, BR_ACC_CodeWasNotVerified (+93 more)
 
 ### Community 67 - "MenuSession"
-Cohesion: 0.05
-Nodes (57): CancellationToken, Guid, IReadOnlyList, Task, ConfirmMenuSessionCommand, ConfirmedItems, SessionId, TrySomethingNew (+49 more)
+Cohesion: 0.06
+Nodes (55): CancellationToken, Guid, IReadOnlyList, Task, IMenuSessionRepository, CancellationToken, Guid, IReadOnlyList (+47 more)
 
 ### Community 68 - "dependencies"
 Cohesion: 0.06
@@ -3021,9 +3042,9 @@ Nodes (37): OpenIddict.Client, OpenIddict.Client.SystemIntegration, OpenIddict.C
 Cohesion: 0.10
 Nodes (22): contentHash, dependencies, requested, resolved, type, Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging.Abstractions, Microsoft.Extensions.Options (+14 more)
 
-### Community 70 - ".CreateOrUpdateSecret"
-Cohesion: 0.18
-Nodes (12): CancellationToken, Task, GetSecretQuery, SecretName, GetSecretValueSecretQueryHandler, GetSecretValueSecretQueryValidator, HttpDelete, HttpGet (+4 more)
+### Community 70 - "IIdentityWrapper"
+Cohesion: 0.10
+Nodes (16): Guid, Task, IIdentityWrapper, AccessCodeType, Default, EmailVerification, ResetPassword, UpdateAccount (+8 more)
 
 ### Community 71 - "net10.0"
 Cohesion: 0.09
@@ -3051,11 +3072,11 @@ Nodes (28): Defender.ServiceTemplate.Application, dependencies, dependencies, ty
 
 ### Community 77 - "BudgetTracker/GeneratedCode.cs"
 Cohesion: 0.01
-Nodes (285): AuthenticationHeaderValue, BudgetTrackerServiceClient, Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken, CultureInfo (+277 more)
+Nodes (256): AuthenticationHeaderValue, BudgetTrackerServiceClient, Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken, CultureInfo (+248 more)
 
 ### Community 78 - "UserManagementServiceClient"
 Cohesion: 0.06
-Nodes (51): CancellationToken, CultureInfo, DateTime, Guid, HttpClient, HttpRequestMessage, HttpResponseMessage, IDictionary (+43 more)
+Nodes (54): JsonSerializerSettings&gt;, Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken, CultureInfo, DateTime (+46 more)
 
 ### Community 79 - "Microsoft.Extensions.DependencyInjection.Abstractions"
 Cohesion: 0.09
@@ -3070,12 +3091,12 @@ Cohesion: 0.23
 Nodes (8): loadConfig(), McpConfig, requireHttpsIssuer(), requireHttpsOrigin(), createPortalReadinessProbe(), mapHealthRoutes(), PortalReadinessProbe, config
 
 ### Community 82 - "DishRating"
-Cohesion: 0.06
-Nodes (44): Defender.PersonalFoodAdvisor.Application.Modules.Ratings.Queries, CancellationToken, Guid, IReadOnlyList, Task, IDishRatingRepository, CancellationToken, Guid (+36 more)
+Cohesion: 0.09
+Nodes (30): CancellationToken, Guid, IReadOnlyList, Task, IDishRatingRepository, CancellationToken, Guid, ILogger (+22 more)
 
 ### Community 83 - "Login/Form/index.tsx"
 Cohesion: 0.11
-Nodes (24): login(), mapDispatchToProps(), LoginByGoogle(), mapDispatchToProps(), CreateForm(), mapDispatchToProps(), LoginForm(), mapDispatchToProps() (+16 more)
+Nodes (23): login(), LoginByGoogle(), mapDispatchToProps(), CreateForm(), mapDispatchToProps(), LoginForm(), mapDispatchToProps(), googleLoginButtonLayout (+15 more)
 
 ### Community 84 - "dependencies"
 Cohesion: 0.06
@@ -3089,9 +3110,9 @@ Nodes (14): xunit.extensibility.core, xunit.extensibility.execution, xunit.exten
 Cohesion: 0.18
 Nodes (11): dependencies, type, Defender.DistributedCache, Defender.Portal.Domain, FluentValidation.DependencyInjectionExtensions, Serilog, Defender.DistributedCache, Defender.Portal.Domain (+3 more)
 
-### Community 87 - "MenuSessionService"
-Cohesion: 0.10
-Nodes (28): CancellationToken, Guid, IReadOnlyList, Task, IMenuSessionService, CancellationToken, Guid, Task (+20 more)
+### Community 87 - "RequestMenuSessionParsingCommand"
+Cohesion: 0.27
+Nodes (8): CancellationToken, Guid, Task, RequestMenuSessionParsingCommand, SessionId, UserId, RequestMenuSessionParsingCommandHandler, RequestMenuSessionParsingCommandValidator
 
 ### Community 88 - "dependencies"
 Cohesion: 0.10
@@ -3099,15 +3120,15 @@ Nodes (21): Defender.WalletService.Infrastructure, dependencies, type, Defender.
 
 ### Community 89 - "Wallet/GeneratedCode.cs"
 Cohesion: 0.01
-Nodes (202): Defender.Common.Clients.Base, JsonSerializerSettings&gt;, IBaseServiceClient, Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken (+194 more)
+Nodes (199): Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken, CultureInfo, DateTime, Guid (+191 more)
 
 ### Community 90 - "net10.0"
 Cohesion: 0.07
 Nodes (29): type, dependencies, net10.0, contentHash, resolved, type, contentHash, resolved (+21 more)
 
 ### Community 91 - "CancellationToken"
-Cohesion: 0.02
-Nodes (181): Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken, CultureInfo, DateTime, Guid (+173 more)
+Cohesion: 0.06
+Nodes (45): Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken, CultureInfo, HttpClient, HttpRequestMessage (+37 more)
 
 ### Community 92 - "dependencies"
 Cohesion: 0.08
@@ -3133,9 +3154,9 @@ Nodes (27): type, dependencies, net10.0, contentHash, requested, resolved, type,
 Cohesion: 0.07
 Nodes (27): type, dependencies, net10.0, contentHash, resolved, type, contentHash, resolved (+19 more)
 
-### Community 98 - "Defender.Portal.Application.Common.Interfaces.Wrappers"
-Cohesion: 0.04
-Nodes (35): Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetReviews, Defender.Portal.Application.DTOs.BudgetTracking.DiagramSetup, Defender.Portal.Infrastructure.Clients.BudgetTracker, Defender.Portal.Application.Models.ApiRequests.RiskGames.Lottery, Defender.Portal.Application.Modules.BudgetTracking.RegularExpenses.Queries, Defender.Portal.Application.Modules.BudgetTracking.Groups.Queries, Defender.Portal.Application.Models.ApiRequests.Accounts, Defender.Portal.Application.Modules.RiskGames.Lottery.Queries (+27 more)
+### Community 98 - "BudgetTrackerSupportedCurrency"
+Cohesion: 0.08
+Nodes (22): BudgetTrackerSupportedCurrency, ALL, BYN, EUR, GEL, PLN, RUB, USD (+14 more)
 
 ### Community 99 - "BaseSwaggerWrapper"
 Cohesion: 0.15
@@ -3147,51 +3168,51 @@ Nodes (16): FluentValidation, FluentValidation.DependencyInjectionExtensions, co
 
 ### Community 101 - "RiskGames/GeneratedCode.cs"
 Cohesion: 0.01
-Nodes (242): Guid&gt;, Action, HttpClient, IServiceCollection, IServiceProvider, CancellationToken, CultureInfo, DateTime (+234 more)
+Nodes (242): Guid&gt;, Guid, IBaseServiceClient, SendPasswordResetCodeCommand, Email, Action, HttpClient, IServiceCollection (+234 more)
 
 ### Community 102 - "OpenIddict.Validation"
 Cohesion: 0.08
 Nodes (27): Microsoft.Extensions.Http.Polly, Microsoft.Extensions.Http.Resilience, OpenIddict.Validation, Microsoft.Extensions.Http.Polly, Microsoft.Extensions.Http.Resilience, OpenIddict.Validation, OpenIddict.Client.SystemNetHttp, OpenIddict.Validation.AspNetCore (+19 more)
 
 ### Community 103 - "TestInstance"
-Cohesion: 0.10
-Nodes (21): Currency, List, Task, IPortalWrapper, Task, Task, List, StepLog (+13 more)
+Cohesion: 0.08
+Nodes (27): List, Currency, List, Task, IPortalWrapper, Task, Task, List (+19 more)
 
 ### Community 104 - "BaseMongoRepository"
-Cohesion: 0.11
-Nodes (23): FilterType, Eq, Gt, Gte, Lt, Lte, Ne, Expression (+15 more)
+Cohesion: 0.10
+Nodes (27): FilterType, Eq, Gt, Gte, Lt, Lte, Ne, Expression (+19 more)
 
 ### Community 105 - "FluentValidation.AspNetCore"
 Cohesion: 0.12
 Nodes (16): FluentValidation, FluentValidation.DependencyInjectionExtensions, contentHash, dependencies, requested, resolved, type, contentHash (+8 more)
 
 ### Community 106 - "Defender.GeneralTestingService.Application.Models"
-Cohesion: 0.15
-Nodes (13): Defender.GeneralTestingService.Application.Helpers.LocalSecretHelper, Defender.GeneralTestingService.Application.Steps, Defender.Common.Clients.Portal, Defender.GeneralTestingService.Application.Steps.Interfaces, Defender.GeneralTestingService.Application.Clients.Portal, Defender.GeneralTestingService.Application.Helpers, Defender.GeneralTestingService.Infrastructure.Clients.Portal, Defender.GeneralTestingService.Domain.Enums (+5 more)
+Cohesion: 0.08
+Nodes (23): Defender.GeneralTestingService.Application.Services, Defender.GeneralTestingService.Application.Helpers.LocalSecretHelper, Defender.GeneralTestingService.Application.Steps, Defender.Common.Clients.Portal, Defender.GeneralTestingService.Application.Steps.Interfaces, Defender.GeneralTestingService.Infrastructure, Defender.GeneralTestingService.Application.Clients.Portal, Defender.GeneralTestingService.Application (+15 more)
 
 ### Community 107 - "dependencies"
 Cohesion: 0.09
 Nodes (23): dependencies, AutoMapper, FluentValidation, Microsoft.AspNetCore.Authentication.JwtBearer, MongoDB.Driver, Newtonsoft.Json, contentHash, dependencies (+15 more)
 
-### Community 108 - "UserInfoTabs/index.tsx"
-Cohesion: 0.06
-Nodes (28): LockedCheckboxProps, Text(), TextProps, TextWrapper, Role, TabPanelProps, UserInfoTabsProps, BasicInfo() (+20 more)
+### Community 108 - "PortalAccountDto"
+Cohesion: 0.05
+Nodes (43): DateTime, Guid, ICollection, FullUserInfoForAdminDto, User, Wallet, PortalAccountDto, CreatedDate (+35 more)
 
 ### Community 109 - "ExceptionsAndWrappersTests"
-Cohesion: 0.18
-Nodes (8): AuthenticationHeaderValue, Fact, Func, InvalidOperationException, Task, ExceptionsAndWrappersTests, TestInternalSwaggerWrapper, TestSwaggerWrapper
+Cohesion: 0.10
+Nodes (19): BaseSwaggerWrapper, AuthenticationHeaderValue, AuthenticationHeaderValue, Task, AuthorizationType, Service, User, WithoutAuthorization (+11 more)
 
 ### Community 110 - "PortalBudgetGroup"
 Cohesion: 0.04
-Nodes (53): Defender.Portal.Application.Modules.BudgetTracking.Groups.Commands, Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetGroups, Guid, List, PortalBudgetGroup, Id, IsActive, MainColor (+45 more)
+Nodes (54): Defender.Portal.Application.Modules.BudgetTracking.Groups.Queries, Defender.Portal.Application.Modules.BudgetTracking.Groups.Commands, Defender.Portal.Application.Models.ApiRequests.BugetTracker.BudgetGroups, Guid, List, PortalBudgetGroup, Id, IsActive (+46 more)
 
 ### Community 111 - "dependencies"
 Cohesion: 0.17
 Nodes (12): Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Diagnostics.Abstractions, Microsoft.Extensions.FileProviders.Abstractions, Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Diagnostics.Abstractions, Microsoft.Extensions.FileProviders.Abstractions, contentHash, dependencies (+4 more)
 
 ### Community 112 - "TravelCalendarMutationResultDto"
-Cohesion: 0.12
-Nodes (26): EventId, ItemId, CancellationToken, Guid, Task, ITravelCalendarService, TravelCalendarMutationResultDto, Guid (+18 more)
+Cohesion: 0.13
+Nodes (20): EventId, ItemId, CancellationToken, Guid, Task, ITravelCalendarService, TravelCalendarMutationResultDto, VersionedRequest (+12 more)
 
 ### Community 113 - ".AddPostgresDistributedCache"
 Cohesion: 0.13
@@ -3199,11 +3220,11 @@ Nodes (13): PostgresHealthCheck, Action, CancellationToken, HealthCheckContext, 
 
 ### Community 114 - "UserTicket"
 Cohesion: 0.07
-Nodes (32): Guid, List, Task, ILotteryUserTicketRepository, GameType, Task, ITransactionManagementService, Guid (+24 more)
+Nodes (31): IList, Task, Guid, List, Task, ILotteryUserTicketRepository, Task, HandleGameTransactionResult (+23 more)
 
 ### Community 115 - "MenuParsingOutboxMessage"
-Cohesion: 0.07
-Nodes (36): CancellationToken, DateTime, Guid, Task, TimeSpan, IMenuParsingOutboxRepository, CancellationToken, Task (+28 more)
+Cohesion: 0.09
+Nodes (29): CancellationToken, DateTime, Guid, Task, TimeSpan, IMenuParsingOutboxRepository, CancellationToken, Task (+21 more)
 
 ### Community 116 - "net10.0"
 Cohesion: 0.20
@@ -3218,8 +3239,8 @@ Cohesion: 0.08
 Nodes (26): Microsoft.Extensions.AmbientMetadata.Application, Microsoft.Extensions.DependencyInjection.AutoActivation, Microsoft.Extensions.Diagnostics, Microsoft.Extensions.Diagnostics.ExceptionSummarization, Microsoft.Extensions.Logging.Configuration, Microsoft.Extensions.Telemetry.Abstractions, Polly.Extensions, Polly.RateLimiting (+18 more)
 
 ### Community 119 - "TelegramWebhookService"
-Cohesion: 0.08
-Nodes (30): CancellationToken, Task, ITelegramWebhookReceiptRepository, CancellationToken, Task, ITelegramBotClient, CancellationToken, Task (+22 more)
+Cohesion: 0.10
+Nodes (27): CancellationToken, Task, ITelegramWebhookReceiptRepository, CancellationToken, Task, ITelegramBotClient, TelegramBotMessage, DateTimeOffset (+19 more)
 
 ### Community 120 - ".PublicTypes_WhenConstructedAndSafeMethodsInvoked_IncreaseCoverage"
 Cohesion: 0.29
@@ -3230,8 +3251,8 @@ Cohesion: 0.07
 Nodes (31): FilterDefinition, SortDefinition, PaginationSettings, Filter, Sort, Task, IUserActivityRepository, Guid (+23 more)
 
 ### Community 122 - "Shared/WalletAccountsInfo/index.tsx"
-Cohesion: 0.33
-Nodes (7): updateWalletInfo(), mapDispatchToProps(), WalletAccountsInfo(), AvatarAddWrapper, CardAddAction, CardCc, CardLogo
+Cohesion: 0.27
+Nodes (8): updateWalletInfo(), mapDispatchToProps(), WalletAccountsInfo(), AvatarAddWrapper, CardAddAction, CardCc, CardLogo, setWalletInfoActionName
 
 ### Community 123 - "Serilog"
 Cohesion: 0.05
@@ -3247,15 +3268,15 @@ Nodes (30): type, dependencies, net10.0, contentHash, resolved, type, contentHas
 
 ### Community 126 - "Currency"
 Cohesion: 0.04
-Nodes (51): DictionarySerializerBase, Task, IHistoricalExchangeRatesRepository, Task, IExchangeRatesApiWrapper, ExchangeRatesApiOptions, AccessKey, BaseUrl (+43 more)
+Nodes (56): DictionarySerializerBase, Task, IHistoricalExchangeRatesRepository, Task, IExchangeRatesApiWrapper, ExchangeRatesApiOptions, AccessKey, BaseUrl (+48 more)
 
 ### Community 127 - "TransactionProcessingService"
-Cohesion: 0.11
-Nodes (26): TransactionStatus, Func, IClientSessionHandle, Task, TransactionType, TransactionTypeActionMapper, Func, IClientSessionHandle (+18 more)
+Cohesion: 0.13
+Nodes (21): TransactionStatus, Func, IClientSessionHandle, Task, TransactionProcessingService, Currency, HashSet, BaseWallet (+13 more)
 
 ### Community 128 - "CancellationToken"
-Cohesion: 0.17
-Nodes (12): CancellationToken, HttpClient, HttpRequestMessage, StringBuilder, Task, SendEmailVerificationCommand, Code, Hash (+4 more)
+Cohesion: 0.21
+Nodes (10): CancellationToken, Task, INotificationServiceClient, SendPureEmailCommand, Body, RecipientEmail, Subject, SendVerificationCodeCommand (+2 more)
 
 ### Community 129 - "Microsoft.Extensions.Logging.Abstractions"
 Cohesion: 0.12
@@ -3275,63 +3296,63 @@ Nodes (12): RatesModel, BaseCurrency, Date, Rates, RatesModelBaseCurrency, BYN, 
 
 ### Community 133 - "CarModels.ts"
 Cohesion: 0.04
-Nodes (105): EffectiveBaseline, IEnumerable, ManualBaseline, Fact, Guid, TimeProvider, VehicleOdometerCalculatorTests, APICallFailure (+97 more)
+Nodes (98): APICallFailure, myGarageApi, requestJson(), requestVoid(), wrapper, SuccessToast(), GarageTable(), GarageTableProps (+90 more)
 
 ### Community 134 - "VehicleDto"
 Cohesion: 0.03
-Nodes (92): CancellationToken, Guid, IReadOnlyList, Task, Unit, IMyGarageApplicationService, DateTimeOffset, Guid (+84 more)
+Nodes (105): CancellationToken, Guid, IReadOnlyList, Task, Unit, IMyGarageApplicationService, Guid, InsuranceStatus (+97 more)
 
 ### Community 135 - "Defender.CarService.Domain.Entities"
 Cohesion: 0.04
-Nodes (54): Defender.CarService.Application.Common.Interfaces.Repositories, Defender.CarService.Application.Requests.Vehicles, Defender.CarService.Application.Mappings, Defender.CarService.Tests.Infrastructure, Defender.CarService.Application.Handlers.Insurance, Defender.CarService.Application.Requests.Maintenance, Defender.CarService.Domain.Entities, Defender.CarService.Tests.Domain.Calculations (+46 more)
+Nodes (56): Defender.CarService.Application.Common.Interfaces.Repositories, Defender.CarService.Application.Requests.Vehicles, Defender.CarService.Application.Mappings, Defender.CarService.Application.Handlers.Insurance, Defender.CarService.Application.Requests.Maintenance, Defender.CarService.Domain.Entities, Defender.CarService.Tests.Domain.Calculations, Defender.CarService.Application.Common.Exceptions (+48 more)
 
 ### Community 136 - "Microsoft.IdentityModel.JsonWebTokens"
 Cohesion: 0.06
 Nodes (39): contentHash, dependencies, requested, resolved, type, Microsoft.IdentityModel.JsonWebTokens, Microsoft.IdentityModel.Protocols, OpenIddict.Abstractions (+31 more)
 
-### Community 137 - "AGENTS Guide: Defender.PersonalFoodAdvisor"
-Cohesion: 0.07
-Nodes (56): Clean Architecture Four-Layer Service Structure, Gemini Model Fallback / Rate-Limit Loop, Health Chart Share RangeMode (Rolling / Absolute / All), HomeController + Swagger Landing Convention, Mongo-Backed Outbox Publish Pattern, Defender.Portal (BFF Service), Google-Based Auth Integration, Kafka (Event Streaming Backbone) (+48 more)
+### Community 137 - "AGENTS Guide: Defender.IdentityService"
+Cohesion: 0.13
+Nodes (26): Health Chart Share RangeMode (Rolling / Absolute / All), HomeController + Swagger Landing Convention, Defender.Portal (BFF Service), Google-Based Auth Integration, Why Public Share Range Is Server-Authorized, Why RangeMode Is Persisted Nullable, SendinBlue (Email Delivery Provider), AGENTS Guide: Defender.GeneralTestingService (+18 more)
 
 ### Community 138 - "PortalMenuSessionDto"
 Cohesion: 0.06
 Nodes (36): DateTime, Guid, List, PortalMenuSessionDto, ConfirmedItems, CreatedAtUtc, Id, ImageRefs (+28 more)
 
 ### Community 139 - "TravelCalendarController"
-Cohesion: 0.14
-Nodes (29): Defender.Portal.Application.Models.ApiRequests.TravelCalendar, Guid, AddPackingItemRequest, AddParticipantRequest, AddPointRequest, CreateEventFromDateRequest, CreateQueuedTripRequest, CreateTravelEventRequest (+21 more)
+Cohesion: 0.22
+Nodes (16): VersionedRequest, StatusCode, Auth, CancellationToken, Guid, HttpDelete, HttpMethod, HttpPatch (+8 more)
 
 ### Community 140 - "Microsoft.IdentityModel.Protocols.OpenIdConnect"
 Cohesion: 0.10
 Nodes (21): dependencies, type, dependencies, type, Defender.Common, Defender.RiskGamesService.Application, Microsoft.IdentityModel.Protocols, MongoDB.Driver (+13 more)
 
-### Community 141 - "IBudgetTrackerWrapper"
-Cohesion: 0.04
-Nodes (47): MappingHelper, IAuthenticationHeaderAccessor, Guid, List, Task, IBudgetTrackerWrapper, Guid, List (+39 more)
+### Community 141 - "BudgetTrackerWrapper"
+Cohesion: 0.10
+Nodes (13): MappingHelper, IAuthenticationHeaderAccessor, Guid, IMapper, List, Task, BudgetTrackerWrapper, Fact (+5 more)
 
 ### Community 142 - "RecommendationsRequestedEvent"
-Cohesion: 0.05
-Nodes (53): CancellationToken, DishName, IReadOnlyList, Rating, Task, IMenuIntelligenceClient, CancellationToken, Task (+45 more)
+Cohesion: 0.07
+Nodes (40): CancellationToken, DishName, IReadOnlyList, Rating, Task, IMenuIntelligenceClient, CancellationToken, Task (+32 more)
 
 ### Community 143 - "TransactionToTrack"
 Cohesion: 0.08
-Nodes (30): IStartTransactionHandler, GameType, List, Task, ITransactionToTrackRepository, IWalletWrapper, IServiceProvider, TransactionHandlerFactory (+22 more)
+Nodes (27): Defender.RiskGamesService.Application.Configuration.Options, GameType, List, Task, ITransactionToTrackRepository, IConfiguration, IServiceCollection, ServiceOptionsExtensions (+19 more)
 
-### Community 144 - "GeminiClient"
-Cohesion: 0.12
-Nodes (22): IGeminiModelLoopStateRepository, Queue, HttpClient, ILogger, IOptions, GeminiClient, Action, CancellationToken (+14 more)
+### Community 144 - "GeminiClientTests"
+Cohesion: 0.14
+Nodes (18): IGeminiModelLoopStateRepository, Queue, Action, CancellationToken, Fact, HttpRequestException, HttpRequestMessage, HttpResponseMessage (+10 more)
 
 ### Community 145 - "Vehicle"
 Cohesion: 0.03
-Nodes (76): CountOptions, DateTimeOffset, TimeProvider, InsurancePolicy, CoverageType, CreatedAtUtc, EndDate, Id (+68 more)
+Nodes (77): CountOptions, DateTimeOffset, Guid, TimeProvider, InsurancePolicy, CoverageType, CreatedAtUtc, EndDate (+69 more)
 
-### Community 146 - "Notification"
-Cohesion: 0.02
-Nodes (131): Defender.NotificationService.Application.Common.Interfaces.Services, Defender.NotificationService.Application.Services, Defender.NotificationService.Application.Modules.Notifications.Commands, Defender.NotificationService.Tests.Domain, Defender.NotificationService.Application.Models, Defender.NotificationService.Application, Defender.NotificationService.Domain.Enum, Defender.NotificationService.Application.Configuration.Options (+123 more)
+### Community 146 - "NotificationResponse"
+Cohesion: 0.03
+Nodes (81): Defender.NotificationService.Application.Mappings, Defender.NotificationService.Application.Common.Interfaces.Services, Defender.NotificationService.Application.Services, Defender.NotificationService.Tests.Domain, Defender.NotificationService.Application.Models, Defender.NotificationService.Application, Defender.NotificationService.Domain.Enum, Defender.NotificationService.Domain.Entities (+73 more)
 
-### Community 147 - "Currency"
-Cohesion: 0.05
-Nodes (83): BankingSupportedCurrencies, BudgetTrackerSupportedCurrencies, createRegularExpense(), deleteRegularExpense(), deleteRegularExpenseReview(), Failure, getRegularExpenseDiagramSetup(), getRegularExpenseReviews() (+75 more)
+### Community 147 - "api.ts"
+Cohesion: 0.04
+Nodes (100): compactIconButtonLayout, CustomDialog(), DialogProps, Transition, LockedIconButtonProps, DefaultTableConsts, BankingSupportedCurrencies, BudgetTrackerSupportedCurrencies (+92 more)
 
 ### Community 148 - "Microsoft.Extensions.DependencyInjection.Abstractions"
 Cohesion: 0.06
@@ -3370,8 +3391,8 @@ Cohesion: 0.07
 Nodes (27): dependencies, type, Defender.SecretManagementService.Domain, Serilog, Defender.SecretManagementService.Domain, Serilog, Defender.SecretManagementService.Application, Serilog.Formatting.Compact (+19 more)
 
 ### Community 157 - "Defender.MonoRepo README"
-Cohesion: 0.06
-Nodes (37): AGENTS.md Repository Guidelines, create-new-service Agent Definition, ArgoCD GitOps Auto-Sync from Pinned Image Tag, Explicit User Approval Gate for Production Actions, Image Build/Publish vs ArgoCD Deploy Separation, Defender Development Guide, Defender Operations Guide, Defender Platform Project Overview (+29 more)
+Cohesion: 0.09
+Nodes (28): AGENTS.md Repository Guidelines, create-new-service Agent Definition, ArgoCD GitOps Auto-Sync from Pinned Image Tag, Clean Architecture Four-Layer Service Structure, Explicit User Approval Gate for Production Actions, Image Build/Publish vs ArgoCD Deploy Separation, Defender Development Guide, Defender Operations Guide (+20 more)
 
 ### Community 158 - "MongoMigrator"
 Cohesion: 0.36
@@ -3379,7 +3400,7 @@ Nodes (6): MongoClient, BsonDocument, IConfiguration, IMongoDatabase, Task, Mong
 
 ### Community 159 - "MongoSecret"
 Cohesion: 0.07
-Nodes (32): SecretManagementService, IOptions, Task, ROSecretRepository, Guid, MongoSecret, Id, SecretName (+24 more)
+Nodes (27): SecretManagementService, Guid, MongoSecret, Id, SecretName, Value, Task, Task (+19 more)
 
 ### Community 160 - "AutoMapper"
 Cohesion: 0.09
@@ -3394,12 +3415,12 @@ Cohesion: 0.29
 Nodes (7): Microsoft.Extensions.DependencyModel, Microsoft.Extensions.DependencyModel, Serilog.Settings.Configuration, contentHash, dependencies, resolved, type
 
 ### Community 163 - "GeminiModelLoopState"
-Cohesion: 0.07
-Nodes (30): FakeGeminiModelLoopStateRepository, CancellationToken, IReadOnlyList, Task, IGeminiModelLoopStateRepository, DateTime, List, GeminiModelLoopState (+22 more)
+Cohesion: 0.08
+Nodes (26): FakeGeminiModelLoopStateRepository, DateTime, List, GeminiModelLoopState, ActiveModelIndex, CreatedAtUtc, Id, LastResetDateUtc (+18 more)
 
 ### Community 164 - "LotteryDrawDto"
-Cohesion: 0.07
-Nodes (31): Currency, DateTime, List, LotteryDrawDto, AllowedBets, AllowedCurrencies, Coefficients, DrawNumber (+23 more)
+Cohesion: 0.09
+Nodes (26): Currency, DateTime, List, LotteryDrawDto, AllowedBets, AllowedCurrencies, Coefficients, DrawNumber (+18 more)
 
 ### Community 165 - "Microsoft.Extensions.Configuration.Abstractions"
 Cohesion: 0.07
@@ -3434,7 +3455,7 @@ Cohesion: 0.11
 Nodes (18): OpenIddict.Server, OpenIddict.Server, OpenIddict.Server.AspNetCore, OpenIddict.Server.DataProtection, OpenIddict.Validation.ServerIntegration, contentHash, dependencies, requested (+10 more)
 
 ### Community 173 - "UserManagementServiceTests"
-Cohesion: 0.16
+Cohesion: 0.14
 Nodes (10): Guid, Task, UserInfo, UserManagementService, Fact, Guid, Mock, Task (+2 more)
 
 ### Community 174 - "devDependencies"
@@ -3443,19 +3464,19 @@ Nodes (33): axe-core, eslint, eslint-plugin-react-hooks, jsdom, patch-package, @
 
 ### Community 175 - "CarDomainException"
 Cohesion: 0.08
-Nodes (37): Guid, CarDomainErrorCodes, CarDomainException, Code, CarDomainExceptionCodes, CancellationToken, EffectiveBaseline, Fact (+29 more)
+Nodes (34): CarDomainException, Code, CancellationToken, EffectiveBaseline, Fact, Func, Guid, InvalidOperationException (+26 more)
 
 ### Community 176 - "PortalBudgetReview"
-Cohesion: 0.04
-Nodes (56): Defender.Portal.Application.Modules.BudgetTracking.BudgetReviews.Queries, Defender.Portal.Application.Modules.BudgetTracking.BudgetReviews.Commands, List, BasePortalPosition, Currency, Name, OrderPriority, Tags (+48 more)
+Cohesion: 0.09
+Nodes (29): Defender.Portal.Application.Modules.BudgetTracking.BudgetReviews.Queries, Currency, Guid, List, PortalBudgetReview, BaseCurrency, Date, Id (+21 more)
 
 ### Community 177 - "Swashbuckle.AspNetCore.Swagger"
 Cohesion: 0.25
 Nodes (8): Microsoft.OpenApi, Microsoft.OpenApi, Swashbuckle.AspNetCore.Swagger, contentHash, dependencies, requested, resolved, type
 
-### Community 178 - "IUserManagementWrapper"
-Cohesion: 0.18
-Nodes (10): Guid, PublicUserInfoDto, Task, IUserManagementWrapper, Guid, IMapper, PublicUserInfoDto, Task (+2 more)
+### Community 178 - "IAccountManagementService"
+Cohesion: 0.10
+Nodes (18): Guid, PublicUserInfoDto, Task, IAccountManagementService, Guid, PublicUserInfoDto, Task, IUserManagementWrapper (+10 more)
 
 ### Community 179 - "net10.0"
 Cohesion: 0.04
@@ -3466,12 +3487,12 @@ Cohesion: 0.06
 Nodes (34): contentHash, dependencies, requested, resolved, type, MediatR.Contracts, Microsoft.Bcl.Cryptography, Microsoft.Extensions.DependencyInjection (+26 more)
 
 ### Community 181 - "RecommendationsOutboxMessage"
-Cohesion: 0.07
-Nodes (35): CancellationToken, DateTime, Guid, Task, TimeSpan, IRecommendationsOutboxRepository, CancellationToken, Guid (+27 more)
+Cohesion: 0.08
+Nodes (31): CancellationToken, DateTime, Guid, Task, TimeSpan, IRecommendationsOutboxRepository, CancellationToken, Task (+23 more)
 
 ### Community 182 - "PortalHealthChartShareDto"
-Cohesion: 0.09
-Nodes (28): CancellationToken, DateTimeOffset, Guid, IReadOnlyList, Task, IHealthCareWrapper, HealthChartShareRangeMode, Absolute (+20 more)
+Cohesion: 0.16
+Nodes (15): DateTimeOffset, IReadOnlyList, PortalHealthChartShareDto, CancellationToken, DateTimeOffset, Guid, IReadOnlyList, Task (+7 more)
 
 ### Community 183 - "AutoMapper"
 Cohesion: 0.12
@@ -3479,11 +3500,11 @@ Nodes (16): contentHash, dependencies, requested, resolved, type, Microsoft.Exte
 
 ### Community 184 - "TransactionModel"
 Cohesion: 0.05
-Nodes (50): Task, Currency, GameType, Guid, Task, Task, Task, TransactionPurpose (+42 more)
+Nodes (58): IGameTransactionHandler, Task, IStartTransactionHandler, Currency, GameType, Guid, Task, IWalletWrapper (+50 more)
 
-### Community 185 - ".RegisterApiClients"
-Cohesion: 0.16
-Nodes (11): Defender.GeneralTestingService.Application.Configuration.Extension, Defender.GeneralTestingService.Application.Configuration.Options, IConfiguration, IServiceCollection, ServiceOptionsExtensions, PortalApiOptions, Url, IConfiguration (+3 more)
+### Community 185 - "DomainModel"
+Cohesion: 0.10
+Nodes (20): Defender.GeneralTestingService.Application.Configuration.Extension, Defender.GeneralTestingService.Application.Configuration.Options, Guid, Task, IDomainModelRepository, IConfiguration, IServiceCollection, ServiceOptionsExtensions (+12 more)
 
 ### Community 186 - "MenuIntelligenceClientHelper"
 Cohesion: 0.16
@@ -3518,12 +3539,12 @@ Cohesion: 0.12
 Nodes (18): contentHash, dependencies, requested, resolved, type, MediatR.Contracts, Microsoft.Extensions.Logging.Abstractions, Microsoft.IdentityModel.JsonWebTokens (+10 more)
 
 ### Community 194 - "TelegramAccountLink"
-Cohesion: 0.11
-Nodes (26): CancellationToken, Guid, Task, ITelegramAccountLinkRepository, DateTimeOffset, DateTimeOffset, Guid, TelegramAccountLink (+18 more)
+Cohesion: 0.10
+Nodes (27): CancellationToken, Guid, Task, ITelegramAccountLinkRepository, DateTimeOffset, ITelegramInitDataValidator, DateTimeOffset, Guid (+19 more)
 
 ### Community 195 - "ThemeProvider.tsx"
 Cohesion: 0.05
-Nodes (34): session, draws, fulfillJson(), mockLotteryApi(), session, tickets, App(), ErrorBoundary (+26 more)
+Nodes (36): session, draws, fulfillJson(), mockLotteryApi(), session, tickets, App(), ErrorBoundary (+28 more)
 
 ### Community 196 - ".LotteryHelpers_Methods_ReturnExpectedValues"
 Cohesion: 0.24
@@ -3541,13 +3562,13 @@ Nodes (51): contentHash, requested, resolved, type, type, dependencies, net10.0,
 Cohesion: 0.10
 Nodes (22): contentHash, dependencies, requested, resolved, type, Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging.Abstractions, Microsoft.Extensions.Options (+14 more)
 
-### Community 200 - ".GetVisibleAsync"
-Cohesion: 0.44
-Nodes (5): CancellationToken, Guid, IReadOnlyList, Task, ITravelEventRepository
+### Community 200 - "TravelEventRepository"
+Cohesion: 0.21
+Nodes (11): CancellationToken, Guid, IReadOnlyList, Task, ITravelEventRepository, CancellationToken, Guid, IReadOnlyList (+3 more)
 
-### Community 201 - ".GetRankedRecommendationsAsync"
-Cohesion: 0.20
-Nodes (10): GeminiContent, GeminiGenerationConfig, CancellationToken, DishName, IReadOnlyList, Rating, Task, GeminiGenerateContentRequest (+2 more)
+### Community 201 - "MenuSessionServiceTests"
+Cohesion: 0.13
+Nodes (19): CancellationToken, Guid, IReadOnlyList, Task, IImageBlobRepository, CancellationToken, Guid, IEnumerable (+11 more)
 
 ### Community 202 - "OpenIddict.Validation"
 Cohesion: 0.08
@@ -3582,16 +3603,16 @@ Cohesion: 0.06
 Nodes (36): Microsoft.Extensions.DependencyModel, Microsoft.Extensions.Logging, Serilog, Microsoft.Extensions.DependencyModel, Microsoft.Extensions.Logging, Serilog, Serilog.Extensions.Logging, Serilog.Formatting.Compact (+28 more)
 
 ### Community 210 - ".CreateShare"
-Cohesion: 0.11
-Nodes (23): DateTimeOffset, Guid, IReadOnlyList, Task, IHealthChartShareRepository, HealthChartShareRangeMode, Absolute, All (+15 more)
+Cohesion: 0.14
+Nodes (19): From, To, HealthChartShareRangeMode, Absolute, All, Rolling, ActionResult, Auth (+11 more)
 
 ### Community 211 - "AccessorsAndBehaviorsTests"
 Cohesion: 0.06
-Nodes (40): Claim, Defender.Common.Behaviors, HttpContextAccessor, IPipelineBehavior, IValidator, AuthenticationHeaderValue, IConfiguration, Task (+32 more)
+Nodes (41): Claim, Defender.Common.Behaviors, HttpContextAccessor, IPipelineBehavior, IValidator, AuthenticationHeaderValue, IConfiguration, Task (+33 more)
 
 ### Community 212 - "TravelCalendar"
 Cohesion: 0.06
-Nodes (38): Defender.TravelCalendarService.Infrastructure, PackingItem, CancellationToken, Guid, Task, ITravelCalendarRepository, Guid, PackingItem (+30 more)
+Nodes (38): PackingItem, CancellationToken, Guid, Task, ITravelCalendarRepository, Guid, PackingItem, Id (+30 more)
 
 ### Community 213 - "ThrowingProducer"
 Cohesion: 0.15
@@ -3630,24 +3651,24 @@ Cohesion: 0.28
 Nodes (6): BsonDocument, IMongoClient, IMongoCollection, Task, BaseMigrator, IMigrator
 
 ### Community 222 - "UserController"
-Cohesion: 0.14
-Nodes (17): Defender.UserManagementService.Tests.DTOs, Guid, PublicUserInfoDto, Id, Nickname, Fact, PublicUserInfoDtoTests, Auth (+9 more)
+Cohesion: 0.11
+Nodes (20): Defender.UserManagementService.Tests.DTOs, Guid, PublicUserInfoDto, Id, Nickname, Fact, PublicUserInfoDtoTests, Fact (+12 more)
 
 ### Community 223 - "Defender.UserManagementService.Domain.Entities"
 Cohesion: 0.05
-Nodes (35): Defender.UserManagementService.Infrastructure, Defender.UserManagementService.Application.Modules.Users.Queries, Defender.UserManagementService.Tests.Configuration, Defender.UserManagementService.Tests.Services, Defender.ServiceTemplate.Infrastructure.Clients.Service, Defender.ServiceTemplate.Application, Defender.ServiceTemplate.Application.Common.Interfaces.Wrapper, Defender.UserManagementService.Application.Configuration.Options (+27 more)
+Nodes (32): Defender.UserManagementService.Infrastructure, Defender.UserManagementService.Application.Modules.Users.Queries, Defender.UserManagementService.Tests.Configuration, Defender.UserManagementService.Tests.Services, Defender.UserManagementService.Application.Configuration.Options, Defender.UserManagementService.Infrastructure.Clients.Identity, Defender.HealthCareService.Infrastructure.Clients.Service, Defender.UserManagementService.Domain.Entities (+24 more)
 
 ### Community 224 - "DefaultKafkaConsumer"
-Cohesion: 0.18
-Nodes (12): Action, CancellationToken, ConsumerConfig, Error, Func, IConsumer, IDeserializer, Ignore (+4 more)
+Cohesion: 0.11
+Nodes (16): Action, CancellationToken, ConsumerConfig, Error, Func, IConsumer, IDeserializer, Ignore (+8 more)
 
 ### Community 225 - "HealthChartShareDto"
 Cohesion: 0.25
 Nodes (14): NotFoundResult, BadRequestObjectResult, CreatedResult, DateTimeOffset, Fact, Guid, InlineData, Mock (+6 more)
 
 ### Community 226 - "RegularExpense"
-Cohesion: 0.04
-Nodes (58): Guid, Task, IRegularExpenseRepository, Guid, Task, Currency, Guid, CreateRegularExpenseRequest (+50 more)
+Cohesion: 0.03
+Nodes (83): Guid, Task, IRegularExpenseRepository, IPositionService, Task, IRatesModelService, Guid, Task (+75 more)
 
 ### Community 227 - "xunit.extensibility.core"
 Cohesion: 0.29
@@ -3661,9 +3682,9 @@ Nodes (12): dependencies, net10.0, contentHash, resolved, type, MediatR.Contract
 Cohesion: 0.09
 Nodes (22): type, dependencies, net10.0, contentHash, resolved, type, contentHash, resolved (+14 more)
 
-### Community 230 - "HealthEvent"
-Cohesion: 0.09
-Nodes (23): IHealthEventRepository, DateTimeOffset, Guid, HealthEvent, AnalysisName, AnalysisStatus, EndedAt, Id (+15 more)
+### Community 230 - "HealthChartShare"
+Cohesion: 0.10
+Nodes (21): DateTimeOffset, Guid, IReadOnlyList, Task, IHealthChartShareRepository, IHealthEventRepository, DateTimeOffset, Guid (+13 more)
 
 ### Community 231 - "AutoMapper"
 Cohesion: 0.12
@@ -3686,16 +3707,16 @@ Cohesion: 0.05
 Nodes (38): type, dependencies, net10.0, contentHash, resolved, type, contentHash, resolved (+30 more)
 
 ### Community 236 - ".ConsumeAsync_WhenCodeIsUsedOnce_LinksValidatedTelegramUserToCurrentAccount"
-Cohesion: 0.07
-Nodes (31): Defender.CarService.Tests.Domain, ExpiresAt, NotSupportedException, DateTimeOffset, TestTimeProvider, CancellationToken, DateTimeOffset, Task (+23 more)
+Cohesion: 0.17
+Nodes (15): ExpiresAt, NotSupportedException, CancellationToken, DateTimeOffset, Fact, Guid, Task, FakeHandoffRepository (+7 more)
 
 ### Community 237 - "UserInfo"
-Cohesion: 0.13
-Nodes (17): IList, Guid, IList, Task, IUserInfoRepository, DateTime, Guid, UserInfo (+9 more)
+Cohesion: 0.14
+Nodes (16): Guid, IList, Task, IUserInfoRepository, DateTime, Guid, UserInfo, CreatedDate (+8 more)
 
 ### Community 238 - "Wallet"
-Cohesion: 0.04
-Nodes (66): CustomException, Currency, Guid, List, PublicWalletInfoDto, Currencies, OwnerId, WalletNumber (+58 more)
+Cohesion: 0.06
+Nodes (44): CustomException, Currency, Guid, HashSet, IClientSessionHandle, Task, IWalletManagementService, CancellationToken (+36 more)
 
 ### Community 239 - "Microsoft.Extensions.Logging.Abstractions"
 Cohesion: 0.14
@@ -3755,11 +3776,11 @@ Nodes (12): CancellationToken, Guid, HttpClient, HttpResponseMessage, IOptions, 
 
 ### Community 253 - "MenuParsingRequestedEvent"
 Cohesion: 0.09
-Nodes (35): CancellationToken, Guid, IReadOnlyList, Task, IImageBlobRepository, Guid, IReadOnlyList, MenuParsingRequestedEvent (+27 more)
+Nodes (36): CancellationToken, Task, IMenuParsingProcessor, Guid, IReadOnlyList, MenuParsingRequestedEvent, CancellationToken, ILogger (+28 more)
 
-### Community 254 - "ServiceHistoryRecord"
-Cohesion: 0.04
-Nodes (62): BsonClassMapSerializer, Cost, EnumSerializer, IEnumerableDeserializingAsCollectionSerializer, NullableSerializer, SerializerBase, DateTimeSerializer, CustomSerializators (+54 more)
+### Community 254 - "MongoMappings"
+Cohesion: 0.06
+Nodes (32): BsonClassMapSerializer, EnumSerializer, IEnumerableDeserializingAsCollectionSerializer, NullableSerializer, SerializerBase, DateTimeSerializer, CustomSerializators, BsonDeserializationArgs (+24 more)
 
 ### Community 255 - "dependencies"
 Cohesion: 0.08
@@ -3782,8 +3803,8 @@ Cohesion: 0.08
 Nodes (26): contentHash, dependencies, requested, resolved, type, Microsoft.IdentityModel.JsonWebTokens, Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.JsonWebTokens (+18 more)
 
 ### Community 260 - "TransactionDto"
-Cohesion: 0.06
-Nodes (50): DateTime, TransactionPurpose, TransactionStatus, TransactionType, AnonymousTransactionDto, TransactionId, TransactionPurpose, TransactionStatus (+42 more)
+Cohesion: 0.09
+Nodes (34): Currency, DateTime, TransactionPurpose, TransactionStatus, TransactionType, TransactionDto, Amount, Comment (+26 more)
 
 ### Community 261 - "dependencies"
 Cohesion: 0.20
@@ -3794,28 +3815,28 @@ Cohesion: 0.17
 Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, contentHash, dependencies, resolved, type, contentHash, dependencies (+4 more)
 
 ### Community 263 - "AGENTS Guide: Defender.Portal"
-Cohesion: 0.06
-Nodes (44): ArgoCD (GitOps Deployment Tool), Backend-For-Frontend (BFF) Pattern, JWT Role-Based Access Control (Guest/User/Admin/SuperAdmin), Material UI as Default Portal Component Library, MCP Portal Scopes (mcp:portal:read, mcp:calendar:write, mcp:calendar:delete), Remote Streamable HTTP MCP Server, Defender.Mongo.MessageBroker (Custom MongoDB Message Broker), OAuth 2.1 Authorization Code + PKCE with Dynamic Client Registration (+36 more)
+Cohesion: 0.08
+Nodes (35): Backend-For-Frontend (BFF) Pattern, JWT Role-Based Access Control (Guest/User/Admin/SuperAdmin), Material UI as Default Portal Component Library, MCP Portal Scopes (mcp:portal:read, mcp:calendar:write, mcp:calendar:delete), Remote Streamable HTTP MCP Server, Defender.Mongo.MessageBroker (Custom MongoDB Message Broker), OAuth 2.1 Authorization Code + PKCE with Dynamic Client Registration, Telegram Mini App (Portal) (+27 more)
 
 ### Community 264 - "PortalMainDiagramSetup"
-Cohesion: 0.06
-Nodes (36): Defender.Portal.Application.Modules.BudgetTracking.MainDiagramSetup.Queries, Defender.Portal.Application.Modules.BudgetTracking.MainDiagramSetup.Commands, Guid, PortalMainDiagramSetup, EndDate, Id, LastMonths, MainCurrency (+28 more)
+Cohesion: 0.10
+Nodes (22): Defender.Portal.Application.Modules.BudgetTracking.MainDiagramSetup.Queries, Defender.Portal.Application.Modules.BudgetTracking.MainDiagramSetup.Commands, Guid, PortalMainDiagramSetup, EndDate, Id, LastMonths, MainCurrency (+14 more)
 
 ### Community 265 - ".RegisterApiClients"
 Cohesion: 0.08
 Nodes (20): IConfiguration, IServiceCollection, ServiceOptionsExtensions, BudgetTrackerOptions, Url, HealthCareOptions, Url, IdentityOptions (+12 more)
 
-### Community 266 - "PagedResult"
+### Community 266 - "Notification"
 Cohesion: 0.06
-Nodes (35): Func, IList, PagedResult, CurrentPage, Items, PageSize, TotalItemsCount, TotalPagesCount (+27 more)
+Nodes (44): Guid, Task, INotificationRepository, Guid, Task, IMonitoringService, CancellationToken, Guid (+36 more)
 
 ### Community 267 - "BasePosition"
 Cohesion: 0.09
 Nodes (28): ReviewedPosition, PositionToPublish, Guid, List, PublishBudgetReviewRequest, Date, Id, ReviewedPositions (+20 more)
 
 ### Community 268 - "TransactionStatusUpdatedEvent"
-Cohesion: 0.05
-Nodes (37): TransactionPurpose, TransactionStatus, TransactionType, TransactionStatusUpdatedEvent, TransactionId, TransactionPurpose, TransactionStatus, TransactionType (+29 more)
+Cohesion: 0.11
+Nodes (25): TransactionPurpose, TransactionStatus, TransactionType, TransactionStatusUpdatedEvent, TransactionId, TransactionPurpose, TransactionStatus, TransactionType (+17 more)
 
 ### Community 269 - "FluentValidation.AspNetCore"
 Cohesion: 0.12
@@ -3834,20 +3855,20 @@ Cohesion: 0.06
 Nodes (30): contentHash, dependencies, requested, resolved, type, dependencies, librdkafka.redist, net10.0 (+22 more)
 
 ### Community 273 - "UserPreferences"
-Cohesion: 0.06
-Nodes (47): Defender.PersonalFoodAdvisor.Application.Modules.Preferences.Queries, CancellationToken, Guid, Task, IUserPreferencesRepository, CancellationToken, Guid, IReadOnlyList (+39 more)
+Cohesion: 0.05
+Nodes (54): Defender.PersonalFoodAdvisor.Application.Modules.Preferences.Commands, Defender.PersonalFoodAdvisor.Application.Modules.Preferences.Queries, CancellationToken, Guid, Task, IUserPreferencesRepository, CancellationToken, Guid (+46 more)
 
 ### Community 274 - "Microsoft.Extensions.Primitives"
 Cohesion: 0.11
 Nodes (18): Microsoft.Extensions.Primitives, Microsoft.Extensions.Primitives, contentHash, dependencies, resolved, type, contentHash, dependencies (+10 more)
 
-### Community 275 - "TravelCalendarDto"
-Cohesion: 0.12
-Nodes (27): CancellationToken, HttpMethod, Task, ITravelCalendarWrapper, DateTimeOffset, Guid, IReadOnlyList, CalendarHolidayDto (+19 more)
+### Community 275 - ".SendAsync"
+Cohesion: 0.18
+Nodes (12): CancellationToken, HttpMethod, Task, ITravelCalendarWrapper, CancellationToken, HttpMethod, Task, ITravelCalendarClient (+4 more)
 
-### Community 276 - "Share.tsx"
-Cohesion: 0.11
-Nodes (28): HealthChartShare, copyDate(), DateRangeBounds, filterEventsByDateRange(), HealthDateRangeSelection, intersectDateRangeBounds(), isValidDate(), rangeDays (+20 more)
+### Community 276 - "dateRange.ts"
+Cohesion: 0.18
+Nodes (16): copyDate(), DateRangeBounds, filterEventsByDateRange(), HealthDateRangeSelection, intersectDateRangeBounds(), isValidDate(), rangeDays, resolveHealthDateRange() (+8 more)
 
 ### Community 277 - "net10.0"
 Cohesion: 0.20
@@ -3858,20 +3879,20 @@ Cohesion: 0.10
 Nodes (21): contentHash, dependencies, resolved, type, MediatR.Contracts, Microsoft.IdentityModel.JsonWebTokens, MediatR.Contracts, Microsoft.IdentityModel.JsonWebTokens (+13 more)
 
 ### Community 279 - "Helm Base Values (service-template)"
-Cohesion: 0.09
-Nodes (19): HomeServer ArgoCD Credentials Config, Kubernetes Service Template (Helm), Prometheus ServiceMonitor Template (Helm), Helm Base Values (service-template), Helm Values Override: budget-tracker, Helm Values Override: health-care, Helm Values Override: identity, Helm Values Override: job-scheduler (+11 more)
+Cohesion: 0.14
+Nodes (15): Kubernetes Service Template (Helm), Prometheus ServiceMonitor Template (Helm), Helm Base Values (service-template), Helm Values Override: budget-tracker, Helm Values Override: health-care, Helm Values Override: identity, Helm Values Override: job-scheduler, Helm Values Override: notification (+7 more)
 
-### Community 280 - "IMenuSessionRepository"
+### Community 280 - ".UploadAsync"
 Cohesion: 0.08
-Nodes (26): ImageHashHelper, CancellationToken, Guid, IReadOnlyList, Task, IMenuSessionRepository, CancellationToken, Guid (+18 more)
+Nodes (23): ImageHashHelper, CancellationToken, ContentType, Guid, IReadOnlyList, Stream, Task, IImageUploadService (+15 more)
 
-### Community 281 - "ICarTransactionContext"
-Cohesion: 0.08
-Nodes (42): DeleteResult, ICarTransactionContext, CancellationToken, Guid, IReadOnlyList, Task, IInsurancePolicyRepository, CancellationToken (+34 more)
+### Community 281 - "ServiceException"
+Cohesion: 0.07
+Nodes (47): DeleteResult, ICarTransactionContext, CancellationToken, Guid, IReadOnlyList, Task, IInsurancePolicyRepository, CancellationToken (+39 more)
 
 ### Community 282 - "ClientAndDtoCoverageSmokeTests"
-Cohesion: 0.20
-Nodes (9): ParameterInfo, CancellationToken, Fact, HttpRequestMessage, HttpResponseMessage, Task, Type, ClientAndDtoCoverageSmokeTests (+1 more)
+Cohesion: 0.18
+Nodes (10): HttpMessageHandler, ParameterInfo, CancellationToken, Fact, HttpRequestMessage, HttpResponseMessage, Task, Type (+2 more)
 
 ### Community 283 - "Defender.SecretManagementService/src/WebApi/WebApi.csproj"
 Cohesion: 0.09
@@ -3882,16 +3903,16 @@ Cohesion: 0.07
 Nodes (34): Application, FluentValidation.DependencyInjectionExtensions, MediatR, Microsoft.Extensions.Http, Serilog, System.IdentityModel.Tokens.Jwt, Microsoft.NET.Sdk, Domain (+26 more)
 
 ### Community 285 - "MongoDbOptions"
-Cohesion: 0.05
-Nodes (35): IBaseModel, MongoDbOptions, AppName, ConnectionString, Environment, SharedMongoDbOptions, Guid, Task (+27 more)
+Cohesion: 0.09
+Nodes (18): MongoDbOptions, AppName, ConnectionString, Environment, SharedMongoDbOptions, ArgumentNullException, DateTime, Fact (+10 more)
 
 ### Community 286 - "prometheus-net.AspNetCore"
 Cohesion: 0.25
 Nodes (8): prometheus-net, prometheus-net, prometheus-net.AspNetCore, contentHash, dependencies, requested, resolved, type
 
 ### Community 287 - "KafkaRequestResponseService"
-Cohesion: 0.07
-Nodes (25): KafkaHealthCheck, ProducerConfig, CancellationToken, Task, TimeSpan, IKafkaRequestResponseService, CancellationToken, ConsumerConfig (+17 more)
+Cohesion: 0.08
+Nodes (24): KafkaHealthCheck, ProducerConfig, CancellationToken, Task, TimeSpan, IKafkaRequestResponseService, CancellationToken, ConsumerConfig (+16 more)
 
 ### Community 288 - "dependencies"
 Cohesion: 0.12
@@ -3910,8 +3931,8 @@ Cohesion: 0.14
 Nodes (14): Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.DependencyInjection.Abstractions, contentHash, dependencies, requested, resolved, type, contentHash (+6 more)
 
 ### Community 292 - "GetUsersQuery"
-Cohesion: 0.24
-Nodes (8): CancellationToken, Task, GetUsersQuery, GetUsersQueryHandler, Fact, Task, GetUsersQueryHandlerTests, Fact
+Cohesion: 0.19
+Nodes (10): CancellationToken, Task, GetUsersQuery, GetUsersQueryHandler, GetUsersQueryValidator, Fact, Task, GetUsersQueryHandlerTests (+2 more)
 
 ### Community 293 - "dependencies"
 Cohesion: 0.17
@@ -3923,15 +3944,11 @@ Nodes (27): type, dependencies, net10.0, contentHash, resolved, type, contentHas
 
 ### Community 295 - "ServiceHistoryRecordDto"
 Cohesion: 0.03
-Nodes (72): IReadOnlyList, PageDto, CurrentPage, Items, PageSize, TotalItemsCount, TotalPagesCount, Guid (+64 more)
+Nodes (86): IReadOnlyList, PageDto, CurrentPage, Items, PageSize, TotalItemsCount, TotalPagesCount, Guid (+78 more)
 
-### Community 296 - "HealthChartShare"
-Cohesion: 0.15
-Nodes (13): DateTimeOffset, Guid, HealthChartShare, CreatedAtUtc, From, Id, IsEnabled, RangeMode (+5 more)
-
-### Community 297 - ".RegisterServices"
-Cohesion: 0.11
-Nodes (17): Task, Task, IGoogleTokenParsingService, IConfiguration, IServiceCollection, GoogleUser, Email, FamilyName (+9 more)
+### Community 297 - "GoogleUser"
+Cohesion: 0.13
+Nodes (15): Task, Task, IGoogleTokenParsingService, GoogleUser, Email, FamilyName, GivenName, Id (+7 more)
 
 ### Community 298 - "dependencies"
 Cohesion: 0.11
@@ -3978,7 +3995,7 @@ Cohesion: 0.12
 Nodes (16): Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.Primitives, Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.Primitives, contentHash, dependencies, requested, resolved (+8 more)
 
 ### Community 309 - "HuggingFaceClient"
-Cohesion: 0.17
+Cohesion: 0.16
 Nodes (13): CancellationToken, DishName, HttpClient, IEnumerable, ILogger, IOptions, IReadOnlyCollection, IReadOnlyList (+5 more)
 
 ### Community 310 - "Serilog"
@@ -4013,25 +4030,25 @@ Nodes (18): contentHash, dependencies, requested, resolved, type, MediatR.Contra
 Cohesion: 0.07
 Nodes (27): Serilog, Serilog, Serilog.Extensions.Logging, Serilog.Formatting.Compact, Serilog.Sinks.Console, Serilog.Sinks.Debug, Serilog.Sinks.File, contentHash (+19 more)
 
-### Community 318 - "BaseApiController"
-Cohesion: 0.29
-Nodes (5): Defender.GeneralTestingService.WebApi.Controllers, IMapper, IMediator, Task, BaseApiController
+### Community 318 - "Role"
+Cohesion: 0.08
+Nodes (22): BaseMongoRepository, IBaseModel, Guid, IOptions, Task, ROAccountInfoRepository, Guid, List (+14 more)
 
 ### Community 319 - "CarController"
-Cohesion: 0.06
-Nodes (57): CreatedAtActionResult, HttpDeleteAttribute, Profile, CancellationToken, Fact, HttpMethodAttribute, IRequest, NoContentResult (+49 more)
+Cohesion: 0.04
+Nodes (71): CreatedAtRouteResult, HttpDeleteAttribute, Profile, CancellationToken, Fact, HttpMethodAttribute, IRequest, NoContentResult (+63 more)
 
 ### Community 320 - "IIdentityWrapper"
 Cohesion: 0.18
 Nodes (10): Guid, Task, IIdentityWrapper, Guid, Task, IdentityWrapper, IConfiguration, IOptions (+2 more)
 
-### Community 321 - "Defender.Portal.WebUI.OAuth"
-Cohesion: 0.14
-Nodes (8): Defender.Portal.WebUI.OAuth, Defender.Portal.WebUI.Controllers, Defender.Portal.Tests.Controllers, InlineData, Theory, OAuthLoginReturnUrlTests, OAuthLoginReturnUrl, PortalOAuthScopes
+### Community 321 - "WalletDto"
+Cohesion: 0.12
+Nodes (25): Currency, Guid, List, PublicWalletInfoDto, Currencies, OwnerId, WalletNumber, Guid (+17 more)
 
 ### Community 322 - "MaintenanceItemDto"
 Cohesion: 0.04
-Nodes (59): Guid, MaintenanceItemDto, HasLinkedHistory, Id, IntervalMonths, IntervalThousandKm, LastDate, LastOdometerKm (+51 more)
+Nodes (57): Guid, MaintenanceItemDto, HasLinkedHistory, Id, IntervalMonths, IntervalThousandKm, LastDate, LastOdometerKm (+49 more)
 
 ### Community 323 - "net10.0"
 Cohesion: 0.06
@@ -4166,8 +4183,8 @@ Cohesion: 0.12
 Nodes (17): contentHash, dependencies, resolved, type, MediatR.Contracts, Microsoft.Extensions.Logging.Abstractions, Microsoft.IdentityModel.JsonWebTokens, MediatR.Contracts (+9 more)
 
 ### Community 356 - "TelegramController"
-Cohesion: 0.11
-Nodes (28): AllowAnonymous, BadRequestResult, ConflictResult, OkResult, Unauthorized, CancellationToken, Guid, Task (+20 more)
+Cohesion: 0.09
+Nodes (33): AllowAnonymous, BadRequestResult, ConflictResult, OkResult, Unauthorized, CancellationToken, Guid, Task (+25 more)
 
 ### Community 357 - "service-template Helm Chart (.NET API chart)"
 Cohesion: 0.19
@@ -4177,13 +4194,13 @@ Nodes (19): auto-deploy-dev AppProject (referenced by dev apps, not defined amon
 Cohesion: 0.33
 Nodes (4): IMapper, IMediator, Task, BaseApiController
 
-### Community 359 - "SendSmtpEmail"
-Cohesion: 0.07
-Nodes (28): SendinBlue (Email Delivery Provider), Task, IEmailServiceWrapper, ReplyTo, Sender7, Email, Name, SendSmtpEmail (+20 more)
+### Community 359 - ".RegisterApiClients"
+Cohesion: 0.26
+Nodes (6): Task, IEmailServiceWrapper, IConfiguration, IOptions, IServiceCollection, ConfigureServices
 
 ### Community 360 - "PortalRegularExpense"
 Cohesion: 0.04
-Nodes (60): Currency, Guid, PortalRegularExpense, Currency, DefaultAmount, Id, Name, OrderPriority (+52 more)
+Nodes (50): Currency, Guid, PortalRegularExpense, Currency, DefaultAmount, Id, Name, OrderPriority (+42 more)
 
 ### Community 361 - ".PublicTypes_WhenConstructedAndSafeMethodsInvoked_IncreaseCoverage"
 Cohesion: 0.25
@@ -4191,7 +4208,7 @@ Nodes (6): Defender.JobSchedulerService.Tests.Services, Fact, MethodInfo, Task, 
 
 ### Community 362 - "IKafkaEnvPrefixer"
 Cohesion: 0.08
-Nodes (26): IEnumerable, ILogger, IOptions, CreateKafkaTopicsService, NumPartitions, ReplicationFactor, Topics, CancellationToken (+18 more)
+Nodes (22): CancellationToken, DeliveryResult, Error, ILogger, IProducer, Null, ProduceException, Task (+14 more)
 
 ### Community 363 - "Defender.Portal.Mcp/package.json"
 Cohesion: 0.07
@@ -4222,8 +4239,8 @@ Cohesion: 0.06
 Nodes (37): Months, DateTimeOffset, EffectiveBaseline, Guid, IEnumerable, ManualBaseline, TimeProvider, MaintenanceItem (+29 more)
 
 ### Community 370 - "PortalTransactionDto"
-Cohesion: 0.04
-Nodes (55): Currency, Task, IAdminTransactionManagementService, Currency, Guid, Task, ITransactionService, Currency (+47 more)
+Cohesion: 0.05
+Nodes (51): Defender.Portal.Application.Modules.Transaction.Commands, Currency, Task, IAdminTransactionManagementService, Currency, Guid, Task, ITransactionService (+43 more)
 
 ### Community 371 - "Microsoft.Extensions.DependencyInjection.Abstractions"
 Cohesion: 0.06
@@ -4238,8 +4255,8 @@ Cohesion: 0.29
 Nodes (7): Microsoft.Extensions.Telemetry, Microsoft.Extensions.Telemetry, contentHash, dependencies, resolved, type, Microsoft.Extensions.Http.Diagnostics
 
 ### Community 374 - "SearchAvailableTicketsQuery"
-Cohesion: 0.14
-Nodes (17): Guid, IEnumerable, List, Task, IUserTicketManagementService, CancellationToken, List, Task (+9 more)
+Cohesion: 0.11
+Nodes (22): IEnumerable, List, Task, IUserTicketManagementService, CancellationToken, IEnumerable, Task, PurchaseLotteryTicketCommand (+14 more)
 
 ### Community 375 - "LotteryDto"
 Cohesion: 0.11
@@ -4281,13 +4298,13 @@ Nodes (63): Microsoft.Extensions.Configuration, Microsoft.Extensions.Configurati
 Cohesion: 0.18
 Nodes (10): Defender.NotificationService.Application.Resources, ResourceManager, CultureInfo, Notifications, Culture, EmailVerification_Body, EmailVerification_Subject, ResourceManager (+2 more)
 
-### Community 385 - "IService"
-Cohesion: 0.17
-Nodes (9): Defender.ServiceTemplate.Application.Services, Defender.ServiceTemplate.Application.Common.Interfaces.Services, Task, IService, IConfiguration, IServiceCollection, ConfigureServices, Task (+1 more)
+### Community 385 - "service-template/src/Application/Modules/Module/Commands/BlockUserCommand.cs"
+Cohesion: 0.04
+Nodes (54): Defender.ServiceTemplate.Domain.Entities, Defender.ServiceTemplate.Infrastructure.Clients.Service, Defender.ServiceTemplate.Application, Defender.ServiceTemplate.Application.Common.Interfaces.Wrapper, Defender.ServiceTemplate.Infrastructure, Defender.ServiceTemplate.Application.Configuration.Extension, Defender.ServiceTemplate.Application.Configuration.Options, Defender.ServiceTemplate.Application.Common.Interfaces.Repositories (+46 more)
 
 ### Community 386 - "Defender.DistributedCache.Configuration.Options"
-Cohesion: 0.22
-Nodes (6): Defender.DistributedCache.Tests, Defender.DistributedCache.Postgres.TTL, Defender.DistributedCache.Postgres, Defender.DistributedCache.Configuration.Options, Fact, ArchitectureTests
+Cohesion: 0.19
+Nodes (7): Defender.DistributedCache.Tests, Defender.DistributedCache.Postgres.TTL, Defender.DistributedCache.Postgres, Defender.DistributedCache.Postgres.Extensions, Defender.DistributedCache.Configuration.Options, Fact, ArchitectureTests
 
 ### Community 387 - "GetMenuSessionByIdQuery"
 Cohesion: 0.09
@@ -4298,7 +4315,7 @@ Cohesion: 0.04
 Nodes (62): contentHash, dependencies, requested, resolved, type, contentHash, dependencies, resolved (+54 more)
 
 ### Community 389 - "CapturingHandler"
-Cohesion: 0.11
+Cohesion: 0.12
 Nodes (31): HttpContent, CarServiceUpstreamException, Code, Detail, Status, CancellationToken, Fact, HttpMessageHandler (+23 more)
 
 ### Community 390 - ".PublicTypes_WhenConstructedAndSafeMethodsInvoked_IncreaseCoverage"
@@ -4306,16 +4323,16 @@ Cohesion: 0.25
 Nodes (6): Defender.NotificationService.Tests.Services, Fact, MethodInfo, Task, Type, NotificationApplicationSurfaceCoverageTests
 
 ### Community 391 - "HealthCare/index.tsx"
-Cohesion: 0.08
-Nodes (30): Graphify Query: HealthCare Page Implementation, AnalysisStatus, healthCareApi, HealthChartShareRangeMode, HealthChartShareRequest, HealthChartShareStatusRequest, HealthEventType, MedicationOptions (+22 more)
+Cohesion: 0.16
+Nodes (14): AnalysisStatus, healthCareApi, HealthChartShareRangeMode, HealthChartShareRequest, HealthChartShareStatusRequest, HealthEventType, MedicationOptions, analysisStatusOptions (+6 more)
 
 ### Community 392 - "net10.0"
 Cohesion: 0.04
 Nodes (54): contentHash, requested, resolved, type, type, dependencies, net10.0, contentHash (+46 more)
 
 ### Community 393 - "Secret"
-Cohesion: 0.04
-Nodes (50): Defender.JobSchedulerService.Application.Helpers.LocalSecretHelper, Defender.Portal.Application.Helpers.LocalSecretHelper, Defender.HealthCareService.Application.Helpers.LocalSecretHelper, Defender.SecretManagementService.Application.Helpers.LocalSecretHelper, Defender.ServiceTemplate.Application.Helpers.LocalSecretHelper, MemoryCache, RSA, IConfiguration (+42 more)
+Cohesion: 0.03
+Nodes (56): Defender.UserManagementService.Tests.Helpers, Defender.JobSchedulerService.Application.Helpers.LocalSecretHelper, Defender.Portal.Application.Helpers.LocalSecretHelper, Defender.NotificationService.Application.Helpers.LocalSecretHelper, Defender.HealthCareService.Application.Helpers.LocalSecretHelper, Defender.SecretManagementService.Application.Helpers.LocalSecretHelper, Defender.UserManagementService.Application.Helpers.LocalSecretHelper, Defender.ServiceTemplate.Application.Helpers.LocalSecretHelper (+48 more)
 
 ### Community 394 - "Defender.HealthCareService/src/WebApi/WebApi.csproj"
 Cohesion: 0.08
@@ -4353,17 +4370,17 @@ Nodes (34): contentHash, requested, resolved, type, type, dependencies, net10.0,
 Cohesion: 0.06
 Nodes (31): type, dependencies, net10.0, contentHash, requested, resolved, type, contentHash (+23 more)
 
-### Community 403 - "Status2"
-Cohesion: 0.29
-Nodes (7): Status2, Archive, Draft, InProcess, Queued, Sent, Suspended
+### Community 403 - "ResetPassword/Form/index.tsx"
+Cohesion: 0.11
+Nodes (14): updateUserInfo(), ElementOptions, ElementsUtils, EditSensitiveUserInfo(), mapDispatchToProps(), ResetPasswordForm(), ResetPassword(), DictionaryType (+6 more)
 
 ### Community 404 - "net10.0"
 Cohesion: 0.06
 Nodes (30): type, dependencies, net10.0, contentHash, resolved, type, contentHash, resolved (+22 more)
 
 ### Community 405 - "HealthCare/chartData.ts"
-Cohesion: 0.10
-Nodes (33): HealthEvent, buildHealthCareChartData(), ChartTimeRange, eventAxisMax, eventAxisMin, eventTimeLabel(), filterEventsByTimeRange(), getLatestWellbeingEvent() (+25 more)
+Cohesion: 0.14
+Nodes (18): buildHealthCareChartData(), ChartTimeRange, eventAxisMax, eventAxisMin, eventTimeLabel(), filterEventsByTimeRange(), getLatestWellbeingEvent(), getTimeRangeBounds() (+10 more)
 
 ### Community 406 - "net10.0"
 Cohesion: 0.07
@@ -4394,7 +4411,7 @@ Cohesion: 0.07
 Nodes (28): MediatR.Contracts, Microsoft.IdentityModel.JsonWebTokens, Microsoft.IdentityModel.Tokens, MediatR.Contracts, Microsoft.IdentityModel.JsonWebTokens, Microsoft.IdentityModel.Tokens, contentHash, dependencies (+20 more)
 
 ### Community 413 - "CheckIsEmailTakenQuery"
-Cohesion: 0.22
+Cohesion: 0.20
 Nodes (11): CancellationToken, Task, CheckIsEmailTakenQuery, Email, IsEmailTakenQueryHandler, IsEmailTakenQueryValidator, Fact, Task (+3 more)
 
 ### Community 414 - "AutoMapper"
@@ -4405,9 +4422,9 @@ Nodes (20): contentHash, dependencies, requested, resolved, type, dependencies, 
 Cohesion: 0.17
 Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, contentHash, dependencies, resolved, type, contentHash, dependencies (+4 more)
 
-### Community 416 - "IRequestHandler"
-Cohesion: 0.04
-Nodes (73): IRequestHandler, Func, Guid, Task, IAuthorizationCheckingService, ICurrentAccountAccessor, Token, VerifyCodeCommandHandler (+65 more)
+### Community 416 - "Transaction"
+Cohesion: 0.05
+Nodes (62): CreateTransactionRequest, Task, ITransactionManagementService, CancellationToken, Task, CancelTransactionCommand, TransactionId, StartCancelationTransactionCommandHandler (+54 more)
 
 ### Community 417 - "RegularExpenseDiagramSetup"
 Cohesion: 0.06
@@ -4437,17 +4454,17 @@ Nodes (12): Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Ext
 Cohesion: 0.08
 Nodes (27): Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Configuration.Binder, Microsoft.Extensions.Primitives, Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Configuration.Binder, Microsoft.Extensions.Primitives, contentHash, dependencies (+19 more)
 
-### Community 424 - "InsurancePolicyDto"
-Cohesion: 0.05
-Nodes (46): Guid, InsuranceStatus, InsurancePolicyDto, CoverageType, EndDate, Id, Notes, PolicyNumber (+38 more)
+### Community 424 - "VehicleSummaryDto"
+Cohesion: 0.08
+Nodes (27): Guid, InsuranceStatus, MaintenanceStatusCountsDto, DueSoon, NotStarted, Overdue, Upcoming, VehicleSummaryDto (+19 more)
 
 ### Community 425 - "SubmitUserRatingCommand"
-Cohesion: 0.09
-Nodes (26): Defender.PersonalFoodAdvisor.Application.Modules.Ratings.Commands, Guid, SubmitRatingRequest, CancellationToken, Guid, Task, Unit, SubmitUserRatingCommand (+18 more)
+Cohesion: 0.06
+Nodes (40): Defender.PersonalFoodAdvisor.Application.Modules.Ratings.Commands, Defender.PersonalFoodAdvisor.Application.Modules.Ratings.Queries, CancellationToken, Guid, IReadOnlyList, Task, IRatingService, Guid (+32 more)
 
-### Community 426 - "IService"
-Cohesion: 0.16
-Nodes (10): Defender.HealthCareService.Application.Common.Interfaces.Services, Defender.HealthCareService.Application.Services, Defender.HealthCareService.Application, Task, IService, IConfiguration, IServiceCollection, ConfigureServices (+2 more)
+### Community 426 - "Defender.HealthCareService/src/Application/Modules/Module/Commands/BlockUserCommand.cs"
+Cohesion: 0.08
+Nodes (23): Defender.HealthCareService.Application.Common.Interfaces.Services, Defender.HealthCareService.Application.Services, Defender.HealthCareService.Application, Defender.HealthCareService.Application.Modules.Module.Commands, Task, IService, IConfiguration, IServiceCollection (+15 more)
 
 ### Community 427 - "Swashbuckle.AspNetCore"
 Cohesion: 0.10
@@ -4530,12 +4547,12 @@ Cohesion: 0.22
 Nodes (9): scripts, build, lint, postinstall, prestart, start, test, test:e2e (+1 more)
 
 ### Community 447 - "PortalAccountDto"
-Cohesion: 0.07
-Nodes (38): ICollection, PortalAccountDto, IsBlocked, IsEmailVerified, IsPhoneVerified, Roles, DateTime, Guid (+30 more)
+Cohesion: 0.11
+Nodes (24): ICollection, PortalAccountDto, IsBlocked, IsEmailVerified, IsPhoneVerified, Roles, DateTime, Guid (+16 more)
 
-### Community 448 - "SelectAndPayPanel/index.tsx"
-Cohesion: 0.05
-Nodes (50): LockedTextFieldProps, CurrencySymbolsMap, WalletTab(), WalletTabProps, WalletAccountsInfo(), WalletAccountsInfoProps, AvatarAddWrapper, CardAddAction (+42 more)
+### Community 448 - "Currency"
+Cohesion: 0.04
+Nodes (63): LockedTextFieldProps, CurrencySymbolsMap, DrawCard(), DrawCardProps, ActiveDraws(), ActiveDrawsProps, HistoricalTickets(), HistoricalTicketsProps (+55 more)
 
 ### Community 449 - "VerificationController"
 Cohesion: 0.16
@@ -4569,17 +4586,17 @@ Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, cont
 Cohesion: 0.11
 Nodes (18): Microsoft.Extensions.Primitives, Microsoft.Extensions.Primitives, contentHash, dependencies, resolved, type, contentHash, dependencies (+10 more)
 
-### Community 457 - "GetUserByLoginQuery"
-Cohesion: 0.17
-Nodes (11): CancellationToken, Task, GetUserByLoginQuery, Login, GetUserByLoginQueryHandler, GetUserByLoginQueryValidator, Fact, Task (+3 more)
+### Community 457 - "IUserManagementService"
+Cohesion: 0.14
+Nodes (14): Guid, Task, IUserManagementService, CancellationToken, Task, GetUserByLoginQuery, Login, GetUserByLoginQueryHandler (+6 more)
 
 ### Community 458 - "CreateUserCommand"
-Cohesion: 0.16
+Cohesion: 0.15
 Nodes (13): CancellationToken, Task, CreateUserCommand, Email, Nickname, PhoneNumber, CreateUserCommandHandler, CreateUserCommandValidator (+5 more)
 
-### Community 459 - "IUserManagementService"
-Cohesion: 0.12
-Nodes (15): Guid, Task, IUserManagementService, CancellationToken, Guid, Task, GetUserByIdQuery, UserId (+7 more)
+### Community 459 - "GetUserByIdQuery"
+Cohesion: 0.17
+Nodes (12): CancellationToken, Guid, Task, GetUserByIdQuery, UserId, GetUserByIdQueryHandler, GetUserByIdQueryValidator, Fact (+4 more)
 
 ### Community 460 - "Microsoft.Extensions.Configuration.Abstractions"
 Cohesion: 0.17
@@ -4606,8 +4623,8 @@ Cohesion: 0.17
 Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, contentHash, dependencies, resolved, type, contentHash, dependencies (+4 more)
 
 ### Community 466 - "JobRunningBackgroundService"
-Cohesion: 0.08
-Nodes (29): ICollection, Task, IJobRunningService, IConfiguration, IServiceCollection, JobRunningOptions, LoopDelayMs, IConfiguration (+21 more)
+Cohesion: 0.09
+Nodes (26): ICollection, Task, IJobRunningService, IConfiguration, IServiceCollection, JobRunningOptions, LoopDelayMs, CancellationToken (+18 more)
 
 ### Community 467 - ".PublicTypes_WhenConstructedAndSafeMethodsInvoked_IncreaseCoverage"
 Cohesion: 0.29
@@ -4622,20 +4639,20 @@ Cohesion: 0.36
 Nodes (7): CancellationToken, Guid, Task, DeletePositionCommand, Id, DeletePositionCommandHandler, DeletePositionCommandValidator
 
 ### Community 470 - "PaginationRequest"
-Cohesion: 0.08
-Nodes (32): FakeTimeProvider, Guid, List, PublishRegularExpenseReviewRequest, Date, Expenses, Id, Month (+24 more)
+Cohesion: 0.05
+Nodes (51): FakeTimeProvider, Guid, List, PublishRegularExpenseReviewRequest, Date, Expenses, Id, Month (+43 more)
 
 ### Community 471 - ".RegisterServices"
-Cohesion: 0.07
-Nodes (26): IDisposable, CancellationToken, Task, IMenuParsingKafkaPublisher, CancellationToken, Task, IRecommendationsKafkaPublisher, Task (+18 more)
+Cohesion: 0.04
+Nodes (56): BackgroundService, Google Gemini API (gemini-2.5-flash-lite), Gemini Model Fallback / Rate-Limit Loop, HuggingFace Inference API (BLIP-2 + flan-t5-base), OCR.space OCR API, Mongo-Backed Outbox Publish Pattern, Together AI Llama-Vision-Free, IDisposable (+48 more)
 
 ### Community 472 - "dependencies"
 Cohesion: 0.10
 Nodes (20): OpenIddict, OpenIddict.Client.AspNetCore, OpenIddict.Client.DataProtection, OpenIddict.Server.AspNetCore, OpenIddict.Server.DataProtection, OpenIddict.Validation.AspNetCore, OpenIddict.Validation.DataProtection, OpenIddict (+12 more)
 
 ### Community 473 - "PortalRegularExpenseDiagramSetup"
-Cohesion: 0.07
-Nodes (33): Currency, Guid, PortalRegularExpenseDiagramSetup, EndMonth, Id, LastMonths, MainCurrency, UserId (+25 more)
+Cohesion: 0.08
+Nodes (26): Currency, Guid, PortalRegularExpenseDiagramSetup, EndMonth, Id, LastMonths, MainCurrency, UserId (+18 more)
 
 ### Community 474 - "net10.0"
 Cohesion: 0.09
@@ -4658,16 +4675,16 @@ Cohesion: 0.12
 Nodes (17): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, contentHash, dependencies, resolved, type, contentHash, dependencies (+9 more)
 
 ### Community 479 - "CreateServiceHistoryRequest"
-Cohesion: 0.06
-Nodes (35): Currency, BYN, EUR, GEL, PLN, RUB, Unknown, USD (+27 more)
+Cohesion: 0.07
+Nodes (27): Fact, InlineData, JsonException, Theory, CarJsonSerializationTests, JsonSerializerOptions, CarJsonOptions, Guid (+19 more)
 
 ### Community 480 - "LotteryDraw"
 Cohesion: 0.06
 Nodes (37): FindOneAndUpdateOptions, CancellationToken, Guid, List, Task, ILotteryDrawRepository, DateTime, Guid (+29 more)
 
 ### Community 481 - "CreateServiceHistoryRequest"
-Cohesion: 0.05
-Nodes (41): HistoryType, Maintenance, Other, Repair, Tire, Unknown, BaseCurrency, BYN (+33 more)
+Cohesion: 0.08
+Nodes (26): HistoryType, Maintenance, Other, Repair, Tire, Unknown, Guid, IReadOnlyList (+18 more)
 
 ### Community 482 - "dependencies"
 Cohesion: 0.17
@@ -4686,12 +4703,12 @@ Cohesion: 0.07
 Nodes (28): type, dependencies, net10.0, contentHash, requested, resolved, type, contentHash (+20 more)
 
 ### Community 486 - "GetExtendedCampaignOverview"
-Cohesion: 0.05
-Nodes (39): GetCampaignOverview, AbTesting, Id, Name, ScheduledAt, SendAtBestTime, SplitRule, Status (+31 more)
+Cohesion: 0.03
+Nodes (58): GetCampaignOverview, AbTesting, Id, Name, ScheduledAt, SendAtBestTime, SplitRule, Status (+50 more)
 
-### Community 487 - "MappingProfileTests"
-Cohesion: 0.47
-Nodes (3): Fact, IMapper, MappingProfileTests
+### Community 487 - "MongoDB (Data Store)"
+Cohesion: 0.10
+Nodes (28): MongoDB (Data Store), Rationale: development-only JWT key for Local/Debug profiles, Rationale: queue-based transaction processing with retry queue, AGENTS Guide: Defender.BudgetTracker, Defender.BudgetTracker README, BudgetTracker WebApi index.html, Defender.PersonalFoodAdvisor README, PersonalFoodAdvisor WebApi index.html (+20 more)
 
 ### Community 488 - "BaseLotteryRequest"
 Cohesion: 0.07
@@ -4702,8 +4719,8 @@ Cohesion: 0.22
 Nodes (8): IConfiguration, IServiceCollection, UserManagementService, ConfigureServices, Task, AccessCodeService, Fact, Task
 
 ### Community 490 - "CarWebApplicationFactory"
-Cohesion: 0.13
-Nodes (22): IHost, IHostBuilder, IWebHostBuilder, CancellationToken, Fact, Guid, HttpClient, HttpResponseMessage (+14 more)
+Cohesion: 0.14
+Nodes (21): IHost, IHostBuilder, IWebHostBuilder, CancellationToken, Fact, Guid, HttpClient, HttpResponseMessage (+13 more)
 
 ### Community 491 - ".Log"
 Cohesion: 0.28
@@ -4714,36 +4731,36 @@ Cohesion: 0.38
 Nodes (4): KafkaEvent, StartCacheCleanup, Unknown, KafkaEventExtensions
 
 ### Community 493 - "WhatsappCampTemplate"
-Cohesion: 0.05
-Nodes (38): ComponentItems, Text, Type, GetWhatsappCampaignOverview, CampaignName, CampaignStatus, CreatedAt, Id (+30 more)
+Cohesion: 0.03
+Nodes (68): Campaigns3, CampaignName, CampaignStatus, CreatedAt, ErrorReason, Id, InvalidatedContacts, ModifiedAt (+60 more)
 
 ### Community 494 - ".GetSecretAsync"
 Cohesion: 0.10
 Nodes (18): Defender.WalletService.Application.Helpers.LocalSecretHelper, Defender.WalletService.Application.Helpers, Defender.WalletService.Tests.Helpers, LocalSecret, Task, LocalSecretsHelper, Exception, LogLevel (+10 more)
 
-### Community 495 - "Defender.HealthCareService/src/Application/Modules/Module/Commands/BlockUserCommand.cs"
-Cohesion: 0.17
-Nodes (13): Defender.HealthCareService.Application.Modules.Module.Commands, CancellationToken, Task, Unit, ModuleCommand, DoModule, ModuleCommandHandler, ModuleCommandValidator (+5 more)
+### Community 495 - "JobManagementService"
+Cohesion: 0.14
+Nodes (14): Guid, Task, IJobManagementService, Guid, ICollection, Task, JobManagementService, CancellationToken (+6 more)
 
 ### Community 496 - "IAccountAccessor"
-Cohesion: 0.06
-Nodes (35): Guid, Task, IAccountAccessor, CancellationToken, Task, Unit, ModuleCommand, DoModule (+27 more)
+Cohesion: 0.09
+Nodes (27): IAccountAccessor, CancellationToken, Task, CreateOrUpdateSecretCommand, SecretName, SecretValue, CreateOrUpdateSecretCommandHandler, CreateOrUpdateSecretCommandValidator (+19 more)
 
 ### Community 497 - "PortalOAuthOptions"
 Cohesion: 0.06
-Nodes (35): HandleConfigurationRequestContext, IConfigureOptions, OpenIddictParameter, OpenIddictServerOptions, Fact, PortalOAuthDiscoveryMetadataTests, Fact, IConfiguration (+27 more)
+Nodes (36): HandleConfigurationRequestContext, IConfigureOptions, OpenIddictParameter, OpenIddictServerOptions, RSA, Fact, PortalOAuthDiscoveryMetadataTests, Fact (+28 more)
 
 ### Community 498 - "FakeHostEnvironment"
 Cohesion: 0.13
 Nodes (15): IHostEnvironment, Fact, IFileProvider, CommonHelpersTests, FakeHostEnvironment, ApplicationName, ContentRootFileProvider, ContentRootPath (+7 more)
 
-### Community 499 - "LoginRecord"
-Cohesion: 0.13
-Nodes (16): Task, ILoginRecordRepository, Task, ILoginHistoryService, Task, LoginHistoryService, Task, DateTime (+8 more)
+### Community 499 - ".RegisterServices"
+Cohesion: 0.08
+Nodes (27): JwtSecurityTokenHandler, SecurityTokenInvalidAudienceException, Task, ILoginRecordRepository, Task, ILoginHistoryService, IConfiguration, IServiceCollection (+19 more)
 
 ### Community 500 - "GetConfigurationQuery"
-Cohesion: 0.07
-Nodes (32): SampleRequest, Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController (+24 more)
+Cohesion: 0.12
+Nodes (19): SampleRequest, Func, IClientSessionHandle, MongoCommandException, Task, MongoTransactionHelper, CancellationToken, Task (+11 more)
 
 ### Community 501 - "Microsoft.AspNetCore.Authentication.JwtBearer"
 Cohesion: 0.25
@@ -4757,9 +4774,9 @@ Nodes (8): contentHash, dependencies, requested, resolved, type, System.Componen
 Cohesion: 0.25
 Nodes (8): MediatR.Contracts, MediatR.Contracts, contentHash, dependencies, requested, resolved, type, MediatR
 
-### Community 504 - "JwtSecurityTokenHandler"
-Cohesion: 0.11
-Nodes (16): CryptographicException, JwtSecurityTokenHandler, SecurityTokenInvalidAudienceException, Task, CryptographyHelper, Task, InternalJwtHelper, Fact (+8 more)
+### Community 504 - ".GetSecretAsync"
+Cohesion: 0.14
+Nodes (11): CryptographicException, MemoryCache, Task, CryptographyHelper, Task, InternalJwtHelper, Task, SecretsHelper (+3 more)
 
 ### Community 505 - "MediatR"
 Cohesion: 0.25
@@ -4785,9 +4802,9 @@ Nodes (23): dependencies, dependencies, type, dependencies, type, AutoMapper, Co
 Cohesion: 0.07
 Nodes (31): Microsoft.Extensions.Configuration, Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Diagnostics.Abstractions, Microsoft.Extensions.FileProviders.Abstractions, Microsoft.Extensions.Options.ConfigurationExtensions, Microsoft.Extensions.Configuration, Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Diagnostics.Abstractions (+23 more)
 
-### Community 511 - "PortalBudgetPosition"
+### Community 511 - "IBudgetTrackerWrapper"
 Cohesion: 0.08
-Nodes (28): Defender.Portal.Application.Modules.BudgetTracking.Positions.Queries, Guid, PortalBudgetPosition, Id, UserId, Guid, List, UpdatePositionRequest (+20 more)
+Nodes (18): Guid, List, Task, IBudgetTrackerWrapper, Guid, PortalBudgetPosition, Id, UserId (+10 more)
 
 ### Community 512 - ".RegisterAsync"
 Cohesion: 0.16
@@ -4802,8 +4819,8 @@ Cohesion: 0.06
 Nodes (35): Event2, Accepted, Blocked, Bounces, Delivered, HardBounces, Rejected, Replies (+27 more)
 
 ### Community 515 - "TicketPrize"
-Cohesion: 0.10
-Nodes (19): CreateLotteryRequest, TicketPrize, Coefficient, TicketsAmount, List, TicketsPrizeSetup, Prizes, List (+11 more)
+Cohesion: 0.06
+Nodes (33): CreateLotteryRequest, LotteryScheduleType, Custom, Daily, Monthly, Weekly, Yearly, DateTime (+25 more)
 
 ### Community 516 - "net10.0"
 Cohesion: 0.06
@@ -4814,28 +4831,28 @@ Cohesion: 0.10
 Nodes (19): Task, IPostgresCacheCleanupService, CancellationToken, Func, Task, IDefaultKafkaConsumer, Task, ITransactionProcessingService (+11 more)
 
 ### Community 518 - "CreateEmailCampaign"
-Cohesion: 0.06
-Nodes (36): CreateEmailCampaign, AbTesting, AttachmentUrl, Footer, Header, HtmlContent, HtmlUrl, IncreaseRate (+28 more)
+Cohesion: 0.05
+Nodes (39): CreateEmailCampaign, AbTesting, AttachmentUrl, Footer, Header, HtmlContent, HtmlUrl, IncreaseRate (+31 more)
 
 ### Community 519 - "UpdateEmailCampaign"
-Cohesion: 0.06
-Nodes (36): Sender6, Email, Id, Name, UpdateEmailCampaign, AbTesting, AttachmentUrl, Footer (+28 more)
+Cohesion: 0.05
+Nodes (39): Recipients4, ExclusionListIds, ListIds, Sender6, Email, Id, Name, UpdateEmailCampaign (+31 more)
 
-### Community 520 - ".RegisterSteps"
-Cohesion: 0.12
-Nodes (16): Defender.GeneralTestingService.Application.Services, Defender.GeneralTestingService.Application.Common.Interfaces, Defender.GeneralTestingService.Application.Steps.Sets, List, Task, ITestStartingService, IConfiguration, IServiceCollection (+8 more)
+### Community 520 - "TestController"
+Cohesion: 0.11
+Nodes (18): Task, ITestStartingService, IConfiguration, IServiceCollection, ConfigureServices, List, Task, TestStartingService (+10 more)
 
 ### Community 521 - "KafkaEvent"
 Cohesion: 0.32
 Nodes (5): KafkaEvent, ScheduleNewLotteryDraws, StartLotteriesProcessing, Unknown, KafkaEventExtensions
 
 ### Community 522 - "TravelCalendarDto"
-Cohesion: 0.11
-Nodes (30): DateTimeOffset, Guid, IReadOnlyList, CalendarHolidayDto, HotelDetailsDto, PackingItemDto, PointOfInterestDto, TravelBudgetDetailDto (+22 more)
+Cohesion: 0.12
+Nodes (27): DateTimeOffset, Guid, IReadOnlyList, CalendarHolidayDto, HotelDetailsDto, PackingItemDto, PointOfInterestDto, TravelBudgetDetailDto (+19 more)
 
-### Community 523 - "Defender.Common.Interfaces"
-Cohesion: 0.05
-Nodes (34): Defender.WalletService.Application.Modules.Transactions.Commands, Defender.WalletService.Application.Modules.Wallets.Queries, Defender.SecretManagementService.Application.Common.Interfaces.Services, Defender.WalletService.Application.Common.Exceptions, Defender.WalletService.Application.Common.Interfaces.Repositories, Defender.WalletService.Application.Modules.Transactions.Queries, Defender.WalletService.Application.Services, Defender.SecretManagementService.Application (+26 more)
+### Community 523 - "Defender.Common.DB.SharedStorage.Enums"
+Cohesion: 0.06
+Nodes (30): Defender.WalletService.Application.Modules.Wallets.Queries, Defender.WalletService.Application.Common.Exceptions, Defender.WalletService.Application.Modules.Transactions.Queries, Defender.WalletService.Application.Services, Defender.WalletService.Application.DTOs, Defender.WalletService.Domain.Enums, Defender.WalletService.Tests.Services, Defender.WalletService.Application.Mappings (+22 more)
 
 ### Community 524 - "CarServiceClient"
 Cohesion: 0.18
@@ -4845,9 +4862,9 @@ Nodes (11): CancellationToken, Guid, HttpClient, HttpMethod, HttpResponseMessage
 Cohesion: 0.08
 Nodes (23): apiPath(), baseUrl, createdVehicleIds, createHistory(), createInsurance(), createMaintenance(), createVehicle(), directCarServiceRequests (+15 more)
 
-### Community 526 - "LotteryProcessingService"
-Cohesion: 0.09
-Nodes (24): CancellationToken, Guid, Task, ILotteryProcessingService, IConfiguration, IServiceCollection, ConfigureServices, CancellationToken (+16 more)
+### Community 526 - "EventListenerService"
+Cohesion: 0.10
+Nodes (18): CancellationToken, Guid, Task, ILotteryProcessingService, IConfiguration, IServiceCollection, ConfigureServices, CancellationToken (+10 more)
 
 ### Community 527 - "RiskGamesConfigurationAndBackgroundTests"
 Cohesion: 0.16
@@ -4922,8 +4939,8 @@ Cohesion: 0.09
 Nodes (24): contentHash, dependencies, requested, resolved, type, MediatR.Contracts, Microsoft.Extensions.Logging.Abstractions, Microsoft.IdentityModel.JsonWebTokens (+16 more)
 
 ### Community 545 - "KafkaOptions"
-Cohesion: 0.14
-Nodes (26): DeliveryReport, Message, Offset, KafkaOptions, BootstrapServers, CorrelatedKafkaRequest, CorrelationId, CreateDefault (+18 more)
+Cohesion: 0.17
+Nodes (23): DeliveryReport, Message, Offset, KafkaOptions, BootstrapServers, Message, Action, ArgumentException (+15 more)
 
 ### Community 546 - "net10.0"
 Cohesion: 0.09
@@ -4965,9 +4982,9 @@ Nodes (16): Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Ext
 Cohesion: 0.07
 Nodes (31): contentHash, dependencies, requested, resolved, type, MediatR.Contracts, Microsoft.Extensions.DependencyInjection, Microsoft.Extensions.Logging.Abstractions (+23 more)
 
-### Community 556 - "InsurancePolicyDto"
-Cohesion: 0.06
-Nodes (32): Guid, InsurancePolicyDto, CoverageType, EndDate, Id, Notes, PolicyNumber, Provider (+24 more)
+### Community 556 - "VehicleDto"
+Cohesion: 0.03
+Nodes (68): DateTimeOffset, Guid, IReadOnlyList, InsurancePolicyDto, CoverageType, EndDate, Id, Notes (+60 more)
 
 ### Community 557 - "Microsoft.Extensions.Logging.Abstractions"
 Cohesion: 0.06
@@ -5006,8 +5023,8 @@ Cohesion: 0.07
 Nodes (31): contentHash, dependencies, requested, resolved, type, MediatR.Contracts, Microsoft.Extensions.Logging.Abstractions, Microsoft.Extensions.Options (+23 more)
 
 ### Community 566 - "PurchaseLotteryTicketsRequest"
-Cohesion: 0.11
-Nodes (19): Currency, Guid, HashSet, List, PurchaseLotteryTicketsRequest, Amount, Currency, DrawNumber (+11 more)
+Cohesion: 0.05
+Nodes (38): GameType, Task, ITransactionManagementService, Currency, Guid, HashSet, List, PurchaseLotteryTicketsRequest (+30 more)
 
 ### Community 567 - "net10.0"
 Cohesion: 0.06
@@ -5081,29 +5098,29 @@ Nodes (16): contentHash, dependencies, requested, resolved, type, Microsoft.Exte
 Cohesion: 0.12
 Nodes (16): Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.Primitives, Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Extensions.Primitives, contentHash, dependencies, requested, resolved (+8 more)
 
-### Community 585 - "TestController"
-Cohesion: 0.16
-Nodes (11): Defender.GeneralTestingService.WebApi.Controllers.V1, HttpGet, HttpPost, IConfiguration, IMapper, IMediator, List, ProducesResponseType (+3 more)
+### Community 585 - "Defender.NotificationService/src/Infrastructure/ConfigureServices.cs"
+Cohesion: 0.11
+Nodes (17): Defender.NotificationService.Application.Configuration.Options, Defender.NotificationService.Application.Common.Interfaces.Wrapper, Defender.NotificationService.Infrastructure.Repositories.Notifications, Defender.NotificationService.Infrastructure.Clients.SendinBlueClient, Defender.NotificationService.Infrastructure.Clients.SendinBlueClient.Generated, Defender.NotificationService.Application.Configuration.Extension, IConfiguration, IServiceCollection (+9 more)
 
 ### Community 586 - ".CreateShareAsync_WhenRangeModeAndAnalysisAreReturned_PreservesContractMetadata"
-Cohesion: 0.19
-Nodes (11): CapturingHandler, HttpMessageHandler, CancellationToken, Fact, HttpRequestMessage, HttpResponseMessage, HttpStatusCode, Task (+3 more)
+Cohesion: 0.21
+Nodes (10): CapturingHandler, CancellationToken, Fact, HttpRequestMessage, HttpResponseMessage, HttpStatusCode, Task, CapturingHandler (+2 more)
 
-### Community 587 - "DomainModel"
-Cohesion: 0.17
-Nodes (11): Defender.ServiceTemplate.Domain.Entities, Defender.ServiceTemplate.Application.Common.Interfaces.Repositories, Guid, Task, IDomainModelRepository, Guid, DomainModel, Id (+3 more)
+### Community 587 - "TelegramLinkHandoffService"
+Cohesion: 0.15
+Nodes (14): CancellationToken, DateTimeOffset, Task, ITelegramLinkHandoffRepository, CancellationToken, Guid, Task, ITelegramSessionService (+6 more)
 
 ### Community 588 - "Microsoft.Extensions.Hosting"
 Cohesion: 0.03
-Nodes (50): Defender.Kafka.Tests, Defender.Kafka.Serialization, Defender.JobSchedulerService.Tests.Services.Background, Defender.Kafka.Service, Defender.WalletService.Tests.Configuration, Defender.Kafka.Configuration.Options, Defender.Kafka.BackgroundServices, Defender.Kafka.Default (+42 more)
+Nodes (59): Defender.Kafka.Tests, Defender.Kafka.Serialization, Defender.JobSchedulerService.Tests.Services.Background, Defender.Kafka.Service, Defender.JobSchedulerService.Application.Common.Interfaces.Repositories, Defender.Kafka.Configuration.Options, Defender.Kafka.BackgroundServices, Defender.Kafka.Default (+51 more)
 
 ### Community 589 - "dependencies"
 Cohesion: 0.07
 Nodes (31): Defender.Portal.Application, OpenIddict.MongoDb.Models, dependencies, dependencies, type, dependencies, type, AutoMapper (+23 more)
 
-### Community 590 - ".RegisterApiClients"
-Cohesion: 0.12
-Nodes (15): Defender.IdentityService.Application.Configuration.Options, Defender.IdentityService.Application.Configuration.Extension, IConfiguration, IServiceCollection, ServiceOptionsExtensions, GoogleOptions, Url, NotificationOptions (+7 more)
+### Community 590 - ".AddApplicationOptions"
+Cohesion: 0.15
+Nodes (11): Defender.IdentityService.Application.Configuration.Options, Defender.IdentityService.Application.Configuration.Extension, IConfiguration, IServiceCollection, ServiceOptionsExtensions, GoogleOptions, Url, NotificationOptions (+3 more)
 
 ### Community 591 - "Defender.DistributedCache.csproj"
 Cohesion: 0.12
@@ -5125,13 +5142,13 @@ Nodes (14): Microsoft.Extensions.DependencyInjection.Abstractions, Microsoft.Ext
 Cohesion: 0.12
 Nodes (16): Microsoft.Extensions.Configuration, Microsoft.Extensions.Diagnostics.Abstractions, Microsoft.Extensions.Options.ConfigurationExtensions, Microsoft.Extensions.Configuration, Microsoft.Extensions.Diagnostics.Abstractions, Microsoft.Extensions.Options.ConfigurationExtensions, contentHash, dependencies (+8 more)
 
-### Community 596 - "CreateRegularExpenseCommand"
-Cohesion: 0.13
-Nodes (17): UpdateRegularExpenseDiagramSetupCommand, UpdateRegularExpenseDiagramSetupCommandValidator, PublishRegularExpenseReviewCommand, PublishRegularExpenseReviewCommandValidator, CancellationToken, List, Task, GetRegularExpenseReviewsByDateRangeQuery (+9 more)
+### Community 596 - "AbstractValidator"
+Cohesion: 0.07
+Nodes (27): AbstractValidator, Defender.Portal.Application.Modules.BudgetTracking.Positions.Queries, GetPositionsQueryValidator, UpdateRegularExpenseDiagramSetupCommand, UpdateRegularExpenseDiagramSetupCommandValidator, PublishRegularExpenseReviewCommand, PublishRegularExpenseReviewCommandValidator, Currency (+19 more)
 
-### Community 597 - "Notification/GeneratedCode.cs"
+### Community 597 - "Notification"
 Cohesion: 0.08
-Nodes (29): DateTime, Guid, AuthCheckDto, HighestRole, UserId, HealthCheckDto, Status, Notification (+21 more)
+Nodes (27): DateTime, Guid, AuthCheckDto, HighestRole, UserId, Notification, CreatedDate, ExternalNotificationId (+19 more)
 
 ### Community 598 - "Microsoft.Extensions.DependencyInjection"
 Cohesion: 0.14
@@ -5182,8 +5199,8 @@ Cohesion: 0.12
 Nodes (16): FluentValidation, Microsoft.Extensions.DependencyInjection.Abstractions, contentHash, dependencies, requested, resolved, type, FluentValidation (+8 more)
 
 ### Community 610 - "EmailExportRecipientsRecipientsType"
-Cohesion: 0.12
-Nodes (16): EmailExportRecipientsRecipientsType, All, Clickers, HardBounces, NonClickers, NonOpeners, Openers, SoftBounces (+8 more)
+Cohesion: 0.22
+Nodes (9): EmailExportRecipientsRecipientsType, All, Clickers, HardBounces, NonClickers, NonOpeners, Openers, SoftBounces (+1 more)
 
 ### Community 611 - "Serilog"
 Cohesion: 0.06
@@ -5214,8 +5231,8 @@ Cohesion: 0.32
 Nodes (5): Fact, HttpContext, TelegramRequestGuardTests, HttpContext, TelegramRequestGuard
 
 ### Community 618 - "UIErrorCodes"
-Cohesion: 0.06
-Nodes (30): UIErrorCodes, AccessCodeWasAlreadyUsed, AccessCodeWasExpired, AuthorizationFailed, CurrencyAccountNotFound, EmailAddressInUse, EmptyEmail, EmptyLogin (+22 more)
+Cohesion: 0.05
+Nodes (38): UIErrorCodes, AccessCodeWasAlreadyUsed, AccessCodeWasExpired, AuthorizationFailed, CurrencyAccountNotFound, EmailAddressInUse, EmptyEmail, EmptyLogin (+30 more)
 
 ### Community 619 - "Microsoft.Extensions.Logging.Abstractions"
 Cohesion: 0.12
@@ -5237,9 +5254,9 @@ Nodes (24): contentHash, dependencies, requested, resolved, type, MediatR.Contra
 Cohesion: 0.12
 Nodes (16): Microsoft.Extensions.Configuration, Microsoft.Extensions.Diagnostics.Abstractions, Microsoft.Extensions.Options.ConfigurationExtensions, Microsoft.Extensions.Configuration, Microsoft.Extensions.Diagnostics.Abstractions, Microsoft.Extensions.Options.ConfigurationExtensions, contentHash, dependencies (+8 more)
 
-### Community 624 - "ServiceException"
-Cohesion: 0.14
-Nodes (19): ServiceException, Func, Guid, Task, AuthorizationCheckingService, Fact, Guid, Task (+11 more)
+### Community 624 - ".ExecuteWithAuthCheckAsync"
+Cohesion: 0.28
+Nodes (8): Func, Guid, Task, AuthorizationCheckingService, Fact, Guid, Task, AuthorizationAndQueriesTests
 
 ### Community 625 - "WebApi"
 Cohesion: 0.09
@@ -5263,15 +5280,15 @@ Nodes (24): Defender.Service.Infrastructure.Clients.IdentityClient, DateTime, Gu
 
 ### Community 630 - ".AllActions_WhenCalled_DelegateEveryRouteAndPreserveStatuses"
 Cohesion: 0.11
-Nodes (23): ObjectResult, CreateVehicleRequest, DisplayName, Make, Model, Plate, Vin, Year (+15 more)
+Nodes (23): ObjectResult, CreateInsurancePolicyRequest, CoverageType, EndDate, Notes, PolicyNumber, Provider, StartDate (+15 more)
 
 ### Community 631 - "TravelCalendarClient"
 Cohesion: 0.12
 Nodes (22): TravelCalendarOptions, Url, CancellationToken, HttpClient, HttpMethod, HttpResponseMessage, IOptions, JsonSerializerOptions (+14 more)
 
-### Community 632 - "EnsureTopicsCreatedService"
-Cohesion: 0.13
-Nodes (25): CreateTopicsException, CreateTopicsOptions, Metadata, CancellationToken, IAdminClient, IEnumerable, ILogger, Task (+17 more)
+### Community 632 - ".ExecuteAsync_WhenCreateTopicsFails_ThrowsCreateTopicsException"
+Cohesion: 0.22
+Nodes (16): CreateTopicsException, CreateTopicsOptions, Metadata, CancellationToken, Fact, IAdminClient, IEnumerable, ILogger (+8 more)
 
 ### Community 633 - "net10.0"
 Cohesion: 0.07
@@ -5342,7 +5359,7 @@ Cohesion: 0.11
 Nodes (18): Serilog.Extensions.Hosting, Serilog.Formatting.Compact, Serilog.Settings.Configuration, Serilog.Sinks.Console, Serilog.Sinks.Debug, Serilog.Sinks.File, Serilog.Extensions.Hosting, Serilog.Formatting.Compact (+10 more)
 
 ### Community 650 - "PublicPortalWalletInfoDto"
-Cohesion: 0.13
+Cohesion: 0.12
 Nodes (23): Currency, Guid, List, PublicPortalWalletInfoDto, Currencies, OwnerId, OwnerName, WalletNumber (+15 more)
 
 ### Community 651 - "KafkaHelpersTests"
@@ -5357,9 +5374,9 @@ Nodes (14): xunit.extensibility.core, xunit.extensibility.execution, xunit.exten
 Cohesion: 0.11
 Nodes (18): Serilog.Extensions.Hosting, Serilog.Formatting.Compact, Serilog.Settings.Configuration, Serilog.Sinks.Console, Serilog.Sinks.Debug, Serilog.Sinks.File, Serilog.Extensions.Hosting, Serilog.Formatting.Compact (+10 more)
 
-### Community 654 - "BackgroundService"
-Cohesion: 0.19
-Nodes (10): BackgroundService, CancellationToken, ILogger, Task, TimeProvider, GeminiModelLoopMaintenanceService, CancellationToken, Func (+2 more)
+### Community 654 - "IGeminiModelFallbackService"
+Cohesion: 0.31
+Nodes (6): CancellationToken, Task, CancellationToken, Func, Task, IGeminiModelFallbackService
 
 ### Community 655 - "AutoMapper"
 Cohesion: 0.12
@@ -5381,9 +5398,9 @@ Nodes (38): HttpStatusCode, TelegramBotApiException, CancellationToken, HttpClie
 Cohesion: 0.25
 Nodes (9): CancellationToken, Guid, IReadOnlyList, Task, CarServiceWrapper, CancellationToken, Fact, Task (+1 more)
 
-### Community 660 - "GeminiOptions"
-Cohesion: 0.08
-Nodes (25): GeminiGenerateContentRequest, GeminiInlineData, GeminiPart, GeminiContent, Parts, GeminiGenerationConfig, MaxOutputTokens, Temperature (+17 more)
+### Community 660 - "GeminiClient"
+Cohesion: 0.07
+Nodes (39): GeminiContent, GeminiGenerateContentRequest, GeminiGenerationConfig, GeminiInlineData, GeminiPart, CancellationToken, DishName, HttpClient (+31 more)
 
 ### Community 661 - "dependencies"
 Cohesion: 0.11
@@ -5438,8 +5455,8 @@ Cohesion: 0.14
 Nodes (14): xunit.extensibility.core, xunit.extensibility.execution, xunit.extensibility.core, xunit.extensibility.execution, xunit.core, xunit.extensibility.execution, contentHash, dependencies (+6 more)
 
 ### Community 674 - "WalletManagementServiceTests"
-Cohesion: 0.34
-Nodes (7): Fact, HashSet, IClientSessionHandle, Mock, Task, Wallet, WalletManagementServiceTests
+Cohesion: 0.10
+Nodes (21): CacheConventionBuilder, CacheForService, BudgetTracker, Identity, Notification, Portal, RiskGames, Shared (+13 more)
 
 ### Community 675 - "Microsoft.Extensions.Options"
 Cohesion: 0.14
@@ -5458,16 +5475,16 @@ Cohesion: 0.11
 Nodes (18): Serilog.Extensions.Hosting, Serilog.Formatting.Compact, Serilog.Settings.Configuration, Serilog.Sinks.Console, Serilog.Sinks.Debug, Serilog.Sinks.File, Serilog.Extensions.Hosting, Serilog.Formatting.Compact (+10 more)
 
 ### Community 679 - "PortalTransactionDto"
-Cohesion: 0.07
-Nodes (28): PortalTransactionDto, Amount, Currency, FromWallet, ParentTransactionId, ToWallet, TransactionId, TransactionPurpose (+20 more)
+Cohesion: 0.06
+Nodes (34): PortalTransactionDto, Amount, Currency, FromWallet, ParentTransactionId, ToWallet, TransactionId, TransactionPurpose (+26 more)
 
 ### Community 680 - "dependencies"
 Cohesion: 0.07
 Nodes (28): dependencies, dependencies, type, dependencies, type, dependencies, type, AutoMapper (+20 more)
 
-### Community 681 - "UpdateUserPreferencesCommand"
-Cohesion: 0.19
-Nodes (11): Defender.PersonalFoodAdvisor.Application.Modules.Preferences.Commands, CancellationToken, Guid, IReadOnlyList, Task, UpdateUserPreferencesCommand, Dislikes, Likes (+3 more)
+### Community 681 - "Plan: Run the whole platform locally with .NET Aspire"
+Cohesion: 0.09
+Nodes (21): Current facts the plan is built on, Effort estimate, Goal, Guiding principle: zero service code changes in the first working version, Kafka and PostgreSQL, Keep the port numbers, Load the existing secrets file, MCP server (Node) (+13 more)
 
 ### Community 682 - "dependencies"
 Cohesion: 0.08
@@ -5593,9 +5610,9 @@ Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, cont
 Cohesion: 0.17
 Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, contentHash, dependencies, resolved, type, contentHash, dependencies (+4 more)
 
-### Community 713 - ".RegisterRepositories"
-Cohesion: 0.07
-Nodes (30): GeminiModelLoopMaintenanceService, Guid, Task, IDomainModelRepository, Task, IServiceWrapper, Guid, DomainModel (+22 more)
+### Community 713 - "IBaseModel"
+Cohesion: 0.04
+Nodes (44): Defender.PersonalFoodAdvisor.Application.Common.Interfaces.Wrapper, Defender.PersonalFoodAdvisor.Application.Configuration.Extension, Defender.SecretManagementService.Domain.Entities, GeminiModelLoopMaintenanceService, Guid, IBaseModel, Id, Guid (+36 more)
 
 ### Community 714 - "Microsoft.IdentityModel.JsonWebTokens"
 Cohesion: 0.17
@@ -5617,9 +5634,9 @@ Nodes (27): Serilog, Serilog, Serilog.Extensions.Logging, Serilog.Formatting.Com
 Cohesion: 0.16
 Nodes (15): DateTime, Guid, PortalDishRatingDto, CreatedAtUtc, DishName, Id, Rating, SessionId (+7 more)
 
-### Community 719 - "Campaigns3"
-Cohesion: 0.07
-Nodes (27): Campaigns3, CampaignName, CampaignStatus, CreatedAt, ErrorReason, Id, InvalidatedContacts, ModifiedAt (+19 more)
+### Community 719 - "Share.tsx"
+Cohesion: 0.24
+Nodes (13): HealthChartShare, paginateHealthEvents(), HealthCareSharePage(), dismissHealthCareShareGuide(), healthCareShareGuideStorageKey, shouldShowHealthCareShareGuide(), clampHealthDateRangeSelection(), getHealthShareAllowedBounds() (+5 more)
 
 ### Community 720 - "Microsoft.IdentityModel.JsonWebTokens"
 Cohesion: 0.17
@@ -5661,9 +5678,9 @@ Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, cont
 Cohesion: 0.17
 Nodes (12): Microsoft.IdentityModel.Tokens, Microsoft.IdentityModel.Tokens, contentHash, dependencies, resolved, type, contentHash, dependencies (+4 more)
 
-### Community 730 - "HotelDetails"
-Cohesion: 0.15
-Nodes (10): IEnumerable, HotelDetails, Address, BookingUrl, CostPln, IsBooked, Name, VehicleSettings (+2 more)
+### Community 730 - "UpdateUserInfoCommand"
+Cohesion: 0.17
+Nodes (14): CancellationToken, Task, UserDto, UpdateUserInfoCommand, UpdateUserInfoCommandHandler, UpdateUserInfoCommandValidator, ActionResult, Auth (+6 more)
 
 ### Community 731 - "Microsoft.Extensions.Configuration.Abstractions"
 Cohesion: 0.07
@@ -5803,7 +5820,7 @@ Nodes (16): DnsClient, MongoDB.Bson, SharpCompress, Snappier, ZstdSharp.Port, Dn
 
 ### Community 765 - "UserDto"
 Cohesion: 0.07
-Nodes (36): DateTime, Guid, UserDto, CreatedDate, Email, Id, Nickname, PhoneNumber (+28 more)
+Nodes (30): DateTime, Guid, UserDto, CreatedDate, Email, Id, Nickname, PhoneNumber (+22 more)
 
 ### Community 766 - "dependencies"
 Cohesion: 0.12
@@ -5837,9 +5854,9 @@ Nodes (5): Fact, MethodInfo, Task, Type, PersonalFoodAdvisorApplicationSurfaceCo
 Cohesion: 0.14
 Nodes (20): CalculatedTotals, Guid, List, RatesModel, BudgetReviewDto, CalculatedTotals, Date, Id (+12 more)
 
-### Community 774 - "ReviewedRegularExpense"
-Cohesion: 0.10
-Nodes (19): Currency, Guid, ReviewedRegularExpense, Amount, Currency, MonthlyContribution, Name, OrderPriority (+11 more)
+### Community 774 - "HealthCareChart.tsx"
+Cohesion: 0.21
+Nodes (15): HealthEvent, HealthChartRange, formatEventDateTime(), formatEventTime(), localeForLanguage(), localesByLanguage, usesTwelveHourClock(), chartMargin (+7 more)
 
 ### Community 775 - "dependencies"
 Cohesion: 0.12
@@ -5861,9 +5878,9 @@ Nodes (25): dependencies, dependencies, type, dependencies, type, AutoMapper, De
 Cohesion: 0.20
 Nodes (9): Element, ElementAttributesProperty, ElementChildrenAttribute, ElementClass, IntrinsicAttributes, IntrinsicClassAttributes, IntrinsicElements, JSX (+1 more)
 
-### Community 780 - ".ResolveAndForward"
-Cohesion: 0.17
-Nodes (8): Fact, TelegramSessionCookieHelperTests, HttpRequest, PortalAuthenticationTokenResolver, CookieOptions, HttpRequest, HttpResponse, TelegramSessionCookieHelper
+### Community 780 - "TelegramSessionCookieHelper"
+Cohesion: 0.36
+Nodes (4): CookieOptions, HttpRequest, HttpResponse, TelegramSessionCookieHelper
 
 ### Community 781 - "net10.0"
 Cohesion: 0.09
@@ -5937,9 +5954,9 @@ Nodes (16): DnsClient, MongoDB.Bson, SharpCompress, Snappier, ZstdSharp.Port, Dn
 Cohesion: 0.12
 Nodes (16): DnsClient, MongoDB.Bson, SharpCompress, Snappier, ZstdSharp.Port, DnsClient, MongoDB.Bson, SharpCompress (+8 more)
 
-### Community 799 - "Free API Options for PersonalFoodAdvisor"
-Cohesion: 0.36
-Nodes (8): Google Gemini API (gemini-2.5-flash-lite), HuggingFace Inference API (BLIP-2 + flan-t5-base), OCR.space OCR API, Together AI Llama-Vision-Free, Rationale: Gemini Flash-Lite as primary menu-intelligence provider, Rationale: OCR.space + text LLM two-stage fallback pipeline, Free API Options for PersonalFoodAdvisor, IMenuIntelligenceClient
+### Community 799 - "GetSmtpTemplateOverview"
+Cohesion: 0.11
+Nodes (18): GetSmtpTemplateOverview, CreatedAt, DoiTemplate, HtmlContent, Id, IsActive, ModifiedAt, Name (+10 more)
 
 ### Community 800 - "LogLevel"
 Cohesion: 0.15
@@ -5954,12 +5971,12 @@ Cohesion: 0.08
 Nodes (25): dependencies, dependencies, type, dependencies, type, AutoMapper, Defender.UserManagementService.Application, Defender.UserManagementService.Domain (+17 more)
 
 ### Community 803 - "AccountDto"
-Cohesion: 0.09
-Nodes (25): AccountDto, IsBlocked, IsEmailVerified, IsPhoneVerified, Guid, Task, IAdminAccountManagementService, Guid (+17 more)
+Cohesion: 0.06
+Nodes (39): AccountDto, IsBlocked, IsEmailVerified, IsPhoneVerified, Guid, Task, IAdminAccountManagementService, FullUserInfoForAdminDto (+31 more)
 
-### Community 804 - ".AddInfrastructureServices"
-Cohesion: 0.13
-Nodes (14): Counter, ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IMongoClient, IMongoDatabase, IOptions (+6 more)
+### Community 804 - "AnonymousTransactionDto"
+Cohesion: 0.14
+Nodes (13): DateTime, TransactionPurpose, TransactionStatus, TransactionType, AnonymousTransactionDto, TransactionId, TransactionPurpose, TransactionStatus (+5 more)
 
 ### Community 805 - ".AddApplicationOptions"
 Cohesion: 0.22
@@ -5969,29 +5986,29 @@ Nodes (7): Defender.HealthCareService.Application.Configuration.Options, Defende
 Cohesion: 0.20
 Nodes (8): Defender.PersonalFoodAdvisor.Application.Helpers, Helper, Exception, LogLevel, Debug, Info, Warning, SimpleLogger
 
-### Community 807 - ".AddApplicationOptions"
-Cohesion: 0.22
-Nodes (7): Defender.ServiceTemplate.Application.Configuration.Extension, Defender.ServiceTemplate.Application.Configuration.Options, IConfiguration, IServiceCollection, ServiceOptionsExtensions, ServiceOptions, Url
+### Community 807 - "Defender.Portal.Application.DTOs.HealthCare"
+Cohesion: 0.17
+Nodes (10): Defender.Portal.Application.DTOs.HealthCare, Defender.Portal.Application.Models.ApiRequests.HealthCare, Defender.Portal.Infrastructure.Clients.HealthCare, HealthChartShareRangeMode, Absolute, All, Rolling, DateTimeOffset (+2 more)
 
 ### Community 808 - "PortalApplicationCoverageSmokeTests"
-Cohesion: 0.31
-Nodes (5): Defender.Portal.Tests.Handlers, Fact, Task, Type, PortalApplicationCoverageSmokeTests
+Cohesion: 0.43
+Nodes (4): Fact, Task, Type, PortalApplicationCoverageSmokeTests
 
 ### Community 809 - ".Log"
 Cohesion: 0.20
 Nodes (8): Defender.ServiceTemplate.Application.Helpers, Helper, Exception, LogLevel, Debug, Info, Warning, SimpleLogger
 
-### Community 810 - "IJobManagementService"
-Cohesion: 0.12
-Nodes (18): Defender.JobSchedulerService.Application.Modules.Jobs.Queries, Guid, Task, IJobManagementService, CancellationToken, Guid, Task, Unit (+10 more)
+### Community 810 - "GetJobsQuery"
+Cohesion: 0.31
+Nodes (7): Defender.JobSchedulerService.Application.Modules.Jobs.Queries, CancellationToken, Task, GetJobsQuery, Name, GetJobsQueryHandler, GetJobsQueryValidator
 
-### Community 811 - ".RegisterRepositories"
-Cohesion: 0.16
-Nodes (11): Defender.RiskGamesService.Application.Configuration.Options, IConfiguration, IServiceCollection, ServiceOptionsExtensions, WalletOptions, Url, IConfiguration, IHostEnvironment (+3 more)
+### Community 811 - "DeleteBudgetReviewCommand"
+Cohesion: 0.18
+Nodes (13): Defender.Portal.Application.Modules.BudgetTracking.BudgetReviews.Commands, CancellationToken, Guid, Task, DeleteBudgetReviewCommand, Id, DeleteBudgetReviewCommandHandler, DeleteBudgetReviewCommandValidator (+5 more)
 
-### Community 812 - "PersonalFoodAdvisorApplicationCoverageSmokeTests"
-Cohesion: 0.27
-Nodes (6): Defender.PersonalFoodAdvisor.Application.Modules.Module.Commands, Defender.PersonalFoodAdvisor.Tests.Handlers, Fact, Task, Type, PersonalFoodAdvisorApplicationCoverageSmokeTests
+### Community 812 - "Defender.PersonalFoodAdvisor/src/Application/Modules/Module/Commands/BlockUserCommand.cs"
+Cohesion: 0.10
+Nodes (17): Defender.PersonalFoodAdvisor.Application.Modules.Module.Commands, Defender.PersonalFoodAdvisor.Tests.Handlers, Task, IService, CancellationToken, Task, Unit, ModuleCommand (+9 more)
 
 ### Community 813 - "JobSchedulerApplicationCoverageSmokeTests"
 Cohesion: 0.31
@@ -6013,9 +6030,9 @@ Nodes (8): Defender.BudgetTracker.Application.Helpers, Helper, Exception, LogLev
 Cohesion: 0.31
 Nodes (5): Defender.NotificationService.Tests.Handlers, Fact, Task, Type, NotificationApplicationCoverageSmokeTests
 
-### Community 818 - "UserDtoPagedResult"
-Cohesion: 0.20
-Nodes (9): ICollection, UserDtoPagedResult, CurrentPage, Items, PageSize, TotalItemsCount, TotalPagesCount, PublicUserInfoDto (+1 more)
+### Community 818 - "UserManagement/GeneratedCode.cs"
+Cohesion: 0.08
+Nodes (21): Defender.Common.Clients.Base, ICollection, AuthCheckDto, HighestRole, UserId, AuthCheckDtoHighestRole, Admin, Guest (+13 more)
 
 ### Community 819 - ".ConfigureProblems"
 Cohesion: 0.25
@@ -6037,21 +6054,21 @@ Nodes (9): >0.2%, last 1 chrome version, last 1 firefox version, last 1 safari v
 Cohesion: 0.08
 Nodes (24): dependencies, dependencies, type, AutoMapper, Confluent.Kafka, FluentValidation, Microsoft.AspNetCore.Authentication.JwtBearer, Microsoft.Extensions.Hosting.Abstractions (+16 more)
 
-### Community 824 - "ForbiddenAccessException"
-Cohesion: 0.20
-Nodes (10): ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection, IWebHostEnvironment, NotImplementedException, ProblemDetailsOptions (+2 more)
+### Community 824 - ".AuthorizationCheckAsync"
+Cohesion: 0.18
+Nodes (13): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController, CancellationToken (+5 more)
 
 ### Community 825 - "dependencies"
 Cohesion: 0.08
 Nodes (24): dependencies, dependencies, type, AutoMapper, Defender.Common, FluentValidation, MediatR, Microsoft.AspNetCore.Authentication.JwtBearer (+16 more)
 
-### Community 826 - "BaseApiController"
-Cohesion: 0.02
-Nodes (112): BaseApiController, Guid, AuthCheckDto, ConfigurationLevel, Admin, All, Hide, List (+104 more)
+### Community 826 - "AuthCheckQuery"
+Cohesion: 0.08
+Nodes (32): Guid, AuthCheckDto, ConfigurationLevel, Admin, All, Hide, AuthCheckDto, CancellationToken (+24 more)
 
-### Community 827 - "ROAccountInfoRepository"
-Cohesion: 0.27
-Nodes (6): BaseMongoRepository, IOptions, ROAccountInfoRepository, IConfiguration, IServiceCollection, CommonServiceExtensions
+### Community 827 - "ROSecretRepository"
+Cohesion: 0.21
+Nodes (7): IOptions, Task, ROSecretRepository, IConfiguration, IServiceCollection, CommonServiceExtensions, IMongoSecretAccessor
 
 ### Community 828 - "xunit"
 Cohesion: 0.17
@@ -6061,9 +6078,9 @@ Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.as
 Cohesion: 0.17
 Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.assert, xunit.core, xunit, contentHash (+4 more)
 
-### Community 830 - "ValidationException"
-Cohesion: 0.17
-Nodes (12): IDictionary, ValidationException, Errors, ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection (+4 more)
+### Community 830 - "BasePortalPosition"
+Cohesion: 0.12
+Nodes (14): List, BasePortalPosition, Currency, Name, OrderPriority, Tags, PortalReviewedBudgetPosition, Amount (+6 more)
 
 ### Community 831 - "xunit"
 Cohesion: 0.17
@@ -6117,9 +6134,9 @@ Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.as
 Cohesion: 0.22
 Nodes (9): ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection, IWebHostEnvironment, NotImplementedException, ProblemDetailsOptions (+1 more)
 
-### Community 844 - "UploadMenuSessionImagesCommand"
-Cohesion: 0.11
-Nodes (19): CancellationToken, ContentType, Guid, IReadOnlyList, Stream, Task, IImageUploadService, CancellationToken (+11 more)
+### Community 844 - "ConfirmMenuSessionCommand"
+Cohesion: 0.05
+Nodes (40): Defender.PersonalFoodAdvisor.Application.Modules.MenuSessions.Commands, CancellationToken, Guid, IReadOnlyList, Task, ConfirmMenuSessionCommand, ConfirmedItems, SessionId (+32 more)
 
 ### Community 845 - "dependencies"
 Cohesion: 0.09
@@ -6129,29 +6146,29 @@ Nodes (23): dependencies, dependencies, type, dependencies, type, AutoMapper, Co
 Cohesion: 0.17
 Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.assert, xunit.core, xunit, contentHash (+4 more)
 
-### Community 847 - ".GetErrorCode"
-Cohesion: 0.11
-Nodes (13): IRuleBuilderOptions, ErrorCodeHelper, ProblemDetails, FluentValidationExtensions, ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration (+5 more)
+### Community 847 - "ValidationException"
+Cohesion: 0.04
+Nodes (54): IRuleBuilderOptions, ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection, IWebHostEnvironment, NotImplementedException (+46 more)
 
 ### Community 848 - "TelegramSessionTokenIssuer"
-Cohesion: 0.14
-Nodes (13): Guid, IReadOnlyCollection, ITelegramSessionTokenIssuer, Guid, IConfiguration, IReadOnlyCollection, TimeProvider, TimeSpan (+5 more)
+Cohesion: 0.11
+Nodes (17): Defender.CarService.Tests.Domain, DateTimeOffset, TestTimeProvider, Guid, IReadOnlyCollection, ITelegramSessionTokenIssuer, Guid, IConfiguration (+9 more)
 
 ### Community 849 - "Roslynator.Analyzers"
 Cohesion: 0.40
 Nodes (5): Roslynator.Analyzers, contentHash, requested, resolved, type
 
 ### Community 850 - ".Get_WhenCalendarContainsSharedEvent_AddsOrganizerDisplayNameBeforeCaching"
-Cohesion: 0.11
-Nodes (21): CacheConventionBuilder, CacheModel, Positions, TravelCalendar, Wallet, Guid, PublicUserInfoDto, Id (+13 more)
+Cohesion: 0.25
+Nodes (12): Guid, TravelCalendarCacheEntry, CancellationToken, Fact, Func, IMapper, IMediator, OkObjectResult (+4 more)
 
 ### Community 851 - "xunit"
 Cohesion: 0.17
 Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.assert, xunit.core, xunit, contentHash (+4 more)
 
-### Community 852 - ".Handle"
-Cohesion: 0.12
-Nodes (21): CancellationToken, Guid, Task, Unit, ResetPasswordCommand, ResetPasswordCommandHandler, ResetPasswordCommandValidator, CancellationToken (+13 more)
+### Community 852 - "IRequest"
+Cohesion: 0.04
+Nodes (71): IRequest, IRequestHandler, Func, Guid, Task, IAuthorizationCheckingService, ICurrentAccountAccessor, Token (+63 more)
 
 ### Community 853 - "dependencies"
 Cohesion: 0.17
@@ -6189,29 +6206,29 @@ Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.as
 Cohesion: 0.17
 Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.assert, xunit.core, xunit, contentHash (+4 more)
 
-### Community 862 - ".ConfigureProblemDetails"
-Cohesion: 0.22
-Nodes (9): ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection, IWebHostEnvironment, NotImplementedException, ProblemDetailsOptions (+1 more)
+### Community 862 - "BaseApiController"
+Cohesion: 0.16
+Nodes (14): BaseApiController, IMapper, IMediator, AdminBankingController, IMapper, IMediator, UserDataController, Auth (+6 more)
 
 ### Community 863 - "WebApi.Controllers"
-Cohesion: 0.12
+Cohesion: 0.11
 Nodes (16): WebApi.Controllers, IMapper, IMediator, Task, BaseApiController, CancellationToken, Fact, IMapper (+8 more)
 
 ### Community 864 - "xunit"
 Cohesion: 0.17
 Nodes (12): xunit.analyzers, xunit.assert, xunit.core, xunit.analyzers, xunit.assert, xunit.core, xunit, contentHash (+4 more)
 
-### Community 865 - ".ConfigureProblemDetails"
-Cohesion: 0.22
-Nodes (9): ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection, IWebHostEnvironment, NotImplementedException, ProblemDetailsOptions (+1 more)
+### Community 865 - "TravelCalendarDto"
+Cohesion: 0.28
+Nodes (15): DateTimeOffset, Guid, IReadOnlyList, CalendarHolidayDto, HotelDetailsDto, PackingItemDto, PointOfInterestDto, TravelBudgetDetailDto (+7 more)
 
 ### Community 866 - "dependencies"
 Cohesion: 0.08
 Nodes (27): Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Configuration.Binder, Microsoft.Extensions.Primitives, Microsoft.Extensions.Configuration.Abstractions, Microsoft.Extensions.Configuration.Binder, Microsoft.Extensions.Primitives, contentHash, dependencies (+19 more)
 
-### Community 867 - "TokenValidationParameters"
-Cohesion: 0.20
-Nodes (10): ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection, IWebHostEnvironment, NotImplementedException, ProblemDetailsOptions (+2 more)
+### Community 867 - ".ConfigureProblemDetails"
+Cohesion: 0.22
+Nodes (9): ApiBehaviorOptions, Exception, HttpRequestException, IConfiguration, IServiceCollection, IWebHostEnvironment, NotImplementedException, ProblemDetailsOptions (+1 more)
 
 ### Community 868 - ".ConfigureProblemDetails"
 Cohesion: 0.22
@@ -6225,9 +6242,9 @@ Nodes (8): dependencies, net10.0, Roslynator.Analyzers, contentHash, requested, 
 Cohesion: 0.09
 Nodes (21): type, dependencies, net10.0, contentHash, resolved, type, contentHash, resolved (+13 more)
 
-### Community 871 - "Shared NuGet Library Distribution"
-Cohesion: 0.67
-Nodes (4): Shared NuGet Library Distribution, AGENTS Guide: Defender.Common, Defender.Common README (Shared NuGet Package), Defender.Kafka README (Shared NuGet Package)
+### Community 871 - "AGENTS Guide: Defender.DistributedCache"
+Cohesion: 0.40
+Nodes (6): Shared NuGet Library Distribution, PostgreSQL / Npgsql (Relational Store), AGENTS Guide: Defender.Common, Defender.Common README (Shared NuGet Package), AGENTS Guide: Defender.DistributedCache, Defender.Kafka README (Shared NuGet Package)
 
 ### Community 872 - "KafkaExtensionsTests"
 Cohesion: 0.21
@@ -6261,9 +6278,9 @@ Nodes (10): Microsoft.CodeCoverage, Microsoft.TestPlatform.TestHost, Microsoft.C
 Cohesion: 0.30
 Nodes (5): CancellationToken, Guid, IReadOnlyList, Task, ICarServiceWrapper
 
-### Community 880 - "ServiceHistoryRecordDto"
-Cohesion: 0.10
-Nodes (22): IReadOnlyList, ServiceHistoryPageDto, CurrentPage, Items, PageSize, TotalItemsCount, TotalPagesCount, ServiceHistoryRecordDto (+14 more)
+### Community 880 - "Currency"
+Cohesion: 0.12
+Nodes (15): BaseCurrency, BYN, EUR, GEL, PLN, RUB, USD, Currency (+7 more)
 
 ### Community 881 - "Microsoft.NET.Test.Sdk"
 Cohesion: 0.20
@@ -6357,9 +6374,9 @@ Nodes (10): Microsoft.CodeCoverage, Microsoft.TestPlatform.TestHost, Microsoft.C
 Cohesion: 0.50
 Nodes (4): contentHash, resolved, type, Microsoft.Extensions.DependencyInjection.Abstractions
 
-### Community 904 - ".GetSecretAsync"
+### Community 904 - "UpdateMainDiagramSetupRequest"
 Cohesion: 0.20
-Nodes (8): Defender.UserManagementService.Tests.Helpers, Defender.UserManagementService.Application.Helpers.LocalSecretHelper, LocalSecret, Task, LocalSecretsHelper, Fact, Task, LocalSecretsHelperTests
+Nodes (10): Task, IDiagramSetupService, Guid, UpdateMainDiagramSetupRequest, DefaultRequest, EndDate, LastMonths, MainCurrency (+2 more)
 
 ### Community 905 - "Microsoft.NET.Test.Sdk"
 Cohesion: 0.20
@@ -6385,9 +6402,9 @@ Nodes (10): Microsoft.Extensions.Diagnostics, Microsoft.Extensions.Logging, Micr
 Cohesion: 0.20
 Nodes (10): Microsoft.Extensions.Diagnostics, Microsoft.Extensions.Logging, Microsoft.Extensions.Diagnostics, Microsoft.Extensions.Logging, contentHash, dependencies, requested, resolved (+2 more)
 
-### Community 911 - ".FromModelState"
-Cohesion: 0.16
-Nodes (11): ModelStateDictionary, Fact, InlineData, Theory, CarProblemDetailsTests, Exception, HashSet, HttpContext (+3 more)
+### Community 911 - ".ConfigureProblemDetails"
+Cohesion: 0.08
+Nodes (22): Counter, ModelStateDictionary, Fact, InlineData, Theory, CarProblemDetailsTests, ApiBehaviorOptions, Exception (+14 more)
 
 ### Community 912 - "MenuSessionController"
 Cohesion: 0.21
@@ -6401,13 +6418,13 @@ Nodes (21): dependencies, type, AutoMapper, FluentValidation, MediatR, Microsoft
 Cohesion: 0.10
 Nodes (21): ReviewedRegularExpenseDto, Amount, Currency, MonthlyContribution, Name, OrderPriority, RegularExpenseId, Type (+13 more)
 
-### Community 915 - ".AddSchedule"
-Cohesion: 0.27
-Nodes (4): Defender.JobSchedulerService.Tests.Domain, DateTime, Fact, ScheduledJobTests
+### Community 915 - "TravelCalendar/TravelCalendarRequests.cs"
+Cohesion: 0.14
+Nodes (13): Defender.Portal.Application.Models.ApiRequests.TravelCalendar, Guid, AddPackingItemRequest, AddParticipantRequest, AddPointRequest, CreateEventFromDateRequest, CreateQueuedTripRequest, CreateTravelEventRequest (+5 more)
 
 ### Community 916 - "UpdateModelRequest"
-Cohesion: 0.15
-Nodes (11): UpdateFieldType, AddToSet, Set, Expression, Func, Guid, List, UpdateDefinition (+3 more)
+Cohesion: 0.09
+Nodes (23): UpdateFieldType, AddToSet, Set, Expression, Func, Guid, List, UpdateDefinition (+15 more)
 
 ### Community 917 - "dependencies"
 Cohesion: 0.10
@@ -6429,9 +6446,9 @@ Nodes (17): CalendarMutationInput, CalendarOperation, calendarOperations, curren
 Cohesion: 0.10
 Nodes (21): Microsoft.Extensions.Http.Polly, Microsoft.Extensions.Http.Resilience, OpenIddict.Client, Microsoft.Extensions.Http.Polly, Microsoft.Extensions.Http.Resilience, OpenIddict.Client, OpenIddict.Client.AspNetCore, OpenIddict.Client.SystemNetHttp (+13 more)
 
-### Community 922 - ".RegisterRepositories"
-Cohesion: 0.60
-Nodes (3): IConfiguration, IServiceCollection, ConfigureServices
+### Community 922 - "PositionToPublish"
+Cohesion: 0.14
+Nodes (14): PositionToPublish, Amount, Currency, Name, OrderPriority, Tags, PositionToPublishCurrency, BYN (+6 more)
 
 ### Community 923 - "UserTicketDto"
 Cohesion: 0.10
@@ -6457,9 +6474,9 @@ Nodes (10): MediatR.Contracts, Microsoft.Extensions.Logging.Abstractions, Mediat
 Cohesion: 0.25
 Nodes (8): Microsoft.IdentityModel.Protocols.OpenIdConnect, Microsoft.IdentityModel.Protocols.OpenIdConnect, contentHash, dependencies, requested, resolved, type, Microsoft.AspNetCore.Authentication.JwtBearer
 
-### Community 929 - "IAccountManagementService"
-Cohesion: 0.22
-Nodes (8): Guid, PublicUserInfoDto, Task, IAccountManagementService, Guid, PublicUserInfoDto, Task, AccountManagementService
+### Community 929 - "ReviewedPosition"
+Cohesion: 0.14
+Nodes (14): ReviewedPosition, Amount, Currency, Name, OrderPriority, Tags, ReviewedPositionCurrency, BYN (+6 more)
 
 ### Community 930 - "Microsoft.AspNetCore.Authentication.JwtBearer"
 Cohesion: 0.25
@@ -6501,9 +6518,9 @@ Nodes (19): dependencies, type, AutoMapper, FluentValidation, Microsoft.AspNetCo
 Cohesion: 0.29
 Nodes (5): Action, HttpClient, IServiceCollection, IServiceProvider, ConfigureNotificationClient
 
-### Community 940 - ".RegisterUserManagementClient"
-Cohesion: 0.29
-Nodes (5): Action, HttpClient, IServiceCollection, IServiceProvider, ConfigureUserManagementClient
+### Community 940 - "IHealthCareWrapper"
+Cohesion: 0.31
+Nodes (6): CancellationToken, DateTimeOffset, Guid, IReadOnlyList, Task, IHealthCareWrapper
 
 ### Community 941 - "Microsoft.AspNetCore.Authentication.JwtBearer"
 Cohesion: 0.25
@@ -6673,9 +6690,9 @@ Nodes (9): Microsoft.Extensions.Hosting.Abstractions, Serilog.Extensions.Logging
 Cohesion: 0.25
 Nodes (8): Microsoft.IdentityModel.Protocols.OpenIdConnect, Microsoft.IdentityModel.Protocols.OpenIdConnect, contentHash, dependencies, requested, resolved, type, Microsoft.AspNetCore.Authentication.JwtBearer
 
-### Community 983 - "IRequest"
-Cohesion: 0.03
-Nodes (88): AbstractValidator, IRequest, CancellationToken, Guid, Task, DeleteRegularExpenseReviewCommand, Id, DeleteRegularExpenseReviewCommandHandler (+80 more)
+### Community 983 - "LoginResponse"
+Cohesion: 0.05
+Nodes (56): Task, ITokenManagementService, LoginResponse, AccountInfo, Token, UserInfo, CancellationToken, IMapper (+48 more)
 
 ### Community 984 - "dependencies"
 Cohesion: 0.11
@@ -6802,8 +6819,8 @@ Cohesion: 0.25
 Nodes (8): Microsoft.IdentityModel.Protocols.OpenIdConnect, Microsoft.IdentityModel.Protocols.OpenIdConnect, contentHash, dependencies, requested, resolved, type, Microsoft.AspNetCore.Authentication.JwtBearer
 
 ### Community 1015 - "ControllerBase"
-Cohesion: 0.06
-Nodes (21): ControllerBase, Defender.TravelCalendarService.WebApi.Controllers.V1, IMapper, IMediator, Task, BaseApiController, IMapper, IMediator (+13 more)
+Cohesion: 0.08
+Nodes (18): ControllerBase, Defender.GeneralTestingService.WebApi.Controllers, Defender.TravelCalendarService.WebApi.Controllers.V1, IMapper, IMediator, Task, BaseApiController, IMapper (+10 more)
 
 ### Community 1016 - "Defender.Common.csproj"
 Cohesion: 0.12
@@ -7254,12 +7271,8 @@ Cohesion: 0.28
 Nodes (7): Defender.SecretManagementService.Application.Helpers, Exception, LogLevel, Debug, Info, Warning, SimpleLogger
 
 ### Community 1128 - "NotificationServiceClient"
-Cohesion: 0.15
-Nodes (10): CultureInfo, HttpResponseMessage, IEnumerable, NotificationServiceClient, JsonSerializerSettings, ReadResponseAsString, ObjectResponseResult, Object (+2 more)
-
-### Community 1129 - "Defender.PersonalFoodAdvisor/src/Tests/ArchitectureTests.cs"
-Cohesion: 0.14
-Nodes (10): Defender.PersonalFoodAdvisor.Tests, Defender.PersonalFoodAdvisor.Application.Configuration.Extension, Defender.PersonalFoodAdvisor.Application.Configuration.Options, IConfiguration, IServiceCollection, ServiceOptionsExtensions, ServiceOptions, Url (+2 more)
+Cohesion: 0.13
+Nodes (14): HttpClient, HttpRequestMessage, HttpResponseMessage, IEnumerable, StringBuilder, HealthCheckDto, Status, NotificationServiceClient (+6 more)
 
 ### Community 1130 - "dependencies"
 Cohesion: 0.12
@@ -7372,6 +7385,10 @@ Nodes (16): DnsClient, MongoDB.Bson, SharpCompress, Snappier, ZstdSharp.Port, Dn
 ### Community 1157 - "Microsoft.IdentityModel.Logging"
 Cohesion: 0.29
 Nodes (7): Microsoft.IdentityModel.Abstractions, Microsoft.IdentityModel.Abstractions, contentHash, dependencies, resolved, type, Microsoft.IdentityModel.Logging
+
+### Community 1158 - "GetUserTicketsQuery"
+Cohesion: 0.14
+Nodes (11): Guid, CancellationToken, Guid, Task, GetUserTicketsQuery, UserId, GetUserTicketsQueryValidator, Auth (+3 more)
 
 ### Community 1159 - "Microsoft.IdentityModel.Logging"
 Cohesion: 0.29
@@ -7578,8 +7595,8 @@ Cohesion: 0.12
 Nodes (16): FluentValidation, FluentValidation.DependencyInjectionExtensions, contentHash, dependencies, requested, resolved, type, contentHash (+8 more)
 
 ### Community 1210 - ".RegisterServices"
-Cohesion: 0.10
-Nodes (16): IConfiguration, IServiceCollection, ConfigureServices, ITelegramInitDataValidator, ITelegramLinkHandoffService, ITelegramWebhookSecretValidator, TimeProvider, TimeSpan (+8 more)
+Cohesion: 0.14
+Nodes (11): IConfiguration, IServiceCollection, ConfigureServices, ITelegramWebhookSecretValidator, TimeSpan, TelegramOptions, BotToken, InitDataMaximumAge (+3 more)
 
 ### Community 1211 - "PortalHealthEventDto"
 Cohesion: 0.08
@@ -7741,9 +7758,9 @@ Nodes (17): Microsoft.Bcl.Cryptography, Microsoft.Extensions.Logging.Abstraction
 Cohesion: 0.29
 Nodes (7): Microsoft.IdentityModel.Abstractions, Microsoft.IdentityModel.Abstractions, contentHash, dependencies, resolved, type, Microsoft.IdentityModel.Logging
 
-### Community 1251 - "LotterySchedule"
-Cohesion: 0.12
-Nodes (14): LotteryScheduleType, Custom, Daily, Monthly, Weekly, Yearly, DateTime, LotterySchedule (+6 more)
+### Community 1251 - "deploy-portal.ps1"
+Cohesion: 0.17
+Nodes (6): ArgoCD (GitOps Deployment Tool), HomeServer ArgoCD Credentials Config, Helm Values Override: portal, Get-Runs(), Wait-NewRun(), scripts/README.md (Repository Automation Guide)
 
 ### Community 1252 - "dependencies"
 Cohesion: 0.12
@@ -7829,9 +7846,9 @@ Nodes (7): Serilog.Extensions.Logging, Serilog.Extensions.Logging, Serilog.Exten
 Cohesion: 0.11
 Nodes (18): Microsoft.Extensions.Primitives, Microsoft.Extensions.Primitives, contentHash, dependencies, requested, resolved, type, contentHash (+10 more)
 
-### Community 1273 - "BaseInternalSwaggerWrapper"
-Cohesion: 0.18
-Nodes (11): BaseSwaggerWrapper, AuthenticationHeaderValue, AuthenticationHeaderValue, Task, AuthorizationType, Service, User, WithoutAuthorization (+3 more)
+### Community 1273 - "GetMainDiagramSetupQuery"
+Cohesion: 0.24
+Nodes (9): CancellationToken, Task, GetMainDiagramSetupQuery, GetMainDiagramSetupQueryHandler, GetMainDiagramSetupQueryValidator, Fact, Mock, Task (+1 more)
 
 ### Community 1275 - "Defender.SecretManagementService/src/Application/Common/Interfaces/Wrapper/IServiceWrapper.cs"
 Cohesion: 0.40
@@ -7851,7 +7868,7 @@ Nodes (16): FluentValidation, FluentValidation.DependencyInjectionExtensions, co
 
 ### Community 1280 - "RegularExpenseReview"
 Cohesion: 0.04
-Nodes (67): Guid, List, Task, IRegularExpenseReviewRepository, Task, IRatesModelService, Guid, List (+59 more)
+Nodes (63): Guid, List, Task, IRegularExpenseReviewRepository, Guid, List, Task, IRegularExpenseReviewService (+55 more)
 
 ### Community 1281 - "FluentValidation"
 Cohesion: 0.40
@@ -7873,9 +7890,9 @@ Nodes (5): Roslynator.Analyzers, contentHash, requested, resolved, type
 Cohesion: 0.40
 Nodes (5): contentHash, requested, resolved, type, FluentValidation
 
-### Community 1286 - "CreateInsurancePolicyRequest"
-Cohesion: 0.13
-Nodes (14): CreateInsurancePolicyRequest, CoverageType, EndDate, Notes, PolicyNumber, Provider, StartDate, UpdateInsurancePolicyRequest (+6 more)
+### Community 1286 - "PublishRegularExpenseReviewRequest"
+Cohesion: 0.15
+Nodes (11): Guid, List, PublishRegularExpenseReviewRequest, Expenses, Id, Month, ReviewedExpenses, Guid (+3 more)
 
 ### Community 1287 - "dependencies"
 Cohesion: 0.13
@@ -8149,9 +8166,9 @@ Nodes (5): Swashbuckle.AspNetCore.SwaggerUI, contentHash, requested, resolved, t
 Cohesion: 0.40
 Nodes (5): xunit.runner.visualstudio, contentHash, requested, resolved, type
 
-### Community 1355 - "BaseApiController"
-Cohesion: 0.33
-Nodes (4): IMapper, IMediator, Task, BaseApiController
+### Community 1355 - ".RechargeAsync"
+Cohesion: 0.18
+Nodes (10): StartRechargeTransactionCommand, Amount, Currency, WalletNumber, StartRechargeTransactionCommandCurrency, EUR, GEL, PLN (+2 more)
 
 ### Community 1356 - "Microsoft.Extensions.Options"
 Cohesion: 0.14
@@ -8198,8 +8215,8 @@ Cohesion: 0.10
 Nodes (21): contentHash, dependencies, requested, resolved, type, Microsoft.Extensions.Options, Microsoft.IdentityModel.JsonWebTokens, Microsoft.Extensions.Options (+13 more)
 
 ### Community 1367 - "ProblemDetails"
-Cohesion: 0.18
-Nodes (12): IDictionary, ConfigurationLevel, Admin, All, Hide, ProblemDetails, AdditionalProperties, Detail (+4 more)
+Cohesion: 0.15
+Nodes (13): CultureInfo, IDictionary, ConfigurationLevel, Admin, All, Hide, ProblemDetails, AdditionalProperties (+5 more)
 
 ### Community 1368 - "xunit.core"
 Cohesion: 0.14
@@ -8245,9 +8262,9 @@ Nodes (5): Newtonsoft.Json, contentHash, requested, resolved, type
 Cohesion: 0.40
 Nodes (5): Roslynator.Analyzers, contentHash, requested, resolved, type
 
-### Community 1379 - "INotificationServiceClient"
-Cohesion: 0.21
-Nodes (8): INotificationServiceClient, Task, INotificationWrapper, Task, NotificationService, IMapper, Task, NotificationWrapper
+### Community 1379 - "SendVerificationCodeCommand"
+Cohesion: 0.08
+Nodes (27): Task, INotificationService, Task, INotificationWrapper, CancellationToken, Guid, Task, SendPasswordResetCodeCommand (+19 more)
 
 ### Community 1380 - "FluentValidation"
 Cohesion: 0.40
@@ -8285,9 +8302,9 @@ Nodes (5): contentHash, requested, resolved, type, Hellang.Middleware.ProblemDet
 Cohesion: 0.14
 Nodes (14): CreateChild, CompanyName, Email, FirstName, Language, LastName, Password, CreateChildLanguage (+6 more)
 
-### Community 1389 - "VehicleDto"
-Cohesion: 0.14
-Nodes (14): DateTimeOffset, VehicleDto, Archived, CreatedAtUtc, CurrentOdometerKm, DisplayName, Id, Make (+6 more)
+### Community 1389 - "UpdateMainDiagramSetupCommand"
+Cohesion: 0.29
+Nodes (7): CancellationToken, Task, UpdateMainDiagramSetupCommand, UpdateMainDiagramSetupCommandHandler, UpdateMainDiagramSetupCommandValidator, Fact, UpdateMainDiagramSetupCommandValidatorTests
 
 ### Community 1390 - "Microsoft.Extensions.Http.Polly"
 Cohesion: 0.14
@@ -8298,8 +8315,8 @@ Cohesion: 0.40
 Nodes (5): Newtonsoft.Json, contentHash, requested, resolved, type
 
 ### Community 1392 - "CreateKafkaTopicsService"
-Cohesion: 0.13
-Nodes (14): IEnumerable, ILogger, IOptions, CreateKafkaTopicsService, NumPartitions, ReplicationFactor, Topics, IEnumerable (+6 more)
+Cohesion: 0.29
+Nodes (7): IEnumerable, ILogger, IOptions, CreateKafkaTopicsService, NumPartitions, ReplicationFactor, Topics
 
 ### Community 1393 - "xunit.core"
 Cohesion: 0.14
@@ -8365,9 +8382,9 @@ Nodes (5): Serilog, contentHash, requested, resolved, type
 Cohesion: 0.40
 Nodes (5): contentHash, requested, resolved, type, FluentValidation
 
-### Community 1409 - "Defender.IdentityService.Application.Models.Google"
-Cohesion: 0.18
-Nodes (8): Defender.IdentityService.Application.Common.Exceptions, Defender.IdentityService.Application.Models.Google, Defender.IdentityService.Infrastructure.Clients.Google, Defender.IdentityService.Application.Common.Interfaces.Clients, GoogleClientException, IGoogleClient, HttpClient, GoogleClient
+### Community 1409 - "Defender.IdentityService.Application.Common.Interfaces.Services"
+Cohesion: 0.05
+Nodes (32): Defender.IdentityService.Domain.Entities, Defender.IdentityService.Tests.Services, Defender.IdentityService.Application.Models.ApiRequests, Defender.IdentityService.Application.Common.Interfaces.Wrapper, Defender.IdentityService.Tests.Domain, Defender.IdentityService.Application.Services, Defender.IdentityService.Domain.Consts, Defender.Common.Clients.UserManagement (+24 more)
 
 ### Community 1410 - "dependencies"
 Cohesion: 0.15
@@ -8509,9 +8526,9 @@ Nodes (5): Newtonsoft.Json, contentHash, requested, resolved, type
 Cohesion: 0.40
 Nodes (5): Roslynator.Analyzers, contentHash, requested, resolved, type
 
-### Community 1445 - ".ConfigureProblemDetails"
-Cohesion: 0.22
-Nodes (8): ApiBehaviorOptions, Exception, IConfiguration, IServiceCollection, IWebHostEnvironment, ProblemDetailsOptions, ConfigureServices, ErrorMappingHelper
+### Community 1445 - "SessionDto"
+Cohesion: 0.24
+Nodes (8): LoginWithPasswordCommand, Login, Password, SessionDto, IsAuthenticated, Language, Token, User
 
 ### Community 1446 - "coverlet.collector"
 Cohesion: 0.40
@@ -8921,9 +8938,9 @@ Nodes (5): Roslynator.Analyzers, contentHash, requested, resolved, type
 Cohesion: 0.40
 Nodes (5): contentHash, requested, resolved, type, FluentValidation
 
-### Community 1548 - "HealthEventType"
-Cohesion: 0.18
-Nodes (10): AnalysisStatus, Bad, Excellent, HasDeviations, HealthEventType, Analysis, Medication, Sleep (+2 more)
+### Community 1548 - "HealthEvent"
+Cohesion: 0.07
+Nodes (28): DateTimeOffset, Guid, AnalysisStatus, Bad, Excellent, HasDeviations, HealthEvent, AnalysisName (+20 more)
 
 ### Community 1549 - "Newtonsoft.Json"
 Cohesion: 0.40
@@ -9133,9 +9150,9 @@ Nodes (5): contentHash, requested, resolved, type, FluentValidation
 Cohesion: 0.20
 Nodes (10): Microsoft.CodeCoverage, Microsoft.TestPlatform.TestHost, Microsoft.CodeCoverage, Microsoft.TestPlatform.TestHost, contentHash, dependencies, requested, resolved (+2 more)
 
-### Community 1601 - "CacheForService"
-Cohesion: 0.20
-Nodes (9): CacheForService, BudgetTracker, Identity, Notification, Portal, RiskGames, Shared, UserManagement (+1 more)
+### Community 1601 - ".RegisterApiClients"
+Cohesion: 0.29
+Nodes (7): IGoogleClient, HttpClient, GoogleClient, IConfiguration, IOptions, IServiceCollection, ConfigureServices
 
 ### Community 1602 - "Serilog"
 Cohesion: 0.40
@@ -9249,9 +9266,9 @@ Nodes (5): Serilog, contentHash, requested, resolved, type
 Cohesion: 0.20
 Nodes (10): Reason, Code, Message, ReasonCode, AdminBlocked, ContactFlaggedAsSpam, HardBounce, UnsubscribedViaApi (+2 more)
 
-### Community 1630 - "DeleteMenuSessionCommand"
-Cohesion: 0.27
-Nodes (8): CancellationToken, Guid, Task, DeleteMenuSessionCommand, SessionId, UserId, DeleteMenuSessionCommandHandler, DeleteMenuSessionCommandValidator
+### Community 1630 - "BaseTransactionCommand"
+Cohesion: 0.18
+Nodes (11): Currency, Guid, TransactionPurpose, BaseTransactionCommand, Amount, Comment, CreateTransactionRequest, Currency (+3 more)
 
 ### Community 1631 - "Microsoft.Extensions.DependencyInjection.Abstractions"
 Cohesion: 0.14
@@ -9329,9 +9346,9 @@ Nodes (5): Roslynator.Analyzers, contentHash, requested, resolved, type
 Cohesion: 0.40
 Nodes (5): Serilog, contentHash, requested, resolved, type
 
-### Community 1650 - "UserLotteryTicketStatus"
-Cohesion: 0.22
-Nodes (8): Defender.Portal.Application.Enums.RiskGames.Lottery, UserLotteryTicketStatus, FailedToPayPrize, Lost, Paid, PrizePaid, Requested, Won
+### Community 1650 - "all_systems.sh"
+Cohesion: 0.24
+Nodes (6): all_systems.sh script, get_short_name(), generate-service-matrix.sh script, update-workflow-services.sh script, get_short_name(), validate-workflow-services.sh script
 
 ### Community 1651 - ".Log"
 Cohesion: 0.28
@@ -9429,9 +9446,9 @@ Nodes (9): Microsoft.Bcl.Cryptography, Microsoft.IdentityModel.Logging, Microsof
 Cohesion: 0.22
 Nodes (9): Microsoft.IdentityModel.Protocols, System.IdentityModel.Tokens.Jwt, Microsoft.IdentityModel.Protocols, System.IdentityModel.Tokens.Jwt, contentHash, dependencies, resolved, type (+1 more)
 
-### Community 1685 - "Graphify Query: Portal UI Components and Styling"
-Cohesion: 0.50
-Nodes (4): Graphify Query: Portal UI Components and Styling, compactIconButtonLayout, InvitationPanel.tsx, Shared/WalletAccountsInfo/styledComponents.tsx
+### Community 1685 - "HealthCarePage"
+Cohesion: 0.19
+Nodes (11): Graphify Query: HealthCare Page Implementation, Graphify Query: Portal UI Components and Styling, compactIconButtonLayout, InvitationPanel.tsx, Shared/WalletAccountsInfo/styledComponents.tsx, getTimeRangeBounds, HealthCarePage(), nowInput() (+3 more)
 
 ### Community 1686 - "Microsoft.IdentityModel.Tokens"
 Cohesion: 0.22
@@ -10245,9 +10262,9 @@ Nodes (4): contentHash, resolved, type, DnsClient
 Cohesion: 0.50
 Nodes (4): contentHash, resolved, type, MediatR.Contracts
 
-### Community 1889 - "AuthCheckDto"
-Cohesion: 0.25
-Nodes (8): AuthCheckDto, HighestRole, UserId, AuthCheckDtoHighestRole, Admin, Guest, SuperAdmin, User
+### Community 1889 - "NotificationWrapper"
+Cohesion: 0.22
+Nodes (7): SendEmailVerificationCommand, Code, Hash, RecipientEmail, IMapper, Task, NotificationWrapper
 
 ### Community 1890 - "Microsoft.Extensions.Primitives"
 Cohesion: 0.50
@@ -10738,8 +10755,8 @@ Cohesion: 0.50
 Nodes (4): contentHash, resolved, type, Microsoft.Extensions.Primitives
 
 ### Community 2012 - ".AddWebUIServices_WhenCalled_RegistersExpectedWebServices"
-Cohesion: 0.25
-Nodes (7): ApiBehaviorOptions, Fact, IOptions, IOptionsMonitor, JwtBearerOptions, ProblemDetailsOptions, SwaggerGenOptions
+Cohesion: 0.18
+Nodes (9): Defender.WalletService.Tests.Configuration, ApiBehaviorOptions, Fact, IOptions, IOptionsMonitor, JwtBearerOptions, ProblemDetailsOptions, WebApiConfigureServicesTests (+1 more)
 
 ### Community 2013 - "Swashbuckle.AspNetCore.Swagger"
 Cohesion: 0.25
@@ -10769,9 +10786,9 @@ Nodes (4): System.Diagnostics.EventLog, contentHash, resolved, type
 Cohesion: 0.50
 Nodes (4): xunit.abstractions, contentHash, resolved, type
 
-### Community 2020 - ".RegisterApiClients"
-Cohesion: 0.46
-Nodes (4): IConfiguration, IOptions, IServiceCollection, ConfigureServices
+### Community 2020 - "AppEnvironment"
+Cohesion: 0.22
+Nodes (6): AppEnvironment, dev, local, prod, IHostEnvironment, CommonHostEnvironmentExtensions
 
 ### Community 2021 - "Swashbuckle.AspNetCore.Swagger"
 Cohesion: 0.25
@@ -10805,13 +10822,13 @@ Nodes (5): Env, Dev, Local, Prod, EnvHelper
 Cohesion: 0.12
 Nodes (16): dependencies, type, Defender.Kafka, Defender.PersonalFoodAdvisor.Domain, Microsoft.IdentityModel.Protocols, System.IdentityModel.Tokens.Jwt, Defender.Kafka, Defender.PersonalFoodAdvisor.Domain (+8 more)
 
-### Community 2029 - "AuthAttribute"
-Cohesion: 0.29
-Nodes (5): AuthorizeAttribute, AuthAttribute, Fact, HttpMethodAttribute, RegularExpenseControllerTests
+### Community 2029 - ".GetConfigurationAsync"
+Cohesion: 0.31
+Nodes (8): ActionResult, Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
-### Community 2030 - "CheckAccountVerificationQueryHandler"
-Cohesion: 0.38
-Nodes (5): Defender.Portal.Application.Modules.Verification.Queries, CancellationToken, Task, CheckAccountVerificationQuery, CheckAccountVerificationQueryHandler
+### Community 2030 - "IdentityServiceApplicationCoverageSmokeTests"
+Cohesion: 0.31
+Nodes (5): Defender.IdentityService.Tests.Handlers, Type, Fact, Task, IdentityServiceApplicationCoverageSmokeTests
 
 ### Community 2031 - "Microsoft.IdentityModel.Logging"
 Cohesion: 0.29
@@ -10873,9 +10890,9 @@ Nodes (4): contentHash, resolved, type, Microsoft.Bcl.Cryptography
 Cohesion: 0.50
 Nodes (4): contentHash, resolved, type, Microsoft.Extensions.DependencyInjection.Abstractions
 
-### Community 2046 - "EffectiveBaseline"
-Cohesion: 0.29
-Nodes (7): Guid, EffectiveBaseline, Date, LastDate, LastOdometerKm, OdometerKm, RecordId
+### Community 2046 - "ServiceHistoryRecord"
+Cohesion: 0.06
+Nodes (39): Cost, EffectiveBaseline, Currency, DateTimeOffset, Guid, IEnumerable, IReadOnlyList, TimeProvider (+31 more)
 
 ### Community 2047 - "Microsoft.IdentityModel.Protocols.OpenIdConnect"
 Cohesion: 0.22
@@ -11037,9 +11054,9 @@ Nodes (4): contentHash, resolved, type, librdkafka.redist
 Cohesion: 0.50
 Nodes (4): contentHash, resolved, type, MediatR.Contracts
 
-### Community 2087 - "LocalSecret"
-Cohesion: 0.29
-Nodes (5): LocalSecret, Testing_Email, Testing_Password, Testing_TransferWalletNumber, LocalSecretsHelper
+### Community 2087 - ".AuthorizationCheckAsync"
+Cohesion: 0.33
+Nodes (7): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
 ### Community 2088 - "Currency"
 Cohesion: 0.29
@@ -11177,9 +11194,9 @@ Nodes (4): contentHash, resolved, type, MongoDB.Bson
 Cohesion: 0.50
 Nodes (4): SharpCompress, contentHash, resolved, type
 
-### Community 2122 - "TopicExtensionsTests"
-Cohesion: 0.48
-Nodes (3): ArgumentException, Fact, TopicExtensionsTests
+### Community 2122 - "AccountManagementServiceTests"
+Cohesion: 0.50
+Nodes (4): Fact, Mock, Task, AccountManagementServiceTests
 
 ### Community 2123 - "DnsClient"
 Cohesion: 0.50
@@ -11233,9 +11250,9 @@ Nodes (5): dependencies, type, Defender.Common, Defender.Common, Defender.Travel
 Cohesion: 0.50
 Nodes (4): contentHash, resolved, type, DnsClient
 
-### Community 2136 - "CreateKafkaTopicsService"
-Cohesion: 0.29
-Nodes (7): IEnumerable, ILogger, IOptions, CreateKafkaTopicsService, NumPartitions, ReplicationFactor, Topics
+### Community 2136 - "EnsureTopicsCreatedService"
+Cohesion: 0.09
+Nodes (23): IEnumerable, ILogger, IOptions, CreateKafkaTopicsService, NumPartitions, ReplicationFactor, Topics, CancellationToken (+15 more)
 
 ### Community 2137 - "Microsoft.Extensions.DependencyInjection.Abstractions"
 Cohesion: 0.50
@@ -11261,9 +11278,9 @@ Nodes (4): IMapper, IMediator, Task, BaseApiController
 Cohesion: 0.50
 Nodes (4): SharpCompress, contentHash, resolved, type
 
-### Community 2143 - "CreateInsurancePolicyRequest"
-Cohesion: 0.29
-Nodes (7): CreateInsurancePolicyRequest, CoverageType, EndDate, Notes, PolicyNumber, Provider, StartDate
+### Community 2143 - ".AuthorizationCheckAsync"
+Cohesion: 0.33
+Nodes (7): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
 ### Community 2144 - "Defender.TravelCalendarService.Domain"
 Cohesion: 0.40
@@ -11565,9 +11582,9 @@ Nodes (4): contentHash, resolved, type, MongoDB.Bson
 Cohesion: 0.29
 Nodes (7): Microsoft.IdentityModel.Abstractions, Microsoft.IdentityModel.Abstractions, contentHash, dependencies, resolved, type, Microsoft.IdentityModel.Logging
 
-### Community 2219 - "ServiceWrapper"
+### Community 2219 - ".AuthorizationCheckAsync"
 Cohesion: 0.33
-Nodes (5): Task, IServiceWrapper, IMapper, Task, ServiceWrapper
+Nodes (7): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
 ### Community 2220 - "Snappier"
 Cohesion: 0.50
@@ -11629,9 +11646,9 @@ Nodes (5): Goal, Removal criteria, Scope, Unit-test audit and cleanup, Validatio
 Cohesion: 0.50
 Nodes (4): contentHash, resolved, type, DnsClient
 
-### Community 2235 - ".EmailAsync"
-Cohesion: 0.40
-Nodes (4): SendPureEmailCommand, Body, RecipientEmail, Subject
+### Community 2235 - ".AuthorizationCheckAsync"
+Cohesion: 0.33
+Nodes (7): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
 ### Community 2236 - "Microsoft.Bcl.Cryptography"
 Cohesion: 0.50
@@ -11653,9 +11670,9 @@ Nodes (4): contentHash, resolved, type, Microsoft.IdentityModel.Abstractions
 Cohesion: 0.22
 Nodes (9): Microsoft.Bcl.Cryptography, Microsoft.IdentityModel.Logging, Microsoft.Bcl.Cryptography, Microsoft.IdentityModel.Logging, contentHash, dependencies, resolved, type (+1 more)
 
-### Community 2241 - "PortalTransactionDtoTransactionType"
+### Community 2241 - ".AuthorizationCheckAsync"
 Cohesion: 0.33
-Nodes (6): PortalTransactionDtoTransactionType, Payment, Recharge, Revert, Transfer, Unknown
+Nodes (7): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
 ### Community 2242 - "SharpCompress"
 Cohesion: 0.50
@@ -11685,9 +11702,9 @@ Nodes (9): Microsoft.IdentityModel.Protocols, System.IdentityModel.Tokens.Jwt, M
 Cohesion: 0.12
 Nodes (17): Microsoft.Bcl.Cryptography, Microsoft.Extensions.Logging.Abstractions, Microsoft.IdentityModel.Logging, Microsoft.Bcl.Cryptography, Microsoft.Extensions.Logging.Abstractions, Microsoft.IdentityModel.Logging, contentHash, dependencies (+9 more)
 
-### Community 2249 - "KafkaTopic"
-Cohesion: 0.47
-Nodes (4): KafkaTopic, ScheduledTasks, TransactionsToProcess, KafkaTopicExtensions
+### Community 2249 - ".AuthorizationCheckAsync"
+Cohesion: 0.33
+Nodes (7): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
 ### Community 2250 - "Roslynator.Analyzers"
 Cohesion: 0.40
@@ -12134,8 +12151,8 @@ Cohesion: 0.40
 Nodes (5): contentHash, requested, resolved, type, FluentValidation
 
 ### Community 2376 - "PostgresDistributedCache"
-Cohesion: 0.17
-Nodes (14): DynamicParameters, IDistributedCache, MemberExpression, NpgsqlConnection, PostgreSQL / Npgsql (Relational Store), AGENTS Guide: Defender.DistributedCache, Expression, Func (+6 more)
+Cohesion: 0.18
+Nodes (12): DynamicParameters, IDistributedCache, MemberExpression, NpgsqlConnection, Expression, Func, ILogger, List (+4 more)
 
 ### Community 2377 - "Microsoft.OpenApi"
 Cohesion: 0.40
@@ -12174,8 +12191,8 @@ Cohesion: 0.40
 Nodes (5): xunit.runner.visualstudio, contentHash, requested, resolved, type
 
 ### Community 2387 - "GeminiModelFallbackService"
-Cohesion: 0.11
-Nodes (26): RouteState, GeminiModelRoute, Recommendation, Vision, CancellationToken, DateTime, Func, HttpRequestException (+18 more)
+Cohesion: 0.10
+Nodes (30): RouteState, CancellationToken, IReadOnlyList, Task, IGeminiModelLoopStateRepository, GeminiModelRoute, Recommendation, Vision (+22 more)
 
 ### Community 2391 - "FluentValidation"
 Cohesion: 0.40
@@ -12225,25 +12242,25 @@ Nodes (5): Roslynator.Analyzers, contentHash, requested, resolved, type
 Cohesion: 0.40
 Nodes (5): Serilog, contentHash, requested, resolved, type
 
-### Community 2403 - "PortalRegularExpenseRatesModel"
-Cohesion: 0.40
-Nodes (5): Currency, PortalRegularExpenseRatesModel, BaseCurrency, Date, Rates
+### Community 2403 - "PortalRegularExpenseReview"
+Cohesion: 0.05
+Nodes (50): Currency, Guid, List, PortalRegularExpenseRatesModel, BaseCurrency, Date, Rates, PortalRegularExpenseReview (+42 more)
 
 ### Community 2404 - "Defender.Portal.Domain"
 Cohesion: 0.40
 Nodes (5): dependencies, type, Defender.Common, Defender.Common, Defender.Portal.Domain
 
-### Community 2405 - "PortalWrapper"
-Cohesion: 0.36
-Nodes (4): Currency, List, Task, PortalWrapper
+### Community 2405 - ".AuthorizationCheckAsync"
+Cohesion: 0.33
+Nodes (7): Auth, HttpGet, IMapper, IMediator, ProducesResponseType, Task, HomeController
 
 ### Community 2406 - "FluentValidation"
 Cohesion: 0.40
 Nodes (5): contentHash, requested, resolved, type, FluentValidation
 
-### Community 2407 - "IBaseModel"
-Cohesion: 0.11
-Nodes (16): Defender.SecretManagementService.Domain.Entities, Guid, IBaseModel, Id, Guid, Task, IDomainModelRepository, Guid (+8 more)
+### Community 2407 - "DiagramSetupCurrency"
+Cohesion: 0.25
+Nodes (8): DiagramSetupCurrency, ALL, BYN, EUR, GEL, PLN, RUB, USD
 
 ### Community 2408 - "Newtonsoft.Json"
 Cohesion: 0.40
@@ -12381,9 +12398,9 @@ Nodes (4): SharpCompress, contentHash, resolved, type
 Cohesion: 0.50
 Nodes (4): Snappier, contentHash, resolved, type
 
-### Community 2442 - "JobManagementController"
-Cohesion: 0.18
-Nodes (11): IMapper, IMediator, Task, BaseApiController, HttpDelete, HttpGet, HttpPost, HttpPut (+3 more)
+### Community 2442 - "DeleteJobCommand"
+Cohesion: 0.11
+Nodes (19): CancellationToken, Guid, Task, Unit, DeleteJobCommand, Id, DeleteJobCommandHandler, DeleteJobCommandValidator (+11 more)
 
 ### Community 2443 - "Microsoft.IdentityModel.Abstractions"
 Cohesion: 0.50
@@ -13185,7 +13202,93 @@ Nodes (4): Snappier, contentHash, resolved, type
 Cohesion: 0.50
 Nodes (4): ZstdSharp.Port, contentHash, resolved, type
 
+### Community 2676 - "DiagramSetupServiceTests"
+Cohesion: 0.50
+Nodes (4): Fact, Mock, Task, DiagramSetupServiceTests
+
+### Community 2677 - ".Create"
+Cohesion: 0.36
+Nodes (6): Auth, HttpGet, HttpPost, ProducesResponseType, Task, DiagramSetupController
+
+### Community 2678 - "PortalTransactionDtoTransactionStatus"
+Cohesion: 0.25
+Nodes (8): PortalTransactionDtoTransactionStatus, Canceled, Failed, Proceed, Queued, QueuedForRevert, Reverted, Unknown
+
+### Community 2679 - "telegramSignInHandoff.ts"
+Cohesion: 0.36
+Nodes (5): createTelegramSignInHandoff(), getHandoffSession(), isSession(), TelegramHandoffMessage, TelegramSignInHandoff
+
+### Community 2680 - ".RegisterServices"
+Cohesion: 0.57
+Nodes (3): IConfiguration, IServiceCollection, ConfigureServices
+
+### Community 2681 - ".RegisterServices"
+Cohesion: 0.57
+Nodes (3): IConfiguration, IServiceCollection, ConfigureServices
+
+### Community 2682 - "Schedule"
+Cohesion: 0.29
+Nodes (6): DateTime, Schedule, EachHour, EachMinutes, LastStartedDate, NextStartTime
+
+### Community 2683 - "MenuSessionStatus"
+Cohesion: 0.29
+Nodes (6): MenuSessionStatus, Confirmed, Failed, Parsing, Review, Uploaded
+
+### Community 2684 - "UpdateVehicleRequest"
+Cohesion: 0.29
+Nodes (7): UpdateVehicleRequest, DisplayName, Make, Model, Plate, Vin, Year
+
+### Community 2685 - "TemperatureSlider.tsx"
+Cohesion: 0.38
+Nodes (5): maxTemperature, minTemperature, normalizeTemperature(), TemperatureSlider(), TemperatureSliderProps
+
+### Community 2686 - "BaseApiController"
+Cohesion: 0.33
+Nodes (4): IMapper, IMediator, Task, BaseApiController
+
+### Community 2687 - "CreateKafkaTopicsService"
+Cohesion: 0.29
+Nodes (7): IEnumerable, ILogger, IOptions, CreateKafkaTopicsService, NumPartitions, ReplicationFactor, Topics
+
+### Community 2688 - "BaseApiController"
+Cohesion: 0.33
+Nodes (4): IMapper, IMediator, Task, BaseApiController
+
+### Community 2689 - ".ReadObjectResponseAsync"
+Cohesion: 0.33
+Nodes (5): HttpResponseMessage, IEnumerable, ObjectResponseResult, Object, Text
+
+### Community 2690 - "CreateCurrencyAccountCommandCurrency"
+Cohesion: 0.33
+Nodes (6): CreateCurrencyAccountCommandCurrency, EUR, GEL, PLN, Unknown, USD
+
+### Community 2691 - "PortalTransactionDtoPagedResult"
+Cohesion: 0.33
+Nodes (6): PortalTransactionDtoPagedResult, CurrentPage, Items, PageSize, TotalItemsCount, TotalPagesCount
+
+### Community 2692 - "generate-main-sln.sh"
+Cohesion: 0.80
+Nodes (4): add_libraries(), add_projects_from(), generate-main-sln.sh script, solution_folder_name()
+
+### Community 2693 - "PublicUserInfoDto"
+Cohesion: 0.40
+Nodes (4): Guid, PublicUserInfoDto, Id, Nickname
+
+### Community 2694 - "TransactionTypeActionMapper"
+Cohesion: 0.40
+Nodes (5): Func, IClientSessionHandle, Task, TransactionType, TransactionTypeActionMapper
+
+### Community 2695 - "ObjectResponseResult"
+Cohesion: 0.67
+Nodes (3): ObjectResponseResult, Object, Text
+
 ## Ambiguous Edges - Review These
+- `HealthCareService WebApi index.html` → `Defender.HealthCareService README (API Surface & Share Semantics)`  [AMBIGUOUS]
+  src/Defender.HealthCareService/src/WebApi/wwwroot/index.html · relation: conceptually_related_to
+- `AGENTS Guide: Defender.IdentityService` → `AGENTS Guide: Defender.DistributedCache`  [AMBIGUOUS]
+  src/Defender.DistributedCache/AGENTS.md · relation: semantically_similar_to
+- `Portal ClientApp robots.txt (allow all crawlers)` → `Defender.Portal README (Defender Ecosystem Overview)`  [AMBIGUOUS]
+  src/Defender.Portal/src/WebUI/ClientApp/public/robots.txt · relation: conceptually_related_to
 - `risk-games ArgoCD Application (dev)` → `auto-deploy-dev AppProject (referenced by dev apps, not defined among scanned argocd-projects.yaml projects)`  [AMBIGUOUS]
   helm/argocd-applications/dev/risk-games-app.yaml · relation: references
 - `travel-calendar ArgoCD Application (dev)` → `auto-deploy-dev AppProject (referenced by dev apps, not defined among scanned argocd-projects.yaml projects)`  [AMBIGUOUS]
@@ -13200,23 +13303,23 @@ Nodes (4): ZstdSharp.Port, contentHash, resolved, type
   helm/service-template/templates/ingress.yaml · relation: references
 - `KEDA HTTP InterceptorRoute template` → `service-template main Service resource (referenced by name/port, not present among scanned templates)`  [AMBIGUOUS]
   helm/service-template/templates/keda-http-interceptorroute.yaml · relation: references
-- `AGENTS Guide: Defender.DistributedCache` → `AGENTS Guide: Defender.IdentityService`  [AMBIGUOUS]
-  src/Defender.DistributedCache/AGENTS.md · relation: semantically_similar_to
-- `Defender.HealthCareService README (API Surface & Share Semantics)` → `HealthCareService WebApi index.html`  [AMBIGUOUS]
-  src/Defender.HealthCareService/src/WebApi/wwwroot/index.html · relation: conceptually_related_to
-- `Defender.Portal README (Defender Ecosystem Overview)` → `Portal ClientApp robots.txt (allow all crawlers)`  [AMBIGUOUS]
-  src/Defender.Portal/src/WebUI/ClientApp/public/robots.txt · relation: conceptually_related_to
 - `src/docker-compose.yml Local & Dev Stack` → `SecretManagementService docker-compose.yml (local/dev/prod profiles)`  [AMBIGUOUS]
   src/docker-compose.yml · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **18419 isolated node(s):** `all_libs.sh script`, `all_systems.sh script`, `generate-service-options.sh script`, `map-service-name.sh script`, `promote-image-tag.sh script` (+18414 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 20876 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **48 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **18436 isolated node(s):** `all_libs.sh script`, `all_systems.sh script`, `generate-service-options.sh script`, `map-service-name.sh script`, `promote-image-tag.sh script` (+18431 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 20893 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **50 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
+- **What is the exact relationship between `HealthCareService WebApi index.html` and `Defender.HealthCareService README (API Surface & Share Semantics)`?**
+  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
+- **What is the exact relationship between `AGENTS Guide: Defender.IdentityService` and `AGENTS Guide: Defender.DistributedCache`?**
+  _Edge tagged AMBIGUOUS (relation: semantically_similar_to) - confidence is low._
+- **What is the exact relationship between `Portal ClientApp robots.txt (allow all crawlers)` and `Defender.Portal README (Defender Ecosystem Overview)`?**
+  _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
 - **What is the exact relationship between `risk-games ArgoCD Application (dev)` and `auto-deploy-dev AppProject (referenced by dev apps, not defined among scanned argocd-projects.yaml projects)`?**
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **What is the exact relationship between `travel-calendar ArgoCD Application (dev)` and `auto-deploy-dev AppProject (referenced by dev apps, not defined among scanned argocd-projects.yaml projects)`?**
@@ -13224,10 +13327,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **What is the exact relationship between `user-management ArgoCD Application (dev)` and `auto-deploy-dev AppProject (referenced by dev apps, not defined among scanned argocd-projects.yaml projects)`?**
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
 - **What is the exact relationship between `wallet ArgoCD Application (dev)` and `auto-deploy-dev AppProject (referenced by dev apps, not defined among scanned argocd-projects.yaml projects)`?**
-  _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
-- **What is the exact relationship between `Deployment template` and `Defender App Secret ({{.Values.secretName}}, not present among scanned files)`?**
-  _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
-- **What is the exact relationship between `Ingress template` and `service-template main Service resource (referenced by name/port, not present among scanned templates)`?**
-  _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
-- **What is the exact relationship between `KEDA HTTP InterceptorRoute template` and `service-template main Service resource (referenced by name/port, not present among scanned templates)`?**
   _Edge tagged AMBIGUOUS (relation: references) - confidence is low._
