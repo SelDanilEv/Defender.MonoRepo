@@ -29,6 +29,8 @@ The workflow automatically builds the following services:
 - `Defender.IdentityService` (uses Dockerfile.Service)
 - `Defender.BudgetTracker` (uses Dockerfile.Service)
 - `Defender.HealthCareService` (uses Dockerfile.Service)
+- `Defender.TravelCalendarService` (uses Dockerfile.Service)
+- `Defender.CarService` (uses Dockerfile.Service; publishes `defendersd/defender.car`)
 
 ## Triggers
 
@@ -84,6 +86,14 @@ promote both services to their newly published build tags. Resolve and commit an
 promoting a service that requires immutable delivery. The promote workflow commits the updated
 `helm/service-template/values-*.yaml` file, and ArgoCD deploys that pinned reference from git.
 
+### CarService manual-sync exception
+
+CarService always uses manual ArgoCD sync. Mutable `latest` bootstrap and immutable promoted tags remain manual.
+Required flow:
+publish an immutable CarService tag, then promotion commits values-car.yaml. After current-task
+deployment approval, run manual ArgoCD sync for `car-service`. Promotion does not auto-deploy
+CarService.
+
 ## Usage Examples
 
 ### Build All Services
@@ -124,6 +134,8 @@ Example:
 docker.io/myusername/Defender.Portal:latest
 docker.io/myusername/Defender.UserManagementService:v1.0.0
 ```
+
+CarService image: `defendersd/defender.car`. Promotion updates `values-car.yaml`.
 
 Portal release tags use `YYYYMMDD-build_version`, for example `20260712-208_1.3.0`. The version is read from `src/Defender.Portal/src/WebUI/ClientApp/package.json`; promotion to production requires explicit user approval in the current task.
 

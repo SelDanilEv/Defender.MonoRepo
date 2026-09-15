@@ -24,5 +24,7 @@
   "header_health_care": "Health Care",
   "page_health_care": "Health Care",
   "header_travel_calendar": "Travel",
-  "page_travel_calendar": "Travel calendar"
+  "page_travel_calendar": "Travel calendar",
+  "header_my_garage": "My Garage",
+  "page_my_garage": "My Garage"
 }

@@ -1,0 +1,26 @@
+image:
+  repository: defendersd/defender.car
+  tag: latest
+  pullPolicy: Always
+deploymentStrategy:
+  rollingUpdate:
+    maxSurge: 0
+    maxUnavailable: 1
+service:
+  targetPort: 8080
+probes:
+  path: /health
+  readinessPath: /health/ready
+ingress:
+  enabled: true
+  ingressClassName: traefik
+  hosts:
+    - host: argo-car
+      paths:
+        - path: /
+          pathType: Prefix
+autoscaling:
+  # Portal calls CarService directly over cluster DNS.
+  minReplicaCount: 1
+  http:
+    enabled: true

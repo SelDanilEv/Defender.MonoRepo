@@ -16,6 +16,13 @@ public static class ServiceOptionsExtensions
         services.Configure<PersonalFoodAdvisorOptions>(configuration.GetSection(nameof(PersonalFoodAdvisorOptions)));
         services.Configure<HealthCareOptions>(configuration.GetSection(nameof(HealthCareOptions)));
         services.Configure<TravelCalendarOptions>(configuration.GetSection(nameof(TravelCalendarOptions)));
+        services
+            .AddOptions<CarServiceOptions>()
+            .Bind(configuration.GetSection(nameof(CarServiceOptions)))
+            .Validate(options => Uri.TryCreate(options.Url, UriKind.Absolute, out _), "CarServiceOptions:Url must be an absolute URI.")
+            .Validate(options => options.TimeoutSeconds > 0, "CarServiceOptions:TimeoutSeconds must be positive.")
+            .ValidateOnStart();
+        services.PostConfigure<CarServiceOptions>(options => options.Url = options.Url.TrimEnd('/') + "/");
 
         return services;
     }

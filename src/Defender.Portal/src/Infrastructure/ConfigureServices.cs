@@ -9,6 +9,7 @@ using Defender.Portal.Application.Common.Interfaces.Wrappers;
 using Defender.Portal.Application.Configuration.Options;
 using Defender.Portal.Application.Modules.Telegram;
 using Defender.Portal.Infrastructure.Clients.BudgetTracker;
+using Defender.Portal.Infrastructure.Clients.CarService;
 using Defender.Portal.Infrastructure.Clients.HealthCare;
 using Defender.Portal.Infrastructure.Clients.TravelCalendar;
 using Defender.Portal.Infrastructure.Clients.Telegram;
@@ -48,6 +49,7 @@ public static class ConfigureServices
         services.AddTransient<IPersonalFoodAdvisorWrapper, PersonalFoodAdvisorWrapper>();
         services.AddTransient<IHealthCareWrapper, HealthCareWrapper>();
         services.AddTransient<ITravelCalendarWrapper, TravelCalendarWrapper>();
+        services.AddTransient<ICarServiceWrapper, CarServiceWrapper>();
 
         //services.AddHostedService<KeepAliveHostedService>();
 
@@ -110,6 +112,13 @@ public static class ConfigureServices
         services.AddHttpClient<ITravelCalendarClient, TravelCalendarClient>((serviceProvider, client) =>
         {
             client.BaseAddress = new Uri(serviceProvider.GetRequiredService<IOptions<TravelCalendarOptions>>().Value.Url.TrimEnd('/') + "/");
+        });
+
+        services.AddHttpClient<ICarServiceClient, CarServiceClient>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<CarServiceOptions>>().Value;
+            client.BaseAddress = new Uri(options.Url);
+            client.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
         });
 
         services.AddHttpClient<ITelegramBotClient, TelegramBotClient>(client =>

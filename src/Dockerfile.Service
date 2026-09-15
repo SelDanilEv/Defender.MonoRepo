@@ -11,27 +11,34 @@ WORKDIR /app-src
 COPY Directory.Build.* ./
 COPY Directory.Packages.* ./
 
-# Copy projects explicitly
-COPY $SERVICE_DIR/src/WebApi/WebApi.csproj ./service/src/WebApi/
-COPY $SERVICE_DIR/src/Application/Application.csproj ./service/src/Application/
-COPY $SERVICE_DIR/src/Domain/Domain.csproj ./service/src/Domain/
-COPY $SERVICE_DIR/src/Infrastructure/Infrastructure.csproj ./service/src/Infrastructure/
+# Copy projects explicitly. Service-template uses short names; CarService uses
+# assembly-qualified names, so match either convention.
+COPY $SERVICE_DIR/src/WebApi/*WebApi.csproj ./service/src/WebApi/
+COPY $SERVICE_DIR/src/Application/*Application.csproj ./service/src/Application/
+COPY $SERVICE_DIR/src/Domain/*Domain.csproj ./service/src/Domain/
+COPY $SERVICE_DIR/src/Infrastructure/*Infrastructure.csproj ./service/src/Infrastructure/
 
 # Copy dependencies explicitly
 COPY Defender.Common/src/Defender.Common ./Defender.Common/src/Defender.Common
 COPY Defender.DistributedCache/src/Defender.DistributedCache ./Defender.DistributedCache/src/Defender.DistributedCache
 COPY Defender.Kafka/src/Defender.Kafka ./Defender.Kafka/src/Defender.Kafka
 
-RUN dotnet restore "service/src/WebApi/WebApi.csproj"
+RUN WEB_API_PROJECT="$(find service/src/WebApi -maxdepth 1 -name '*WebApi.csproj' -print -quit)" \
+    && test -n "$WEB_API_PROJECT" \
+    && dotnet restore "$WEB_API_PROJECT"
 
 COPY $SERVICE_DIR/src ./service/src
 
 WORKDIR /app-src/service/src/WebApi
-RUN dotnet build "WebApi.csproj" -c Release -o /app/build
+RUN WEB_API_PROJECT="$(find . -maxdepth 1 -name '*WebApi.csproj' -print -quit)" \
+    && test -n "$WEB_API_PROJECT" \
+    && dotnet build "$WEB_API_PROJECT" -c Release -o /app/build
 
 FROM build AS publish
 WORKDIR /app-src/service/src/WebApi
-RUN dotnet publish "WebApi.csproj" -c Release -o /app/publish
+RUN WEB_API_PROJECT="$(find . -maxdepth 1 -name '*WebApi.csproj' -print -quit)" \
+    && test -n "$WEB_API_PROJECT" \
+    && dotnet publish "$WEB_API_PROJECT" -c Release -o /app/publish
 
 # ⬇️ DEBUG: Explicitly list all files in publish folder to confirm
 RUN echo "Checking publish output:" && ls -Rla /app/publish

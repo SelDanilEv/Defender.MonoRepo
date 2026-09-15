@@ -24,5 +24,7 @@
   "header_health_care": "Здоровье",
   "page_health_care": "Здоровье",
   "header_travel_calendar": "Путешествия",
-  "page_travel_calendar": "Календарь поездок"
+  "page_travel_calendar": "Календарь поездок",
+  "header_my_garage": "Мой гараж",
+  "page_my_garage": "Мой гараж"
 }

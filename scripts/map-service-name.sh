@@ -46,6 +46,9 @@ case "$SERVICE_NAME" in
     "Defender.TravelCalendarService")
         echo "travel-calendar"
         ;;
+    "Defender.CarService")
+        echo "car"
+        ;;
     "Defender.PersonalFoodAdvisor")
         echo "personal-food-advisor"
         ;;

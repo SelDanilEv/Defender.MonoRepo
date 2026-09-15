@@ -13,6 +13,7 @@ import en_budgetTracker from "src/localization/en/budgetTracker.json";
 import en_foodAdvisor from "src/localization/en/foodAdvisor.json";
 import en_healthCare from "src/localization/en/healthCare.json";
 import en_travelCalendar from "src/localization/en/travelCalendar.json";
+import en_myGarage from "src/localization/en/myGarage.json";
 
 import ru from "src/localization/ru/ru.json";
 import ru_home from "src/localization/ru/home.json";
@@ -24,6 +25,7 @@ import ru_budgetTracker from "src/localization/ru/budgetTracker.json";
 import ru_foodAdvisor from "src/localization/ru/foodAdvisor.json";
 import ru_healthCare from "src/localization/ru/healthCare.json";
 import ru_travelCalendar from "src/localization/ru/travelCalendar.json";
+import ru_myGarage from "src/localization/ru/myGarage.json";
 
 const resources: any = {
   en: {
@@ -37,6 +39,7 @@ const resources: any = {
     foodAdvisor: en_foodAdvisor,
     healthCare: en_healthCare,
     travelCalendar: en_travelCalendar,
+    myGarage: en_myGarage,
   },
   ru: {
     translation: ru,
@@ -49,6 +52,7 @@ const resources: any = {
     foodAdvisor: ru_foodAdvisor,
     healthCare: ru_healthCare,
     travelCalendar: ru_travelCalendar,
+    myGarage: ru_myGarage,
   },
 };
 

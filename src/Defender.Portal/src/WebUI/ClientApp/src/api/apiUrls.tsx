@@ -95,6 +95,26 @@ const APIEndpoints = {
   },
 };
 
+const myGarageApiUrls = {
+  getVehicles: "/api/my-garage/vehicles",
+  createVehicle: "/api/my-garage/vehicles",
+  getVehicle: "/api/my-garage/vehicles/:vehicleId",
+  updateVehicle: "/api/my-garage/vehicles/:vehicleId",
+  archiveVehicle: "/api/my-garage/vehicles/:vehicleId/archive",
+  unarchiveVehicle: "/api/my-garage/vehicles/:vehicleId/unarchive",
+  getMaintenanceItems: "/api/my-garage/vehicles/:vehicleId/maintenance",
+  createMaintenanceItem: "/api/my-garage/vehicles/:vehicleId/maintenance",
+  updateMaintenanceItem: "/api/my-garage/vehicles/:vehicleId/maintenance/:maintenanceId",
+  deleteMaintenanceItem: "/api/my-garage/vehicles/:vehicleId/maintenance/:maintenanceId",
+  getHistory: "/api/my-garage/vehicles/:vehicleId/history",
+  createHistory: "/api/my-garage/vehicles/:vehicleId/history",
+  updateHistory: "/api/my-garage/vehicles/:vehicleId/history/:historyId",
+  deleteHistory: "/api/my-garage/vehicles/:vehicleId/history/:historyId",
+  getInsurancePolicies: "/api/my-garage/vehicles/:vehicleId/insurance",
+  createInsurancePolicy: "/api/my-garage/vehicles/:vehicleId/insurance",
+  updateInsurancePolicy: "/api/my-garage/vehicles/:vehicleId/insurance/:insuranceId",
+};
+
 const APIUrls = () => {
   let urls = APIEndpoints;
 
@@ -117,4 +137,9 @@ const APIUrls = () => {
   return urls;
 };
 
-export default APIUrls() || APIEndpoints;
+const apiUrls = {
+  ...(APIUrls() || APIEndpoints),
+  myGarage: myGarageApiUrls,
+};
+
+export default apiUrls;

@@ -14,10 +14,12 @@ import LocalHospitalIcon from "@mui/icons-material/LocalHospital";
 import TravelExploreIcon from "@mui/icons-material/TravelExplore";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import GarageIcon from "@mui/icons-material/Garage";
 
 import MenuItem from "./MenuItem";
 import useUtils from "src/appUtils";
 import Role from "src/consts/Role";
+import { canAccessMyGarage } from "src/routes/myGarageAccess";
 import UserService from "src/services/UserService";
 
 const SubMenuWrapper = styled(Box)(
@@ -143,7 +145,7 @@ const SubMenuWrapper = styled(Box)(
 `
 );
 
-const RoleBasedMenu = (props: any) => {
+export const RoleBasedMenu = (props: any) => {
   const u = useUtils();
 
   const RenderMenu = () => {
@@ -301,6 +303,29 @@ const RoleBasedMenu = (props: any) => {
             </SubMenuWrapper>
           </List>
         );
+        if (canAccessMyGarage(props.role)) {
+          result.push(
+            <List
+              key={"my_garage"}
+              component="div"
+              subheader={
+                <ListSubheader component="div" disableSticky>
+                  {u.t("sidebar_menu:header_my_garage")}
+                </ListSubheader>
+              }
+            >
+              <SubMenuWrapper>
+                <List component="ul">
+                  <MenuItem
+                    to="/my-garage/vehicles"
+                    icon={<GarageIcon style={{ fontSize: "1.1em" }} />}
+                    text={u.t("sidebar_menu:page_my_garage")}
+                  />
+                </List>
+              </SubMenuWrapper>
+            </List>
+          );
+        }
         result.push(
           <List
             key={"games.lottery"}

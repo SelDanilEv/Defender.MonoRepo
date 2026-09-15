@@ -1,11 +1,14 @@
 import { Suspense, lazy } from "react";
-import { Navigate, type RouteObject } from "react-router";
+import { connect } from "react-redux";
+import { Navigate, Outlet, type RouteObject } from "react-router";
 
 import SidebarLayout from "src/layouts/SidebarLayout";
 import EmptyLayout from "src/layouts/EmptyLayout";
 
 import ErrorBoundary from "src/components/ErrorBoundary";
 import SuspenseLoader from "src/components/SuspenseLoader";
+import { canAccessMyGarage } from "src/routes/myGarageAccess";
+import UserService from "src/services/UserService";
 import WelcomeLayout from "./layouts/WelcomeLayout";
 
 const Loader = (Component) => (props) =>
@@ -118,6 +121,18 @@ const HealthCareSharePage = Loader(
 const TravelCalendarPage = Loader(
   lazy(() => import("src/content/appPages/TravelCalendar"))
 );
+
+export const MY_GARAGE_PLACEHOLDER_MODULE = "src/content/basePages/Status/ComingSoon";
+const MyGaragePage = Loader(
+  lazy(() => import("src/content/appPages/MyGarage"))
+);
+
+export const MyGarageRouteGuard = ({ role }: { role: string }) =>
+  canAccessMyGarage(role) ? <Outlet /> : <Navigate to="/home" replace />;
+
+const ConnectedMyGarageRouteGuard = connect((state: any) => ({
+  role: UserService.GetHighestRole(state.session?.user?.roles),
+}))(MyGarageRouteGuard);
 
 // Home
 
@@ -359,6 +374,27 @@ const routes: RouteObject[] = [
     children: [
       { path: "", element: <TravelCalendarPage /> },
       { path: "*", element: <Status404 /> },
+    ],
+  },
+  {
+    path: "my-garage",
+    element: <SidebarLayout />,
+    children: [
+      {
+        element: <ConnectedMyGarageRouteGuard />,
+        children: [
+          {
+            path: "",
+            element: <Navigate to="/my-garage/vehicles" replace />,
+          },
+          { path: "vehicles", element: <MyGaragePage /> },
+          { path: "vehicles/:vehicleId", element: <MyGaragePage /> },
+          { path: "vehicles/:vehicleId/maintenance", element: <MyGaragePage /> },
+          { path: "vehicles/:vehicleId/history", element: <MyGaragePage /> },
+          { path: "vehicles/:vehicleId/insurance", element: <MyGaragePage /> },
+          { path: "*", element: <Status404 /> },
+        ],
+      },
     ],
   },
   {
