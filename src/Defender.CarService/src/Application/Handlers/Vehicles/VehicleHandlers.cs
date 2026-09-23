@@ -7,10 +7,10 @@ using MediatR;
 namespace Defender.CarService.Application.Handlers.Vehicles;
 
 public sealed class GetVehiclesQueryHandler(IMyGarageApplicationService service)
-    : IRequestHandler<GetVehiclesQuery, IReadOnlyList<VehicleSummaryDto>>
+    : IRequestHandler<GetVehiclesQuery, VehiclePageDto>
 {
-    public Task<IReadOnlyList<VehicleSummaryDto>> Handle(GetVehiclesQuery request, CancellationToken cancellationToken)
-        => service.GetVehiclesAsync(request.IncludeArchived, cancellationToken);
+    public Task<VehiclePageDto> Handle(GetVehiclesQuery request, CancellationToken cancellationToken)
+        => service.GetVehiclesAsync(request, cancellationToken);
 }
 
 public sealed class GetVehicleQueryHandler(IMyGarageApplicationService service)

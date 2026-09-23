@@ -18,6 +18,12 @@ public interface IMaintenanceItemRepository
         ICarTransactionContext? transactionContext = null,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<MaintenanceItem>> GetForVehiclesAsync(
+        Guid userId,
+        IReadOnlyList<Guid> vehicleIds,
+        ICarTransactionContext? transactionContext = null,
+        CancellationToken cancellationToken = default);
+
     Task<MaintenanceItem> AddAsync(
         Guid userId,
         Guid vehicleId,

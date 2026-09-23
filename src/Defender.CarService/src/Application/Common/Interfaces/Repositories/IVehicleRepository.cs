@@ -16,6 +16,14 @@ public interface IVehicleRepository
         ICarTransactionContext? transactionContext = null,
         CancellationToken cancellationToken = default);
 
+    Task<(IReadOnlyList<Vehicle> Items, int TotalItemsCount)> GetPageForUserAsync(
+        Guid userId,
+        bool includeArchived,
+        int page,
+        int pageSize,
+        ICarTransactionContext? transactionContext = null,
+        CancellationToken cancellationToken = default);
+
     Task<Vehicle> AddAsync(
         Guid userId,
         Vehicle vehicle,

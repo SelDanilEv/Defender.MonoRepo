@@ -9,7 +9,7 @@ namespace Defender.CarService.Application.Common.Interfaces.Services;
 
 public interface IMyGarageApplicationService
 {
-    Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesAsync(bool includeArchived, CancellationToken cancellationToken);
+    Task<VehiclePageDto> GetVehiclesAsync(GetVehiclesQuery request, CancellationToken cancellationToken);
 
     Task<VehicleDetailDto> GetVehicleAsync(Guid vehicleId, CancellationToken cancellationToken);
 
@@ -42,4 +42,6 @@ public interface IMyGarageApplicationService
     Task<InsurancePolicyDto> CreateInsurancePolicyAsync(CreateInsurancePolicyCommand request, CancellationToken cancellationToken);
 
     Task<InsurancePolicyDto> UpdateInsurancePolicyAsync(UpdateInsurancePolicyCommand request, CancellationToken cancellationToken);
+
+    Task<Unit> DeleteInsurancePolicyAsync(DeleteInsurancePolicyCommand request, CancellationToken cancellationToken);
 }

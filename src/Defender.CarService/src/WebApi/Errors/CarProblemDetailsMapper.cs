@@ -31,6 +31,7 @@ public static class CarProblemDetailsMapper
     private static readonly HashSet<string> ValidationCodes =
     [
         CarApplicationErrorCodes.HistoryPaginationInvalid,
+        CarApplicationErrorCodes.VehiclesPaginationInvalid,
         CarDomainErrorCodes.VehicleDisplayNameRequired,
         CarDomainErrorCodes.VehicleFieldTooLong,
         CarDomainErrorCodes.VehicleYearInvalid,

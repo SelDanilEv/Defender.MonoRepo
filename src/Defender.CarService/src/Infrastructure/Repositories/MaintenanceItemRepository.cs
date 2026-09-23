@@ -49,6 +49,17 @@ public sealed class MaintenanceItemRepository : MongoRepositoryBase<MaintenanceI
             transactionContext,
             cancellationToken);
 
+    public Task<IReadOnlyList<MaintenanceItem>> GetForVehiclesAsync(
+        Guid userId,
+        IReadOnlyList<Guid> vehicleIds,
+        ICarTransactionContext? transactionContext = null,
+        CancellationToken cancellationToken = default)
+        => FindManyAsync(
+            CreateUserFilter(userId) & Builders<MaintenanceItem>.Filter.In(item => item.VehicleId, vehicleIds),
+            Builders<MaintenanceItem>.Sort.Ascending(nameof(MaintenanceItem.Name)),
+            transactionContext,
+            cancellationToken);
+
     public async Task<MaintenanceItem> AddAsync(
         Guid userId,
         Guid vehicleId,

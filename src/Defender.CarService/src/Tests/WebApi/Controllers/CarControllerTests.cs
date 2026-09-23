@@ -46,13 +46,13 @@ public sealed class CarControllerTests
         Assert.DoesNotContain(templates, template => template!.Contains("import", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(templates, template => template!.Contains("migration", StringComparison.OrdinalIgnoreCase));
         Assert.DoesNotContain(templates, template => template!.Contains("notification", StringComparison.OrdinalIgnoreCase));
-        Assert.DoesNotContain(templates, template =>
-            template!.Contains("insurance/{insuranceId:guid}", StringComparison.OrdinalIgnoreCase)
-            && typeof(CarController)
-                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
-                .Where(method => method.GetCustomAttributes<HttpDeleteAttribute>().Any())
-                .SelectMany(method => method.GetCustomAttributes<HttpMethodAttribute>())
-                .Any(attribute => attribute.Template == template));
+        var deleteTemplates = typeof(CarController)
+            .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly)
+            .Where(method => method.GetCustomAttributes<HttpDeleteAttribute>().Any())
+            .SelectMany(method => method.GetCustomAttributes<HttpMethodAttribute>())
+            .Select(attribute => attribute.Template)
+            .ToArray();
+        Assert.Contains("vehicles/{vehicleId:guid}/insurance/{insuranceId:guid}", deleteTemplates);
     }
 
     [Fact]
@@ -85,6 +85,50 @@ public sealed class CarControllerTests
         mediator.Verify(item => item.Send(
             It.Is<CreateVehicleCommand>(command => command.DisplayName == "Daily" && command.GetType().GetProperties().All(property => property.Name != "UserId")),
             It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetVehicles_PassesPageAndPageSizeAndIncludeArchivedThrough()
+    {
+        var page = new VehiclePageDto { Items = [], TotalItemsCount = 0, CurrentPage = 2, PageSize = 10 };
+        var mediator = new Mock<IMediator>();
+        mediator
+            .Setup(item => item.Send(It.IsAny<GetVehiclesQuery>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(page);
+        var mapper = new MapperConfiguration(
+            configuration => configuration.AddProfile<CarApiMappingProfile>(),
+            NullLoggerFactory.Instance).CreateMapper();
+        var controller = new CarController(mediator.Object, mapper);
+
+        var result = await controller.GetVehiclesAsync(
+            includeArchived: true,
+            page: 2,
+            pageSize: 10,
+            CancellationToken.None);
+
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        Assert.Equal(page, okResult.Value);
+        mediator.Verify(item => item.Send(
+            It.Is<GetVehiclesQuery>(query => query.IncludeArchived && query.Page == 2 && query.PageSize == 10),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteInsurancePolicy_ReturnsNoContent()
+    {
+        var mediator = new Mock<IMediator>();
+        mediator
+            .Setup(item => item.Send(It.IsAny<IRequest<Unit>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Unit.Value);
+        var mapper = new MapperConfiguration(
+            configuration => configuration.AddProfile<CarApiMappingProfile>(),
+            NullLoggerFactory.Instance).CreateMapper();
+        var controller = new CarController(mediator.Object, mapper);
+
+        var result = await controller.DeleteInsurancePolicyAsync(Guid.NewGuid(), Guid.NewGuid(), CancellationToken.None);
+
+        Assert.IsType<NoContentResult>(result);
     }
 
     [Fact]

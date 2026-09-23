@@ -54,22 +54,29 @@ public sealed class CarWebApiPipelineTests
         var accountAccessor = factory.Services.GetRequiredService<ICurrentAccountAccessor>();
         var accountId = new TaskCompletionSource<Guid>(TaskCreationOptions.RunContinuationsAsynchronously);
         factory.ApplicationService
-            .Setup(service => service.GetVehiclesAsync(false, It.IsAny<CancellationToken>()))
-            .Returns((bool _, CancellationToken _) =>
+            .Setup(service => service.GetVehiclesAsync(It.IsAny<GetVehiclesQuery>(), It.IsAny<CancellationToken>()))
+            .Returns((GetVehiclesQuery _, CancellationToken _) =>
             {
                 accountId.TrySetResult(accountAccessor.GetAccountId());
-                return Task.FromResult<IReadOnlyList<VehicleSummaryDto>>(
-                [
-                    new VehicleSummaryDto
-                    {
-                        Id = OtherUserVehicleId,
-                        DisplayName = "Daily",
-                        Make = "Make",
-                        Model = "Model",
-                        Year = 2026,
-                        Plate = "ABC",
-                    },
-                ]);
+                return Task.FromResult(new VehiclePageDto
+                {
+                    Items =
+                    [
+                        new VehicleSummaryDto
+                        {
+                            Id = OtherUserVehicleId,
+                            DisplayName = "Daily",
+                            Make = "Make",
+                            Model = "Model",
+                            Year = 2026,
+                            Plate = "ABC",
+                        },
+                    ],
+                    TotalItemsCount = 1,
+                    CurrentPage = 0,
+                    PageSize = 25,
+                    TotalPagesCount = 1,
+                });
             });
 
         using var client = factory.CreateAuthenticatedClient(UserId);
@@ -78,10 +85,34 @@ public sealed class CarWebApiPipelineTests
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Equal(UserId, await accountId.Task.WaitAsync(TimeSpan.FromSeconds(5)));
-        var vehicle = document.RootElement[0];
+        Assert.Equal(1, document.RootElement.GetProperty("totalItemsCount").GetInt32());
+        var vehicle = document.RootElement.GetProperty("items")[0];
         Assert.Equal("Daily", vehicle.GetProperty("displayName").GetString());
         Assert.True(vehicle.TryGetProperty("maintenanceCounts", out _));
         Assert.False(vehicle.TryGetProperty("DisplayName", out _));
+    }
+
+    [Fact]
+    public async Task Vehicles_WithPageAndPageSizeQuery_PassesPagingToApplicationService()
+    {
+        using var factory = new CarWebApplicationFactory();
+        GetVehiclesQuery? capturedQuery = null;
+        factory.ApplicationService
+            .Setup(service => service.GetVehiclesAsync(It.IsAny<GetVehiclesQuery>(), It.IsAny<CancellationToken>()))
+            .Returns((GetVehiclesQuery query, CancellationToken _) =>
+            {
+                capturedQuery = query;
+                return Task.FromResult(new VehiclePageDto { Items = [], TotalItemsCount = 0, CurrentPage = query.Page, PageSize = query.PageSize });
+            });
+
+        using var client = factory.CreateAuthenticatedClient(UserId);
+        using var response = await client.GetAsync("/api/V1/car/vehicles?includeArchived=true&page=2&pageSize=10");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.NotNull(capturedQuery);
+        Assert.True(capturedQuery!.IncludeArchived);
+        Assert.Equal(2, capturedQuery.Page);
+        Assert.Equal(10, capturedQuery.PageSize);
     }
 
     [Fact]
@@ -244,6 +275,28 @@ public sealed class CarWebApiPipelineTests
     }
 
     [Fact]
+    public async Task DeleteInsurancePolicy_ReturnsNoContentResponse()
+    {
+        using var factory = new CarWebApplicationFactory();
+        var vehicleId = Guid.NewGuid();
+        var insuranceId = Guid.NewGuid();
+        factory.ApplicationService
+            .Setup(service => service.DeleteInsurancePolicyAsync(
+                It.IsAny<DeleteInsurancePolicyCommand>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Unit.Value);
+
+        using var client = factory.CreateAuthenticatedClient(UserId);
+        using var response = await client.DeleteAsync($"/api/V1/car/vehicles/{vehicleId}/insurance/{insuranceId}");
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        factory.ApplicationService.Verify(service => service.DeleteInsurancePolicyAsync(
+            It.Is<DeleteInsurancePolicyCommand>(command => command.VehicleId == vehicleId && command.InsuranceId == insuranceId),
+            It.IsAny<CancellationToken>()),
+            Times.Once);
+    }
+
+    [Fact]
     public async Task VehicleForOtherAccount_ReturnsOwnershipScopedNotFoundProblem()
     {
         using var factory = new CarWebApplicationFactory();
@@ -317,7 +370,7 @@ public sealed class CarWebApiPipelineTests
     {
         using var factory = new CarWebApplicationFactory();
         factory.ApplicationService
-            .Setup(service => service.GetVehiclesAsync(false, It.IsAny<CancellationToken>()))
+            .Setup(service => service.GetVehiclesAsync(It.IsAny<GetVehiclesQuery>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new CarApplicationException(CarDomainErrorCodes.DatabaseUnavailable));
 
         using var client = factory.CreateAuthenticatedClient(UserId);
@@ -368,7 +421,7 @@ public sealed class CarWebApiPipelineTests
             .Where(operation => operation.Name is "get" or "post" or "put" or "delete")
             .ToArray();
 
-        Assert.Equal(17, operations.Length);
+        Assert.Equal(18, operations.Length);
         foreach (var operation in operations)
         {
             var responses = operation.Value.GetProperty("responses");
@@ -393,8 +446,8 @@ public sealed class CarWebApiPipelineTests
         using var factory = new CarWebApplicationFactory();
         var started = new TaskCompletionSource<CancellationToken>(TaskCreationOptions.RunContinuationsAsynchronously);
         factory.ApplicationService
-            .Setup(service => service.GetVehiclesAsync(false, It.IsAny<CancellationToken>()))
-            .Returns((bool _, CancellationToken cancellationToken) =>
+            .Setup(service => service.GetVehiclesAsync(It.IsAny<GetVehiclesQuery>(), It.IsAny<CancellationToken>()))
+            .Returns((GetVehiclesQuery _, CancellationToken cancellationToken) =>
                 WaitForCancellationAsync(cancellationToken, started));
 
         using var client = factory.CreateAuthenticatedClient(UserId);
@@ -443,13 +496,13 @@ public sealed class CarWebApiPipelineTests
         }
     }
 
-    private static async Task<IReadOnlyList<VehicleSummaryDto>> WaitForCancellationAsync(
+    private static async Task<VehiclePageDto> WaitForCancellationAsync(
         CancellationToken cancellationToken,
         TaskCompletionSource<CancellationToken> started)
     {
         started.TrySetResult(cancellationToken);
         await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
-        return [];
+        return new VehiclePageDto();
     }
 
     private static async Task AssertProblemAsync(

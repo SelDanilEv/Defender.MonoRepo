@@ -41,6 +41,17 @@ public sealed class InsurancePolicyRepository : MongoRepositoryBase<InsurancePol
             transactionContext,
             cancellationToken);
 
+    public Task<IReadOnlyList<InsurancePolicy>> GetForVehiclesAsync(
+        Guid userId,
+        IReadOnlyList<Guid> vehicleIds,
+        ICarTransactionContext? transactionContext = null,
+        CancellationToken cancellationToken = default)
+        => FindManyAsync(
+            CreateUserFilter(userId) & Builders<InsurancePolicy>.Filter.In(policy => policy.VehicleId, vehicleIds),
+            Builders<InsurancePolicy>.Sort.Descending(nameof(InsurancePolicy.EndDate)),
+            transactionContext,
+            cancellationToken);
+
     public async Task<InsurancePolicy> AddAsync(
         Guid userId,
         Guid vehicleId,

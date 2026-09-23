@@ -73,3 +73,7 @@ public sealed class VehicleDetailDto
 
     public IReadOnlyList<InsurancePolicyDto> InsurancePolicies { get; init; } = [];
 }
+
+public sealed class VehiclePageDto : PageDto<VehicleSummaryDto>
+{
+}

@@ -90,6 +90,40 @@ public sealed class ApplicationValidatorTests
     }
 
     [Fact]
+    public async Task GetVehicles_WhenPageIsNegative_ReturnsStableCode()
+    {
+        var request = new GetVehiclesQuery { Page = -1, PageSize = 25 };
+
+        var result = await new GetVehiclesQueryValidator().ValidateAsync(request);
+
+        Assert.Contains(result.Errors, error => error.ErrorMessage == "CAR_VEHICLES_PAGINATION_INVALID");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(101)]
+    public async Task GetVehicles_WhenPageSizeOutsideAllowedRange_ReturnsStableCode(int pageSize)
+    {
+        var request = new GetVehiclesQuery { Page = 0, PageSize = pageSize };
+
+        var result = await new GetVehiclesQueryValidator().ValidateAsync(request);
+
+        Assert.Contains(result.Errors, error => error.ErrorMessage == "CAR_VEHICLES_PAGINATION_INVALID");
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(100)]
+    public async Task GetVehicles_WhenPageSizeAtBoundary_IsValid(int pageSize)
+    {
+        var request = new GetVehiclesQuery { Page = 0, PageSize = pageSize };
+
+        var result = await new GetVehiclesQueryValidator().ValidateAsync(request);
+
+        Assert.True(result.IsValid);
+    }
+
+    [Fact]
     public async Task CreateHistory_WhenLinkedMaintenanceIdsAreNull_ReturnsStableCode()
     {
         var result = await new CreateHistoryCommandValidator().ValidateAsync(new CreateHistoryCommand

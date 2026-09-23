@@ -26,3 +26,10 @@ public sealed class UpdateInsurancePolicyCommandHandler(IMyGarageApplicationServ
     public Task<InsurancePolicyDto> Handle(UpdateInsurancePolicyCommand request, CancellationToken cancellationToken)
         => service.UpdateInsurancePolicyAsync(request, cancellationToken);
 }
+
+public sealed class DeleteInsurancePolicyCommandHandler(IMyGarageApplicationService service)
+    : IRequestHandler<DeleteInsurancePolicyCommand, Unit>
+{
+    public Task<Unit> Handle(DeleteInsurancePolicyCommand request, CancellationToken cancellationToken)
+        => service.DeleteInsurancePolicyAsync(request, cancellationToken);
+}
