@@ -26,12 +26,21 @@ namespace Defender.CarService.WebApi.Controllers;
 public sealed class CarController(IMediator mediator, IMapper mapper) : ControllerBase
 {
     [HttpGet("vehicles")]
-    [ProducesResponseType(typeof(IReadOnlyList<VehicleSummaryDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<VehicleSummaryDto>>> GetVehiclesAsync(
+    [ProducesResponseType(typeof(VehiclePageDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<VehiclePageDto>> GetVehiclesAsync(
         [FromQuery] bool includeArchived = false,
+        [FromQuery] int page = 0,
+        [FromQuery] int pageSize = 25,
         CancellationToken cancellationToken = default)
     {
-        var result = await mediator.Send(new GetVehiclesQuery { IncludeArchived = includeArchived }, cancellationToken);
+        var result = await mediator.Send(
+            new GetVehiclesQuery
+            {
+                IncludeArchived = includeArchived,
+                Page = page,
+                PageSize = pageSize,
+            },
+            cancellationToken);
         return Ok(result);
     }
 
@@ -246,5 +255,22 @@ public sealed class CarController(IMediator mediator, IMapper mapper) : Controll
         };
         var result = await mediator.Send(command, cancellationToken);
         return Ok(result);
+    }
+
+    [HttpDelete("vehicles/{vehicleId:guid}/insurance/{insuranceId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteInsurancePolicyAsync(
+        Guid vehicleId,
+        Guid insuranceId,
+        CancellationToken cancellationToken = default)
+    {
+        await mediator.Send(
+            new DeleteInsurancePolicyCommand
+            {
+                VehicleId = vehicleId,
+                InsuranceId = insuranceId,
+            },
+            cancellationToken);
+        return NoContent();
     }
 }

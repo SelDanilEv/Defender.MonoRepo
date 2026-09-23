@@ -49,10 +49,15 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
         dueCalculator = new MaintenanceDueCalculator(timeProvider);
     }
 
-    public Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesAsync(bool includeArchived, CancellationToken cancellationToken)
+    public Task<VehiclePageDto> GetVehiclesAsync(GetVehiclesQuery request, CancellationToken cancellationToken)
     {
+        if (request.Page < 0 || request.PageSize is < 1 or > 100)
+        {
+            throw new CarApplicationException(CarApplicationErrorCodes.VehiclesPaginationInvalid);
+        }
+
         var userId = currentAccountAccessor.GetAccountId();
-        return TranslateAsync(() => GetVehiclesCoreAsync(userId, includeArchived, cancellationToken));
+        return TranslateAsync(() => GetVehiclesCoreAsync(userId, request, cancellationToken));
     }
 
     public Task<VehicleDetailDto> GetVehicleAsync(Guid vehicleId, CancellationToken cancellationToken)
@@ -277,6 +282,37 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
             cancellationToken));
     }
 
+    public Task<Unit> DeleteInsurancePolicyAsync(DeleteInsurancePolicyCommand request, CancellationToken cancellationToken)
+    {
+        var userId = currentAccountAccessor.GetAccountId();
+        return TranslateAsync(() => transactionCoordinator.ExecuteAsync(
+            async context =>
+            {
+                var vehicle = await GetVehicleOrThrowAsync(userId, request.VehicleId, context, cancellationToken);
+                vehicle.EnsureActive();
+                var policy = await insurancePolicyRepository.GetByIdAsync(userId, request.VehicleId, request.InsuranceId, context, cancellationToken);
+                if (policy is null)
+                {
+                    throw new CarApplicationException(CarDomainErrorCodes.InsuranceNotFound);
+                }
+
+                var expectedVehicleVersion = vehicle.Version;
+                if (!await insurancePolicyRepository.DeleteAsync(userId, request.VehicleId, policy.Id, context, cancellationToken))
+                {
+                    throw new CarApplicationException(CarDomainErrorCodes.InsuranceNotFound);
+                }
+
+                vehicle.Touch(timeProvider);
+                if (!await vehicleRepository.ReplaceAsync(userId, vehicle, expectedVehicleVersion, context, cancellationToken))
+                {
+                    throw new CarApplicationException(CarDomainErrorCodes.ConcurrencyConflict);
+                }
+
+                return Unit.Value;
+            },
+            cancellationToken));
+    }
+
     private async Task<InsurancePolicyDto> UpdateInsurancePolicyInTransactionAsync(
         Guid userId,
         UpdateInsurancePolicyCommand request,
@@ -306,18 +342,47 @@ public sealed class MyGarageApplicationService : IMyGarageApplicationService
         return MapInsurance(policy);
     }
 
-    private async Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesCoreAsync(Guid userId, bool includeArchived, CancellationToken cancellationToken)
+    private async Task<VehiclePageDto> GetVehiclesCoreAsync(Guid userId, GetVehiclesQuery request, CancellationToken cancellationToken)
     {
-        var vehicles = await vehicleRepository.GetForUserAsync(userId, includeArchived, cancellationToken: cancellationToken);
-        var summaries = new List<VehicleSummaryDto>(vehicles.Count);
-        foreach (var vehicle in vehicles)
+        var page = await vehicleRepository.GetPageForUserAsync(
+            userId,
+            request.IncludeArchived,
+            request.Page,
+            request.PageSize,
+            cancellationToken: cancellationToken);
+        var totalItems = page.TotalItemsCount;
+        var summaries = await MapVehicleSummariesAsync(userId, page.Items, cancellationToken);
+        return new VehiclePageDto
         {
-            var items = await maintenanceItemRepository.GetForVehicleAsync(userId, vehicle.Id, cancellationToken: cancellationToken);
-            var policies = await insurancePolicyRepository.GetForVehicleAsync(userId, vehicle.Id, cancellationToken: cancellationToken);
-            summaries.Add(MapVehicleSummary(vehicle, items, policies));
+            Items = summaries,
+            TotalItemsCount = totalItems,
+            CurrentPage = request.Page,
+            PageSize = request.PageSize,
+            TotalPagesCount = totalItems == 0 ? 0 : (int)Math.Ceiling((double)totalItems / request.PageSize),
+        };
+    }
+
+    private async Task<IReadOnlyList<VehicleSummaryDto>> MapVehicleSummariesAsync(
+        Guid userId,
+        IReadOnlyList<Vehicle> vehicles,
+        CancellationToken cancellationToken)
+    {
+        if (vehicles.Count == 0)
+        {
+            return [];
         }
 
-        return summaries;
+        var vehicleIds = vehicles.Select(vehicle => vehicle.Id).ToArray();
+        var items = await maintenanceItemRepository.GetForVehiclesAsync(userId, vehicleIds, cancellationToken: cancellationToken);
+        var policies = await insurancePolicyRepository.GetForVehiclesAsync(userId, vehicleIds, cancellationToken: cancellationToken);
+        var itemsByVehicle = items.ToLookup(item => item.VehicleId);
+        var policiesByVehicle = policies.ToLookup(policy => policy.VehicleId);
+        return vehicles
+            .Select(vehicle => MapVehicleSummary(
+                vehicle,
+                itemsByVehicle[vehicle.Id].ToArray(),
+                policiesByVehicle[vehicle.Id].ToArray()))
+            .ToArray();
     }
 
     private async Task<VehicleDetailDto> GetVehicleCoreAsync(Guid userId, Guid vehicleId, CancellationToken cancellationToken)

@@ -6,12 +6,12 @@ Standalone backend for My Garage. Provides Clean Architecture projects, JWT auth
 
 Base route: `/api/V1/car`. Every route requires a bearer JWT with the `User` role. Account ownership comes from the authenticated JWT account and is never accepted from request data.
 
-- Vehicles: `GET /vehicles`, `POST /vehicles` (201), `GET /vehicles/{vehicleId}`, `PUT /vehicles/{vehicleId}`, `POST /vehicles/{vehicleId}/archive`, and `POST /vehicles/{vehicleId}/unarchive`.
+- Vehicles: `GET /vehicles`, `POST /vehicles` (201), `GET /vehicles/{vehicleId}`, `PUT /vehicles/{vehicleId}`, `POST /vehicles/{vehicleId}/archive`, and `POST /vehicles/{vehicleId}/unarchive`. `GET /vehicles` takes `includeArchived` (default `false`), `page` (default `0`), and `pageSize` (default `25`, bounded `1-100`; out-of-bounds values return `CAR_VEHICLES_PAGINATION_INVALID`), and returns a paged `{ items, totalItemsCount, currentPage, pageSize, totalPagesCount }` shape.
 - Maintenance: `GET` and `POST /vehicles/{vehicleId}/maintenance`, `PUT` and `DELETE /vehicles/{vehicleId}/maintenance/{maintenanceId}` (204 delete).
 - History: `GET` and `POST /vehicles/{vehicleId}/history`, `PUT` and `DELETE /vehicles/{vehicleId}/history/{historyId}` (204 delete). `GET` defaults to `page=0&pageSize=25`.
-- Insurance: `GET` and `POST /vehicles/{vehicleId}/insurance`, and `PUT /vehicles/{vehicleId}/insurance/{insuranceId}`.
+- Insurance: `GET` and `POST /vehicles/{vehicleId}/insurance`, `PUT /vehicles/{vehicleId}/insurance/{insuranceId}`, and `DELETE /vehicles/{vehicleId}/insurance/{insuranceId}` (204 delete).
 
-Errors use ProblemDetails with stable `CAR_*` codes and status mapping for validation, ownership-scoped not found, conflicts, database unavailability, and unexpected failures. There is no insurance delete, tax, import, migration, or notification route.
+Errors use ProblemDetails with stable `CAR_*` codes and status mapping for validation, ownership-scoped not found, conflicts, database unavailability, and unexpected failures. There is no tax, import, migration, or notification route.
 
 ## Local commands
 

@@ -672,6 +672,233 @@ public sealed class MyGarageApplicationServiceTests
         maintenance.Verify(repository => repository.ReplaceEffectiveBaselineAsync(UserId, VehicleId, FirstMaintenanceId, It.Is<EffectiveBaseline>(baseline => baseline.Date == new DateOnly(2025, 1, 1) && baseline.OdometerKm == 10), context, It.IsAny<CancellationToken>()), Times.Once);
     }
 
+    [Fact]
+    public async Task GetVehicles_WhenMultipleVehiclesReturned_UsesBatchRepositoryMethodsOnce()
+    {
+        var firstVehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var secondVehicleId = Guid.Parse("00000000-0000-0000-0000-000000000008");
+        var secondVehicle = Vehicle.Create(UserId, "Garage", "Audi", "A4", 2010, "XYZ-987", timeProvider: FixedTimeProvider(), id: secondVehicleId);
+        var vehicles = new Mock<IVehicleRepository>();
+        var maintenance = new Mock<IMaintenanceItemRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        vehicles.Setup(repository => repository.GetPageForUserAsync(UserId, false, 0, 25, null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((new[] { firstVehicle, secondVehicle }, 2));
+        maintenance.Setup(repository => repository.GetForVehiclesAsync(UserId, It.Is<IReadOnlyList<Guid>>(ids => ids.Contains(VehicleId) && ids.Contains(secondVehicleId)), null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+        insurance.Setup(repository => repository.GetForVehiclesAsync(UserId, It.Is<IReadOnlyList<Guid>>(ids => ids.Contains(VehicleId) && ids.Contains(secondVehicleId)), null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+        var service = CreateService(vehicles: vehicles, maintenance: maintenance, insurance: insurance);
+
+        var result = await service.GetVehiclesAsync(new GetVehiclesQuery(), CancellationToken.None);
+
+        Assert.Equal(2, result.Items.Count);
+        maintenance.Verify(repository => repository.GetForVehicleAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<ICarTransactionContext>(), It.IsAny<CancellationToken>()), Times.Never);
+        insurance.Verify(repository => repository.GetForVehicleAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<ICarTransactionContext>(), It.IsAny<CancellationToken>()), Times.Never);
+        maintenance.Verify(repository => repository.GetForVehiclesAsync(UserId, It.IsAny<IReadOnlyList<Guid>>(), null, It.IsAny<CancellationToken>()), Times.Once);
+        insurance.Verify(repository => repository.GetForVehiclesAsync(UserId, It.IsAny<IReadOnlyList<Guid>>(), null, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetVehicles_WhenPageIsNegative_ThrowsPaginationInvalid()
+    {
+        var service = CreateService();
+
+        var exception = await Assert.ThrowsAsync<CarApplicationException>(() => service.GetVehiclesAsync(
+            new GetVehiclesQuery { Page = -1, PageSize = 25 },
+            CancellationToken.None));
+
+        Assert.Equal("CAR_VEHICLES_PAGINATION_INVALID", exception.Code);
+    }
+
+    [Fact]
+    public async Task GetVehicles_WhenPageSizeExceedsMaximum_ThrowsPaginationInvalid()
+    {
+        var service = CreateService();
+
+        var exception = await Assert.ThrowsAsync<CarApplicationException>(() => service.GetVehiclesAsync(
+            new GetVehiclesQuery { Page = 0, PageSize = 101 },
+            CancellationToken.None));
+
+        Assert.Equal("CAR_VEHICLES_PAGINATION_INVALID", exception.Code);
+    }
+
+    [Fact]
+    public async Task GetVehicles_WhenRequested_ReturnsPagedSummaryWithRepositoryTotals()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var vehicles = new Mock<IVehicleRepository>();
+        var maintenance = new Mock<IMaintenanceItemRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        vehicles.Setup(repository => repository.GetPageForUserAsync(UserId, false, 1, 10, null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((new[] { vehicle }, 11));
+        maintenance.Setup(repository => repository.GetForVehiclesAsync(UserId, It.IsAny<IReadOnlyList<Guid>>(), null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+        insurance.Setup(repository => repository.GetForVehiclesAsync(UserId, It.IsAny<IReadOnlyList<Guid>>(), null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync([]);
+        var service = CreateService(vehicles: vehicles, maintenance: maintenance, insurance: insurance);
+
+        var result = await service.GetVehiclesAsync(
+            new GetVehiclesQuery { Page = 1, PageSize = 10 },
+            CancellationToken.None);
+
+        Assert.Single(result.Items);
+        Assert.Equal(11, result.TotalItemsCount);
+        Assert.Equal(1, result.CurrentPage);
+        Assert.Equal(10, result.PageSize);
+        Assert.Equal(2, result.TotalPagesCount);
+    }
+
+    [Fact]
+    public async Task DeleteInsurance_WhenPolicyExists_DeletesAndTouchesVehicle()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var policyId = Guid.Parse("00000000-0000-0000-0000-000000000009");
+        var policy = InsurancePolicy.Create(UserId, VehicleId, "Provider", null, null, new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31), id: policyId, timeProvider: FixedTimeProvider());
+        var context = new Mock<ICarTransactionContext>().Object;
+        var vehicles = new Mock<IVehicleRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        var coordinator = new Mock<ICarTransactionCoordinator>();
+        vehicles.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehicle);
+        vehicles.Setup(repository => repository.ReplaceAsync(UserId, vehicle, 0, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        insurance.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, policyId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(policy);
+        insurance.Setup(repository => repository.DeleteAsync(UserId, VehicleId, policyId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        coordinator.Setup(transaction => transaction.ExecuteAsync(It.IsAny<Func<ICarTransactionContext, Task<Unit>>>(), It.IsAny<CancellationToken>()))
+            .Returns((Func<ICarTransactionContext, Task<Unit>> operation, CancellationToken _) => operation(context));
+        var service = CreateService(vehicles: vehicles, insurance: insurance, coordinator: coordinator);
+
+        await service.DeleteInsurancePolicyAsync(
+            new DeleteInsurancePolicyCommand { VehicleId = VehicleId, InsuranceId = policyId },
+            CancellationToken.None);
+
+        insurance.Verify(repository => repository.DeleteAsync(UserId, VehicleId, policyId, context, It.IsAny<CancellationToken>()), Times.Once);
+        vehicles.Verify(repository => repository.ReplaceAsync(UserId, vehicle, 0, context, It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task DeleteInsurance_WhenPolicyNotFound_ReturnsInsuranceNotFoundCode()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var policyId = Guid.Parse("00000000-0000-0000-0000-00000000000a");
+        var context = new Mock<ICarTransactionContext>().Object;
+        var vehicles = new Mock<IVehicleRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        var coordinator = new Mock<ICarTransactionCoordinator>();
+        vehicles.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehicle);
+        insurance.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, policyId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((InsurancePolicy?)null);
+        coordinator.Setup(transaction => transaction.ExecuteAsync(It.IsAny<Func<ICarTransactionContext, Task<Unit>>>(), It.IsAny<CancellationToken>()))
+            .Returns((Func<ICarTransactionContext, Task<Unit>> operation, CancellationToken _) => operation(context));
+        var service = CreateService(vehicles: vehicles, insurance: insurance, coordinator: coordinator);
+
+        var exception = await Assert.ThrowsAsync<CarApplicationException>(() => service.DeleteInsurancePolicyAsync(
+            new DeleteInsurancePolicyCommand { VehicleId = VehicleId, InsuranceId = policyId },
+            CancellationToken.None));
+
+        Assert.Equal("CAR_INSURANCE_NOT_FOUND", exception.Code);
+        insurance.Verify(repository => repository.DeleteAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<ICarTransactionContext>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task DeleteInsurance_WhenPolicyBelongsToDifferentUser_ReturnsInsuranceNotFoundCode()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var otherUserPolicyId = Guid.Parse("00000000-0000-0000-0000-00000000000b");
+        var context = new Mock<ICarTransactionContext>().Object;
+        var vehicles = new Mock<IVehicleRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        var coordinator = new Mock<ICarTransactionCoordinator>();
+        vehicles.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehicle);
+        insurance.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, otherUserPolicyId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((InsurancePolicy?)null);
+        coordinator.Setup(transaction => transaction.ExecuteAsync(It.IsAny<Func<ICarTransactionContext, Task<Unit>>>(), It.IsAny<CancellationToken>()))
+            .Returns((Func<ICarTransactionContext, Task<Unit>> operation, CancellationToken _) => operation(context));
+        var service = CreateService(vehicles: vehicles, insurance: insurance, coordinator: coordinator);
+
+        var exception = await Assert.ThrowsAsync<CarApplicationException>(() => service.DeleteInsurancePolicyAsync(
+            new DeleteInsurancePolicyCommand { VehicleId = VehicleId, InsuranceId = otherUserPolicyId },
+            CancellationToken.None));
+
+        Assert.Equal("CAR_INSURANCE_NOT_FOUND", exception.Code);
+    }
+
+    [Fact]
+    public async Task DeleteInsurance_WhenVehicleVersionCompareFails_ReturnsConcurrencyCode()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        var policyId = Guid.Parse("00000000-0000-0000-0000-00000000000c");
+        var policy = InsurancePolicy.Create(UserId, VehicleId, "Provider", null, null, new DateOnly(2026, 1, 1), new DateOnly(2026, 12, 31), id: policyId, timeProvider: FixedTimeProvider());
+        var context = new Mock<ICarTransactionContext>().Object;
+        var vehicles = new Mock<IVehicleRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        var coordinator = new Mock<ICarTransactionCoordinator>();
+        vehicles.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehicle);
+        vehicles.Setup(repository => repository.ReplaceAsync(UserId, vehicle, 0, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+        insurance.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, policyId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(policy);
+        insurance.Setup(repository => repository.DeleteAsync(UserId, VehicleId, policyId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        coordinator.Setup(transaction => transaction.ExecuteAsync(It.IsAny<Func<ICarTransactionContext, Task<Unit>>>(), It.IsAny<CancellationToken>()))
+            .Returns((Func<ICarTransactionContext, Task<Unit>> operation, CancellationToken _) => operation(context));
+        var service = CreateService(vehicles: vehicles, insurance: insurance, coordinator: coordinator);
+
+        var exception = await Assert.ThrowsAsync<CarApplicationException>(() => service.DeleteInsurancePolicyAsync(
+            new DeleteInsurancePolicyCommand { VehicleId = VehicleId, InsuranceId = policyId },
+            CancellationToken.None));
+
+        Assert.Equal("CAR_CONCURRENCY_CONFLICT", exception.Code);
+    }
+
+    [Fact]
+    public async Task DeleteInsurance_WhenVehicleIsArchived_ReturnsArchiveCode()
+    {
+        var vehicle = Vehicle.Create(UserId, "Garage", "BMW", "E46", 2002, "ABC-123", timeProvider: FixedTimeProvider(), id: VehicleId);
+        vehicle.Archive(FixedTimeProvider());
+        var policyId = Guid.Parse("00000000-0000-0000-0000-00000000000d");
+        var context = new Mock<ICarTransactionContext>().Object;
+        var vehicles = new Mock<IVehicleRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        var coordinator = new Mock<ICarTransactionCoordinator>();
+        vehicles.Setup(repository => repository.GetByIdAsync(UserId, VehicleId, context, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(vehicle);
+        coordinator.Setup(transaction => transaction.ExecuteAsync(It.IsAny<Func<ICarTransactionContext, Task<Unit>>>(), It.IsAny<CancellationToken>()))
+            .Returns((Func<ICarTransactionContext, Task<Unit>> operation, CancellationToken _) => operation(context));
+        var service = CreateService(vehicles: vehicles, insurance: insurance, coordinator: coordinator);
+
+        var exception = await Assert.ThrowsAsync<CarApplicationException>(() => service.DeleteInsurancePolicyAsync(
+            new DeleteInsurancePolicyCommand { VehicleId = VehicleId, InsuranceId = policyId },
+            CancellationToken.None));
+
+        Assert.Equal("CAR_VEHICLE_ARCHIVED", exception.Code);
+        insurance.Verify(repository => repository.GetByIdAsync(It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<Guid>(), It.IsAny<ICarTransactionContext>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task GetVehicles_WhenRepositoryReturnsEmptyPage_ReturnsEmptyItemsWithoutBatchLookup()
+    {
+        var vehicles = new Mock<IVehicleRepository>();
+        var maintenance = new Mock<IMaintenanceItemRepository>();
+        var insurance = new Mock<IInsurancePolicyRepository>();
+        vehicles.Setup(repository => repository.GetPageForUserAsync(UserId, false, 0, 25, null, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Array.Empty<Vehicle>(), 0));
+        var service = CreateService(vehicles: vehicles, maintenance: maintenance, insurance: insurance);
+
+        var result = await service.GetVehiclesAsync(new GetVehiclesQuery(), CancellationToken.None);
+
+        Assert.Empty(result.Items);
+        Assert.Equal(0, result.TotalItemsCount);
+        Assert.Equal(0, result.TotalPagesCount);
+        maintenance.Verify(repository => repository.GetForVehiclesAsync(It.IsAny<Guid>(), It.IsAny<IReadOnlyList<Guid>>(), It.IsAny<ICarTransactionContext>(), It.IsAny<CancellationToken>()), Times.Never);
+        insurance.Verify(repository => repository.GetForVehiclesAsync(It.IsAny<Guid>(), It.IsAny<IReadOnlyList<Guid>>(), It.IsAny<ICarTransactionContext>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
     private MyGarageApplicationService CreateService(
         Mock<IVehicleRepository>? vehicles = null,
         Mock<IMaintenanceItemRepository>? maintenance = null,

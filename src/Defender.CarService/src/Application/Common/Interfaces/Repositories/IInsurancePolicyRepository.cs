@@ -17,6 +17,12 @@ public interface IInsurancePolicyRepository
         ICarTransactionContext? transactionContext = null,
         CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<InsurancePolicy>> GetForVehiclesAsync(
+        Guid userId,
+        IReadOnlyList<Guid> vehicleIds,
+        ICarTransactionContext? transactionContext = null,
+        CancellationToken cancellationToken = default);
+
     Task<InsurancePolicy> AddAsync(
         Guid userId,
         Guid vehicleId,
