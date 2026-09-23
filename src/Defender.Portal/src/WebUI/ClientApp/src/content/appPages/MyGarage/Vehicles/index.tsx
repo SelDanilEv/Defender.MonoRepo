@@ -14,6 +14,7 @@ import {
   Stack,
   Switch,
   TableCell,
+  TablePagination,
   TableRow,
   Typography,
 } from "@mui/material";
@@ -27,8 +28,9 @@ import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 import { getVehicles, createVehicle, updateVehicle, archiveVehicle, unarchiveVehicle } from "src/api/myGarage";
 import type { APICallFailure } from "src/api/APIWrapper/interfaces/APICallProps";
 import type { CreateVehicleRequest } from "src/models/myGarage/CarRequests";
-import type { VehicleSummary } from "src/models/myGarage/CarModels";
+import type { VehiclePage, VehicleSummary } from "src/models/myGarage/CarModels";
 
+import ConfirmDialog from "../components/ConfirmDialog";
 import GarageTable from "../components/GarageTable";
 import VehicleDialog from "../components/VehicleDialog";
 import StatusBadge from "../components/StatusBadge";
@@ -40,28 +42,32 @@ const formatKm = (value: number | null | undefined, locale: string, unit: string
 export default function VehiclesPage() {
   const { t, i18n } = useTranslation("myGarage");
   const navigate = useNavigate();
-  const [vehicles, setVehicles] = useState<VehicleSummary[]>([]);
+  const [vehiclePage, setVehiclePage] = useState<VehiclePage | null>(null);
   const [includeArchived, setIncludeArchived] = useState(false);
+  const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState(25);
   const [loading, setLoading] = useState(true);
   const [mutating, setMutating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleSummary | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [archiveTarget, setArchiveTarget] = useState<VehicleSummary | null>(null);
   const locale = i18n.language === "ru" ? "ru-RU" : "en-US";
+  const vehicles = vehiclePage?.items ?? [];
 
   const load = useCallback(async (signal?: AbortSignal) => {
     setLoading(true);
     setError(null);
     try {
-      setVehicles(await getVehicles(includeArchived, null, signal));
+      setVehiclePage(await getVehicles(includeArchived, page, pageSize, null, signal));
     } catch (failure) {
       if (signal?.aborted) return;
       setError(getGarageFailureMessage(failure as APICallFailure, t));
     } finally {
       if (!signal?.aborted) setLoading(false);
     }
-  }, [includeArchived, t]);
+  }, [includeArchived, page, pageSize, t]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -103,9 +109,11 @@ export default function VehiclesPage() {
     }
   };
 
-  const toggleArchive = async (vehicle: VehicleSummary) => {
-    const action = vehicle.archived ? t("actions.unarchiveVehicle") : t("actions.archiveVehicle");
-    if (!window.confirm(`${action}: ${vehicle.displayName}?`)) return;
+  const requestToggleArchive = (vehicle: VehicleSummary) => setArchiveTarget(vehicle);
+
+  const confirmToggleArchive = async () => {
+    if (!archiveTarget) return;
+    const vehicle = archiveTarget;
     setMutating(true);
     setError(null);
     try {
@@ -116,10 +124,12 @@ export default function VehiclesPage() {
         await archiveVehicle(vehicle.id, null);
         await SuccessToast(t("success.vehicleArchived"));
       }
+      setArchiveTarget(null);
       await load();
     } catch (failure) {
       const typed = failure as APICallFailure;
       setError(getGarageFailureMessage(typed, t));
+      setArchiveTarget(null);
       if (typed.status === 409) await load();
     } finally {
       setMutating(false);
@@ -134,7 +144,7 @@ export default function VehiclesPage() {
           <Typography color="text.secondary">{t("subtitle")}</Typography>
         </Box>
         <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ alignItems: { sm: "center" } }}>
-          <FormControlLabel control={<Switch checked={includeArchived} onChange={(event) => setIncludeArchived(event.target.checked)} disabled={mutating} slotProps={{ input: { "aria-label": t("actions.includeArchived") } }} />} label={t("actions.includeArchived")} />
+          <FormControlLabel control={<Switch checked={includeArchived} onChange={(event) => { setPage(0); setIncludeArchived(event.target.checked); }} disabled={mutating} slotProps={{ input: { "aria-label": t("actions.includeArchived") } }} />} label={t("actions.includeArchived")} />
           <Button variant="contained" startIcon={<AddIcon />} onClick={openCreate} disabled={mutating} aria-label={t("actions.addVehicle")}>{t("actions.addVehicle")}</Button>
         </Stack>
       </Stack>
@@ -175,16 +185,40 @@ export default function VehiclesPage() {
                   <Stack direction="row" spacing={0.25}>
                     <Button size="small" startIcon={<OpenInNewOutlinedIcon />} onClick={() => navigate(`/my-garage/vehicles/${vehicle.id}`)} disabled={mutating} aria-label={`${t("actions.openVehicle")}: ${vehicle.displayName}`}>{t("actions.openVehicle")}</Button>
                     <Button size="small" onClick={() => openEdit(vehicle)} disabled={mutating} aria-label={`${t("actions.editVehicle")}: ${vehicle.displayName}`}><EditOutlinedIcon fontSize="small" /></Button>
-                    <Button size="small" color={vehicle.archived ? "success" : "warning"} onClick={() => void toggleArchive(vehicle)} disabled={mutating} aria-label={`${vehicle.archived ? t("actions.unarchiveVehicle") : t("actions.archiveVehicle")}: ${vehicle.displayName}`}>{vehicle.archived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />}</Button>
+                    <Button size="small" color={vehicle.archived ? "success" : "warning"} onClick={() => requestToggleArchive(vehicle)} disabled={mutating} aria-label={`${vehicle.archived ? t("actions.unarchiveVehicle") : t("actions.archiveVehicle")}: ${vehicle.displayName}`}>{vehicle.archived ? <UnarchiveOutlinedIcon fontSize="small" /> : <ArchiveOutlinedIcon fontSize="small" />}</Button>
                   </Stack>
                 </TableCell>
               </TableRow>
             ))}
           </GarageTable>
+          {vehiclePage ? (
+            <TablePagination
+              component="div"
+              count={vehiclePage.totalItemsCount}
+              page={vehiclePage.currentPage}
+              rowsPerPage={Math.min(vehiclePage.pageSize, 100)}
+              rowsPerPageOptions={[25, 50, 100]}
+              onPageChange={(_, nextPage) => setPage(nextPage)}
+              onRowsPerPageChange={(event) => { setPage(0); setPageSize(Math.min(Number(event.target.value), 100)); }}
+              labelRowsPerPage={t("table_rows_per_page_label")}
+              disabled={mutating}
+              slotProps={{ select: { inputProps: { "aria-label": t("table_rows_per_page_label") } } }}
+            />
+          ) : null}
         </CardContent>
       </Card>
 
       <VehicleDialog open={dialogOpen} vehicle={selectedVehicle} busy={mutating} submitError={submitError} onClose={() => setDialogOpen(false)} onSubmit={submitVehicle} />
+      <ConfirmDialog
+        open={Boolean(archiveTarget)}
+        title={archiveTarget?.archived ? t("actions.unarchiveVehicle") : t("actions.archiveVehicle")}
+        message={archiveTarget?.displayName ?? ""}
+        confirmLabel={archiveTarget?.archived ? t("actions.unarchiveVehicle") : t("actions.archiveVehicle")}
+        destructive={!archiveTarget?.archived}
+        busy={mutating}
+        onCancel={() => setArchiveTarget(null)}
+        onConfirm={() => void confirmToggleArchive()}
+      />
     </Box>
   );
 }

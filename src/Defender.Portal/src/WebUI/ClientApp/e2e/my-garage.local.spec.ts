@@ -369,16 +369,16 @@ test.describe("My Garage local integration", () => {
     await expect(page.getByRole("row").filter({ hasText: vehicleBEditedName })).toBeVisible();
 
     const vehicleARow = page.getByRole("row").filter({ hasText: vehicleAEditedName }).last();
-    await page.once("dialog", (dialog) => dialog.accept());
     await vehicleARow.getByRole("button", { name: "Archive vehicle: " + vehicleAEditedName, exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Archive vehicle", exact: true }).click();
     await expectToast(page, "Vehicle archived.");
 
     const includeArchived = page.getByRole("switch", { name: "Include archived vehicles" });
     await includeArchived.click();
     const archivedRow = page.getByRole("row").filter({ hasText: vehicleAEditedName }).last();
     await expect(archivedRow.getByText("Include archived vehicles", { exact: true })).toBeVisible();
-    await page.once("dialog", (dialog) => dialog.accept());
     await archivedRow.getByRole("button", { name: "Unarchive vehicle: " + vehicleAEditedName, exact: true }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Unarchive vehicle", exact: true }).click();
     await expectToast(page, "Vehicle restored.");
 
     await openMaintenance(page, vehicleAId);
@@ -471,7 +471,7 @@ test.describe("My Garage local integration", () => {
     await page.unroute(conflictPattern, conflictHandler);
     await conflictDialog.getByRole("button", { name: "Cancel", exact: true }).click();
 
-    const unavailablePattern = new RegExp("/api/my-garage/vehicles\\?includeArchived=false$");
+    const unavailablePattern = new RegExp("/api/my-garage/vehicles\\?includeArchived=false&page=0&pageSize=25$");
     const unavailableHandler = async (route: Route) => {
       await route.fulfill({
         status: 503,

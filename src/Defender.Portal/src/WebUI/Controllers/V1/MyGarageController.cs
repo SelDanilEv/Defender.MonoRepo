@@ -14,8 +14,10 @@ public sealed class MyGarageController(ICarServiceWrapper wrapper) : ControllerB
     [HttpGet("vehicles")]
     public async Task<IActionResult> GetVehiclesAsync(
         [FromQuery] bool includeArchived = false,
+        [FromQuery] int page = 0,
+        [FromQuery] int pageSize = 25,
         CancellationToken cancellationToken = default) =>
-        Ok(await wrapper.GetVehiclesAsync(includeArchived, cancellationToken));
+        Ok(await wrapper.GetVehiclesAsync(includeArchived, page, pageSize, cancellationToken));
 
     [HttpPost("vehicles")]
     public async Task<IActionResult> CreateVehicleAsync(
@@ -132,4 +134,14 @@ public sealed class MyGarageController(ICarServiceWrapper wrapper) : ControllerB
         [FromBody] UpdateInsurancePolicyRequest request,
         CancellationToken cancellationToken = default) =>
         Ok(await wrapper.UpdateInsurancePolicyAsync(vehicleId, insuranceId, request, cancellationToken));
+
+    [HttpDelete("vehicles/{vehicleId:guid}/insurance/{insuranceId:guid}")]
+    public async Task<IActionResult> DeleteInsurancePolicyAsync(
+        Guid vehicleId,
+        Guid insuranceId,
+        CancellationToken cancellationToken = default)
+    {
+        await wrapper.DeleteInsurancePolicyAsync(vehicleId, insuranceId, cancellationToken);
+        return NoContent();
+    }
 }

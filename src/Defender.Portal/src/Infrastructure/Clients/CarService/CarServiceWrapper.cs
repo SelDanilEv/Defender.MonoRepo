@@ -7,8 +7,8 @@ namespace Defender.Portal.Infrastructure.Clients.CarService;
 
 public sealed class CarServiceWrapper(ICarServiceClient client) : BaseSwaggerWrapper, ICarServiceWrapper
 {
-    public Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesAsync(bool includeArchived = false, CancellationToken cancellationToken = default) =>
-        ExecuteUnsafelyAsync(() => client.GetVehiclesAsync(includeArchived, cancellationToken));
+    public Task<VehiclePageDto> GetVehiclesAsync(bool includeArchived = false, int page = 0, int pageSize = 25, CancellationToken cancellationToken = default) =>
+        ExecuteUnsafelyAsync(() => client.GetVehiclesAsync(includeArchived, page, pageSize, cancellationToken));
 
     public Task<VehicleDto> CreateVehicleAsync(CreateVehicleRequest request, CancellationToken cancellationToken = default) =>
         ExecuteUnsafelyAsync(() => client.CreateVehicleAsync(request, cancellationToken));
@@ -57,4 +57,7 @@ public sealed class CarServiceWrapper(ICarServiceClient client) : BaseSwaggerWra
 
     public Task<InsurancePolicyDto> UpdateInsurancePolicyAsync(Guid vehicleId, Guid insuranceId, UpdateInsurancePolicyRequest request, CancellationToken cancellationToken = default) =>
         ExecuteUnsafelyAsync(() => client.UpdateInsurancePolicyAsync(vehicleId, insuranceId, request, cancellationToken));
+
+    public Task DeleteInsurancePolicyAsync(Guid vehicleId, Guid insuranceId, CancellationToken cancellationToken = default) =>
+        ExecuteUnsafelyAsync(() => client.DeleteInsurancePolicyAsync(vehicleId, insuranceId, cancellationToken));
 }

@@ -56,6 +56,7 @@
     "deleteHistory": "Удалить запись истории",
     "addInsurance": "Добавить полис",
     "editInsurance": "Изменить полис",
+    "deleteInsurance": "Удалить полис",
     "save": "Сохранить",
     "cancel": "Отмена",
     "close": "Закрыть",
@@ -100,7 +101,8 @@
     "historyUpdated": "Запись обслуживания изменена.",
     "historyDeleted": "Запись обслуживания удалена.",
     "insuranceCreated": "Полис добавлен.",
-    "insuranceUpdated": "Полис изменён."
+    "insuranceUpdated": "Полис изменён.",
+    "insuranceDeleted": "Полис удалён."
   },
   "validation": {
     "required": "Заполните поле.",
@@ -122,6 +124,7 @@
   },
   "errors": {
     "CAR_HISTORY_PAGINATION_INVALID": "Выберите корректные страницу и размер страницы истории.",
+    "CAR_VEHICLES_PAGINATION_INVALID": "Выберите корректные страницу и размер страницы автомобилей.",
     "CAR_VEHICLE_NOT_FOUND": "Автомобиль не найден.",
     "CAR_MAINTENANCE_NOT_FOUND": "Обслуживание не найдено.",
     "CAR_HISTORY_NOT_FOUND": "Запись истории не найдена.",

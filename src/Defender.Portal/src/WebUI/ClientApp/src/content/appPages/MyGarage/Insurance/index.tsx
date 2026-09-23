@@ -16,14 +16,16 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutlined";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 
-import { getVehicle, getInsurancePolicies, createInsurancePolicy, updateInsurancePolicy } from "src/api/myGarage";
+import { getVehicle, getInsurancePolicies, createInsurancePolicy, updateInsurancePolicy, deleteInsurancePolicy } from "src/api/myGarage";
 import type { APICallFailure } from "src/api/APIWrapper/interfaces/APICallProps";
 import type { CreateInsurancePolicyRequest } from "src/models/myGarage/CarRequests";
 import type { InsurancePolicy, VehicleDetail } from "src/models/myGarage/CarModels";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 
+import ConfirmDialog from "../components/ConfirmDialog";
 import GarageTable from "../components/GarageTable";
 import InsuranceDialog from "../components/InsuranceDialog";
 import StatusBadge from "../components/StatusBadge";
@@ -43,6 +45,7 @@ export default function InsurancePage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedPolicy, setSelectedPolicy] = useState<InsurancePolicy | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<InsurancePolicy | null>(null);
   const locale = i18n.language === "ru" ? "ru-RU" : "en-US";
 
   const load = useCallback(async (signal?: AbortSignal) => {
@@ -106,6 +109,24 @@ export default function InsurancePage() {
     }
   };
 
+  const remove = async () => {
+    if (!vehicleId || !deleteTarget) return;
+    setMutating(true);
+    try {
+      await deleteInsurancePolicy(vehicleId, deleteTarget.id, null);
+      await SuccessToast(t("success.insuranceDeleted"));
+      setDeleteTarget(null);
+      await load();
+    } catch (failure) {
+      const typed = failure as APICallFailure;
+      setError(getGarageFailureMessage(typed, t));
+      setDeleteTarget(null);
+      if (typed.status === 409) await load();
+    } finally {
+      setMutating(false);
+    }
+  };
+
   if (loading) return <Box sx={{ p: { xs: 2, sm: 3, lg: 4 } }}><LinearProgress /></Box>;
   if (error || !detail || !vehicleId) return <Box sx={{ p: { xs: 2, sm: 3, lg: 4 } }}><Alert severity="error" action={<Button color="inherit" onClick={() => void load()}>{t("retry")}</Button>}>{error || t("errors.CAR_VEHICLE_NOT_FOUND")}</Alert></Box>;
 
@@ -129,12 +150,21 @@ export default function InsurancePage() {
             <TableCell>{formatDate(policy.startDate, locale)}</TableCell>
             <TableCell>{formatDate(policy.endDate, locale)}</TableCell>
             <TableCell><StatusBadge status={policy.status} /></TableCell>
-            <TableCell><Button size="small" onClick={() => openEdit(policy)} disabled={mutating || readOnly} aria-label={`${t("actions.editInsurance")}: ${policy.provider}`}><EditOutlinedIcon fontSize="small" /></Button></TableCell>
+            <TableCell><Stack direction="row" spacing={0.5}><Button size="small" onClick={() => openEdit(policy)} disabled={mutating || readOnly} aria-label={`${t("actions.editInsurance")}: ${policy.provider}`}><EditOutlinedIcon fontSize="small" /></Button><Button size="small" color="error" onClick={() => setDeleteTarget(policy)} disabled={mutating || readOnly} aria-label={`${t("actions.deleteInsurance")}: ${policy.provider}`}><DeleteOutlineIcon fontSize="small" /></Button></Stack></TableCell>
           </TableRow>)}
         </GarageTable>
       </CardContent></Card>
 
       <InsuranceDialog open={dialogOpen} policy={selectedPolicy} busy={mutating} submitError={submitError} onClose={() => setDialogOpen(false)} onSubmit={submit} />
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={t("actions.deleteInsurance")}
+        message={deleteTarget?.provider ?? ""}
+        confirmLabel={t("actions.deleteInsurance")}
+        busy={mutating}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => void remove()}
+      />
     </Box>
   );
 }

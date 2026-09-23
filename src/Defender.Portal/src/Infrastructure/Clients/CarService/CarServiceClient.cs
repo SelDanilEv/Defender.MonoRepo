@@ -27,15 +27,21 @@ public sealed class CarServiceClient(
         JsonOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false));
     }
 
-    public Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesAsync(
+    public Task<VehiclePageDto> GetVehiclesAsync(
         bool includeArchived = false,
+        int page = 0,
+        int pageSize = 25,
         CancellationToken cancellationToken = default) =>
-        SendAsync<IReadOnlyList<VehicleSummaryDto>>(
+        SendAsync<VehiclePageDto>(
             HttpMethod.Get,
             QueryHelpers.AddQueryString(
                 "/vehicles",
-                "includeArchived",
-                includeArchived.ToString().ToLowerInvariant()),
+                new Dictionary<string, string?>
+                {
+                    ["includeArchived"] = includeArchived.ToString().ToLowerInvariant(),
+                    ["page"] = page.ToString(),
+                    ["pageSize"] = pageSize.ToString(),
+                }),
             null,
             cancellationToken);
 
@@ -186,6 +192,18 @@ public sealed class CarServiceClient(
             $"/vehicles/{vehicleId}/insurance/{insuranceId}",
             request,
             cancellationToken);
+
+    public async Task DeleteInsurancePolicyAsync(
+        Guid vehicleId,
+        Guid insuranceId,
+        CancellationToken cancellationToken = default)
+    {
+        using var response = await SendAsync(
+            HttpMethod.Delete,
+            $"/vehicles/{vehicleId}/insurance/{insuranceId}",
+            null,
+            cancellationToken);
+    }
 
     private string Url(string path) =>
         $"{options.Value.Url.TrimEnd('/')}/api/V1/car{path}";

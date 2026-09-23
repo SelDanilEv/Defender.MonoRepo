@@ -60,6 +60,14 @@ export interface VehicleSummary {
   insuranceStatus: InsuranceStatus | null;
 }
 
+export interface VehiclePage {
+  items: VehicleSummary[];
+  totalItemsCount: number;
+  currentPage: number;
+  pageSize: number;
+  totalPagesCount: number;
+}
+
 export interface VehicleDetail {
   vehicle: Vehicle;
   maintenanceItems: MaintenanceItem[];
@@ -117,6 +125,7 @@ export interface InsurancePolicy {
 
 export type VehicleDto = Vehicle;
 export type VehicleSummaryDto = VehicleSummary;
+export type VehiclePageDto = VehiclePage;
 export type VehicleDetailDto = VehicleDetail;
 export type MaintenanceStatusCountsDto = MaintenanceStatusCounts;
 export type MaintenanceItemDto = MaintenanceItem;

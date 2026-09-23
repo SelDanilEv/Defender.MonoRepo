@@ -24,7 +24,7 @@ vi.mock("src/api/myGarage", () => api);
 describe("My Garage page", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    api.getVehicles.mockResolvedValue([]);
+    api.getVehicles.mockResolvedValue({ items: [], totalItemsCount: 0, currentPage: 0, pageSize: 25, totalPagesCount: 0 });
   });
 
   test("vehicles_WhenEmpty_ShowsCreateFirstVehicleState", async () => {

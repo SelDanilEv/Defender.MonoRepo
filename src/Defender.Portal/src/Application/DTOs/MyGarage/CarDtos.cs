@@ -89,6 +89,19 @@ public sealed class VehicleSummaryDto
     public InsuranceStatus? InsuranceStatus { get; init; }
 }
 
+public sealed class VehiclePageDto
+{
+    public IReadOnlyList<VehicleSummaryDto> Items { get; init; } = [];
+
+    public int TotalItemsCount { get; init; }
+
+    public int CurrentPage { get; init; }
+
+    public int PageSize { get; init; }
+
+    public int TotalPagesCount { get; init; }
+}
+
 public sealed class VehicleDetailDto
 {
     public VehicleDto Vehicle { get; init; } = new();

@@ -7,10 +7,6 @@ import {
   Button,
   Card,
   CardContent,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   Grid,
   InputLabel,
@@ -35,6 +31,7 @@ import type { CreateServiceHistoryRequest } from "src/models/myGarage/CarRequest
 import { HistoryType, type ServiceHistoryPage, type ServiceHistoryRecord, type VehicleDetail } from "src/models/myGarage/CarModels";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 
+import ConfirmDialog from "../components/ConfirmDialog";
 import GarageTable from "../components/GarageTable";
 import HistoryDialog from "../components/HistoryDialog";
 import { getLinkedMaintenanceLabels } from "../helpers/historySelection";
@@ -184,11 +181,15 @@ export default function HistoryPage() {
       </CardContent></Card>
 
       <HistoryDialog open={dialogOpen} record={selectedRecord} maintenanceItems={detail.maintenanceItems} busy={mutating} submitError={submitError} onClose={() => setDialogOpen(false)} onSubmit={submit} />
-      <Dialog open={Boolean(deleteTarget)} onClose={mutating ? undefined : () => setDeleteTarget(null)}>
-        <DialogTitle>{t("actions.deleteHistory")}</DialogTitle>
-        <DialogContent><Typography>{deleteTarget?.title}</Typography></DialogContent>
-        <DialogActions><Button onClick={() => setDeleteTarget(null)} disabled={mutating}>{t("actions.cancel")}</Button><Button color="error" variant="contained" onClick={() => void remove()} disabled={mutating}>{t("actions.deleteHistory")}</Button></DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={t("actions.deleteHistory")}
+        message={deleteTarget?.title ?? ""}
+        confirmLabel={t("actions.deleteHistory")}
+        busy={mutating}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => void remove()}
+      />
     </Box>
   );
 }

@@ -12,11 +12,11 @@ public sealed class CarServiceWrapperTests
         var expected = new CarServiceUpstreamException(409, "CAR_CONCURRENCY_CONFLICT", "conflict");
         var client = new Mock<ICarServiceClient>();
         client
-            .Setup(item => item.GetVehiclesAsync(false, It.IsAny<CancellationToken>()))
+            .Setup(item => item.GetVehiclesAsync(false, 0, 25, It.IsAny<CancellationToken>()))
             .ThrowsAsync(expected);
         var sut = new CarServiceWrapper(client.Object);
 
-        var actual = await Assert.ThrowsAsync<CarServiceUpstreamException>(() => sut.GetVehiclesAsync(false, CancellationToken.None));
+        var actual = await Assert.ThrowsAsync<CarServiceUpstreamException>(() => sut.GetVehiclesAsync(false, cancellationToken: CancellationToken.None));
 
         Assert.Same(expected, actual);
     }
@@ -52,7 +52,7 @@ public sealed class CarServiceWrapperTests
         var insuranceRequest = new CreateInsurancePolicyRequest();
         var updateInsuranceRequest = new UpdateInsurancePolicyRequest();
 
-        client.Setup(item => item.GetVehiclesAsync(true, token)).ReturnsAsync([]);
+        client.Setup(item => item.GetVehiclesAsync(true, 2, 10, token)).ReturnsAsync(new VehiclePageDto());
         client.Setup(item => item.CreateVehicleAsync(vehicleRequest, token)).ReturnsAsync(new VehicleDto());
         client.Setup(item => item.GetVehicleAsync(vehicleId, token)).ReturnsAsync(new VehicleDetailDto());
         client.Setup(item => item.UpdateVehicleAsync(vehicleId, updateVehicleRequest, token)).ReturnsAsync(new VehicleDto());
@@ -69,10 +69,11 @@ public sealed class CarServiceWrapperTests
         client.Setup(item => item.GetInsurancePoliciesAsync(vehicleId, token)).ReturnsAsync([]);
         client.Setup(item => item.CreateInsurancePolicyAsync(vehicleId, insuranceRequest, token)).ReturnsAsync(new InsurancePolicyDto());
         client.Setup(item => item.UpdateInsurancePolicyAsync(vehicleId, insuranceId, updateInsuranceRequest, token)).ReturnsAsync(new InsurancePolicyDto());
+        client.Setup(item => item.DeleteInsurancePolicyAsync(vehicleId, insuranceId, token)).Returns(Task.CompletedTask);
 
         var sut = new CarServiceWrapper(client.Object);
 
-        await sut.GetVehiclesAsync(true, token);
+        await sut.GetVehiclesAsync(true, 2, 10, token);
         await sut.CreateVehicleAsync(vehicleRequest, token);
         await sut.GetVehicleAsync(vehicleId, token);
         await sut.UpdateVehicleAsync(vehicleId, updateVehicleRequest, token);
@@ -89,6 +90,7 @@ public sealed class CarServiceWrapperTests
         await sut.GetInsurancePoliciesAsync(vehicleId, token);
         await sut.CreateInsurancePolicyAsync(vehicleId, insuranceRequest, token);
         await sut.UpdateInsurancePolicyAsync(vehicleId, insuranceId, updateInsuranceRequest, token);
+        await sut.DeleteInsurancePolicyAsync(vehicleId, insuranceId, token);
 
         client.VerifyAll();
     }

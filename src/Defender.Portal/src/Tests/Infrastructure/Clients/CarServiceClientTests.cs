@@ -18,17 +18,33 @@ public sealed class CarServiceClientTests
     [Fact]
     public async Task GetVehiclesAsync_WhenCalled_SendsRouteQueryAndUserAuthorization()
     {
-        var handler = new CapturingHandler(Json("[]"));
+        var handler = new CapturingHandler(Json(EmptyVehiclePage));
         var authentication = CreateAuthenticationMock();
         var sut = CreateClient(handler, authentication.Object);
 
-        await sut.GetVehiclesAsync(true, CancellationToken.None);
+        await sut.GetVehiclesAsync(true, page: 2, pageSize: 10, cancellationToken: CancellationToken.None);
 
         Assert.Equal("GET", handler.Request!.Method.Method);
-        Assert.Equal("/api/V1/car/vehicles?includeArchived=true", handler.Request.RequestUri!.PathAndQuery);
+        Assert.Equal("/api/V1/car/vehicles?includeArchived=true&page=2&pageSize=10", handler.Request.RequestUri!.PathAndQuery);
         Assert.Equal("Bearer", handler.Request.Headers.Authorization!.Scheme);
         Assert.Equal("portal-token", handler.Request.Headers.Authorization.Parameter);
         authentication.Verify(item => item.GetAuthenticationHeader(AuthorizationType.User), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetVehiclesAsync_WhenResponseIsPaged_DeserializesPageMetadata()
+    {
+        var handler = new CapturingHandler(Json(
+            "{\"items\":[{\"id\":\"00000000-0000-0000-0000-000000000001\"}],\"totalItemsCount\":5,\"currentPage\":1,\"pageSize\":2,\"totalPagesCount\":3}"));
+        var sut = CreateClient(handler, CreateAuthenticationMock().Object);
+
+        var result = await sut.GetVehiclesAsync(false, 1, 2, CancellationToken.None);
+
+        Assert.Single(result.Items);
+        Assert.Equal(5, result.TotalItemsCount);
+        Assert.Equal(1, result.CurrentPage);
+        Assert.Equal(2, result.PageSize);
+        Assert.Equal(3, result.TotalPagesCount);
     }
 
     [Fact]
@@ -202,7 +218,7 @@ public sealed class CarServiceClientTests
     }
 
     [Fact]
-    public async Task InsuranceMethods_WhenCalled_DoNotExposeDeleteAndUseRouteIds()
+    public async Task InsuranceMethods_WhenCalled_UseRouteIds()
     {
         var vehicleId = Guid.NewGuid();
         var policyId = Guid.NewGuid();
@@ -225,7 +241,11 @@ public sealed class CarServiceClientTests
         await sut.UpdateInsurancePolicyAsync(vehicleId, policyId, new UpdateInsurancePolicyRequest(), CancellationToken.None);
         Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/insurance/{policyId}", handler.Request.RequestUri!.AbsolutePath);
         Assert.Equal(HttpMethod.Put, handler.Request.Method);
-        Assert.DoesNotContain("DeleteInsurance", typeof(ICarServiceClient).GetMethods().Select(item => item.Name));
+
+        handler.Response = new HttpResponseMessage(HttpStatusCode.NoContent);
+        await sut.DeleteInsurancePolicyAsync(vehicleId, policyId, CancellationToken.None);
+        Assert.Equal(HttpMethod.Delete, handler.Request.Method);
+        Assert.Equal($"/api/V1/car/vehicles/{vehicleId}/insurance/{policyId}", handler.Request.RequestUri!.AbsolutePath);
     }
 
     [Theory]
@@ -242,7 +262,7 @@ public sealed class CarServiceClientTests
         });
         var sut = CreateClient(handler, CreateAuthenticationMock().Object);
 
-        var exception = await Assert.ThrowsAsync<CarServiceUpstreamException>(() => sut.GetVehiclesAsync(false, CancellationToken.None));
+        var exception = await Assert.ThrowsAsync<CarServiceUpstreamException>(() => sut.GetVehiclesAsync(false, cancellationToken: CancellationToken.None));
 
         Assert.Equal((int)status, exception.Status);
         Assert.Equal(code, exception.Code);
@@ -259,7 +279,7 @@ public sealed class CarServiceClientTests
         var sut = CreateClient(handler, CreateAuthenticationMock().Object);
 
         var exception = await Assert.ThrowsAsync<CarServiceUpstreamException>(
-            () => sut.GetVehiclesAsync(false, CancellationToken.None));
+            () => sut.GetVehiclesAsync(false, cancellationToken: CancellationToken.None));
 
         Assert.Equal((int)HttpStatusCode.Conflict, exception.Status);
         Assert.Equal("CAR_CONCURRENCY_CONFLICT", exception.Code);
@@ -273,7 +293,7 @@ public sealed class CarServiceClientTests
         var handler = new CapturingHandler(new HttpResponseMessage(HttpStatusCode.InternalServerError) { Content = content });
         var sut = CreateClient(handler, CreateAuthenticationMock().Object);
 
-        await Assert.ThrowsAsync<CarServiceUpstreamException>(() => sut.GetVehiclesAsync(false, CancellationToken.None));
+        await Assert.ThrowsAsync<CarServiceUpstreamException>(() => sut.GetVehiclesAsync(false, cancellationToken: CancellationToken.None));
 
         Assert.Equal(1, content.ReadCount);
     }
@@ -295,7 +315,7 @@ public sealed class CarServiceClientTests
         var sut = CreateClient(handler, CreateAuthenticationMock().Object);
 
         var exception = await Assert.ThrowsAsync<CarServiceUpstreamException>(
-            () => sut.GetVehiclesAsync(false, CancellationToken.None));
+            () => sut.GetVehiclesAsync(false, cancellationToken: CancellationToken.None));
 
         Assert.Equal((int)HttpStatusCode.InternalServerError, exception.Status);
         Assert.Null(exception.Code);
@@ -333,7 +353,7 @@ public sealed class CarServiceClientTests
         var handler = new CancellingHandler();
         var sut = CreateClient(handler, CreateAuthenticationMock().Object);
         using var source = new CancellationTokenSource();
-        var task = sut.GetVehiclesAsync(false, source.Token);
+        var task = sut.GetVehiclesAsync(false, cancellationToken: source.Token);
 
         await handler.Entered.Task;
         source.Cancel();
@@ -344,6 +364,8 @@ public sealed class CarServiceClientTests
         Assert.IsNotType<CarServiceUpstreamException>(exception);
         Assert.True(handler.RequestCancellationToken.IsCancellationRequested);
     }
+
+    private const string EmptyVehiclePage = "{\"items\":[],\"totalItemsCount\":0,\"currentPage\":0,\"pageSize\":25,\"totalPagesCount\":0}";
 
     private static Mock<IAuthenticationHeaderAccessor> CreateAuthenticationMock()
     {

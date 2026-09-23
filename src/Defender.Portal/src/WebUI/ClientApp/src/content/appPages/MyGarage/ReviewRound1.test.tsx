@@ -30,6 +30,7 @@ const api = vi.hoisted(() => ({
   getInsurancePolicies: vi.fn(),
   createInsurancePolicy: vi.fn(),
   updateInsurancePolicy: vi.fn(),
+  deleteInsurancePolicy: vi.fn(),
 }));
 
 vi.mock("src/api/myGarage", () => api);
@@ -103,6 +104,14 @@ const detail = {
   insurancePolicies: [],
 };
 
+const vehiclePage = (items: Array<Record<string, unknown>>) => ({
+  items,
+  totalItemsCount: items.length,
+  currentPage: 0,
+  pageSize: 25,
+  totalPagesCount: 1,
+});
+
 const renderRoute = (path: string, element: React.ReactNode) => render(
   <ThemeProvider>
     <MemoryRouter initialEntries={[path.replace(":vehicleId", "vehicle-1")]}>
@@ -116,7 +125,7 @@ describe("My Garage review round 1", () => {
     vi.clearAllMocks();
     api.getVehicle.mockResolvedValue(detail);
     api.getHistory.mockResolvedValue(historyPage);
-    api.getVehicles.mockResolvedValue([{ ...vehicle, maintenanceCounts: { overdue: 1, dueSoon: 1, upcoming: 1, notStarted: 1 }, insuranceStatus: InsuranceStatus.Active }]);
+    api.getVehicles.mockResolvedValue(vehiclePage([{ ...vehicle, maintenanceCounts: { overdue: 1, dueSoon: 1, upcoming: 1, notStarted: 1 }, insuranceStatus: InsuranceStatus.Active }]));
     api.createVehicle.mockResolvedValue(vehicle);
     api.updateVehicle.mockResolvedValue(vehicle);
     api.archiveVehicle.mockResolvedValue(vehicle);
@@ -237,12 +246,12 @@ describe("My Garage review round 1", () => {
   });
 
   test("vehicles_WhenCurrentOdometerIsMissing_RendersPlaceholder", async () => {
-    api.getVehicles.mockResolvedValue([{
+    api.getVehicles.mockResolvedValue(vehiclePage([{
       ...vehicle,
       currentOdometerKm: undefined,
       maintenanceCounts: { overdue: 0, dueSoon: 0, upcoming: 0, notStarted: 0 },
       insuranceStatus: null,
-    }]);
+    }]));
 
     renderRoute("/my-garage/vehicles", <VehiclesPage />);
 
@@ -252,8 +261,22 @@ describe("My Garage review round 1", () => {
     expect(within(row!).getAllByRole("cell")[3].textContent?.trim()).toBe("-");
   });
 
+  test("vehicles_WhenPageChanges_RequestsTheSelectedPage", async () => {
+    api.getVehicles.mockResolvedValue({
+      items: [{ ...vehicle, maintenanceCounts: { overdue: 0, dueSoon: 0, upcoming: 0, notStarted: 0 }, insuranceStatus: null }],
+      totalItemsCount: 30,
+      currentPage: 0,
+      pageSize: 25,
+      totalPagesCount: 2,
+    });
+    renderRoute("/my-garage/vehicles", <VehiclesPage />);
+
+    await waitFor(() => expect(screen.getByText("Daily")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: /next page/i }));
+    await waitFor(() => expect(api.getVehicles).toHaveBeenCalledWith(false, 1, 25, null, expect.anything()));
+  });
+
   test("vehicles_WhenCreateEditArchiveActionsRun_UsesVehicleMutationEndpointsAndConfirmation", async () => {
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(true);
     api.createVehicle.mockResolvedValue(vehicle);
     api.updateVehicle.mockResolvedValue(vehicle);
     api.archiveVehicle.mockResolvedValue({ ...vehicle, archived: true });
@@ -276,9 +299,11 @@ describe("My Garage review round 1", () => {
     await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
 
     fireEvent.click(screen.getByRole("button", { name: "Archive vehicle: Daily" }));
+    const dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText("Daily")).toBeTruthy();
+    fireEvent.click(within(dialog).getByRole("button", { name: "Archive vehicle" }));
     await waitFor(() => expect(api.archiveVehicle).toHaveBeenCalledWith(vehicle.id, null));
-    expect(confirm).toHaveBeenCalledWith("Archive vehicle: Daily?");
-    confirm.mockRestore();
+    await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
   });
 
   test("vehicles_WhenUpdateIsPending_DisablesConflictingControls", async () => {
@@ -499,6 +524,28 @@ describe("My Garage review round 1", () => {
     fireEvent.change(screen.getByRole("textbox", { name: "Provider" }), { target: { value: "Updated Cover" } });
     fireEvent.click(screen.getByRole("button", { name: "Save" }));
     await waitFor(() => expect(api.updateInsurancePolicy).toHaveBeenCalledWith("vehicle-1", "policy-1", expect.objectContaining({ provider: "Updated Cover" }), null));
+  });
+
+  test("insurance_WhenDeleteIsConfirmed_DeletesThroughBff", async () => {
+    const policy = {
+      id: "policy-1",
+      vehicleId: "vehicle-1",
+      provider: "Safe Cover",
+      policyNumber: "P-1",
+      coverageType: "OC",
+      startDate: "2026-01-01",
+      endDate: "2026-12-31",
+      notes: null,
+      status: InsuranceStatus.Active,
+    };
+    api.getInsurancePolicies.mockResolvedValue([policy]);
+    api.deleteInsurancePolicy.mockResolvedValue(undefined);
+    renderRoute("/my-garage/vehicles/:vehicleId/insurance", <InsurancePage />);
+
+    await waitFor(() => expect(screen.getByText("Safe Cover")).toBeTruthy());
+    fireEvent.click(screen.getByRole("button", { name: "Delete insurance policy: Safe Cover" }));
+    fireEvent.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Delete insurance policy" }));
+    await waitFor(() => expect(api.deleteInsurancePolicy).toHaveBeenCalledWith("vehicle-1", "policy-1", null));
   });
 
   test("insurance_WhenUpdateConflicts_ShowsLocalizedConflict", async () => {
