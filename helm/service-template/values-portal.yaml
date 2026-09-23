@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.portal
-  tag: sha-1d37718
+  tag: sha-7889eb4
   pullPolicy: Always
 deploymentStrategy:
   type: RollingUpdate
