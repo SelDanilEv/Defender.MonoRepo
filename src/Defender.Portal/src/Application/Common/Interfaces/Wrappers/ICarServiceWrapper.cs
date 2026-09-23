@@ -5,7 +5,7 @@ namespace Defender.Portal.Application.Common.Interfaces.Wrappers;
 
 public interface ICarServiceWrapper
 {
-    Task<IReadOnlyList<VehicleSummaryDto>> GetVehiclesAsync(bool includeArchived = false, CancellationToken cancellationToken = default);
+    Task<VehiclePageDto> GetVehiclesAsync(bool includeArchived = false, int page = 0, int pageSize = 25, CancellationToken cancellationToken = default);
 
     Task<VehicleDto> CreateVehicleAsync(CreateVehicleRequest request, CancellationToken cancellationToken = default);
 
@@ -38,4 +38,6 @@ public interface ICarServiceWrapper
     Task<InsurancePolicyDto> CreateInsurancePolicyAsync(Guid vehicleId, CreateInsurancePolicyRequest request, CancellationToken cancellationToken = default);
 
     Task<InsurancePolicyDto> UpdateInsurancePolicyAsync(Guid vehicleId, Guid insuranceId, UpdateInsurancePolicyRequest request, CancellationToken cancellationToken = default);
+
+    Task DeleteInsurancePolicyAsync(Guid vehicleId, Guid insuranceId, CancellationToken cancellationToken = default);
 }

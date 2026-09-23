@@ -6,6 +6,8 @@ import {
   type MaintenanceItem,
   type ServiceHistoryRecord,
   type Vehicle,
+  type VehiclePage,
+  type VehicleSummary,
 } from "src/models/myGarage/CarModels";
 
 describe("My Garage model contracts", () => {
@@ -66,5 +68,34 @@ describe("My Garage model contracts", () => {
     expect(maintenance.lastOdometerKm).toBeUndefined();
     expect(maintenance.manualBaselineOdometerKm).toBeUndefined();
     expect(maintenance.nextOdometerKm).toBeUndefined();
+  });
+
+  test("vehiclePage_WhenParsed_PreservesItemsAndPageMetadata", () => {
+    const summary: VehicleSummary = {
+      id: "vehicle-1",
+      displayName: "Daily",
+      make: "Ford",
+      model: "Focus",
+      year: 2020,
+      plate: "ABC",
+      vin: null,
+      archived: false,
+      maintenanceCounts: { overdue: 0, dueSoon: 0, upcoming: 0, notStarted: 0 },
+      insuranceStatus: null,
+    };
+    const page: VehiclePage = {
+      items: [summary],
+      totalItemsCount: 1,
+      currentPage: 0,
+      pageSize: 25,
+      totalPagesCount: 1,
+    };
+
+    expect(page.items).toHaveLength(1);
+    expect(page.items[0].displayName).toBe("Daily");
+    expect(page.totalItemsCount).toBe(1);
+    expect(page.currentPage).toBe(0);
+    expect(page.pageSize).toBe(25);
+    expect(page.totalPagesCount).toBe(1);
   });
 });

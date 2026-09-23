@@ -23,12 +23,13 @@ describe("myGarageApi", () => {
   });
 
   test("getVehicles_WhenArchivedRequested_UsesTheExplicitBffRouteAndQuery", async () => {
-    respondWith([]);
+    const page = { items: [], totalItemsCount: 0, currentPage: 2, pageSize: 10, totalPagesCount: 0 };
+    respondWith(page);
 
-    await expect(myGarageApi.getVehicles(true)).resolves.toEqual([]);
+    await expect(myGarageApi.getVehicles(true, 2, 10)).resolves.toEqual(page);
 
     expect(wrapper).toHaveBeenCalledWith(expect.objectContaining({
-      url: "/api/my-garage/vehicles?includeArchived=true",
+      url: "/api/my-garage/vehicles?includeArchived=true&page=2&pageSize=10",
       options: expect.objectContaining({ method: "GET" }),
     }));
   });
@@ -99,7 +100,7 @@ describe("myGarageApi", () => {
   test("allOperations_WhenCalled_StayOnThePortalBffAndUseExactSuffixes", async () => {
     const bffPaths = Object.values(apiUrls.myGarage).filter((value) => typeof value === "string") as string[];
 
-    expect(bffPaths.length).toBe(17);
+    expect(bffPaths.length).toBe(18);
     expect(bffPaths.every((value) => value.startsWith("/api/my-garage"))).toBe(true);
     expect(bffPaths.some((value) => value.includes("Defender.CarService"))).toBe(false);
     expect(bffPaths).toEqual(expect.arrayContaining([
@@ -165,7 +166,7 @@ describe("myGarageApi", () => {
       notes: null,
     };
 
-    await myGarageApi.getVehicles(true, null, controller.signal);
+    await myGarageApi.getVehicles(true, 0, 25, null, controller.signal);
     await myGarageApi.createVehicle(vehicleRequest, null, controller.signal);
     await myGarageApi.getVehicle(vehicleId, null, controller.signal);
     await myGarageApi.updateVehicle(vehicleId, vehicleRequest, null, controller.signal);
@@ -182,14 +183,15 @@ describe("myGarageApi", () => {
     await myGarageApi.getInsurancePolicies(vehicleId, null, controller.signal);
     await myGarageApi.createInsurancePolicy(vehicleId, insuranceRequest, null, controller.signal);
     await myGarageApi.updateInsurancePolicy(vehicleId, insuranceId, insuranceRequest, null, controller.signal);
+    await myGarageApi.deleteInsurancePolicy(vehicleId, insuranceId, null, controller.signal);
 
-    expect(calls).toHaveLength(17);
+    expect(calls).toHaveLength(18);
     expect(calls.map(({ options }) => options.method)).toEqual([
       "GET", "POST", "GET", "PUT", "POST", "POST", "GET", "POST", "PUT", "DELETE",
-      "GET", "POST", "PUT", "DELETE", "GET", "POST", "PUT",
+      "GET", "POST", "PUT", "DELETE", "GET", "POST", "PUT", "DELETE",
     ]);
     expect(calls.map(({ url }) => url)).toEqual([
-      "/api/my-garage/vehicles?includeArchived=true",
+      "/api/my-garage/vehicles?includeArchived=true&page=0&pageSize=25",
       "/api/my-garage/vehicles",
       "/api/my-garage/vehicles/vehicle%2Fone",
       "/api/my-garage/vehicles/vehicle%2Fone",
@@ -206,6 +208,7 @@ describe("myGarageApi", () => {
       "/api/my-garage/vehicles/vehicle%2Fone/insurance",
       "/api/my-garage/vehicles/vehicle%2Fone/insurance",
       "/api/my-garage/vehicles/vehicle%2Fone/insurance/insurance%20one",
+      "/api/my-garage/vehicles/vehicle%2Fone/insurance/insurance%20one",
     ]);
     expect(calls.every(({ options }) => options.signal === controller.signal)).toBe(true);
     expect(JSON.parse(String(calls[1].options.body))).toEqual(vehicleRequest);
@@ -214,5 +217,6 @@ describe("myGarageApi", () => {
     expect(JSON.parse(String(calls[15].options.body))).toEqual(insuranceRequest);
     expect(calls[9].options.body).toBeUndefined();
     expect(calls[13].options.body).toBeUndefined();
+    expect(calls[17].options.body).toBeUndefined();
   });
 });

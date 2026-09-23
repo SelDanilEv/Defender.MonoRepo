@@ -16,14 +16,42 @@ public sealed class MyGarageControllerTests
     public async Task GetVehiclesAsync_WhenCalled_DelegatesIncludeArchivedAndReturnsOk()
     {
         var wrapper = new Mock<ICarServiceWrapper>();
-        var expected = new List<VehicleSummaryDto>();
-        wrapper.Setup(item => item.GetVehiclesAsync(true, It.IsAny<CancellationToken>())).ReturnsAsync(expected);
+        var expected = new VehiclePageDto();
+        wrapper.Setup(item => item.GetVehiclesAsync(true, It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>())).ReturnsAsync(expected);
         var sut = CreateController(wrapper.Object);
 
-        var result = await sut.GetVehiclesAsync(true, CancellationToken.None);
+        var result = await sut.GetVehiclesAsync(true, cancellationToken: CancellationToken.None);
 
         var response = Assert.IsType<OkObjectResult>(result);
         Assert.Same(expected, response.Value);
+    }
+
+    [Fact]
+    public async Task GetVehiclesAsync_WhenCalled_DelegatesPageAndPageSize()
+    {
+        var wrapper = new Mock<ICarServiceWrapper>();
+        var expected = new VehiclePageDto();
+        wrapper.Setup(item => item.GetVehiclesAsync(false, 3, 15, It.IsAny<CancellationToken>())).ReturnsAsync(expected);
+        var sut = CreateController(wrapper.Object);
+
+        var result = await sut.GetVehiclesAsync(page: 3, pageSize: 15, cancellationToken: CancellationToken.None);
+
+        var response = Assert.IsType<OkObjectResult>(result);
+        Assert.Same(expected, response.Value);
+    }
+
+    [Fact]
+    public async Task DeleteInsurancePolicyAsync_WhenCalled_ReturnsNoContent()
+    {
+        var wrapper = new Mock<ICarServiceWrapper>();
+        var vehicleId = Guid.NewGuid();
+        var insuranceId = Guid.NewGuid();
+        wrapper.Setup(item => item.DeleteInsurancePolicyAsync(vehicleId, insuranceId, It.IsAny<CancellationToken>())).Returns(Task.CompletedTask);
+        var sut = CreateController(wrapper.Object);
+
+        var result = await sut.DeleteInsurancePolicyAsync(vehicleId, insuranceId, CancellationToken.None);
+
+        Assert.IsType<NoContentResult>(result);
     }
 
     [Fact]
@@ -96,6 +124,7 @@ public sealed class MyGarageControllerTests
             "GET vehicles/{vehicleId:guid}/insurance",
             "POST vehicles/{vehicleId:guid}/insurance",
             "PUT vehicles/{vehicleId:guid}/insurance/{insuranceId:guid}",
+            "DELETE vehicles/{vehicleId:guid}/insurance/{insuranceId:guid}",
         };
 
         Assert.Equal(expected, routes);
@@ -119,7 +148,7 @@ public sealed class MyGarageControllerTests
         var insuranceRequest = new CreateInsurancePolicyRequest();
         var updateInsuranceRequest = new UpdateInsurancePolicyRequest();
 
-        wrapper.Setup(item => item.GetVehiclesAsync(true, token)).ReturnsAsync([]);
+        wrapper.Setup(item => item.GetVehiclesAsync(true, 2, 10, token)).ReturnsAsync(new VehiclePageDto());
         wrapper.Setup(item => item.CreateVehicleAsync(vehicleRequest, token)).ReturnsAsync(new VehicleDto());
         wrapper.Setup(item => item.GetVehicleAsync(vehicleId, token)).ReturnsAsync(new VehicleDetailDto());
         wrapper.Setup(item => item.UpdateVehicleAsync(vehicleId, updateVehicleRequest, token)).ReturnsAsync(new VehicleDto());
@@ -136,10 +165,11 @@ public sealed class MyGarageControllerTests
         wrapper.Setup(item => item.GetInsurancePoliciesAsync(vehicleId, token)).ReturnsAsync([]);
         wrapper.Setup(item => item.CreateInsurancePolicyAsync(vehicleId, insuranceRequest, token)).ReturnsAsync(new InsurancePolicyDto());
         wrapper.Setup(item => item.UpdateInsurancePolicyAsync(vehicleId, insuranceId, updateInsuranceRequest, token)).ReturnsAsync(new InsurancePolicyDto());
+        wrapper.Setup(item => item.DeleteInsurancePolicyAsync(vehicleId, insuranceId, token)).Returns(Task.CompletedTask);
 
         var sut = CreateController(wrapper.Object);
 
-        Assert.IsType<OkObjectResult>(await sut.GetVehiclesAsync(true, token));
+        Assert.IsType<OkObjectResult>(await sut.GetVehiclesAsync(true, 2, 10, token));
         Assert.Equal(StatusCodes.Status201Created, Assert.IsType<ObjectResult>(await sut.CreateVehicleAsync(vehicleRequest, token)).StatusCode);
         Assert.IsType<OkObjectResult>(await sut.GetVehicleAsync(vehicleId, token));
         Assert.IsType<OkObjectResult>(await sut.UpdateVehicleAsync(vehicleId, updateVehicleRequest, token));
@@ -156,6 +186,7 @@ public sealed class MyGarageControllerTests
         Assert.IsType<OkObjectResult>(await sut.GetInsurancePoliciesAsync(vehicleId, token));
         Assert.Equal(StatusCodes.Status201Created, Assert.IsType<ObjectResult>(await sut.CreateInsurancePolicyAsync(vehicleId, insuranceRequest, token)).StatusCode);
         Assert.IsType<OkObjectResult>(await sut.UpdateInsurancePolicyAsync(vehicleId, insuranceId, updateInsuranceRequest, token));
+        Assert.IsType<NoContentResult>(await sut.DeleteInsurancePolicyAsync(vehicleId, insuranceId, token));
 
         wrapper.VerifyAll();
     }

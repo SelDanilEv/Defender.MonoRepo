@@ -20,7 +20,7 @@ import type {
   ServiceHistoryRecord,
   Vehicle,
   VehicleDetail,
-  VehicleSummary,
+  VehiclePage,
 } from "src/models/myGarage/CarModels";
 
 const replacePath = (template: string, values: Record<string, string>): string =>
@@ -71,9 +71,15 @@ const requestVoid = (
 const garageUrls = apiUrls.myGarage;
 
 export const myGarageApi = {
-  getVehicles: (includeArchived = false, utils?: IUtils | null, signal?: AbortSignal): Promise<VehicleSummary[]> =>
-    requestJson<VehicleSummary[]>(
-      `${garageUrls.getVehicles}${RequestParamsBuilder.BuildQuery({ includeArchived })}`,
+  getVehicles: (
+    includeArchived = false,
+    page = 0,
+    pageSize = 25,
+    utils?: IUtils | null,
+    signal?: AbortSignal,
+  ): Promise<VehiclePage> =>
+    requestJson<VehiclePage>(
+      `${garageUrls.getVehicles}${RequestParamsBuilder.BuildQuery({ includeArchived, page, pageSize })}`,
       "GET",
       undefined,
       utils,
@@ -133,6 +139,9 @@ export const myGarageApi = {
 
   updateInsurancePolicy: (vehicleId: string, insuranceId: string, request: UpdateInsurancePolicyRequest, utils?: IUtils | null, signal?: AbortSignal): Promise<InsurancePolicy> =>
     requestJson<InsurancePolicy>(replacePath(garageUrls.updateInsurancePolicy, { vehicleId, insuranceId }), "PUT", request, utils, signal),
+
+  deleteInsurancePolicy: (vehicleId: string, insuranceId: string, utils?: IUtils | null, signal?: AbortSignal): Promise<void> =>
+    requestVoid(replacePath(garageUrls.deleteInsurancePolicy, { vehicleId, insuranceId }), "DELETE", utils, signal),
 };
 
 export const {
@@ -153,4 +162,5 @@ export const {
   getInsurancePolicies,
   createInsurancePolicy,
   updateInsurancePolicy,
+  deleteInsurancePolicy,
 } = myGarageApi;

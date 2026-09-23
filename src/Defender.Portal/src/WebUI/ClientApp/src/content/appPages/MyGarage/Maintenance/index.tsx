@@ -7,10 +7,6 @@ import {
   Button,
   Card,
   CardContent,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Grid,
   LinearProgress,
   Stack,
@@ -29,6 +25,7 @@ import type { CreateMaintenanceItemRequest } from "src/models/myGarage/CarReques
 import type { MaintenanceItem, VehicleDetail } from "src/models/myGarage/CarModels";
 import SuccessToast from "src/components/Toast/DefaultSuccessToast";
 
+import ConfirmDialog from "../components/ConfirmDialog";
 import GarageTable from "../components/GarageTable";
 import MaintenanceDialog from "../components/MaintenanceDialog";
 import StatusBadge from "../components/StatusBadge";
@@ -155,11 +152,15 @@ export default function MaintenancePage() {
       </CardContent></Card>
 
       <MaintenanceDialog open={dialogOpen} item={selectedItem} baselineLocked={Boolean(selectedItem?.hasLinkedHistory)} busy={mutating} submitError={submitError} onClose={() => setDialogOpen(false)} onSubmit={submit} />
-      <Dialog open={Boolean(deleteTarget)} onClose={mutating ? undefined : () => setDeleteTarget(null)}>
-        <DialogTitle>{t("actions.deleteMaintenance")}</DialogTitle>
-        <DialogContent><Typography>{deleteTarget?.name}</Typography></DialogContent>
-        <DialogActions><Button onClick={() => setDeleteTarget(null)} disabled={mutating}>{t("actions.cancel")}</Button><Button color="error" variant="contained" onClick={() => void remove()} disabled={mutating}>{t("actions.deleteMaintenance")}</Button></DialogActions>
-      </Dialog>
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title={t("actions.deleteMaintenance")}
+        message={deleteTarget?.name ?? ""}
+        confirmLabel={t("actions.deleteMaintenance")}
+        busy={mutating}
+        onCancel={() => setDeleteTarget(null)}
+        onConfirm={() => void remove()}
+      />
     </Box>
   );
 }

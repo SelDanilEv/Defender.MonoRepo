@@ -56,6 +56,7 @@
     "deleteHistory": "Delete history record",
     "addInsurance": "Add insurance policy",
     "editInsurance": "Edit insurance policy",
+    "deleteInsurance": "Delete insurance policy",
     "save": "Save",
     "cancel": "Cancel",
     "close": "Close",
@@ -100,7 +101,8 @@
     "historyUpdated": "Service record updated.",
     "historyDeleted": "Service record deleted.",
     "insuranceCreated": "Insurance policy added.",
-    "insuranceUpdated": "Insurance policy updated."
+    "insuranceUpdated": "Insurance policy updated.",
+    "insuranceDeleted": "Insurance policy deleted."
   },
   "validation": {
     "required": "This field is required.",
@@ -122,6 +124,7 @@
   },
   "errors": {
     "CAR_HISTORY_PAGINATION_INVALID": "Choose a valid history page and page size.",
+    "CAR_VEHICLES_PAGINATION_INVALID": "Choose a valid vehicles page and page size.",
     "CAR_VEHICLE_NOT_FOUND": "Vehicle was not found.",
     "CAR_MAINTENANCE_NOT_FOUND": "Maintenance item was not found.",
     "CAR_HISTORY_NOT_FOUND": "Service record was not found.",

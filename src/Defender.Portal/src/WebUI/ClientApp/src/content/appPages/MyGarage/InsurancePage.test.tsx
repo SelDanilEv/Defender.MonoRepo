@@ -13,6 +13,7 @@ const api = vi.hoisted(() => ({
   getInsurancePolicies: vi.fn(),
   createInsurancePolicy: vi.fn(),
   updateInsurancePolicy: vi.fn(),
+  deleteInsurancePolicy: vi.fn(),
 }));
 
 vi.mock("src/api/myGarage", () => api);
@@ -30,7 +31,7 @@ describe("My Garage insurance page", () => {
     ]);
   });
 
-  test("insurance_WhenLoaded_ShowsStatusAndNoDeleteControl", async () => {
+  test("insurance_WhenLoaded_ShowsStatusAndDeleteControl", async () => {
     render(
       <ThemeProvider>
         <MemoryRouter initialEntries={["/my-garage/vehicles/vehicle-1/insurance"]}>
@@ -43,6 +44,6 @@ describe("My Garage insurance page", () => {
 
     await waitFor(() => expect(screen.getByText("Safe Cover")).toBeTruthy());
     expect(screen.getAllByText(/Active/i).length).toBeGreaterThan(0);
-    expect(screen.queryByRole("button", { name: /delete/i })).toBeNull();
+    expect(screen.getByRole("button", { name: /delete/i })).toBeTruthy();
   });
 });

@@ -113,6 +113,7 @@ const myGarageApiUrls = {
   getInsurancePolicies: "/api/my-garage/vehicles/:vehicleId/insurance",
   createInsurancePolicy: "/api/my-garage/vehicles/:vehicleId/insurance",
   updateInsurancePolicy: "/api/my-garage/vehicles/:vehicleId/insurance/:insuranceId",
+  deleteInsurancePolicy: "/api/my-garage/vehicles/:vehicleId/insurance/:insuranceId",
 };
 
 const APIUrls = () => {
