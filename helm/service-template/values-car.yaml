@@ -1,6 +1,6 @@
 image:
   repository: defendersd/defender.car
-  tag: sha-1d37718
+  tag: sha-7889eb4
   pullPolicy: Always
 deploymentStrategy:
   rollingUpdate:
